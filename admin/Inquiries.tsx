@@ -91,8 +91,12 @@ const Inquiries = () => {
         return '未読';
       case 'read':
         return '既読';
+      case 'in_progress':
+        return '対応中';
       case 'replied':
         return '返信済み';
+      case 'resolved':
+        return '対応済み';
       default:
         return s || '未読';
     }
@@ -105,8 +109,12 @@ const Inquiries = () => {
         return 'bg-amber-100 text-amber-800 border-amber-200';
       case 'read':
         return 'bg-gray-100 text-gray-700 border-gray-200';
+      case 'in_progress':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
       case 'replied':
         return 'bg-green-100 text-green-800 border-green-200';
+      case 'resolved':
+        return 'bg-gray-100 text-gray-700 border-gray-200';
       default:
         return 'bg-gray-100 text-gray-600 border-gray-200';
     }
@@ -150,7 +158,9 @@ const Inquiries = () => {
             <option value="unread">未読</option>
             <option value="new">新規</option>
             <option value="read">既読</option>
+            <option value="in_progress">対応中</option>
             <option value="replied">返信済み</option>
+            <option value="resolved">対応済み</option>
           </select>
         </div>
 
@@ -218,7 +228,9 @@ const Inquiries = () => {
                       <option value="unread">未読</option>
                       <option value="new">新規</option>
                       <option value="read">既読</option>
+                      <option value="in_progress">対応中</option>
                       <option value="replied">返信済み</option>
+                      <option value="resolved">対応済み</option>
                     </select>
                   </div>
                   <dl className="space-y-3 text-sm">

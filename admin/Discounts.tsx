@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import {
   IconPlus,
+  IconSearch,
   IconPercent,
   IconFilter,
   IconEdit,
@@ -28,7 +29,7 @@ type Coupon = {
   created_at: string;
 };
 
-type Status = 'active' | 'scheduled' | 'expired' | 'inactive';
+type Status = 'active' | 'inactive' | 'expired';
 
 const Discounts = () => {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
@@ -50,8 +51,8 @@ const Discounts = () => {
         .order('created_at', { ascending: false });
       if (e) throw e;
       setCoupons((data || []) as Coupon[]);
-    } catch (err: any) {
-      setError(err?.message || 'クーポンの取得に失敗しました');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'クーポンの取得に失敗しました');
     } finally {
       setLoading(false);
     }
@@ -61,56 +62,42 @@ const Discounts = () => {
     fetchCoupons();
   }, []);
 
+  const filteredCoupons = useMemo(() => {
+    const q = searchQuery.toLowerCase();
+    return coupons.filter(
+      (c) =>
+        c.code?.toLowerCase().includes(q) ||
+        c.name?.toLowerCase().includes(q)
+    );
+  }, [coupons, searchQuery]);
+
   const getStatus = (c: Coupon): Status => {
     if (!c.is_active) return 'inactive';
-    const now = new Date().toISOString();
-    if (c.starts_at && now < c.starts_at) return 'scheduled';
-    if (c.ends_at && now > c.ends_at) return 'expired';
+    const now = Date.now();
+    if (c.starts_at && new Date(c.starts_at).getTime() > now) return 'inactive';
+    if (c.ends_at && new Date(c.ends_at).getTime() < now) return 'expired';
     return 'active';
   };
 
-  const getStatusLabel = (s: Status): string => {
-    switch (s) {
-      case 'active': return '有効';
-      case 'scheduled': return '予約';
-      case 'expired': return '期限切れ';
-      case 'inactive': return '無効';
-      default: return '';
-    }
-  };
+  const getStatusLabel = (s: Status): string =>
+    s === 'active' ? '有効' : s === 'expired' ? '期限切れ' : '無効';
 
-  const getStatusColor = (s: Status): string => {
-    switch (s) {
-      case 'active': return 'bg-green-50 text-green-700 border-green-200';
-      case 'scheduled': return 'bg-blue-50 text-blue-700 border-blue-200';
-      case 'expired': return 'bg-gray-100 text-gray-600 border-gray-200';
-      case 'inactive': return 'bg-red-50 text-red-700 border-red-200';
-      default: return 'bg-gray-50 text-gray-600 border-gray-200';
-    }
-  };
+  const getStatusColor = (s: Status): string =>
+    s === 'active'
+      ? 'bg-green-50 text-green-700 border-green-100'
+      : s === 'expired'
+        ? 'bg-red-50 text-red-700 border-red-100'
+        : 'bg-gray-100 text-gray-600 border-gray-200';
 
   const formatDiscountValue = (c: Coupon): string => {
-    if (c.discount_type === 'percentage') return `${c.discount_value}%OFF`;
-    return `¥${c.discount_value}`;
+    if (c.discount_type === 'percentage') return `${c.discount_value}% OFF`;
+    return `¥${c.discount_value.toLocaleString()} OFF`;
   };
-
-  const filteredCoupons = coupons.filter((c) => {
-    if (!searchQuery.trim()) return true;
-    const q = searchQuery.toLowerCase();
-    return (
-      (c.name?.toLowerCase().includes(q)) ||
-      (c.code?.toLowerCase().includes(q))
-    );
-  });
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">クーポン</h1>
-          <p className="text-sm text-gray-500 mt-1">割引コードの作成・管理</p>
-        </div>
-        <div className="flex items-center gap-3">
+      <div className="flex justify-end mb-6">
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={fetchCoupons}
@@ -121,7 +108,7 @@ const Discounts = () => {
           </button>
           <Link
             href="/admin/discounts/new"
-            className="bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-emerald-800 transition-all shadow-sm flex items-center gap-2"
+            className="flex items-center gap-2 px-4 py-2 bg-emerald-700 text-white text-sm font-medium rounded-md hover:bg-emerald-800 transition-all shadow-sm"
           >
             <IconPlus className="w-4 h-4" />
             クーポンを作成
@@ -175,6 +162,7 @@ const Discounts = () => {
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           <div className="p-4 border-b border-gray-100 flex gap-4">
             <div className="flex-1 relative">
+              <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"
                 value={searchQuery}
@@ -210,12 +198,13 @@ const Discounts = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {filteredCoupons.map((c) => {
+                  {filteredCoupons.map((c, index) => {
                     const status = getStatus(c);
                     return (
                       <tr
                         key={c.id}
-                        className="group hover:bg-gray-50/80 transition-colors"
+                        className="group hover:bg-gray-50/80 transition-colors opacity-0 animate-fade-in-up"
+                        style={{ animationDelay: `${index * 30}ms` }}
                       >
                         <td className="px-6 py-4">
                           <span
@@ -229,26 +218,16 @@ const Discounts = () => {
                             href={`/admin/discounts/${c.id}`}
                             className="font-medium text-gray-900 hover:text-primary transition-colors"
                           >
-                            {c.name || '（未設定）'}
-                            <div className="text-xs text-gray-500 font-mono mt-0.5">
-                              {c.code || '-'}
-                            </div>
+                            {c.name ?? '（未設定）'}
+                            <div className="text-xs text-gray-500 font-mono mt-0.5">{c.code ?? '-'}</div>
                           </Link>
                         </td>
                         <td className="px-6 py-4">
-                          <span className="font-medium text-gray-900">
-                            {formatDiscountValue(c)}
-                          </span>
+                          <span className="font-medium text-gray-900">{formatDiscountValue(c)}</span>
                         </td>
                         <td className="px-6 py-4 text-gray-500 text-xs">
-                          {c.starts_at
-                            ? new Date(c.starts_at).toLocaleDateString('ja-JP')
-                            : '指定なし'}
-                          {c.ends_at
-                            ? ` 〜 ${new Date(c.ends_at).toLocaleDateString('ja-JP')}`
-                            : c.starts_at
-                              ? ''
-                              : ''}
+                          {c.starts_at ? new Date(c.starts_at).toLocaleDateString('ja-JP') : '指定なし'}
+                          {c.ends_at ? ` 〜 ${new Date(c.ends_at).toLocaleDateString('ja-JP')}` : c.starts_at ? '' : ''}
                           {!c.ends_at && !c.starts_at && '（期間なし）'}
                         </td>
                         <td className="px-6 py-4 text-gray-600">
@@ -275,8 +254,29 @@ const Discounts = () => {
                       </tr>
                     );
                   })}
+                  {filteredCoupons.length === 0 && (
+                    <tr>
+                      <td colSpan={6} className="px-6 py-10 text-center text-gray-500">
+                        クーポンがありません
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
+            </div>
+          )}
+
+          {!loading && !error && (
+            <div className="p-4 border-t border-gray-100 flex justify-between items-center text-xs text-gray-500">
+              <span>{filteredCoupons.length} 件中 {filteredCoupons.length === 0 ? '0' : `1-${filteredCoupons.length}`} 件を表示</span>
+              <div className="flex gap-2">
+                <button type="button" className="px-3 py-1 border border-gray-200 rounded hover:bg-gray-50 disabled:opacity-50" disabled>
+                  前へ
+                </button>
+                <button type="button" className="px-3 py-1 border border-gray-200 rounded hover:bg-gray-50" disabled>
+                  次へ
+                </button>
+              </div>
             </div>
           )}
         </div>
