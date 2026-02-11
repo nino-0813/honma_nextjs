@@ -125,21 +125,21 @@ export default function CollectionsPage() {
         <div className="text-center mb-8 md:mb-12 animate-fade-in">
           <h1 className="text-xl md:text-2xl font-serif tracking-[0.15em] font-normal mb-4">{getPageTitle()}</h1>
           <div className="overflow-x-auto pb-4 -mx-6 px-6 scrollbar-hide w-full">
-            {currentCategory === 'お米' && currentSubcategory ? (
+            {currentCategory === 'お米' ? (
               <div className="flex gap-4 min-w-max justify-center md:justify-center">
-                <Link href="/collections" className="px-4 py-2 rounded-full text-xs tracking-widest border transition-colors bg-white text-gray-600 border-gray-200 hover:bg-gray-50">
+                <Link href="/collections/rice" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${!currentSubcategory ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
                   ALL
                 </Link>
-                <Link href="/collections/rice/yearly" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentSubcategory === 'yearly' ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200'}`}>
+                <Link href="/collections/rice/yearly" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentSubcategory === 'yearly' ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
                   年間契約
                 </Link>
-                <Link href="/collections/rice/koshihikari" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentSubcategory === 'koshihikari' ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200'}`}>
+                <Link href="/collections/rice/koshihikari" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentSubcategory === 'koshihikari' ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
                   コシヒカリ
                 </Link>
-                <Link href="/collections/rice/kamenoo" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentSubcategory === 'kamenoo' ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200'}`}>
+                <Link href="/collections/rice/kamenoo" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentSubcategory === 'kamenoo' ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
                   亀の尾
                 </Link>
-                <Link href="/collections/rice/nikomaru" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentSubcategory === 'nikomaru' ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200'}`}>
+                <Link href="/collections/rice/nikomaru" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentSubcategory === 'nikomaru' ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
                   にこまる
                 </Link>
               </div>

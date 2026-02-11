@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { FadeInImage } from '@/components/UI';
@@ -35,6 +35,152 @@ const sanitizeHtml = (rawHtml: string) => {
 };
 
 const looksLikeHtml = (value: string) => /<[^>]+>/.test(value);
+
+type BlockType = 'paragraph' | 'heading1' | 'heading2' | 'image' | 'bulletList' | 'numberedList' | 'quote' | 'code' | 'divider' | 'toc' | 'embed' | 'file';
+interface ContentBlock {
+  id?: string;
+  type: BlockType;
+  content?: string;
+  imageUrl?: string;
+  listItems?: string[];
+  embedUrl?: string;
+  fileUrl?: string;
+  fileName?: string;
+}
+
+function renderBlockContent(content: string): ReactNode {
+  if (!content?.trim()) return null;
+  if (looksLikeHtml(content)) {
+    return <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(content) }} />;
+  }
+  return content;
+}
+
+function renderBlocks(blocks: ContentBlock[]): ReactNode {
+  const baseClass = 'blog-prose text-sm md:text-base text-gray-700 leading-loose md:leading-relaxed';
+  const headings = blocks.filter((b) => b.type === 'heading1' || b.type === 'heading2');
+
+  return (
+    <div className={`${baseClass} space-y-4`}>
+      {blocks.map((block, idx) => {
+        const key = (block as { id?: string }).id ?? idx;
+        switch (block.type) {
+          case 'heading1':
+            return (
+              <h2 key={key} className="text-xl md:text-2xl font-bold text-gray-900 mt-8 mb-4 first:mt-0">
+                {renderBlockContent(block.content || '')}
+              </h2>
+            );
+          case 'heading2':
+            return (
+              <h3 key={key} className="text-lg md:text-xl font-bold text-gray-900 mt-6 mb-3">
+                {renderBlockContent(block.content || '')}
+              </h3>
+            );
+          case 'image':
+            if (block.imageUrl) {
+              return (
+                <figure key={key} className="my-6">
+                  <img
+                    src={block.imageUrl}
+                    alt=""
+                    className="max-w-full h-auto rounded-lg mx-auto w-full"
+                  />
+                  {block.content && (
+                    <figcaption className="text-center text-sm text-gray-500 mt-2">
+                      {renderBlockContent(block.content)}
+                    </figcaption>
+                  )}
+                </figure>
+              );
+            }
+            return null;
+          case 'bulletList':
+          case 'numberedList': {
+            const items = block.listItems?.filter((i) => i?.trim()) ?? [];
+            if (items.length === 0) return null;
+            const List = block.type === 'numberedList' ? 'ol' : 'ul';
+            const listClass = block.type === 'numberedList' ? 'list-decimal list-inside' : 'list-disc list-inside';
+            return (
+              <List key={key} className={`${listClass} my-4 space-y-1 pl-2`}>
+                {items.map((item, i) => (
+                  <li key={i}>{renderBlockContent(item)}</li>
+                ))}
+              </List>
+            );
+          }
+          case 'quote':
+            return (
+              <blockquote key={key} className="border-l-4 border-gray-300 pl-4 italic my-4 text-gray-600">
+                {renderBlockContent(block.content || '')}
+              </blockquote>
+            );
+          case 'code':
+            return (
+              <pre key={key} className="bg-gray-800 text-gray-100 rounded-lg p-4 my-4 overflow-x-auto text-sm">
+                <code>{block.content || ''}</code>
+              </pre>
+            );
+          case 'divider':
+            return <hr key={key} className="border-t border-gray-200 my-6" />;
+          case 'toc':
+            if (headings.length === 0) return null;
+            return (
+              <nav key={key} className="my-6 p-4 rounded-lg border border-gray-200 bg-gray-50">
+                <p className="text-sm font-semibold text-gray-700 mb-2">目次</p>
+                <ul className="space-y-1 text-sm text-gray-700">
+                  {headings.map((h, i) => (
+                    <li key={i} className={h.type === 'heading2' ? 'pl-4 text-gray-600' : ''}>
+                      {h.content || '(無題)'}
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            );
+          case 'embed':
+            if (block.embedUrl) {
+              return (
+                <div key={key} className="my-6">
+                  <a href={block.embedUrl} target="_blank" rel="noopener noreferrer" className="text-primary underline hover:no-underline">
+                    {block.embedUrl}
+                  </a>
+                  {block.content && <p className="text-sm text-gray-500 mt-1">{block.content}</p>}
+                </div>
+              );
+            }
+            return null;
+          case 'file':
+            if (block.fileUrl) {
+              return (
+                <div key={key} className="my-6">
+                  <a href={block.fileUrl} target="_blank" rel="noopener noreferrer" className="text-primary underline hover:no-underline">
+                    {block.fileName || 'ダウンロード'}
+                  </a>
+                  {block.content && <p className="text-sm text-gray-500 mt-1">{block.content}</p>}
+                </div>
+              );
+            }
+            return null;
+          default: {
+            // paragraph
+            const text = block.content?.trim();
+            if (!text) return null;
+            if (looksLikeHtml(text)) {
+              return (
+                <p
+                  key={key}
+                  className="leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(text) }}
+                />
+              );
+            }
+            return <p key={key} className="leading-relaxed">{text}</p>;
+          }
+        }
+      })}
+    </div>
+  );
+}
 
 export default function BlogDetailView({
   articleId,
@@ -146,8 +292,10 @@ export default function BlogDetailView({
     contentBlock = <p className="text-gray-500">コンテンツがありません</p>;
   } else {
     try {
-      const parsed = JSON.parse(article.content);
-      if (Array.isArray(parsed) && parsed.length > 0) {
+      const parsed = JSON.parse(article.content) as unknown;
+      if (Array.isArray(parsed) && parsed.length > 0 && parsed.every((b) => b && typeof b === 'object' && 'type' in b)) {
+        contentBlock = renderBlocks(parsed as ContentBlock[]);
+      } else if (Array.isArray(parsed) && parsed.length > 0) {
         contentBlock = (
           <div
             className="blog-prose prose prose-slate text-sm md:text-base max-w-none text-gray-700 leading-loose md:leading-relaxed"
@@ -192,7 +340,28 @@ export default function BlogDetailView({
       <style>{`
         .blog-prose { font-family: "Helvetica Neue", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Arial, "Noto Sans JP", Meiryo, sans-serif; }
         .blog-prose img { max-width: 100%; height: auto; margin: 1rem 0; border-radius: 0.75rem; }
-        .blog-prose a { color: inherit; text-decoration: underline; }
+        .blog-prose a {
+          display: block;
+          padding: 0.75rem 1rem;
+          margin: 0.75rem 0;
+          border: 1px solid #e5e7eb;
+          border-radius: 0.5rem;
+          background: #f9fafb;
+          color: inherit;
+          text-decoration: underline;
+          font-weight: 600;
+          transition: background 0.15s, border-color 0.15s;
+        }
+        .blog-prose a:hover { background: #f3f4f6; border-color: #d1d5db; }
+        .blog-prose a::after {
+          content: attr(href);
+          display: block;
+          font-size: 0.75rem;
+          font-weight: 400;
+          color: #6b7280;
+          margin-top: 0.25rem;
+          word-break: break-all;
+        }
       `}</style>
       <div className="max-w-4xl mx-auto px-6 md:px-12">
         <Link
