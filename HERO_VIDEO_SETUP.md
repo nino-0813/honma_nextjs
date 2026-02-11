@@ -27,12 +27,18 @@ URL の例:
 https://xxxxx.supabase.co/storage/v1/object/public/site-images/hero/hero-video.mp4
 ```
 
-## 2. 環境変数を設定
+## 2. 動画の指定方法（どちらか）
 
-`.env.local` に以下を追加（または `Vercel` の環境変数に設定）:
+### 方法A: ローカルに置く（簡単）
+
+`public/videos/hero.mp4` に MP4 を置くだけです。環境変数は不要です。
+
+### 方法B: 環境変数でURLを指定（Supabase など）
+
+`.env.local` に以下を追加（または Vercel の環境変数に設定）:
 
 ```env
-VITE_HERO_VIDEO_URL=https://xxxxx.supabase.co/storage/v1/object/public/site-images/hero/hero-video.mp4
+NEXT_PUBLIC_HERO_VIDEO_URL=https://xxxxx.supabase.co/storage/v1/object/public/site-images/hero/hero-video.mp4
 ```
 
 ※ `xxxxx` は Supabase プロジェクトIDに置き換え、ファイル名は実際の名前に合わせてください。
@@ -44,7 +50,7 @@ VITE_HERO_VIDEO_URL=https://xxxxx.supabase.co/storage/v1/object/public/site-imag
 
 ヒーロー部分が MP4 で表示されれば完了です。
 
-**補足**: `VITE_HERO_VIDEO_URL` が未設定の場合、または MP4 の読み込みに失敗した場合は、プレースホルダー画像（田園風景）が表示されます。
+**補足**: 動画URLが未設定・または MP4 の読み込みに失敗した場合は、プレースホルダー画像（田園風景）が表示されます。ローカルでは `public/videos/hero.mp4` を優先して使用します。
 
 ## 動画の最適化のコツ
 

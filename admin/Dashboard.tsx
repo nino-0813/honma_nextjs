@@ -111,7 +111,7 @@ const Dashboard = () => {
         <h1 className="text-xl font-semibold text-gray-900">ホーム</h1>
       </div>
 
-      {/* Top Filter Bar - admin1 に合わせる */}
+      {/* Top Filter Bar */}
       <div className="bg-white border border-gray-200 rounded-lg shadow-sm mb-6 p-4">
         <div className="flex flex-wrap items-center gap-4 text-sm">
           <div className="flex items-center gap-2">
@@ -138,7 +138,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* KPI Cards - admin1 に合わせる */}
+      {/* KPI Cards */}
       <div className="bg-white border border-gray-100 rounded-lg px-6 py-5 mb-6 shadow-sm">
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">

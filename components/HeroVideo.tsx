@@ -6,9 +6,15 @@ const HERO_IMG_400 = '/images/home/parallax/sunset_riceplanting_7_400.webp';
 const HERO_IMG_800 = '/images/home/parallax/sunset_riceplanting_7_800.webp';
 const HERO_IMG_1200 = '/images/home/parallax/sunset_riceplanting_7_1200.webp';
 
+/** 動画URL: 環境変数（Next / Vite 両方） > ローカル public/videos/hero.mp4 */
+const DEFAULT_HERO_VIDEO = '/videos/hero.mp4';
+
 const HeroVideo = () => {
-  const mp4Url = process.env.NEXT_PUBLIC_HERO_VIDEO_URL ?? '';
-  const useMp4 = Boolean(mp4Url);
+  const mp4Url =
+    process.env.NEXT_PUBLIC_HERO_VIDEO_URL ||
+    (process.env as Record<string, string>).VITE_HERO_VIDEO_URL ||
+    DEFAULT_HERO_VIDEO;
+  const useMp4 = true; // 常に動画を試す。失敗時は画像にフォールバック
 
   const [isLoaded, setIsLoaded] = useState(!useMp4);
   const [isLoading, setIsLoading] = useState(useMp4);

@@ -30,6 +30,10 @@ interface Order {
   shipping_address?: string | null;
   shipping_postal_code?: string | null;
   shipping_city?: string | null;
+  shipping_first_name?: string | null;
+  shipping_last_name?: string | null;
+  shipping_phone?: string | null;
+  delivery_time_slot?: string | null;
   subtotal: number;
   shipping_cost: number;
   total: number;
@@ -59,8 +63,9 @@ const toCsv = (rows: Record<string, unknown>[]) => {
   return [headers.join(','), ...rows.map((r) => headers.map((h) => escape(r[h])).join(','))].join('\n');
 };
 
-const downloadText = (filename: string, text: string) => {
-  const blob = new Blob([text], { type: 'text/csv;charset=utf-8;' });
+const downloadText = (filename: string, text: string, utf8Bom = false) => {
+  const content = utf8Bom ? '\uFEFF' + text : text;
+  const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -269,9 +274,31 @@ const Orders = () => {
     合計: o.total,
   });
 
+  /** 発送用CSV 1行（配送希望時間帯・発送先・注文者・購入商品） */
+  const getShippingName = (o: Order) =>
+    `${o.shipping_last_name ?? o.last_name ?? ''} ${o.shipping_first_name ?? o.first_name ?? ''}`.trim();
+  const getShippingAddress = (o: Order) =>
+    [o.shipping_city, o.shipping_address].filter(Boolean).join('') || (o.shipping_address ?? '') || '';
+
+  const orderToShippingRow = (o: Order) => ({
+    注文番号: getOrderNumber(o),
+    配送希望時間帯: o.delivery_time_slot ?? '',
+    発送先氏名: getShippingName(o),
+    発送先電話: (o.shipping_phone ?? o.phone) ?? '',
+    発送先郵便番号: o.shipping_postal_code ?? '',
+    発送先住所: getShippingAddress(o),
+    注文者氏名: getCustomerName(o),
+    注文者電話: o.phone ?? '',
+    注文者郵便番号: o.shipping_postal_code ?? '',
+    注文者住所: getShippingAddress(o),
+    購入商品情報: (o.order_items ?? [])
+      .map((it) => `【${it.product_title}】 ${it.quantity}`)
+      .join(' '),
+  });
+
   const exportOrdersCsv = () => {
     const rows = filteredOrders.map(orderToCsvRow);
-    downloadText(`orders-${new Date().toISOString().slice(0, 10)}.csv`, toCsv(rows));
+    downloadText(`orders-${new Date().toISOString().slice(0, 10)}.csv`, toCsv(rows), true);
     setExportOpen(false);
   };
 
@@ -281,7 +308,21 @@ const Orders = () => {
       alert('出力する注文を選択してください。');
       return;
     }
-    downloadText(`orders-selected-${new Date().toISOString().slice(0, 10)}.csv`, toCsv(toExport.map(orderToCsvRow)));
+    downloadText(`orders-selected-${new Date().toISOString().slice(0, 10)}.csv`, toCsv(toExport.map(orderToCsvRow)), true);
+    setExportOpen(false);
+  };
+
+  const exportShippingCsv = (useSelected: boolean) => {
+    const list = useSelected
+      ? filteredOrders.filter((o) => selectedIds.has(o.id))
+      : filteredOrders;
+    if (useSelected && list.length === 0) {
+      alert('出力する注文を選択してください。');
+      return;
+    }
+    const rows = list.map(orderToShippingRow);
+    const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    downloadText(`shipping-${date}.csv`, toCsv(rows), true);
     setExportOpen(false);
   };
 
@@ -362,20 +403,36 @@ const Orders = () => {
             {exportOpen && (
               <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-20 overflow-hidden">
                 {selectedCount > 0 && (
-                  <button
-                    type="button"
-                    onClick={exportSelectedCsv}
-                    className="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100"
-                  >
-                    選択した注文をCSV（{selectedCount}件）
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      onClick={exportSelectedCsv}
+                      className="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100"
+                    >
+                      選択した注文をCSV（{selectedCount}件）
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => exportShippingCsv(true)}
+                      className="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100"
+                    >
+                      発送用CSV（選択 {selectedCount}件）
+                    </button>
+                  </>
                 )}
                 <button
                   type="button"
                   onClick={exportOrdersCsv}
-                  className="w-full text-left px-4 py-3 text-sm hover:bg-gray-50"
+                  className="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100"
                 >
                   注文一覧CSV（フィルタ適用）
+                </button>
+                <button
+                  type="button"
+                  onClick={() => exportShippingCsv(false)}
+                  className="w-full text-left px-4 py-3 text-sm hover:bg-gray-50"
+                >
+                  発送用CSV（フィルタ適用）
                 </button>
               </div>
             )}
