@@ -70,7 +70,10 @@ const HeroVideo = () => {
             muted
             loop
             playsInline
+<<<<<<< HEAD
             preload="auto"
+=======
+>>>>>>> 81edcee4bf7981c12e7ca3a0dec3a85f894adf52
             onLoadedData={handleMp4Loaded}
             onError={handleMp4Error}
           />
@@ -103,7 +106,10 @@ const HeroVideo = () => {
             muted
             loop
             playsInline
+<<<<<<< HEAD
             preload="auto"
+=======
+>>>>>>> 81edcee4bf7981c12e7ca3a0dec3a85f894adf52
             onLoadedData={handleMp4Loaded}
             onError={handleMp4Error}
           />
