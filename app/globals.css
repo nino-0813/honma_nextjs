@@ -1,0 +1,61 @@
+/* Tailwind v4: 自動検出を無効化し、スキャン対象を明示（リロード時も同じCSSになるように） */
+@import "tailwindcss" source(none);
+
+@source "../components/**/*.{js,ts,jsx,tsx}";
+@source "../providers/**/*.{js,ts,jsx,tsx}";
+@source "../app/**/*.{js,ts,jsx,tsx}";
+@source "../hooks/**/*.{js,ts,jsx,tsx}";
+@source "../admin/**/*.{js,ts,jsx,tsx}";
+
+@theme {
+  --font-serif: "Times New Roman", YuMincho, "Yu Mincho", "Hiragino Mincho ProN", serif;
+  --font-sans: "Helvetica Neue", Helvetica, "Hiragino Sans", "Hiragino Kaku Gothic ProN", Arial, sans-serif;
+  --font-mincho: "Noto Serif JP", YuMincho, "Yu Mincho", "Hiragino Mincho ProN", serif;
+  --color-primary: #1c1d1d;
+  --color-secondary: #e8e8e1;
+  --color-dim: #f2f2f2;
+  --tracking-widest-xl: 0.2em;
+  --animate-fade-in: fadeIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  --animate-slide-up: slideUp 1s ease-out forwards;
+  --animate-slide-up-delayed: slideUp 1s ease-out 0.3s forwards;
+  --animate-fade-in-up: fadeInUp 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  --animate-spin: spin 1s linear infinite;
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+  @keyframes slideUp {
+    0% { opacity: 0; transform: translateY(40px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeInUp {
+    0% { opacity: 0; transform: translateY(40px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+}
+
+/* 縦書きテキスト（ABOUT 等で使用） */
+@layer utilities {
+  .vertical-text {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
+  /* カスタム色の透明度（Tailwind v4 で確実に効くように） */
+  .bg-secondary\/30 {
+    background-color: rgb(232 232 225 / 0.3);
+  }
+}
+
+/* ABOUT 等で使うクラスを確実に生成（リロード時も崩れないように） */
+@source inline("animate-fade-in");
+@source inline("md:w-2/5");
+@source inline("md:w-1/2");
+@source inline("w-2/3");
+@source inline("h-1/2");
+@source inline("bg-secondary/30");
+@source inline("grayscale");
+@source inline("grayscale-0");
