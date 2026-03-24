@@ -18,8 +18,13 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const { cartItems } = useContext(CartContext);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -121,7 +126,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
               isHomePage && !isScrolled ? 'text-white hover:text-white/80' : 'text-primary hover:text-gray-500'
             }`}>
               <IconBag className="w-5 h-5" />
-              {cartItemCount > 0 && (
+              {mounted && cartItemCount > 0 && (
                 <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[9px] font-medium w-4 h-4 flex items-center justify-center rounded-full">
                   {cartItemCount > 99 ? '99+' : cartItemCount}
                 </span>

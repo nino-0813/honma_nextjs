@@ -33,19 +33,29 @@ export function CartProvider({
   onCartOpen: () => void;
   onMenuOpen: () => void;
 }) {
-  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
-    if (typeof window === 'undefined') return [];
-    try {
-      const savedCart = localStorage.getItem('ikevege_cart');
-      return savedCart ? JSON.parse(savedCart) : [];
-    } catch {
-      return [];
-    }
-  });
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [isCartHydrated, setIsCartHydrated] = useState(false);
 
   useEffect(() => {
+    try {
+      const savedCart = localStorage.getItem('ikevege_cart');
+      if (savedCart) {
+        const parsed = JSON.parse(savedCart);
+        if (Array.isArray(parsed)) {
+          setCartItems(parsed);
+        }
+      }
+    } catch {
+      // Ignore invalid localStorage payloads.
+    } finally {
+      setIsCartHydrated(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isCartHydrated) return;
     localStorage.setItem('ikevege_cart', JSON.stringify(cartItems));
-  }, [cartItems]);
+  }, [cartItems, isCartHydrated]);
 
   const addToCart = (
     product: Product,
