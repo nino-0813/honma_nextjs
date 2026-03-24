@@ -230,6 +230,30 @@ export default function CheckoutPage() {
 
   const shipping = shippingResult.cost;
 
+  const getCartItemVariantLabel = (item: (typeof cartItems)[number]): string | undefined => {
+    if (item.variant && String(item.variant).trim()) return String(item.variant).trim();
+    const selected = item.selectedOptions || {};
+
+    if (item.product.variants_config && item.product.variants_config.length > 0) {
+      const parts = item.product.variants_config
+        .map((type) => {
+          const selectedOptionId = selected[type.id];
+          if (!selectedOptionId) return null;
+          const option = type.options.find((o) => o.id === selectedOptionId);
+          return option?.value || null;
+        })
+        .filter((v): v is string => Boolean(v && String(v).trim()));
+      if (parts.length > 0) return parts.join(' / ');
+    }
+
+    if ((selected as any).legacy_migration) {
+      const legacyOption = item.product.variants?.find((v) => String(v) === String((selected as any).legacy_migration));
+      if (legacyOption) return legacyOption;
+    }
+    if ((selected as any).legacy) return String((selected as any).legacy);
+    return undefined;
+  };
+
   useEffect(() => {
     setShippingError(shippingResult.error);
   }, [shippingResult]);
@@ -329,6 +353,9 @@ export default function CheckoutPage() {
                 <div key={`${item.product.id}-${item.variant || ''}`} className="p-4 flex items-center justify-between gap-4">
                   <div>
                     <p className="text-sm font-medium">{item.product.title}</p>
+                    {getCartItemVariantLabel(item) ? (
+                      <p className="text-xs text-gray-500">種類: {getCartItemVariantLabel(item)}</p>
+                    ) : null}
                     <p className="text-xs text-gray-500">数量: {item.quantity}</p>
                   </div>
                   <p className="text-sm">¥{((item.finalPrice ?? item.product.price) * item.quantity).toLocaleString()}</p>

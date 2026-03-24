@@ -75,6 +75,13 @@ type ShippingMethodBreakdown = {
   breakdown?: string | null;
 };
 
+type EstimatedOrderLine = {
+  title: string;
+  variant?: string;
+  qty: number;
+  estimated: boolean;
+};
+
 const formatYen = (n: number | null | undefined) => `¥${Number(n || 0).toLocaleString()}`;
 const formatDateTime = (iso: string) =>
   new Date(iso).toLocaleString('ja-JP', {
@@ -118,6 +125,36 @@ const safeParseShippingMethod = (value: string | null | undefined): ShippingMeth
   } catch {
     return null;
   }
+};
+
+const parseItemsFromShippingText = (text: string): Array<{ title: string; variant?: string; qty: number }> => {
+  const chunks = text
+    .split('/')
+    .map((v) => v.trim())
+    .filter(Boolean);
+  const out: Array<{ title: string; variant?: string; qty: number }> = [];
+
+  for (const chunk of chunks) {
+    const withVariant = chunk.match(/^(.+?)（(.+?)）\s*[×x]\s*(\d+)$/i);
+    if (withVariant) {
+      out.push({
+        title: withVariant[1].trim(),
+        variant: withVariant[2].trim(),
+        qty: Number(withVariant[3]) || 0,
+      });
+      continue;
+    }
+
+    const withoutVariant = chunk.match(/^(.+?)\s*[×x]\s*(\d+)$/i);
+    if (withoutVariant) {
+      out.push({
+        title: withoutVariant[1].trim(),
+        qty: Number(withoutVariant[2]) || 0,
+      });
+    }
+  }
+
+  return out.filter((v) => v.title && v.qty > 0);
 };
 
 const toCsv = (rows: Record<string, any>[]) => {
@@ -397,10 +434,29 @@ const Orders = () => {
     const ids = Array.from(selectedIds);
     if (ids.length === 0) return;
     if (!confirm(`${ids.length}件の注文を削除します。この操作は取り消せません。よろしいですか？`)) return;
+    const verifyText = `DELETE ${ids.length}`;
+    const typed = window.prompt(`実削除確認: 「${verifyText}」と入力してください`);
+    if (typed !== verifyText) {
+      alert('確認テキストが一致しないため削除を中止しました。');
+      return;
+    }
 
     try {
+      const { error: itemDeleteErr } = await client.from('order_items').delete().in('order_id', ids);
+      if (itemDeleteErr) {
+        console.warn('order_items 一括削除はスキップされました:', itemDeleteErr);
+      }
+
       const { error } = await client.from('orders').delete().in('id', ids);
       if (error) throw error;
+
+      const { data: remaining, error: verifyErr } = await client.from('orders').select('id').in('id', ids);
+      if (verifyErr) throw verifyErr;
+      const remainedCount = (remaining || []).length;
+      if (remainedCount > 0) {
+        throw new Error(`${remainedCount}件の注文が削除されずに残りました。権限または制約を確認してください。`);
+      }
+
       setOrders((prev) => prev.filter((o) => !selectedIds.has(o.id)));
       setSelectedIds(new Set());
       alert(`${ids.length}件の注文を削除しました。`);
@@ -462,10 +518,39 @@ const Orders = () => {
 
     const breakdown = safeParseShippingMethod(order.shipping_method);
     if (!breakdown || breakdown.length === 0) return 0;
-    const text = breakdown.map((b) => b.items || '').join(' ');
-    const matches = (text.match(/(?:×|x)\s*(\d+)/gi) || []) as string[];
-    if (matches.length === 0) return 0;
-    return matches.reduce((sum: number, m: string) => sum + (Number(String(m).replace(/[^0-9]/g, '')) || 0), 0);
+    return breakdown.reduce((sum, b) => {
+      if (!b.items) return sum;
+      return sum + parseItemsFromShippingText(b.items).reduce((s, it) => s + it.qty, 0);
+    }, 0);
+  };
+
+  const getDisplayLines = (order: Order): EstimatedOrderLine[] => {
+    if ((order.order_items || []).length > 0) {
+      return (order.order_items || []).map((it) => ({
+        title: it.product_title,
+        variant: it.variant || undefined,
+        qty: it.quantity,
+        estimated: false,
+      }));
+    }
+
+    const breakdown = safeParseShippingMethod(order.shipping_method);
+    if (!breakdown || breakdown.length === 0) return [];
+
+    const merged = new Map<string, EstimatedOrderLine>();
+    for (const b of breakdown) {
+      if (!b.items) continue;
+      for (const parsed of parseItemsFromShippingText(b.items)) {
+        const key = `${parsed.title}::${parsed.variant || ''}`;
+        const current = merged.get(key);
+        if (!current) {
+          merged.set(key, { ...parsed, estimated: true });
+        } else {
+          current.qty += parsed.qty;
+        }
+      }
+    }
+    return Array.from(merged.values());
   };
 
   const filteredOrders = useMemo(() => {
@@ -910,7 +995,21 @@ const Orders = () => {
                             )}
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-gray-600">{getItemCount(order)}点</td>
+                        <td className="px-6 py-4 text-gray-600">
+                          <div className="text-sm">
+                            {getItemCount(order)}点
+                            {(order.order_items || []).length === 0 && getItemCount(order) > 0 ? '（推定）' : ''}
+                          </div>
+                          {getDisplayLines(order).length > 0 ? (
+                            <div className="mt-1 text-xs text-gray-500">
+                              {getDisplayLines(order)
+                                .slice(0, 2)
+                                .map((it) => `${it.title}${it.variant ? `（${it.variant}）` : ''}×${it.qty}`)
+                                .join(' / ')}
+                              {getDisplayLines(order).length > 2 ? ` +${getDisplayLines(order).length - 2}` : ''}
+                            </div>
+                          ) : null}
+                        </td>
                         <td className="px-6 py-4 text-right font-medium">¥{order.total.toLocaleString()}</td>
                         <td className="px-6 py-4">
                           <button
@@ -1169,14 +1268,15 @@ const Orders = () => {
                       <div className="text-gray-500">商品情報がありません（注文明細が未保存の可能性）</div>
                       {safeParseShippingMethod(detailOrder.shipping_method) ? (
                         <div className="text-xs text-gray-700">
-                          {safeParseShippingMethod(detailOrder.shipping_method)!.some((b) => b.items) ? (
+                          {getDisplayLines(detailOrder).length > 0 ? (
                             <div className="space-y-1">
                               <div className="font-medium text-gray-900">保存データから推定:</div>
-                              {safeParseShippingMethod(detailOrder.shipping_method)!
-                                .filter((b) => b.items)
-                                .map((b, idx) => (
-                                  <div key={idx}>- {b.items}</div>
-                                ))}
+                              {getDisplayLines(detailOrder).map((line, idx) => (
+                                <div key={`${line.title}-${line.variant || ''}-${idx}`}>
+                                  - {line.title}
+                                  {line.variant ? `（${line.variant}）` : ''} × {line.qty}
+                                </div>
+                              ))}
                             </div>
                           ) : (
                             <div>（送料データに対象商品が含まれていません）</div>

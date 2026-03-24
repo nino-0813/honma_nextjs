@@ -219,6 +219,7 @@ export interface Order {
   payment_intent_id?: string | null;
   total: number;
   payment_status: string;
+  shipping_method?: string | null;
   created_at: string;
   updated_at: string;
   order_items?: OrderItem[];
@@ -229,6 +230,8 @@ export interface OrderItem {
   product_id: string;
   quantity: number;
   price: number;
+  variant?: string | null;
+  selected_options?: Record<string, any> | null;
   product?: {
     title: string;
     image: string | null;
@@ -236,6 +239,49 @@ export interface OrderItem {
     handle: string | null;
   };
 }
+
+const parseFallbackOrderItems = (shippingMethodRaw: string | null | undefined) => {
+  if (!shippingMethodRaw) return [] as Array<{ title: string; variant?: string; quantity: number }>;
+  const trimmed = String(shippingMethodRaw).trim();
+  if (!(trimmed.startsWith('[') || trimmed.startsWith('{'))) return [];
+
+  let parsed: any;
+  try {
+    parsed = JSON.parse(trimmed);
+  } catch {
+    return [];
+  }
+
+  const list = Array.isArray(parsed) ? parsed : [parsed];
+  const output: Array<{ title: string; variant?: string; quantity: number }> = [];
+  for (const row of list) {
+    const itemsText = String(row?.items || '');
+    if (!itemsText) continue;
+    const chunks = itemsText
+      .split('/')
+      .map((v) => v.trim())
+      .filter(Boolean);
+    for (const chunk of chunks) {
+      const withVariant = chunk.match(/^(.+?)（(.+?)）\s*[×x]\s*(\d+)$/i);
+      if (withVariant) {
+        output.push({
+          title: withVariant[1].trim(),
+          variant: withVariant[2].trim(),
+          quantity: Number(withVariant[3]) || 0,
+        });
+        continue;
+      }
+      const withoutVariant = chunk.match(/^(.+?)\s*[×x]\s*(\d+)$/i);
+      if (withoutVariant) {
+        output.push({
+          title: withoutVariant[1].trim(),
+          quantity: Number(withoutVariant[2]) || 0,
+        });
+      }
+    }
+  }
+  return output.filter((v) => v.title && v.quantity > 0);
+};
 
 export const getOrders = async (userId: string): Promise<Order[]> => {
   if (!supabase) return [];
@@ -291,7 +337,7 @@ export const getOrders = async (userId: string): Promise<Order[]> => {
 
   if (itemsError) {
     console.error('注文履歴取得エラー (order_items):', itemsError);
-    // order_itemsの取得に失敗しても、注文情報は返す
+    // order_itemsの取得に失敗しても、shipping_method から推定表示できるようにフォールバックする
   }
 
   console.log('[getOrders] 取得した注文明細数:', orderItemsData?.length || 0);
@@ -313,28 +359,46 @@ export const getOrders = async (userId: string): Promise<Order[]> => {
     .filter((order: any) => order.payment_status === 'paid')
     .map((order: any) => {
       const orderItems = itemsByOrderId[order.id] || [];
+      const fallbackItems = orderItems.length === 0 ? parseFallbackOrderItems(order.shipping_method) : [];
       return {
         id: order.id,
         order_number: order.order_number,
         payment_intent_id: order.payment_intent_id ?? null,
         total: order.total,
         payment_status: order.payment_status,
+        shipping_method: order.shipping_method ?? null,
         created_at: order.created_at,
         updated_at: order.updated_at,
-        order_items: orderItems.map((item: any) => ({
-        id: item.id,
-        product_id: item.product_id,
-        quantity: item.quantity,
-        price: item.product_price || (item.line_total ? item.line_total / item.quantity : 0) || 0, // product_price または line_totalから計算
-        product: {
-          title: item.product_title || '商品情報なし',
-          image: item.product_image || null,
-          images: item.product_image ? [item.product_image] : null,
-          handle: null, // handleはproduct_idから取得できないためnull
-        },
-        variant: item.variant,
-        selected_options: item.selected_options,
-      })),
+        order_items:
+          orderItems.length > 0
+            ? orderItems.map((item: any) => ({
+                id: item.id,
+                product_id: item.product_id,
+                quantity: item.quantity,
+                price: item.product_price || (item.line_total ? item.line_total / item.quantity : 0) || 0,
+                product: {
+                  title: item.product_title || '商品情報なし',
+                  image: item.product_image || null,
+                  images: item.product_image ? [item.product_image] : null,
+                  handle: null,
+                },
+                variant: item.variant,
+                selected_options: item.selected_options,
+              }))
+            : fallbackItems.map((item, idx) => ({
+                id: `fallback-${order.id}-${idx}`,
+                product_id: `fallback-${idx}`,
+                quantity: item.quantity,
+                price: 0,
+                product: {
+                  title: item.title || '商品情報なし',
+                  image: null,
+                  images: null,
+                  handle: null,
+                },
+                variant: item.variant ?? null,
+                selected_options: { estimated_from_shipping_method: true },
+              })),
     };
   });
 };
