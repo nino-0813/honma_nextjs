@@ -36,6 +36,12 @@ export const useAdmin = () => {
   const mountedRef = useRef(true);
 
   useEffect(() => {
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+    const client = supabase;
+
     mountedRef.current = true;
     
     // 安全装置: 15秒経過してもロードが終わらない場合は強制終了
@@ -47,15 +53,10 @@ export const useAdmin = () => {
     }, 15000);
 
     const checkAdmin = async () => {
-      if (!supabase) {
-        if (mountedRef.current) setLoading(false);
-        return;
-      }
-
       try {
         console.log('管理者権限チェックを開始します...');
         
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        const { data: { session }, error: sessionError } = await client.auth.getSession();
 
         if (sessionError) throw sessionError;
 
@@ -78,7 +79,7 @@ export const useAdmin = () => {
           return;
         }
 
-        const { data: profile, error: profileError } = await supabase
+        const { data: profile, error: profileError } = await client
           .from('profiles')
           .select('id, email, is_admin, first_name, last_name')
           .eq('id', session.user.id)
@@ -130,7 +131,7 @@ export const useAdmin = () => {
 
     checkAdmin();
 
-    const { data: { subscription } } = supabase!.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = client.auth.onAuthStateChange((event, session) => {
       if (!mountedRef.current) return;
 
       if (event === 'SIGNED_OUT' || !session) {

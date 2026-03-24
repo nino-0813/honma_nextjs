@@ -22,6 +22,32 @@ export default function AdminRootLayout({ children }: { children: React.ReactNod
   }, []);
 
   useEffect(() => {
+    if (!mounted || isLoginPage || typeof window === 'undefined') return;
+
+    const hostname = window.location.hostname;
+    const isLocalhost =
+      hostname === 'localhost' ||
+      hostname === '127.0.0.1' ||
+      hostname.includes('localhost');
+
+    if (isLocalhost) return;
+
+    const currentPath = pathname || '/';
+    if (currentPath === '/admin') {
+      sessionStorage.setItem('basic_auth_passed', 'true');
+      return;
+    }
+
+    const basicAuthPassed = sessionStorage.getItem('basic_auth_passed');
+    if (basicAuthPassed === 'true') return;
+
+    if (currentPath.startsWith('/admin')) {
+      sessionStorage.setItem('admin_return_path', currentPath);
+      window.location.href = '/admin';
+    }
+  }, [mounted, pathname, isLoginPage]);
+
+  useEffect(() => {
     if (!mounted || loading || isLoginPage) return;
     if (isAdmin === false) {
       window.location.href = '/admin/login';

@@ -35,6 +35,16 @@ const AdminLogin = () => {
       if (!profile?.is_admin) {
         throw new Error('管理者権限がありません。');
       }
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('basic_auth_passed', 'true');
+      }
+      const returnPath =
+        typeof window !== 'undefined' ? sessionStorage.getItem('admin_return_path') : null;
+      if (returnPath) {
+        sessionStorage.removeItem('admin_return_path');
+        router.push(returnPath);
+        return;
+      }
       router.push('/admin');
     } catch (err: any) {
       setError(err.message || 'ログインに失敗しました');

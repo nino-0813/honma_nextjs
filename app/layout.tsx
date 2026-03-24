@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { SITE_NAME, DEFAULT_DESCRIPTION, getBaseUrl } from '@/lib/site';
 import { jsonLdOrganization, jsonLdWebSite } from '@/lib/jsonld';
+import RootClientEffects from '@/components/RootClientEffects';
 import './globals.css';
 import { Analytics } from '@vercel/analytics/react';
 
@@ -47,6 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="min-h-screen bg-white font-serif font-medium tracking-widest text-primary antialiased">
+        <RootClientEffects />
         {children}
         <Analytics />
       </body>

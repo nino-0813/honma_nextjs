@@ -1,12 +1,16 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import Link from 'next/link';
+import { CartContext } from '@/providers/CartProvider';
 
 export default function CheckoutSuccessPage() {
+  const { clearCart } = useContext(CartContext);
+
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+    clearCart();
+  }, [clearCart]);
 
   return (
     <div className="pt-28 pb-24 min-h-screen bg-white">
