@@ -495,7 +495,7 @@ const ProductEditor = () => {
                     </button>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                       <div>
-                        <label className="block text-xs font-medium text-gray-500 mb-1">バリエーション名</label>
+                        <label className="block text-xs font-medium text-gray-500 mb-1">バリエーション名 (例: 種類, 包装)</label>
                         <input
                           type="text"
                           value={vt.name}
