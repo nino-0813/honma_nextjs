@@ -2622,9 +2622,9 @@ const Checkout = () => {
 
                       {!STRIPE_PUBLISHABLE_KEY ? (
                         <div className="border border-red-200 bg-red-50 text-red-700 px-4 py-3 rounded">
-                          Stripe公開可能キー（<code className="font-mono">VITE_STRIPE_PUBLISHABLE_KEY</code>）が未設定です。<br />
+                          Stripe公開可能キー（<code className="font-mono">NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</code>）が未設定です。<br />
                           <span className="text-xs">
-                            ※ <code className="font-mono">.env.local</code> を設定後、Viteを再起動してください
+                            ※ Vercel の Environment Variables に登録後、再デプロイしてください
                           </span>
                         </div>
                       ) : paymentClientSecret ? (
