@@ -38,6 +38,17 @@ function getProductSubcategories(p: Product): string[] {
   return p.subcategory ? [p.subcategory] : [];
 }
 
+function isProductPreorder(p: Product): boolean {
+  if (!p.scheduledShippingDate) return false;
+  // 日付ベースで比較（YYYY-MM-DD の辞書順で比較できる）
+  // 「発送開始予定日」が到来したらバッジを消す: today >= shipDate のとき false
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  // scheduledShippingDate は "YYYY-MM-DD" 形式
+  const shipStr = String(p.scheduledShippingDate).slice(0, 10);
+  return shipStr > todayStr;
+}
+
 function isProductSoldOut(p: Product): boolean {
   if (p.soldOut) return true;
 
@@ -221,6 +232,7 @@ export default function CollectionsPage() {
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 sm:gap-x-6 gap-y-12 sm:gap-y-16">
             {filteredProducts.map((product, index) => {
               const soldOut = isProductSoldOut(product);
+              const preorder = !soldOut && isProductPreorder(product); // 在庫切れ優先
               return (
               <Link
                 key={product.id}
@@ -230,9 +242,9 @@ export default function CollectionsPage() {
               >
                 <div className="relative aspect-square bg-white border border-gray-100 overflow-hidden mb-5 flex items-center justify-center">
                   <div className="absolute top-2 left-2 z-20 flex flex-col gap-2">
-                    {soldOut && (
-                      <span className="bg-primary text-white px-3 py-1 text-[10px] font-bold tracking-widest uppercase shadow-sm">
-                        Sold Out
+                    {preorder && (
+                      <span className="bg-amber-600 text-white px-3 py-1 text-[10px] font-bold tracking-widest uppercase shadow-sm">
+                        予約商品
                       </span>
                     )}
                   </div>
@@ -266,6 +278,11 @@ export default function CollectionsPage() {
                     {soldOut && (
                       <span className="text-[10px] font-bold tracking-widest uppercase text-red-600 border border-red-600 px-2 py-0.5">
                         Sold Out
+                      </span>
+                    )}
+                    {preorder && (
+                      <span className="text-[10px] font-bold tracking-widest uppercase text-amber-700 border border-amber-600 px-2 py-0.5">
+                        予約商品
                       </span>
                     )}
                   </p>

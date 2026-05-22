@@ -336,12 +336,42 @@ export default function ProductDetailView({ product }: { product: Product }) {
 
               {/* 販売期間の表示 */}
               {(product?.saleStartAt || product?.saleEndAt) && (
-                <div className="mb-8">
+                <div className="mb-4">
                   <p className="text-sm text-gray-600">
                     販売期間: {product.saleStartAt ? formatSaleDateTime(product.saleStartAt) : ''}{product.saleStartAt && product.saleEndAt ? ' ~ ' : ''}{product.saleEndAt ? formatSaleDateTime(product.saleEndAt) : ''}
                   </p>
                 </div>
               )}
+
+              {/* 発送開始予定日の表示（予約販売） — 発送開始予定日が来たら自動で非表示 */}
+              {product?.scheduledShippingDate && (() => {
+                const shipStr = String(product.scheduledShippingDate).slice(0, 10);
+                const now = new Date();
+                const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+                const isPreorder = shipStr > todayStr;
+                if (!isPreorder) return null; // 発送開始日以降は表示しない
+
+                // YYYY-MM-DD → YYYY年M月D日 へフォーマット
+                const [y, m, d] = shipStr.split('-').map((x) => Number(x));
+                if (!y || !m || !d) return null;
+                const formatted = `${y}年${m}月${d}日`;
+
+                return (
+                  <div className="mb-8 p-3 rounded-lg border border-amber-200 bg-amber-50">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="inline-block text-[10px] font-bold tracking-widest uppercase bg-amber-600 text-white px-2 py-0.5 rounded">
+                        予約商品
+                      </span>
+                      <span className="text-sm font-medium text-amber-900">
+                        発送開始予定日: {formatted}
+                      </span>
+                    </div>
+                    <p className="text-xs text-amber-700 mt-1">
+                      ※ ご注文時にお支払いいただきますが、商品の発送は上記の日付以降になります。
+                    </p>
+                  </div>
+                );
+              })()}
 
               {/* 購入タイプ選択（通常 / 定期）— 定期購入が有効な商品のみ表示 */}
               {subscriptionEnabled && subscriptionIntervals.length > 0 && (

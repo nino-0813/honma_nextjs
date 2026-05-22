@@ -32,6 +32,7 @@ export interface Product {
   isFreeShipping?: boolean; // 送料無料フラグ
   saleStartAt?: string | null; // 販売開始日時 (ISO)
   saleEndAt?: string | null; // 販売終了日時 (ISO)
+  scheduledShippingDate?: string | null; // 発送開始予定日 (YYYY-MM-DD)
   // 定期購入設定
   subscriptionEnabled?: boolean;
   subscriptionDiscountPercent?: number; // 0-100

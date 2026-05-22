@@ -74,6 +74,7 @@ const ProductEditor = () => {
   const [isFreeShipping, setIsFreeShipping] = useState(false);
   const [saleStartAt, setSaleStartAt] = useState('');
   const [saleEndAt, setSaleEndAt] = useState('');
+  const [scheduledShippingDate, setScheduledShippingDate] = useState('');
   const [stockValidationError, setStockValidationError] = useState('');
 
   const [hasVariants, setHasVariants] = useState(false);
@@ -171,6 +172,7 @@ const ProductEditor = () => {
       };
       setSaleStartAt(toDatetimeLocal(data.sale_start_at));
       setSaleEndAt(toDatetimeLocal(data.sale_end_at));
+      setScheduledShippingDate(data.scheduled_shipping_date ?? '');
 
       setSubscriptionEnabled(Boolean(data.subscription_enabled));
       setSubscriptionDiscountPercent(String(data.subscription_discount_percent ?? 0));
@@ -402,6 +404,7 @@ const ProductEditor = () => {
         images,
         sale_start_at: saleStartAt ? new Date(saleStartAt).toISOString() : null,
         sale_end_at: saleEndAt ? new Date(saleEndAt).toISOString() : null,
+        scheduled_shipping_date: scheduledShippingDate || null,
         subscription_enabled: subscriptionEnabled,
         subscription_discount_percent: (() => {
           const n = Number(subscriptionDiscountPercent);
@@ -772,6 +775,34 @@ const ProductEditor = () => {
                   className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black text-sm bg-white"
                 />
               </div>
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <h3 className="text-base font-medium text-gray-900 mb-4 flex items-center gap-2">
+              <IconCalendar className="w-5 h-5 text-gray-500" />
+              予約販売
+            </h3>
+            <p className="text-xs text-gray-500 mb-3">
+              発送開始予定日を設定すると、その日までは「予約商品」として購入されます。決済は通常通り即時行われます。空欄なら通常販売。
+            </p>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">発送開始予定日</label>
+              <input
+                type="date"
+                value={scheduledShippingDate}
+                onChange={(e) => setScheduledShippingDate(e.target.value)}
+                className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black text-sm bg-white"
+              />
+              {scheduledShippingDate && (
+                <button
+                  type="button"
+                  onClick={() => setScheduledShippingDate('')}
+                  className="mt-2 text-xs text-gray-500 hover:text-black underline"
+                >
+                  クリアする
+                </button>
+              )}
             </div>
           </div>
 

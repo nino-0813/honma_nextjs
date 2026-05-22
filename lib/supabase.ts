@@ -56,6 +56,7 @@ export interface DatabaseProduct {
   is_free_shipping: boolean | null;
   sale_start_at: string | null;
   sale_end_at: string | null;
+  scheduled_shipping_date?: string | null;
   subscription_enabled?: boolean | null;
   subscription_discount_percent?: number | null;
   subscription_intervals?: unknown; // jsonb 配列
@@ -91,6 +92,7 @@ export const convertDatabaseProductToProduct = (dbProduct: DatabaseProduct): Pro
     isFreeShipping: dbProduct.is_free_shipping ?? false,
     saleStartAt: (dbProduct as any).sale_start_at ?? undefined,
     saleEndAt: (dbProduct as any).sale_end_at ?? undefined,
+    scheduledShippingDate: (dbProduct as any).scheduled_shipping_date ?? undefined,
     subscriptionEnabled: dbProduct.subscription_enabled ?? false,
     subscriptionDiscountPercent: dbProduct.subscription_discount_percent ?? 0,
     subscriptionIntervals: normalizeSubscriptionIntervals(dbProduct.subscription_intervals),
@@ -149,6 +151,7 @@ export const convertProductToDatabaseProduct = (product: Partial<Product> & { st
     is_visible: product.is_visible ?? true,
     sale_start_at: (product as any).saleStartAt ?? null,
     sale_end_at: (product as any).saleEndAt ?? null,
+    scheduled_shipping_date: (product as any).scheduledShippingDate ?? null,
     subscription_enabled: (product as any).subscriptionEnabled ?? false,
     subscription_discount_percent: (product as any).subscriptionDiscountPercent ?? 0,
     subscription_intervals: normalizeSubscriptionIntervals((product as any).subscriptionIntervals),
