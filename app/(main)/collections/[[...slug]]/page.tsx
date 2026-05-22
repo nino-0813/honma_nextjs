@@ -38,6 +38,35 @@ function getProductSubcategories(p: Product): string[] {
   return p.subcategory ? [p.subcategory] : [];
 }
 
+function isProductSoldOut(p: Product): boolean {
+  if (p.soldOut) return true;
+
+  if (p.hasVariants && p.variants_config && p.variants_config.length > 0) {
+    // 在庫管理ありのタイプのみ判定対象
+    const managedTypes = p.variants_config.filter(
+      (t) => t.stockManagement === 'individual' || t.stockManagement === 'shared'
+    );
+    if (managedTypes.length === 0) return false;
+    // 全タイプで在庫切れなら売り切れ
+    return managedTypes.every((t) => {
+      // sharedStock が設定されていればそれを最優先（実データはほぼこのケース）
+      if (t.sharedStock !== null && t.sharedStock !== undefined) {
+        return Number(t.sharedStock) <= 0;
+      }
+      // sharedStock が無い場合は個別の option.stock を判定
+      const opts = t.options.filter((o) => o.stock !== null && o.stock !== undefined);
+      if (opts.length === 0) return false; // 在庫管理されていない＝売り切れ扱いしない
+      return opts.every((o) => Number(o.stock) <= 0);
+    });
+  }
+
+  // バリエーション無し: 基本在庫が0以下
+  if (p.stock !== undefined && p.stock !== null) {
+    return Number(p.stock) <= 0;
+  }
+  return false;
+}
+
 export default function CollectionsPage() {
   const params = useParams();
   const slug = (params?.slug as string[] | undefined) ?? [];
@@ -190,7 +219,9 @@ export default function CollectionsPage() {
 
         {!loading && !error && filteredProducts.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 sm:gap-x-6 gap-y-12 sm:gap-y-16">
-            {filteredProducts.map((product, index) => (
+            {filteredProducts.map((product, index) => {
+              const soldOut = isProductSoldOut(product);
+              return (
               <Link
                 key={product.id}
                 href={`/products/${product.handle || product.id}`}
@@ -199,7 +230,7 @@ export default function CollectionsPage() {
               >
                 <div className="relative aspect-square bg-white border border-gray-100 overflow-hidden mb-5 flex items-center justify-center">
                   <div className="absolute top-2 left-2 z-20 flex flex-col gap-2">
-                    {product.soldOut && (
+                    {soldOut && (
                       <span className="bg-primary text-white px-3 py-1 text-[10px] font-bold tracking-widest uppercase shadow-sm">
                         Sold Out
                       </span>
@@ -228,12 +259,20 @@ export default function CollectionsPage() {
                   <h2 className="text-sm font-medium text-primary leading-relaxed group-hover:text-gray-600 transition-colors line-clamp-2 min-h-[2.8em]">
                     {product.title}
                   </h2>
-                  <p className="text-sm text-gray-900 font-serif tracking-wide">
-                    ¥{product.price.toLocaleString()} {product.title.includes('〜') ? '〜' : ''}
+                  <p className="text-sm text-gray-900 font-serif tracking-wide flex items-center justify-center gap-2">
+                    <span>
+                      ¥{product.price.toLocaleString()} {product.title.includes('〜') ? '〜' : ''}
+                    </span>
+                    {soldOut && (
+                      <span className="text-[10px] font-bold tracking-widest uppercase text-red-600 border border-red-600 px-2 py-0.5">
+                        Sold Out
+                      </span>
+                    )}
                   </p>
                 </div>
               </Link>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

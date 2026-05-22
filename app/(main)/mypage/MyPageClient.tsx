@@ -6,6 +6,32 @@ import Link from 'next/link';
 import { supabase, getProfile, updateProfile, getOrders, Order, Profile } from '@/lib/supabase';
 import { FadeInImage, LoadingButton } from '@/components/UI';
 import AuthForm from '@/components/AuthForm';
+import { SUBSCRIPTION_INTERVAL_LABELS, SubscriptionInterval } from '@/types';
+
+interface SubscriptionRow {
+  id: string;
+  stripe_subscription_id: string;
+  stripe_customer_id: string;
+  email: string;
+  status: string;
+  interval: string;
+  next_billing_at: string | null;
+  canceled_at: string | null;
+  metadata: any;
+  created_at: string;
+  updated_at: string;
+}
+
+const SUBSCRIPTION_STATUS_LABELS: Record<string, { label: string; cls: string }> = {
+  active: { label: '有効', cls: 'bg-green-100 text-green-700' },
+  trialing: { label: 'お試し中', cls: 'bg-blue-100 text-blue-700' },
+  past_due: { label: '支払い遅延', cls: 'bg-red-100 text-red-700' },
+  unpaid: { label: '未払い', cls: 'bg-red-100 text-red-700' },
+  canceled: { label: '解約済み', cls: 'bg-gray-100 text-gray-600' },
+  incomplete: { label: '処理中', cls: 'bg-yellow-100 text-yellow-700' },
+  incomplete_expired: { label: '期限切れ', cls: 'bg-gray-100 text-gray-600' },
+  paused: { label: '一時停止', cls: 'bg-yellow-100 text-yellow-700' },
+};
 
 const PREFECTURES = [
   '北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県',
@@ -26,7 +52,10 @@ const MyPage = () => {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
-  const [activeTab, setActiveTab] = useState<'orders' | 'profile'>('orders');
+  const [subscriptions, setSubscriptions] = useState<SubscriptionRow[]>([]);
+  const [cancelingId, setCancelingId] = useState<string | null>(null);
+  const [syncingSubscriptions, setSyncingSubscriptions] = useState(false);
+  const [activeTab, setActiveTab] = useState<'orders' | 'subscriptions' | 'profile'>('orders');
   const [editingProfile, setEditingProfile] = useState(false);
   const [saving, setSaving] = useState(false);
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(false);
@@ -35,6 +64,7 @@ const MyPage = () => {
   useEffect(() => {
     const tab = searchParams?.get('tab');
     if (tab === 'orders') setActiveTab('orders');
+    if (tab === 'subscriptions') setActiveTab('subscriptions');
     if (tab === 'profile') setActiveTab('profile');
   }, [searchParams]);
 
@@ -157,8 +187,81 @@ const MyPage = () => {
       }
 
       setOrders(ordersData);
+
+      // 定期購入を取得
+      if (supabase) {
+        const { data: subs } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('auth_user_id', userId)
+          .order('created_at', { ascending: false });
+        setSubscriptions((subs ?? []) as SubscriptionRow[]);
+      }
     } catch (error) {
       console.error('データ読み込みエラー:', error);
+    }
+  };
+
+  const handleSyncSubscriptions = async () => {
+    if (!supabase || !user?.id) return;
+    try {
+      setSyncingSubscriptions(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      const accessToken = session?.access_token;
+      if (!accessToken) throw new Error('セッションが切れています');
+      const res = await fetch('/api/sync-subscription', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.error || '同期に失敗しました');
+      }
+      await loadUserData(user.id);
+    } catch (e: any) {
+      console.error(e);
+      alert(e?.message || '同期に失敗しました');
+    } finally {
+      setSyncingSubscriptions(false);
+    }
+  };
+
+  const handleCancelSubscription = async (stripeSubscriptionId: string) => {
+    if (!supabase) return;
+    const confirmed = window.confirm(
+      '定期購入をキャンセルしますか？\n現在のサイクルの配送は予定通り行われ、その後の自動更新が停止します。'
+    );
+    if (!confirmed) return;
+
+    try {
+      setCancelingId(stripeSubscriptionId);
+      const { data: { session } } = await supabase.auth.getSession();
+      const accessToken = session?.access_token;
+      if (!accessToken) throw new Error('セッションが切れています。再度ログインしてください。');
+
+      const res = await fetch('/api/cancel-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          subscription_id: stripeSubscriptionId,
+          cancel_at_period_end: true,
+        }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error(data?.error || 'キャンセルに失敗しました');
+      }
+      alert('定期購入のキャンセルを受け付けました。');
+      // 再読込
+      if (user?.id) await loadUserData(user.id);
+    } catch (e: any) {
+      console.error('キャンセルエラー:', e);
+      alert(e?.message || 'キャンセルに失敗しました');
+    } finally {
+      setCancelingId(null);
     }
   };
 
@@ -325,10 +428,10 @@ const MyPage = () => {
           </div>
         )}
 
-        <div className="flex border-b border-gray-200 mb-8">
+        <div className="flex border-b border-gray-200 mb-8 overflow-x-auto">
           <button
             onClick={() => setActiveTab('orders')}
-            className={`px-6 py-3 text-sm font-medium tracking-wider transition-colors ${
+            className={`px-6 py-3 text-sm font-medium tracking-wider transition-colors whitespace-nowrap ${
               activeTab === 'orders'
                 ? 'border-b-2 border-black text-black'
                 : 'text-gray-500 hover:text-black'
@@ -337,8 +440,23 @@ const MyPage = () => {
             購入履歴
           </button>
           <button
+            onClick={() => setActiveTab('subscriptions')}
+            className={`px-6 py-3 text-sm font-medium tracking-wider transition-colors whitespace-nowrap ${
+              activeTab === 'subscriptions'
+                ? 'border-b-2 border-black text-black'
+                : 'text-gray-500 hover:text-black'
+            }`}
+          >
+            定期購入
+            {subscriptions.filter((s) => s.status === 'active' || s.status === 'trialing').length > 0 && (
+              <span className="ml-2 inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs bg-black text-white rounded-full">
+                {subscriptions.filter((s) => s.status === 'active' || s.status === 'trialing').length}
+              </span>
+            )}
+          </button>
+          <button
             onClick={() => setActiveTab('profile')}
-            className={`px-6 py-3 text-sm font-medium tracking-wider transition-colors ${
+            className={`px-6 py-3 text-sm font-medium tracking-wider transition-colors whitespace-nowrap ${
               activeTab === 'profile'
                 ? 'border-b-2 border-black text-black'
                 : 'text-gray-500 hover:text-black'
@@ -450,6 +568,108 @@ const MyPage = () => {
                   </div>
                 </div>
               ))
+            )}
+          </div>
+        )}
+
+        {activeTab === 'subscriptions' && (
+          <div className="space-y-6">
+            {subscriptions.length === 0 ? (
+              <div className="text-center py-16">
+                <p className="text-gray-500 mb-4">定期購入はまだありません</p>
+                <Link href="/collections" className="text-sm text-black underline hover:no-underline">
+                  商品を見る
+                </Link>
+              </div>
+            ) : (
+              <>
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={handleSyncSubscriptions}
+                    disabled={syncingSubscriptions}
+                    className="text-xs text-gray-500 hover:text-black underline underline-offset-2 disabled:opacity-50"
+                  >
+                    {syncingSubscriptions ? '同期中...' : '最新情報を取得'}
+                  </button>
+                </div>
+                {(
+              subscriptions.map((sub) => {
+                const statusInfo = SUBSCRIPTION_STATUS_LABELS[sub.status] || {
+                  label: sub.status,
+                  cls: 'bg-gray-100 text-gray-600',
+                };
+                const intervalLabel =
+                  SUBSCRIPTION_INTERVAL_LABELS[sub.interval as SubscriptionInterval] || sub.interval;
+                const cancelAtPeriodEnd = Boolean((sub.metadata as any)?.cancel_at_period_end);
+                const isActive = sub.status === 'active' || sub.status === 'trialing';
+                const canCancel = isActive && !cancelAtPeriodEnd;
+
+                return (
+                  <div key={sub.id} className="border border-gray-200 rounded-lg overflow-hidden">
+                    <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            定期購入ID: {sub.stripe_subscription_id}
+                          </p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            開始日: {formatDate(sub.created_at)}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className={`px-3 py-1 text-xs font-medium rounded-full ${statusInfo.cls}`}>
+                            {statusInfo.label}
+                          </span>
+                          {cancelAtPeriodEnd && isActive && (
+                            <span className="px-3 py-1 text-xs font-medium rounded-full bg-amber-100 text-amber-700">
+                              次回更新で停止
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-6 space-y-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                        <div>
+                          <p className="text-xs text-gray-500 mb-1">配送頻度</p>
+                          <p className="text-gray-900">{intervalLabel}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500 mb-1">
+                            {cancelAtPeriodEnd ? '停止日' : '次回お届け予定'}
+                          </p>
+                          <p className="text-gray-900">
+                            {sub.next_billing_at ? formatDate(sub.next_billing_at) : '-'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {sub.canceled_at && (
+                        <p className="text-xs text-gray-500">
+                          解約日: {formatDate(sub.canceled_at)}
+                        </p>
+                      )}
+
+                      {canCancel && (
+                        <div className="pt-3 border-t border-gray-100 flex justify-end">
+                          <button
+                            type="button"
+                            onClick={() => handleCancelSubscription(sub.stripe_subscription_id)}
+                            disabled={cancelingId === sub.stripe_subscription_id}
+                            className="text-sm text-red-600 hover:text-red-700 underline underline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {cancelingId === sub.stripe_subscription_id ? '処理中...' : '定期購入をキャンセル'}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })
+              )}
+              </>
             )}
           </div>
         )}

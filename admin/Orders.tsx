@@ -1180,6 +1180,15 @@ const Orders = () => {
                       <div className="text-xs text-gray-900">{detailOrder.delivery_time_slot}</div>
                     </div>
                   ) : null}
+
+                  {detailOrder.notes ? (
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <div className="text-xs font-semibold text-gray-700 mb-2">備考</div>
+                      <div className="text-xs text-gray-900 whitespace-pre-wrap break-words">
+                        {detailOrder.notes}
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
               </div>
 

@@ -22,7 +22,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ onAuthSuccess, initialEmail = '' })
   const [resendError, setResendError] = useState<string | null>(null);
   const [lastResendTime, setLastResendTime] = useState<number | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
-  
+  const [forgotPassword, setForgotPassword] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
+
   // 再送クールタイムの管理（60秒）
   const RESEND_COOLDOWN_SECONDS = 60;
   
@@ -69,8 +71,50 @@ const AuthForm: React.FC<AuthFormProps> = ({ onAuthSuccess, initialEmail = '' })
     return errorMessage;
   };
 
+  const handleResetPasswordEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setMessage(null);
+
+    if (!supabase) {
+      setError('Supabaseが設定されていません。.env.local に NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY を設定してください。');
+      setLoading(false);
+      return;
+    }
+    if (!email.trim()) {
+      setError('メールアドレスを入力してください。');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const redirectTo = `${window.location.origin}/account/reset-password`;
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo,
+      });
+      if (resetError) throw resetError;
+      try {
+        localStorage.setItem('ikevege_pw_reset_expected', String(Date.now()));
+      } catch (_) {}
+      setResetEmailSent(true);
+      setMessage(
+        'ご入力のメールアドレスが登録されている場合、パスワード再設定用のリンクを送信しました。\nメールをご確認のうえ、記載のリンクから新しいパスワードを設定してください。\nメールが届かない場合は、迷惑メールフォルダもご確認ください。'
+      );
+    } catch (err: any) {
+      console.error('パスワード再設定メール:', err);
+      setError(translateError(err?.message || '送信に失敗しました。しばらくしてから再度お試しください。'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (forgotPassword) {
+      await handleResetPasswordEmail(e);
+      return;
+    }
     setLoading(true);
     setError(null);
     setMessage(null);
@@ -206,6 +250,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ onAuthSuccess, initialEmail = '' })
     }
 
     try {
+      try {
+        localStorage.removeItem('ikevege_pw_reset_expected');
+      } catch (_) {}
       // ログイン後のリダイレクト先を保存
       // 現在のパスが /checkout を含む場合、明示的に保存
       if (typeof window !== 'undefined' && (window.location.pathname || '').includes('checkout')) {
@@ -243,6 +290,13 @@ const AuthForm: React.FC<AuthFormProps> = ({ onAuthSuccess, initialEmail = '' })
             </div>
             <p className="text-sm md:text-base text-gray-600">
               新規アカウントを作成して始めましょう
+            </p>
+          </div>
+        ) : forgotPassword ? (
+          <div>
+            <h2 className="text-xl font-medium mb-2">パスワードの再設定</h2>
+            <p className="text-sm text-gray-500">
+              登録のメールアドレスに再設定用のリンクをお送りします
             </p>
           </div>
         ) : (
@@ -283,7 +337,8 @@ const AuthForm: React.FC<AuthFormProps> = ({ onAuthSuccess, initialEmail = '' })
         </div>
       ) : (
         <>
-          {/* Google認証 */}
+          {/* Google認証（パスワード再設定モードでは非表示） */}
+          {!forgotPassword && (
           <button
             type="button"
             onClick={handleGoogleAuth}
@@ -310,7 +365,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ onAuthSuccess, initialEmail = '' })
             </svg>
             <span className="font-medium text-gray-700">Googleで続ける</span>
           </button>
+          )}
 
+          {!forgotPassword && (
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-200"></div>
@@ -319,6 +376,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onAuthSuccess, initialEmail = '' })
               <span className="px-2 bg-white text-gray-500">または</span>
             </div>
           </div>
+          )}
 
           {/* メール/パスワード認証 */}
           <form onSubmit={handleEmailAuth} className="space-y-4">
@@ -344,7 +402,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onAuthSuccess, initialEmail = '' })
           </div>
         </div>
 
-        {!signUpCompleted && (
+        {!signUpCompleted && !forgotPassword && (
           <div>
             <label htmlFor="auth-password" className="block text-sm font-medium text-gray-700 mb-2">
               パスワード
@@ -360,8 +418,23 @@ const AuthForm: React.FC<AuthFormProps> = ({ onAuthSuccess, initialEmail = '' })
                 minLength={6}
                 className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-black transition-colors"
                 placeholder="••••••••"
+                autoComplete={isSignUp ? 'new-password' : 'current-password'}
               />
             </div>
+            {!isSignUp && (
+              <button
+                type="button"
+                onClick={() => {
+                  setForgotPassword(true);
+                  setError(null);
+                  setMessage(null);
+                  setResetEmailSent(false);
+                }}
+                className="mt-2 text-xs text-gray-500 hover:text-black underline underline-offset-2"
+              >
+                パスワードをお忘れの方
+              </button>
+            )}
           </div>
         )}
 
@@ -380,7 +453,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onAuthSuccess, initialEmail = '' })
         {!signUpCompleted && (
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || (forgotPassword && resetEmailSent)}
             className="w-full py-3 bg-primary text-white text-sm tracking-widest uppercase hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading ? (
@@ -389,8 +462,30 @@ const AuthForm: React.FC<AuthFormProps> = ({ onAuthSuccess, initialEmail = '' })
                 <span>処理中...</span>
               </>
             ) : (
-              <span>{isSignUp ? 'アカウントを作成' : 'ログイン'}</span>
+              <span>
+                {forgotPassword
+                  ? resetEmailSent
+                    ? '送信済み'
+                    : '再設定用メールを送信'
+                  : isSignUp
+                    ? 'アカウントを作成'
+                    : 'ログイン'}
+              </span>
             )}
+          </button>
+        )}
+        {forgotPassword && (
+          <button
+            type="button"
+            onClick={() => {
+              setForgotPassword(false);
+              setResetEmailSent(false);
+              setError(null);
+              setMessage(null);
+            }}
+            className="w-full text-sm text-gray-500 hover:text-black transition-colors"
+          >
+            ログイン画面に戻る
           </button>
         )}
       </form>
@@ -398,7 +493,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onAuthSuccess, initialEmail = '' })
       )}
 
       {/* Email not confirmed の場合のUI（ログイン時のみ） */}
-      {!isSignUp && showResendButton && emailNotConfirmed && (
+      {!forgotPassword && !isSignUp && showResendButton && emailNotConfirmed && (
         <div className="space-y-3">
           <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg text-sm whitespace-pre-line">
             このメールアドレスはまだ認証されていません。
@@ -423,7 +518,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onAuthSuccess, initialEmail = '' })
       )}
 
       {/* ログイン/新規登録切り替えボタン（新規登録成功時は非表示） */}
-      {!signUpSuccess && (
+      {!signUpSuccess && !forgotPassword && (
         <div className="text-center">
         <button
           type="button"

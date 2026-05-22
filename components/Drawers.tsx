@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { IconClose, IconInstagram, IconYoutube, IconChevronDown, IconPlus, IconTrash } from './Icons';
-import { CartItem } from '@/types';
+import { CartItem, SubscriptionInterval, SUBSCRIPTION_INTERVAL_LABELS } from '@/types';
 import { FadeInImage } from './UI';
 import { supabase, checkStockAvailability } from '@/lib/supabase';
 
@@ -53,9 +53,17 @@ interface CartDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   cartItems: CartItem[];
-  onRemove: (productId: string, variant?: string) => void;
-  onUpdateQuantity: (productId: string, quantity: number, variant?: string) => void;
+  onRemove: (productId: string, variant?: string, subscriptionInterval?: SubscriptionInterval) => void;
+  onUpdateQuantity: (
+    productId: string,
+    quantity: number,
+    variant?: string,
+    subscriptionInterval?: SubscriptionInterval
+  ) => void;
 }
+
+const cartItemKey = (item: CartItem) =>
+  `${item.product.id}-${item.variant || 'default'}-${item.purchaseType ?? 'one_time'}-${item.subscriptionInterval ?? ''}`;
 
 export const CartDrawer = ({ isOpen, onClose, cartItems, onRemove, onUpdateQuantity }: CartDrawerProps) => {
   const router = useRouter();
@@ -82,13 +90,16 @@ export const CartDrawer = ({ isOpen, onClose, cartItems, onRemove, onUpdateQuant
       ) : (
         <div className="flex flex-col h-full">
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
-            {cartItems.map((item) => (
-              <div key={`${item.product.id}-${item.variant || 'default'}`} className="flex gap-4 pb-4 border-b border-gray-100 last:border-b-0">
+            {cartItems.map((item) => {
+              const isSubscription = item.purchaseType === 'subscription' && item.subscriptionInterval;
+              const itemKey = cartItemKey(item);
+              return (
+              <div key={itemKey} className="flex gap-4 pb-4 border-b border-gray-100 last:border-b-0">
                 <Link href={`/products/${item.product.handle}`} onClick={onClose} className="flex-shrink-0 aspect-square w-20 bg-gray-100 rounded overflow-hidden block">
-                  <FadeInImage 
-                    src={item.product.images && item.product.images.length > 0 ? item.product.images[0] : (item.product.image || '')} 
-                    alt={item.product.title} 
-                    className="w-full h-full object-cover" 
+                  <FadeInImage
+                    src={item.product.images && item.product.images.length > 0 ? item.product.images[0] : (item.product.image || '')}
+                    alt={item.product.title}
+                    className="w-full h-full object-cover"
                   />
                 </Link>
                 <div className="flex-1 min-w-0">
@@ -102,12 +113,19 @@ export const CartDrawer = ({ isOpen, onClose, cartItems, onRemove, onUpdateQuant
                       {item.variant}
                     </p>
                   )}
+                  {isSubscription && item.subscriptionInterval && (
+                    <p className="text-xs mb-1">
+                      <span className="inline-block bg-red-50 text-red-600 px-2 py-0.5 rounded font-medium">
+                        定期 {SUBSCRIPTION_INTERVAL_LABELS[item.subscriptionInterval]}
+                      </span>
+                    </p>
+                  )}
                   <p className="text-sm font-serif text-gray-600 mb-2">
                     ¥{(item.finalPrice ?? item.product.price).toLocaleString()}
                   </p>
-                  {stockErrors[`${item.product.id}-${item.variant || ''}`] && (
+                  {stockErrors[itemKey] && (
                     <p className="text-xs text-red-600 mb-1">
-                      {stockErrors[`${item.product.id}-${item.variant || ''}`]}
+                      {stockErrors[itemKey]}
                     </p>
                   )}
                   <div className="flex items-center gap-3">
@@ -116,7 +134,7 @@ export const CartDrawer = ({ isOpen, onClose, cartItems, onRemove, onUpdateQuant
                         type="button"
                         onClick={(e) => {
                           e.preventDefault();
-                          onUpdateQuantity(item.product.id, item.quantity - 1, item.variant);
+                          onUpdateQuantity(item.product.id, item.quantity - 1, item.variant, item.subscriptionInterval);
                         }}
                         className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black transition-colors"
                       >
@@ -128,7 +146,6 @@ export const CartDrawer = ({ isOpen, onClose, cartItems, onRemove, onUpdateQuant
                         onClick={(e) => {
                           e.preventDefault();
                           const newQuantity = item.quantity + 1;
-                          const itemKey = `${item.product.id}-${item.variant || ''}`;
                           const selectedOptions = item.selectedOptions ?? {};
                           const stockCheck = checkStockAvailability(
                             item.product,
@@ -155,7 +172,7 @@ export const CartDrawer = ({ isOpen, onClose, cartItems, onRemove, onUpdateQuant
                             delete newErrors[itemKey];
                             return newErrors;
                           });
-                          onUpdateQuantity(item.product.id, newQuantity, item.variant);
+                          onUpdateQuantity(item.product.id, newQuantity, item.variant, item.subscriptionInterval);
                         }}
                         className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black transition-colors"
                       >
@@ -166,7 +183,7 @@ export const CartDrawer = ({ isOpen, onClose, cartItems, onRemove, onUpdateQuant
                       type="button"
                       onClick={(e) => {
                         e.preventDefault();
-                        onRemove(item.product.id, item.variant);
+                        onRemove(item.product.id, item.variant, item.subscriptionInterval);
                       }}
                       className="p-1 text-gray-400 hover:text-red-500 transition-colors"
                     >
@@ -175,7 +192,8 @@ export const CartDrawer = ({ isOpen, onClose, cartItems, onRemove, onUpdateQuant
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
           
           <div className="border-t border-gray-200 p-6 space-y-4 bg-white">

@@ -3,11 +3,13 @@
 import React, { useState, useEffect, useContext } from 'react';
 import Link from 'next/link';
 import { useProducts } from '@/hooks/useProducts';
-import { Product } from '@/types';
+import { Product, SubscriptionInterval, SUBSCRIPTION_INTERVAL_LABELS } from '@/types';
 import { IconChevronDown } from '@/components/Icons';
 import { FadeInImage, LoadingButton } from '@/components/UI';
 import { CartContext } from '@/providers/CartProvider';
 import { supabase, checkStockAvailability, getStockForVariant } from '@/lib/supabase';
+
+type PurchaseType = 'one_time' | 'subscription';
 
 export default function ProductDetailView({ product }: { product: Product }) {
   const { products: allProducts } = useProducts();
@@ -18,6 +20,31 @@ export default function ProductDetailView({ product }: { product: Product }) {
   const [activeAccordion, setActiveAccordion] = useState<string | null>('desc');
   const { addToCart, openCart, cartItems } = useContext(CartContext);
   const [stockError, setStockError] = useState<string>('');
+
+  // 定期購入関連 state（商品設定から取得）
+  const subscriptionEnabled = Boolean(product.subscriptionEnabled);
+  const subscriptionDiscountPercent = product.subscriptionDiscountPercent ?? 0;
+  const subscriptionIntervals: SubscriptionInterval[] = product.subscriptionIntervals ?? [];
+  const [purchaseType, setPurchaseType] = useState<PurchaseType>('one_time');
+  const [subscriptionInterval, setSubscriptionInterval] = useState<SubscriptionInterval>(
+    subscriptionIntervals[0] ?? 'monthly'
+  );
+  const subscriptionPrice = Math.round(calculatedPrice * (1 - subscriptionDiscountPercent / 100));
+
+  // 配送間隔の選択肢が変わったら有効な値に補正
+  useEffect(() => {
+    if (subscriptionIntervals.length === 0) return;
+    if (!subscriptionIntervals.includes(subscriptionInterval)) {
+      setSubscriptionInterval(subscriptionIntervals[0]);
+    }
+  }, [subscriptionIntervals, subscriptionInterval]);
+
+  // 定期購入が無効化されたら通常購入に戻す
+  useEffect(() => {
+    if (!subscriptionEnabled && purchaseType === 'subscription') {
+      setPurchaseType('one_time');
+    }
+  }, [subscriptionEnabled, purchaseType]);
 
   // 販売期間内かどうか
   const isWithinSalesPeriod = (p: Product | null): boolean => {
@@ -215,7 +242,15 @@ export default function ProductDetailView({ product }: { product: Product }) {
             <div className="lg:sticky lg:top-32">
               <h1 className="text-xl md:text-2xl font-medium text-primary leading-relaxed tracking-wide mb-4">{product.title}</h1>
               <div className="mb-8 border-b border-gray-100 pb-8">
-                <span className="text-xl md:text-2xl font-serif text-primary block mb-1">¥{calculatedPrice.toLocaleString()}</span>
+                {subscriptionEnabled && purchaseType === 'subscription' && subscriptionDiscountPercent > 0 ? (
+                  <div className="flex items-baseline gap-3 mb-1">
+                    <span className="text-xl md:text-2xl font-serif text-primary">¥{subscriptionPrice.toLocaleString()}</span>
+                    <span className="text-sm text-gray-400 line-through">¥{calculatedPrice.toLocaleString()}</span>
+                    <span className="text-xs bg-red-50 text-red-600 px-2 py-0.5 rounded">定期 {subscriptionDiscountPercent}%OFF</span>
+                  </div>
+                ) : (
+                  <span className="text-xl md:text-2xl font-serif text-primary block mb-1">¥{calculatedPrice.toLocaleString()}</span>
+                )}
                 <span className="text-xs text-gray-500 block">税込</span>
               </div>
 
@@ -308,6 +343,88 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 </div>
               )}
 
+              {/* 購入タイプ選択（通常 / 定期）— 定期購入が有効な商品のみ表示 */}
+              {subscriptionEnabled && subscriptionIntervals.length > 0 && (
+              <div className="mb-6">
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setPurchaseType('one_time')}
+                    className={`relative flex flex-col items-center justify-center py-6 px-4 border-2 rounded transition-colors ${
+                      purchaseType === 'one_time'
+                        ? 'border-primary bg-white'
+                        : 'border-gray-200 bg-white hover:border-gray-300'
+                    }`}
+                  >
+                    {purchaseType === 'one_time' && (
+                      <span className="absolute top-2 right-2 w-5 h-5 rounded-full bg-primary text-white text-xs flex items-center justify-center">✓</span>
+                    )}
+                    <svg className="w-8 h-8 mb-2 text-primary" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                    </svg>
+                    <span className="text-sm font-medium text-primary">通常購入</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPurchaseType('subscription')}
+                    className={`relative flex flex-col items-center justify-center py-6 px-4 border-2 rounded transition-colors ${
+                      purchaseType === 'subscription'
+                        ? 'border-primary bg-white'
+                        : 'border-gray-200 bg-white hover:border-gray-300'
+                    }`}
+                  >
+                    {purchaseType === 'subscription' && (
+                      <span className="absolute top-2 right-2 w-5 h-5 rounded-full bg-primary text-white text-xs flex items-center justify-center">✓</span>
+                    )}
+                    <svg className="w-8 h-8 mb-2 text-primary" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                    </svg>
+                    <span className="text-sm font-medium text-primary">定期購入</span>
+                    {subscriptionDiscountPercent > 0 && (
+                      <span className="text-[10px] text-red-600 mt-1">{subscriptionDiscountPercent}%OFF</span>
+                    )}
+                  </button>
+                </div>
+
+                {/* 定期購入プラン選択 */}
+                {purchaseType === 'subscription' && subscriptionIntervals.length > 0 && (
+                  <div className="mt-6 bg-gray-50 rounded p-4">
+                    <p className="text-xs font-medium text-gray-700 mb-3">お届け頻度</p>
+                    <div className="space-y-2">
+                      {subscriptionIntervals.map((interval) => (
+                        <label
+                          key={interval}
+                          className={`flex items-center justify-between p-3 bg-white border rounded cursor-pointer transition-colors ${
+                            subscriptionInterval === interval ? 'border-primary' : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                              subscriptionInterval === interval ? 'border-primary' : 'border-gray-300'
+                            }`}>
+                              {subscriptionInterval === interval && (
+                                <span className="w-2 h-2 rounded-full bg-primary"></span>
+                              )}
+                            </span>
+                            <span className="text-sm text-primary">{SUBSCRIPTION_INTERVAL_LABELS[interval]}</span>
+                          </div>
+                          <span className="text-sm font-serif text-primary">¥{subscriptionPrice.toLocaleString()}</span>
+                          <input
+                            type="radio"
+                            name="subscription-interval"
+                            value={interval}
+                            checked={subscriptionInterval === interval}
+                            onChange={() => setSubscriptionInterval(interval)}
+                            className="sr-only"
+                          />
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+              )}
+
               <div className="space-y-4 mb-12">
                  {(() => {
                    // 販売期間外の場合は「販売期間外です」を表示
@@ -335,18 +452,30 @@ export default function ProductDetailView({ product }: { product: Product }) {
                               setQuantity(quantity + 1);
                             }} className="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-black transition-colors">+</button>
                          </div>
-                         <LoadingButton 
+                         <LoadingButton
                            onClick={() => {
                              if (product) {
                                setStockError('');
                                const variantString = getSelectedVariantString();
-                               addToCart(product, quantity, variantString);
+                               addToCart(product, quantity, {
+                                 variant: variantString,
+                                 subscription:
+                                   purchaseType === 'subscription'
+                                     ? {
+                                         purchaseType: 'subscription',
+                                         subscriptionInterval,
+                                         subscriptionDiscountPercent,
+                                       }
+                                     : undefined,
+                               });
                                openCart();
                              }
                            }}
                            className="w-full py-4 text-sm tracking-widest uppercase bg-black text-white hover:bg-gray-800 transition-colors"
                          >
-                           カートに追加
+                           {purchaseType === 'subscription'
+                             ? `定期購入（${SUBSCRIPTION_INTERVAL_LABELS[subscriptionInterval]}）をカートに追加`
+                             : 'カートに追加'}
                          </LoadingButton>
                          {stockError && (
                            <p className="text-sm text-red-600 mt-2 text-center">{stockError}</p>
@@ -419,14 +548,30 @@ export default function ProductDetailView({ product }: { product: Product }) {
                                    return;
                                  }
                                  
-                                 addToCart(product, quantity, variantString, calculatedPrice, selectedOptions);
+                                 addToCart(product, quantity, {
+                                   variant: variantString,
+                                   finalPrice: calculatedPrice,
+                                   selectedOptions,
+                                   subscription:
+                                     purchaseType === 'subscription'
+                                       ? {
+                                           purchaseType: 'subscription',
+                                           subscriptionInterval,
+                                           subscriptionDiscountPercent,
+                                         }
+                                       : undefined,
+                                 });
                                  openCart();
                                }
                              }}
                              className="w-full py-4 text-sm tracking-widest bg-white text-black border border-black hover:bg-gray-50 transition-colors group relative"
                            >
                              <div className="flex items-center justify-center w-full">
-                               <span>カートに追加する</span>
+                               <span>
+                                 {purchaseType === 'subscription'
+                                   ? `定期購入（${SUBSCRIPTION_INTERVAL_LABELS[subscriptionInterval]}）をカートに追加する`
+                                   : 'カートに追加する'}
+                               </span>
                                <span className="absolute right-4 text-lg transition-transform duration-300 group-hover:translate-x-1">→</span>
                              </div>
                            </LoadingButton>

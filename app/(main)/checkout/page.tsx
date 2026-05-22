@@ -9,7 +9,7 @@ import { CartContext } from '@/providers/CartProvider';
 import { FadeInImage } from '@/components/UI';
 import AuthForm from '@/components/AuthForm';
 import { supabase, checkStockAvailability } from '@/lib/supabase';
-import { ShippingMethod, AreaFees, Product, CartItem } from '@/types';
+import { ShippingMethod, AreaFees, Product, CartItem, SUBSCRIPTION_INTERVAL_LABELS } from '@/types';
 
 // Stripe公開可能キー（環境変数から取得）
 // NOTE: 未設定だとPaymentElementが無言で出ないことがあるため、フォールバック文字列は使わない
@@ -508,6 +508,31 @@ const Checkout = () => {
   const creatingPaymentIntentRef = useRef(false);
   const upsertingOrderDraftRef = useRef(false);
   const lastOrderDraftKeyRef = useRef<string | null>(null);
+  // 定期購入用
+  const [stripeSubscriptionId, setStripeSubscriptionId] = useState<string | null>(null);
+  const [stripeCustomerId, setStripeCustomerId] = useState<string | null>(null);
+
+  // カート内の定期購入アイテムを判定
+  const subscriptionCartInfo = useMemo(() => {
+    const subscriptionItems = cartItems.filter((i) => i.purchaseType === 'subscription');
+    const oneTimeItems = cartItems.filter((i) => i.purchaseType !== 'subscription');
+    const intervals = Array.from(
+      new Set(subscriptionItems.map((i) => i.subscriptionInterval).filter((v): v is NonNullable<typeof v> => Boolean(v)))
+    );
+    const isSubscriptionCart = subscriptionItems.length > 0;
+    const hasMixed = isSubscriptionCart && oneTimeItems.length > 0;
+    const hasMultipleIntervals = intervals.length > 1;
+    return {
+      isSubscriptionCart,
+      subscriptionItems,
+      oneTimeItems,
+      intervals,
+      interval: intervals[0] ?? null,
+      hasMixed,
+      hasMultipleIntervals,
+      blocked: isSubscriptionCart && (hasMixed || hasMultipleIntervals),
+    };
+  }, [cartItems]);
 
   // 認証状態を確認
   useEffect(() => {
@@ -1344,70 +1369,140 @@ const Checkout = () => {
   
   const total = subtotal + shippingCost - discountAmount;
 
-  // PaymentIntent 作成（ElementsにclientSecretを渡すため、ここで作る）
+  // PaymentIntent / Subscription 作成（ElementsにclientSecretを渡すため、ここで作る）
   useEffect(() => {
-    const createPaymentIntent = async () => {
+    const createPayment = async () => {
       if (!isAuthenticated) return;
       if (!cartItems.length || total <= 0) return;
       if (paymentClientSecret && paymentIntentAmount === total && paymentIntentId) return;
       if (creatingPaymentIntentRef.current) return;
 
+      // 混在カート/複数間隔はブロック
+      if (subscriptionCartInfo.blocked) {
+        setPaymentInitError(
+          subscriptionCartInfo.hasMixed
+            ? '定期購入と通常購入は同時にご注文いただけません。カートをご確認ください。'
+            : '異なる配送間隔の定期購入を同時にご注文いただけません。カートをご確認ください。'
+        );
+        return;
+      }
+
       try {
         creatingPaymentIntentRef.current = true;
         setPaymentInitError(null);
-        const response = await fetch('/api/create-payment-intent', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            amount: total,
-            currency: 'jpy',
-            metadata: {
-              itemCount: String(cartItems.length),
-              subtotal: String(subtotal),
-              shippingCost: String(shippingCost),
-              total: String(total),
-            },
-          }),
-        });
 
-        const responseText = await response.text();
-        let responseData: any = null;
-        if (responseText) {
+        if (subscriptionCartInfo.isSubscriptionCart && subscriptionCartInfo.interval) {
+          // 定期購入カート: Subscription を作成
+          const items = subscriptionCartInfo.subscriptionItems.map((it) => ({
+            product_id: it.product.id,
+            product_title: it.product.title + (it.variant ? `（${it.variant}）` : ''),
+            unit_price: it.finalPrice ?? it.product.price,
+            quantity: it.quantity,
+          }));
+          const response = await fetch('/api/create-subscription', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: formData.email,
+              name: `${formData.lastName ?? ''} ${formData.firstName ?? ''}`.trim() || undefined,
+              phone: formData.phone || undefined,
+              interval: subscriptionCartInfo.interval,
+              items,
+              shipping_cost: shippingCost,
+              metadata: {
+                itemCount: String(cartItems.length),
+                subtotal: String(subtotal),
+                shippingCost: String(shippingCost),
+                total: String(total),
+              },
+            }),
+          });
+          const responseText = await response.text();
+          let responseData: any = null;
           try {
-            responseData = JSON.parse(responseText);
+            responseData = responseText ? JSON.parse(responseText) : null;
           } catch (e) {
-            console.error('PaymentIntent JSONパースエラー:', e, responseText);
+            console.error('Subscription JSONパースエラー:', e, responseText);
           }
+          if (!response.ok) {
+            throw new Error(responseData?.error || `Subscriptionの作成に失敗しました (HTTP ${response.status})`);
+          }
+          const cs = responseData?.clientSecret;
+          const piId = responseData?.paymentIntentId;
+          const subId = responseData?.subscriptionId;
+          const custId = responseData?.customerId;
+          const livemode = responseData?.livemode;
+          const secretKeyPrefix = responseData?.secretKeyPrefix;
+          if (!cs) throw new Error('clientSecretが取得できませんでした');
+          if (!piId) throw new Error('paymentIntentIdが取得できませんでした');
+
+          setPaymentClientSecret(cs);
+          setPaymentIntentId(piId);
+          setStripeSubscriptionId(subId ?? null);
+          setStripeCustomerId(custId ?? null);
+          if (typeof livemode === 'boolean') setPaymentIntentLivemode(livemode);
+          if (typeof secretKeyPrefix === 'string') setPaymentIntentSecretKeyPrefix(secretKeyPrefix);
+          setPaymentIntentAmount(total);
+        } else {
+          // 通常購入: PaymentIntent
+          const response = await fetch('/api/create-payment-intent', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              amount: total,
+              currency: 'jpy',
+              metadata: {
+                itemCount: String(cartItems.length),
+                subtotal: String(subtotal),
+                shippingCost: String(shippingCost),
+                total: String(total),
+              },
+            }),
+          });
+
+          const responseText = await response.text();
+          let responseData: any = null;
+          if (responseText) {
+            try {
+              responseData = JSON.parse(responseText);
+            } catch (e) {
+              console.error('PaymentIntent JSONパースエラー:', e, responseText);
+            }
+          }
+
+          if (!response.ok) {
+            const isHtmlError = /<\s*(!doctype|html)\b/i.test(responseText);
+            const normalizedError = responseData?.error
+              || (isHtmlError ? null : responseText)
+              || `PaymentIntentの作成に失敗しました (HTTP ${response.status})`;
+            throw new Error(normalizedError);
+          }
+
+          const cs = responseData?.clientSecret;
+          const piId = responseData?.paymentIntentId;
+          const livemode = responseData?.livemode;
+          const secretKeyPrefix = responseData?.secretKeyPrefix;
+          if (!cs) throw new Error('clientSecretが取得できませんでした');
+          if (!piId) throw new Error('paymentIntentIdが取得できませんでした');
+
+          setPaymentClientSecret(cs);
+          setPaymentIntentId(piId);
+          setStripeSubscriptionId(null);
+          setStripeCustomerId(null);
+          if (typeof livemode === 'boolean') setPaymentIntentLivemode(livemode);
+          if (typeof secretKeyPrefix === 'string') setPaymentIntentSecretKeyPrefix(secretKeyPrefix);
+          setPaymentIntentAmount(total);
         }
-
-        if (!response.ok) {
-          const isHtmlError = /<\s*(!doctype|html)\b/i.test(responseText);
-          const normalizedError = responseData?.error
-            || (isHtmlError ? null : responseText)
-            || `PaymentIntentの作成に失敗しました (HTTP ${response.status})`;
-          throw new Error(normalizedError);
-        }
-
-        const cs = responseData?.clientSecret;
-        const piId = responseData?.paymentIntentId;
-        const livemode = responseData?.livemode;
-        const secretKeyPrefix = responseData?.secretKeyPrefix;
-        if (!cs) throw new Error('clientSecretが取得できませんでした');
-        if (!piId) throw new Error('paymentIntentIdが取得できませんでした');
-
-        setPaymentClientSecret(cs);
-        setPaymentIntentId(piId);
-        if (typeof livemode === 'boolean') setPaymentIntentLivemode(livemode);
-        if (typeof secretKeyPrefix === 'string') setPaymentIntentSecretKeyPrefix(secretKeyPrefix);
-        setPaymentIntentAmount(total);
 
         // NOTE:
         // PaymentIntent作成直後にordersを作ると「途中入力の値」がordersに残ることがあるため、
         // 注文レコードは「支払いボタン押下時」に完成した入力で作成する（ensureOrderDraftが担当）
       } catch (e: any) {
-        console.error('PaymentIntent初期化エラー:', e);
+        console.error('決済初期化エラー:', e);
         setPaymentClientSecret(null);
         setPaymentIntentId(null);
+        setStripeSubscriptionId(null);
+        setStripeCustomerId(null);
         setPaymentIntentLivemode(null);
         setPaymentIntentSecretKeyPrefix(null);
         setPaymentIntentAmount(null);
@@ -1417,8 +1512,24 @@ const Checkout = () => {
       }
     };
 
-    createPaymentIntent();
-  }, [isAuthenticated, cartItems.length, total, subtotal, shippingCost, paymentClientSecret, paymentIntentAmount, paymentIntentId]);
+    createPayment();
+  }, [
+    isAuthenticated,
+    cartItems.length,
+    total,
+    subtotal,
+    shippingCost,
+    paymentClientSecret,
+    paymentIntentAmount,
+    paymentIntentId,
+    subscriptionCartInfo.blocked,
+    subscriptionCartInfo.isSubscriptionCart,
+    subscriptionCartInfo.interval,
+    formData.email,
+    formData.firstName,
+    formData.lastName,
+    formData.phone,
+  ]);
 
   // 注文明細は「同一商品の別バリエーション」を保持するため、注文単位で全削除→全挿入で置き換える
   const replaceOrderItems = async (
@@ -1665,6 +1776,9 @@ const Checkout = () => {
         total: total,
           payment_status: 'pending',
           payment_intent_id: paymentIntentId,
+          stripe_subscription_id: stripeSubscriptionId,
+          stripe_customer_id: stripeCustomerId,
+          subscription_interval: subscriptionCartInfo.interval,
         order_status: 'pending',
           delivery_time_slot: formData.deliveryTimeSlot || null,
           notes: formData.notes || null,
@@ -1683,6 +1797,7 @@ const Checkout = () => {
         // 注文明細を保存（種類ごとの行を保持するため全置換）
         const orderItemsRaw = cartItems.map((item) => {
           const unitPrice = item.finalPrice ?? item.product.price;
+          const isSub = item.purchaseType === 'subscription';
           return {
             order_id: order.id,
             product_id: item.product.id,
@@ -1693,6 +1808,9 @@ const Checkout = () => {
             selected_options: item.selectedOptions ?? null,
             quantity: item.quantity,
             line_total: unitPrice * item.quantity,
+            is_subscription: isSub,
+            subscription_interval: isSub ? item.subscriptionInterval ?? null : null,
+            subscription_discount_percent: isSub ? item.subscriptionDiscountPercent ?? null : null,
           };
         });
         await replaceOrderItems(order.id, orderItemsRaw);
@@ -1704,7 +1822,7 @@ const Checkout = () => {
   };
 
     upsertOrderDraft();
-  }, [supabase, authUser, paymentIntentId, cartItems, total, subtotal, shippingCost, discountAmount, appliedCoupon, formData, shippingPlan, useDifferentShippingAddress, shippingAddressData]);
+  }, [supabase, authUser, paymentIntentId, cartItems, total, subtotal, shippingCost, discountAmount, appliedCoupon, formData, shippingPlan, useDifferentShippingAddress, shippingAddressData, stripeSubscriptionId, stripeCustomerId, subscriptionCartInfo.interval]);
 
   // 決済ボタン押下時に必ず注文ドラフトを作成する（レース回避）
   const ensureOrderDraft = async (shippingData: any) => {
@@ -1770,6 +1888,9 @@ const Checkout = () => {
       total: total,
       payment_status: 'pending',
       payment_intent_id: paymentIntentId,
+      stripe_subscription_id: stripeSubscriptionId,
+      stripe_customer_id: stripeCustomerId,
+      subscription_interval: subscriptionCartInfo.interval,
       order_status: 'pending',
       delivery_time_slot: formData.deliveryTimeSlot || null,
       notes: formData.notes || null,
@@ -1790,6 +1911,7 @@ const Checkout = () => {
     if (orderId) {
       const orderItemsRaw = cartItems.map((item) => {
         const unitPrice = item.finalPrice ?? item.product.price;
+        const isSub = item.purchaseType === 'subscription';
         return {
           order_id: orderId,
           product_id: item.product.id,
@@ -1800,6 +1922,9 @@ const Checkout = () => {
           selected_options: item.selectedOptions ?? null,
           quantity: item.quantity,
           line_total: unitPrice * item.quantity,
+          is_subscription: isSub,
+          subscription_interval: isSub ? item.subscriptionInterval ?? null : null,
+          subscription_discount_percent: isSub ? item.subscriptionDiscountPercent ?? null : null,
         };
       });
       await replaceOrderItems(orderId, orderItemsRaw);
@@ -2685,13 +2810,16 @@ const Checkout = () => {
                 <div className="border border-gray-200 p-6 space-y-4">
                   {/* カートアイテム */}
                   <div className="space-y-4 max-h-[400px] overflow-y-auto">
-                    {cartItems.map((item) => (
-                      <div key={`${item.product.id}-${item.variant || 'default'}`} className="flex gap-3 pb-4 border-b border-gray-100 last:border-b-0">
+                    {cartItems.map((item) => {
+                      const isSubscription = item.purchaseType === 'subscription' && item.subscriptionInterval;
+                      const itemKey = `${item.product.id}-${item.variant || 'default'}-${item.purchaseType ?? 'one_time'}-${item.subscriptionInterval ?? ''}`;
+                      return (
+                      <div key={itemKey} className="flex gap-3 pb-4 border-b border-gray-100 last:border-b-0">
                         <Link href={`/products/${item.product.handle || item.product.id}`} className="flex-shrink-0 aspect-square w-16 bg-gray-100 rounded overflow-hidden block">
-                          <FadeInImage 
-                            src={item.product.images && item.product.images.length > 0 ? item.product.images[0] : (item.product.image || '')} 
-                            alt={item.product.title} 
-                            className="w-full h-full object-cover" 
+                          <FadeInImage
+                            src={item.product.images && item.product.images.length > 0 ? item.product.images[0] : (item.product.image || '')}
+                            alt={item.product.title}
+                            className="w-full h-full object-cover"
                           />
                         </Link>
                         <div className="flex-1 min-w-0">
@@ -2703,6 +2831,13 @@ const Checkout = () => {
                           {getCartItemVariantLabel(item) ? (
                             <div className="text-xs text-gray-500 mt-0.5">種類: {getCartItemVariantLabel(item)}</div>
                           ) : null}
+                          {isSubscription && item.subscriptionInterval && (
+                            <div className="mt-1">
+                              <span className="inline-block text-[10px] font-medium bg-red-50 text-red-600 px-2 py-0.5 rounded">
+                                定期 {SUBSCRIPTION_INTERVAL_LABELS[item.subscriptionInterval]}
+                              </span>
+                            </div>
+                          )}
                           <div className="flex items-center justify-between mt-1">
                             <span className="text-xs text-gray-500">数量: {item.quantity}</span>
                             <span className="text-sm font-serif text-gray-900">
@@ -2711,10 +2846,23 @@ const Checkout = () => {
                           </div>
                         </div>
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
 
-                  {/* クーポン入力 */}
+                  {/* 定期購入の混在エラー */}
+                  {subscriptionCartInfo.blocked && (
+                    <div className="pt-4 border-t border-red-200">
+                      <div className="bg-red-50 border border-red-200 rounded p-3 text-sm text-red-700">
+                        {subscriptionCartInfo.hasMixed
+                          ? '定期購入と通常購入は同時にご注文いただけません。一度カートを分けてご注文ください。'
+                          : '異なる配送間隔の定期購入を同時にご注文いただけません。カートをご確認ください。'}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 定期購入カートではクーポンを利用不可 */}
+                  {!subscriptionCartInfo.isSubscriptionCart && (
                   <div className="pt-4 border-t border-gray-200">
                     <h3 className="text-sm font-medium mb-3">クーポンコード</h3>
                     {appliedCoupon ? (
@@ -2766,6 +2914,7 @@ const Checkout = () => {
                       <p className="text-xs text-red-600 mt-2">{couponError}</p>
                     )}
                   </div>
+                  )}
 
                   {/* 合計 */}
                   <div className="space-y-2 pt-4 border-t border-gray-200">

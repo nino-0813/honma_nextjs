@@ -1,18 +1,42 @@
 'use client';
 
 import React, { createContext, useState, useEffect } from 'react';
-import { Product, CartItem } from '@/types';
+import { Product, CartItem, SubscriptionInterval } from '@/types';
 import { checkStockAvailability } from '@/lib/supabase';
+
+export interface AddToCartSubscription {
+  purchaseType: 'subscription';
+  subscriptionInterval: SubscriptionInterval;
+  subscriptionDiscountPercent: number;
+}
+
+export interface AddToCartOptions {
+  variant?: string;
+  finalPrice?: number;
+  selectedOptions?: Record<string, string>;
+  subscription?: AddToCartSubscription;
+}
 
 export interface CartContextType {
   cartItems: CartItem[];
-  addToCart: (product: Product, quantity: number, variant?: string, finalPrice?: number, selectedOptions?: Record<string, string>) => void;
-  removeFromCart: (productId: string, variant?: string) => void;
-  updateQuantity: (productId: string, quantity: number, variant?: string) => void;
+  addToCart: (product: Product, quantity: number, options?: AddToCartOptions) => void;
+  removeFromCart: (productId: string, variant?: string, subscriptionInterval?: SubscriptionInterval) => void;
+  updateQuantity: (productId: string, quantity: number, variant?: string, subscriptionInterval?: SubscriptionInterval) => void;
   clearCart: () => void;
   openCart: () => void;
   restoreCart: () => void;
 }
+
+// カート内で同一アイテムかどうかを判定するキー
+// 通常購入と定期購入、間隔の違いで別エントリとして扱う
+const matchCartItem = (
+  a: Pick<CartItem, 'product' | 'variant' | 'purchaseType' | 'subscriptionInterval'>,
+  b: Pick<CartItem, 'product' | 'variant' | 'purchaseType' | 'subscriptionInterval'>
+) =>
+  a.product.id === b.product.id &&
+  (a.variant ?? '') === (b.variant ?? '') &&
+  (a.purchaseType ?? 'one_time') === (b.purchaseType ?? 'one_time') &&
+  (a.subscriptionInterval ?? '') === (b.subscriptionInterval ?? '');
 
 export const CartContext = createContext<CartContextType>({
   cartItems: [],
@@ -57,18 +81,23 @@ export function CartProvider({
     localStorage.setItem('ikevege_cart', JSON.stringify(cartItems));
   }, [cartItems, isCartHydrated]);
 
-  const addToCart = (
-    product: Product,
-    quantity: number,
-    variant?: string,
-    finalPrice?: number,
-    selectedOptions?: Record<string, string>
-  ) => {
-    const price = finalPrice ?? product.price;
+  const addToCart = (product: Product, quantity: number, options?: AddToCartOptions) => {
+    const { variant, finalPrice, selectedOptions, subscription } = options ?? {};
+    const purchaseType = subscription ? 'subscription' : 'one_time';
+    const subscriptionInterval = subscription?.subscriptionInterval;
+    const subscriptionDiscountPercent = subscription?.subscriptionDiscountPercent ?? 0;
+    const basePrice = finalPrice ?? product.price;
+    const priceAfterDiscount = subscription
+      ? Math.round(basePrice * (1 - subscriptionDiscountPercent / 100))
+      : basePrice;
+
+    const target = { product, variant, purchaseType, subscriptionInterval } as Pick<
+      CartItem,
+      'product' | 'variant' | 'purchaseType' | 'subscriptionInterval'
+    >;
+
     setCartItems((prev) => {
-      const existingItemIndex = prev.findIndex(
-        (item) => item.product.id === product.id && item.variant === variant
-      );
+      const existingItemIndex = prev.findIndex((item) => matchCartItem(item, target));
       const currentCartQuantity = existingItemIndex > -1 ? prev[existingItemIndex].quantity : 0;
       const newQuantity = currentCartQuantity + quantity;
       if (selectedOptions) {
@@ -80,28 +109,59 @@ export function CartProvider({
         newCart[existingItemIndex] = {
           ...newCart[existingItemIndex],
           quantity: newQuantity,
-          finalPrice: newCart[existingItemIndex].finalPrice ?? price,
+          finalPrice: newCart[existingItemIndex].finalPrice ?? priceAfterDiscount,
           selectedOptions: newCart[existingItemIndex].selectedOptions ?? selectedOptions,
         };
         return newCart;
       }
-      return [...prev, { product, quantity, variant, finalPrice: price, selectedOptions }];
+      const newItem: CartItem = {
+        product,
+        quantity,
+        variant,
+        finalPrice: priceAfterDiscount,
+        selectedOptions,
+        purchaseType,
+        subscriptionInterval,
+        subscriptionDiscountPercent: subscription ? subscriptionDiscountPercent : undefined,
+      };
+      return [...prev, newItem];
     });
   };
 
-  const removeFromCart = (productId: string, variant?: string) => {
+  const removeFromCart = (
+    productId: string,
+    variant?: string,
+    subscriptionInterval?: SubscriptionInterval
+  ) => {
     setCartItems((prev) =>
-      prev.filter((item) => !(item.product.id === productId && item.variant === variant))
+      prev.filter(
+        (item) =>
+          !(
+            item.product.id === productId &&
+            (item.variant ?? '') === (variant ?? '') &&
+            (item.subscriptionInterval ?? '') === (subscriptionInterval ?? '')
+          )
+      )
     );
   };
 
-  const updateQuantity = (productId: string, quantity: number, variant?: string) => {
+  const updateQuantity = (
+    productId: string,
+    quantity: number,
+    variant?: string,
+    subscriptionInterval?: SubscriptionInterval
+  ) => {
     if (quantity <= 0) {
-      removeFromCart(productId, variant);
+      removeFromCart(productId, variant, subscriptionInterval);
       return;
     }
     setCartItems((prev) => {
-      const item = prev.find((i) => i.product.id === productId && i.variant === variant);
+      const item = prev.find(
+        (i) =>
+          i.product.id === productId &&
+          (i.variant ?? '') === (variant ?? '') &&
+          (i.subscriptionInterval ?? '') === (subscriptionInterval ?? '')
+      );
       if (!item) return prev;
       const selectedOptions = item.selectedOptions;
       if (selectedOptions && Object.keys(selectedOptions).length > 0) {
@@ -112,7 +172,11 @@ export function CartProvider({
         if (stock !== null && quantity > stock) return prev;
       }
       return prev.map((i) =>
-        i.product.id === productId && i.variant === variant ? { ...i, quantity } : i
+        i.product.id === productId &&
+        (i.variant ?? '') === (variant ?? '') &&
+        (i.subscriptionInterval ?? '') === (subscriptionInterval ?? '')
+          ? { ...i, quantity }
+          : i
       );
     });
   };

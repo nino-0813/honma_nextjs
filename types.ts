@@ -32,7 +32,30 @@ export interface Product {
   isFreeShipping?: boolean; // 送料無料フラグ
   saleStartAt?: string | null; // 販売開始日時 (ISO)
   saleEndAt?: string | null; // 販売終了日時 (ISO)
+  // 定期購入設定
+  subscriptionEnabled?: boolean;
+  subscriptionDiscountPercent?: number; // 0-100
+  subscriptionIntervals?: SubscriptionInterval[];
 }
+
+export type SubscriptionInterval =
+  | 'weekly'
+  | 'biweekly'
+  | 'monthly'
+  | 'bimonthly'
+  | 'quarterly'
+  | 'semiannual'
+  | 'annual';
+
+export const SUBSCRIPTION_INTERVAL_LABELS: Record<SubscriptionInterval, string> = {
+  weekly: '毎週お届け',
+  biweekly: '2週間毎にお届け',
+  monthly: '毎月お届け',
+  bimonthly: '2か月毎にお届け',
+  quarterly: '3か月毎にお届け',
+  semiannual: '6か月毎にお届け',
+  annual: '1年毎にお届け',
+};
 
 export interface Collection {
   id: string;
@@ -61,6 +84,10 @@ export interface CartItem {
   variant?: string; // 選択された種類
   finalPrice?: number; // バリエーション価格調整後の最終価格（カート追加時に固定）
   selectedOptions?: Record<string, string>; // 選択したオプション（在庫チェック用）
+  // 定期購入用
+  purchaseType?: 'one_time' | 'subscription';
+  subscriptionInterval?: SubscriptionInterval;
+  subscriptionDiscountPercent?: number;
 }
 
 export interface Review {

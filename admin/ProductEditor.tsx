@@ -16,7 +16,18 @@ import {
 } from '@/components/Icons';
 import { convertImageToWebP } from '@/lib/imageUtils';
 import { LoadingButton } from '@/components/UI';
-import type { ShippingMethod } from '@/types';
+import type { ShippingMethod, SubscriptionInterval } from '@/types';
+import { SUBSCRIPTION_INTERVAL_LABELS } from '@/types';
+
+const SUBSCRIPTION_INTERVAL_OPTIONS: SubscriptionInterval[] = [
+  'weekly',
+  'biweekly',
+  'monthly',
+  'bimonthly',
+  'quarterly',
+  'semiannual',
+  'annual',
+];
 
 const CATEGORIES = [
   { id: 'お米', name: 'お米', subcategories: ['コシヒカリ', '亀の尾', 'にこまる', '年間契約'] },
@@ -67,6 +78,11 @@ const ProductEditor = () => {
 
   const [hasVariants, setHasVariants] = useState(false);
   const [variationTypes, setVariationTypes] = useState<VariationType[]>([]);
+
+  // 定期購入設定
+  const [subscriptionEnabled, setSubscriptionEnabled] = useState(false);
+  const [subscriptionDiscountPercent, setSubscriptionDiscountPercent] = useState<string>('0');
+  const [subscriptionIntervals, setSubscriptionIntervals] = useState<SubscriptionInterval[]>([]);
 
   const [images, setImages] = useState<string[]>([]);
   const [draggedImageIndex, setDraggedImageIndex] = useState<number | null>(null);
@@ -155,6 +171,16 @@ const ProductEditor = () => {
       };
       setSaleStartAt(toDatetimeLocal(data.sale_start_at));
       setSaleEndAt(toDatetimeLocal(data.sale_end_at));
+
+      setSubscriptionEnabled(Boolean(data.subscription_enabled));
+      setSubscriptionDiscountPercent(String(data.subscription_discount_percent ?? 0));
+      const loadedIntervals = Array.isArray(data.subscription_intervals)
+        ? (data.subscription_intervals as unknown[]).filter(
+            (v): v is SubscriptionInterval =>
+              typeof v === 'string' && (SUBSCRIPTION_INTERVAL_OPTIONS as string[]).includes(v)
+          )
+        : [];
+      setSubscriptionIntervals(loadedIntervals);
 
       const hasVariantsFromConfig = Array.isArray(data.variants_config) && data.variants_config.length > 0;
       const hasVariantsFromLegacy = Array.isArray(data.variants) && data.variants.length > 0;
@@ -376,6 +402,13 @@ const ProductEditor = () => {
         images,
         sale_start_at: saleStartAt ? new Date(saleStartAt).toISOString() : null,
         sale_end_at: saleEndAt ? new Date(saleEndAt).toISOString() : null,
+        subscription_enabled: subscriptionEnabled,
+        subscription_discount_percent: (() => {
+          const n = Number(subscriptionDiscountPercent);
+          if (Number.isNaN(n)) return 0;
+          return Math.max(0, Math.min(100, Math.round(n)));
+        })(),
+        subscription_intervals: subscriptionEnabled ? subscriptionIntervals : [],
         updated_at: new Date().toISOString(),
       };
 
@@ -812,6 +845,78 @@ const ProductEditor = () => {
                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black" />
               </label>
             </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-base font-medium text-gray-900 mb-1">定期購入</h3>
+                <p className="text-xs text-gray-500">この商品で定期購入を提供する</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={subscriptionEnabled}
+                  onChange={(e) => setSubscriptionEnabled(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black" />
+              </label>
+            </div>
+
+            {subscriptionEnabled && (
+              <div className="space-y-4 pt-4 border-t border-gray-100">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">割引率 (%)</label>
+                  <input
+                    type="number"
+                    min={0}
+                    max={100}
+                    step={1}
+                    value={subscriptionDiscountPercent}
+                    onChange={(e) => setSubscriptionDiscountPercent(e.target.value)}
+                    className="w-32 p-2 border border-gray-200 rounded-md text-sm"
+                    placeholder="例: 10"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">定期購入時に通常価格から割引される割合（0〜100）</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">提供する配送間隔</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {SUBSCRIPTION_INTERVAL_OPTIONS.map((interval) => {
+                      const checked = subscriptionIntervals.includes(interval);
+                      return (
+                        <label
+                          key={interval}
+                          className={`flex items-center gap-2 p-2 border rounded cursor-pointer transition-colors ${
+                            checked ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSubscriptionIntervals((prev) =>
+                                  prev.includes(interval) ? prev : [...prev, interval]
+                                );
+                              } else {
+                                setSubscriptionIntervals((prev) => prev.filter((i) => i !== interval));
+                              }
+                            }}
+                            className="rounded border-gray-300 text-black focus:ring-black"
+                          />
+                          <span className="text-sm">{SUBSCRIPTION_INTERVAL_LABELS[interval]}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                  {subscriptionIntervals.length === 0 && (
+                    <p className="text-xs text-amber-600 mt-2">配送間隔を1つ以上選択してください</p>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">

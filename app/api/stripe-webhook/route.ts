@@ -269,6 +269,284 @@ export async function POST(request: Request) {
       return NextResponse.json({ received: true });
     }
 
+    // ============================================================
+    // 定期購入: Subscription ライフサイクル
+    // ============================================================
+    if (
+      event.type === 'customer.subscription.created' ||
+      event.type === 'customer.subscription.updated'
+    ) {
+      const sub: any = event.data.object;
+      const stripeSubscriptionId = sub.id as string;
+      const stripeCustomerId = sub.customer as string;
+      const status = sub.status as string;
+      const intervalFromMeta = sub.metadata?.interval || null;
+      // 新しい Stripe API では current_period_end は subscription item 側にある
+      const periodEndUnix =
+        sub.current_period_end ??
+        sub.items?.data?.[0]?.current_period_end ??
+        null;
+      const currentPeriodEnd = periodEndUnix
+        ? new Date(periodEndUnix * 1000).toISOString()
+        : null;
+      const canceledAt = sub.canceled_at ? new Date(sub.canceled_at * 1000).toISOString() : null;
+
+      // 元注文から auth_user_id / email を取得
+      const { data: originalOrder } = await supabaseAdmin
+        .from('orders')
+        .select('auth_user_id, email, subscription_interval')
+        .eq('stripe_subscription_id', stripeSubscriptionId)
+        .order('created_at', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+
+      // Stripe Customer からメールを取得（フォールバック）
+      let email = originalOrder?.email ?? null;
+      if (!email) {
+        try {
+          const customer = await stripe.customers.retrieve(stripeCustomerId);
+          if (customer && !(customer as any).deleted) {
+            email = (customer as any).email ?? null;
+          }
+        } catch (e) {
+          console.warn('[Webhook] failed to fetch customer email', e);
+        }
+      }
+
+      const row = {
+        stripe_subscription_id: stripeSubscriptionId,
+        stripe_customer_id: stripeCustomerId,
+        auth_user_id: originalOrder?.auth_user_id ?? null,
+        email: email ?? 'unknown@example.com',
+        status,
+        interval: intervalFromMeta || originalOrder?.subscription_interval || 'monthly',
+        metadata: sub.metadata ?? {},
+        next_billing_at: currentPeriodEnd,
+        canceled_at: canceledAt,
+        updated_at: new Date().toISOString(),
+      };
+
+      const { error: upsertErr } = await supabaseAdmin
+        .from('subscriptions')
+        .upsert([row], { onConflict: 'stripe_subscription_id' });
+      if (upsertErr) {
+        console.error('[Webhook] subscriptions upsert error:', upsertErr);
+      }
+      return NextResponse.json({ received: true });
+    }
+
+    if (event.type === 'customer.subscription.deleted') {
+      const sub: any = event.data.object;
+      const stripeSubscriptionId = sub.id as string;
+      const canceledAt = sub.canceled_at
+        ? new Date(sub.canceled_at * 1000).toISOString()
+        : new Date().toISOString();
+
+      const { error: updErr } = await supabaseAdmin
+        .from('subscriptions')
+        .update({
+          status: 'canceled',
+          canceled_at: canceledAt,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('stripe_subscription_id', stripeSubscriptionId);
+      if (updErr) {
+        console.error('[Webhook] subscriptions cancel update error:', updErr);
+      }
+      return NextResponse.json({ received: true });
+    }
+
+    // ============================================================
+    // 定期請求の各サイクル: 新規 order を生成
+    // billing_reason:
+    //   - 'subscription_create' → 初回（既存の payment_intent.succeeded で処理済み）
+    //   - 'subscription_cycle' → 2回目以降の自動請求
+    // ============================================================
+    if (event.type === 'invoice.paid') {
+      const invoice: any = event.data.object;
+      const billingReason = invoice.billing_reason as string;
+      const stripeSubscriptionId = invoice.subscription as string | null;
+      const stripePaymentIntentId = invoice.payment_intent as string | null;
+
+      if (!stripeSubscriptionId) {
+        return NextResponse.json({ received: true, skipped: 'not_subscription_invoice' });
+      }
+      if (billingReason === 'subscription_create') {
+        // 初回は payment_intent.succeeded ハンドラに任せる
+        return NextResponse.json({ received: true, skipped: 'first_cycle_handled_elsewhere' });
+      }
+      if (billingReason !== 'subscription_cycle' && billingReason !== 'subscription_update') {
+        return NextResponse.json({ received: true, skipped: `unhandled_billing_reason:${billingReason}` });
+      }
+
+      // 既に同じpayment_intent_idでordersが存在すれば重複生成しない
+      if (stripePaymentIntentId) {
+        const { data: existing } = await supabaseAdmin
+          .from('orders')
+          .select('id')
+          .eq('payment_intent_id', stripePaymentIntentId)
+          .maybeSingle();
+        if (existing) {
+          return NextResponse.json({ received: true, skipped: 'order_already_exists' });
+        }
+      }
+
+      // 元注文（最初の請求時に作られた order）をテンプレートとして取得
+      const { data: original, error: origErr } = await supabaseAdmin
+        .from('orders')
+        .select('*')
+        .eq('stripe_subscription_id', stripeSubscriptionId)
+        .order('created_at', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (origErr) {
+        console.error('[Webhook] original order fetch error:', origErr);
+        return NextResponse.json({ error: 'original_order_fetch_failed' }, { status: 500 });
+      }
+      if (!original) {
+        console.error('[Webhook] original order not found for subscription:', stripeSubscriptionId);
+        return NextResponse.json({
+          received: true,
+          warning: 'original_order_not_found',
+          stripe_subscription_id: stripeSubscriptionId,
+        });
+      }
+
+      const newOrderNumber = generateOrderNumber();
+      const nowIso = new Date().toISOString();
+      const amountPaid = Number(invoice.amount_paid ?? 0);
+
+      // 注文の複製（id, order_number, payment_intent_id 等は差し替え）
+      const cloneOrder: any = { ...original };
+      delete cloneOrder.id;
+      delete cloneOrder.created_at;
+      cloneOrder.order_number = newOrderNumber;
+      cloneOrder.payment_intent_id = stripePaymentIntentId;
+      cloneOrder.payment_status = 'paid';
+      cloneOrder.paid_at = nowIso;
+      cloneOrder.order_status = 'processing';
+      cloneOrder.updated_at = nowIso;
+      cloneOrder.notes = `[定期請求] サイクル ${invoice.number || ''} - 元注文 ${original.order_number ?? original.id}`;
+      // 金額が異なる場合はinvoiceの値で上書き（送料変動などのため）
+      if (amountPaid && Number(original.total) !== amountPaid) {
+        cloneOrder.total = amountPaid;
+      }
+
+      const { data: inserted, error: insErr } = await supabaseAdmin
+        .from('orders')
+        .insert([cloneOrder])
+        .select('id')
+        .single();
+      if (insErr || !inserted?.id) {
+        console.error('[Webhook] clone order insert error:', insErr);
+        return NextResponse.json({ error: 'clone_order_failed' }, { status: 500 });
+      }
+
+      // 注文明細を複製
+      const { data: origItems } = await supabaseAdmin
+        .from('order_items')
+        .select('*')
+        .eq('order_id', original.id);
+
+      if (origItems && origItems.length > 0) {
+        const newItems = origItems.map((it: any) => {
+          const next: any = { ...it };
+          delete next.id;
+          delete next.created_at;
+          next.order_id = inserted.id;
+          return next;
+        });
+        const { error: itemsErr } = await supabaseAdmin.from('order_items').insert(newItems);
+        if (itemsErr) {
+          console.error('[Webhook] clone order_items insert error:', itemsErr);
+        }
+      }
+
+      // 在庫減算
+      if (origItems) {
+        for (const it of origItems) {
+          if (!it.product_id || !it.quantity) continue;
+          const { error: rpcErr } = await supabaseAdmin.rpc('decrement_product_stock', {
+            p_product_id: it.product_id,
+            p_selected_options: it.selected_options ?? null,
+            p_qty: Number(it.quantity),
+          });
+          if (rpcErr) {
+            console.error('[Webhook] decrement_product_stock failed for recurring', { pid: it.product_id, rpcErr });
+          }
+        }
+      }
+
+      // GAS通知（既存形式に揃える）
+      try {
+        const payload = {
+          created_at: nowIso,
+          order_number: newOrderNumber,
+          name:
+            `${original.last_name ?? ''}${original.first_name ? ` ${original.first_name}` : ''}`.trim() ||
+            `${original.first_name ?? ''} ${original.last_name ?? ''}`.trim(),
+          email: original.email,
+          phone: original.phone,
+          shipping_address: original.shipping_address,
+          shipping_city: original.shipping_city,
+          shipping_postal_code: original.shipping_postal_code,
+          subtotal: original.subtotal,
+          shipping_cost: original.shipping_cost,
+          total: cloneOrder.total,
+          payment_status: 'paid',
+          order_status: 'processing',
+          is_subscription_cycle: true,
+          subscription_interval: original.subscription_interval,
+        };
+        await postToGAS(payload);
+      } catch (gasErr: any) {
+        console.error('[GAS] recurring order notify error (ignored)', gasErr?.message || gasErr);
+      }
+
+      // subscriptions テーブルの next_billing_at を進める
+      try {
+        const { data: subFromStripe } = await stripe.subscriptions.retrieve(stripeSubscriptionId).then(
+          (s) => ({ data: s as any }),
+          (err) => {
+            console.warn('[Webhook] retrieve subscription failed', err?.message);
+            return { data: null as any };
+          }
+        );
+        if (subFromStripe) {
+          const periodEndUnix =
+            subFromStripe.current_period_end ??
+            subFromStripe.items?.data?.[0]?.current_period_end ??
+            null;
+          await supabaseAdmin
+            .from('subscriptions')
+            .update({
+              status: subFromStripe.status,
+              next_billing_at: periodEndUnix
+                ? new Date(periodEndUnix * 1000).toISOString()
+                : null,
+              updated_at: nowIso,
+            })
+            .eq('stripe_subscription_id', stripeSubscriptionId);
+        }
+      } catch (e: any) {
+        console.warn('[Webhook] update subscriptions next_billing_at failed', e?.message);
+      }
+
+      return NextResponse.json({ received: true, new_order_id: inserted.id });
+    }
+
+    if (event.type === 'invoice.payment_failed') {
+      const invoice: any = event.data.object;
+      const stripeSubscriptionId = invoice.subscription as string | null;
+      if (stripeSubscriptionId) {
+        await supabaseAdmin
+          .from('subscriptions')
+          .update({ status: 'past_due', updated_at: new Date().toISOString() })
+          .eq('stripe_subscription_id', stripeSubscriptionId);
+      }
+      return NextResponse.json({ received: true });
+    }
+
     return NextResponse.json({ received: true });
   } catch (err: any) {
     console.error('stripe webhook error', err);

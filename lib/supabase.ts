@@ -1,5 +1,22 @@
 import { createClient } from '@supabase/supabase-js';
-import { Product } from '../types';
+import { Product, SubscriptionInterval } from '../types';
+
+const VALID_SUBSCRIPTION_INTERVALS: SubscriptionInterval[] = [
+  'weekly',
+  'biweekly',
+  'monthly',
+  'bimonthly',
+  'quarterly',
+  'semiannual',
+  'annual',
+];
+
+const normalizeSubscriptionIntervals = (raw: unknown): SubscriptionInterval[] => {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((v): v is SubscriptionInterval =>
+    typeof v === 'string' && (VALID_SUBSCRIPTION_INTERVALS as string[]).includes(v)
+  );
+};
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
@@ -39,6 +56,9 @@ export interface DatabaseProduct {
   is_free_shipping: boolean | null;
   sale_start_at: string | null;
   sale_end_at: string | null;
+  subscription_enabled?: boolean | null;
+  subscription_discount_percent?: number | null;
+  subscription_intervals?: unknown; // jsonb 配列
   created_at: string;
   updated_at: string;
 }
@@ -71,6 +91,9 @@ export const convertDatabaseProductToProduct = (dbProduct: DatabaseProduct): Pro
     isFreeShipping: dbProduct.is_free_shipping ?? false,
     saleStartAt: (dbProduct as any).sale_start_at ?? undefined,
     saleEndAt: (dbProduct as any).sale_end_at ?? undefined,
+    subscriptionEnabled: dbProduct.subscription_enabled ?? false,
+    subscriptionDiscountPercent: dbProduct.subscription_discount_percent ?? 0,
+    subscriptionIntervals: normalizeSubscriptionIntervals(dbProduct.subscription_intervals),
   };
 };
 
@@ -126,6 +149,9 @@ export const convertProductToDatabaseProduct = (product: Partial<Product> & { st
     is_visible: product.is_visible ?? true,
     sale_start_at: (product as any).saleStartAt ?? null,
     sale_end_at: (product as any).saleEndAt ?? null,
+    subscription_enabled: (product as any).subscriptionEnabled ?? false,
+    subscription_discount_percent: (product as any).subscriptionDiscountPercent ?? 0,
+    subscription_intervals: normalizeSubscriptionIntervals((product as any).subscriptionIntervals),
   };
 };
 

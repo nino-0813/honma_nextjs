@@ -50,7 +50,7 @@ const AmbassadorProductDetail = () => {
       return;
     }
 
-    addToCart(product, quantity, undefined, calculatedPrice, {});
+    addToCart(product, quantity, { finalPrice: calculatedPrice, selectedOptions: {} });
     openCart();
   };
 
