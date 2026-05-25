@@ -31,6 +31,10 @@ export default function ProductDetailView({ product }: { product: Product }) {
   );
   const subscriptionPrice = Math.round(calculatedPrice * (1 - subscriptionDiscountPercent / 100));
 
+  // 定期購入の注意事項モーダル
+  const [showSubscriptionNotice, setShowSubscriptionNotice] = useState(false);
+  const [hasAgreedSubscription, setHasAgreedSubscription] = useState(false);
+
   // 配送間隔の選択肢が変わったら有効な値に補正
   useEffect(() => {
     if (subscriptionIntervals.length === 0) return;
@@ -334,11 +338,19 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 );
               })()}
 
-              {/* 販売期間の表示 */}
+              {/* 販売期間の表示（片方だけでも自然な日本語で出す） */}
               {(product?.saleStartAt || product?.saleEndAt) && (
                 <div className="mb-4">
                   <p className="text-sm text-gray-600">
-                    販売期間: {product.saleStartAt ? formatSaleDateTime(product.saleStartAt) : ''}{product.saleStartAt && product.saleEndAt ? ' ~ ' : ''}{product.saleEndAt ? formatSaleDateTime(product.saleEndAt) : ''}
+                    {product.saleStartAt && product.saleEndAt && (
+                      <>販売期間: {formatSaleDateTime(product.saleStartAt)} 〜 {formatSaleDateTime(product.saleEndAt)}</>
+                    )}
+                    {product.saleStartAt && !product.saleEndAt && (
+                      <>販売開始: {formatSaleDateTime(product.saleStartAt)} から</>
+                    )}
+                    {!product.saleStartAt && product.saleEndAt && (
+                      <>販売終了: {formatSaleDateTime(product.saleEndAt)} まで</>
+                    )}
                   </p>
                 </div>
               )}
@@ -357,16 +369,16 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 const formatted = `${y}年${m}月${d}日`;
 
                 return (
-                  <div className="mb-8 p-3 rounded-lg border border-amber-200 bg-amber-50">
+                  <div className="mb-8 p-3 rounded-lg border border-sky-200 bg-sky-50">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="inline-block text-[10px] font-bold tracking-widest uppercase bg-amber-600 text-white px-2 py-0.5 rounded">
+                      <span className="inline-block text-[10px] font-bold tracking-widest uppercase bg-sky-700 text-white px-2 py-0.5 rounded">
                         予約商品
                       </span>
-                      <span className="text-sm font-medium text-amber-900">
+                      <span className="text-sm font-medium text-sky-900">
                         発送開始予定日: {formatted}
                       </span>
                     </div>
-                    <p className="text-xs text-amber-700 mt-1">
+                    <p className="text-xs text-sky-800 mt-1">
                       ※ ご注文時にお支払いいただきますが、商品の発送は上記の日付以降になります。
                     </p>
                   </div>
@@ -396,7 +408,14 @@ export default function ProductDetailView({ product }: { product: Product }) {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setPurchaseType('subscription')}
+                    onClick={() => {
+                      if (purchaseType === 'subscription') return; // 既に選択中なら何もしない
+                      if (hasAgreedSubscription) {
+                        setPurchaseType('subscription');
+                      } else {
+                        setShowSubscriptionNotice(true);
+                      }
+                    }}
                     className={`relative flex flex-col items-center justify-center py-6 px-4 border-2 rounded transition-colors ${
                       purchaseType === 'subscription'
                         ? 'border-primary bg-white'
@@ -660,6 +679,91 @@ export default function ProductDetailView({ product }: { product: Product }) {
           </div>
         </div>
       
+        {/* 定期購入 注意事項モーダル */}
+        {showSubscriptionNotice && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-8"
+            onClick={() => setShowSubscriptionNotice(false)}
+          >
+            <div
+              className="relative bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                onClick={() => setShowSubscriptionNotice(false)}
+                aria-label="閉じる"
+                className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <div className="p-6 md:p-8">
+                <h3 className="text-lg md:text-xl font-medium text-primary mb-4 tracking-wider">
+                  定期購入のご注意事項
+                </h3>
+                <p className="text-xs text-gray-500 mb-4">
+                  お申し込み前に必ずご確認ください。
+                </p>
+                <ul className="space-y-3 text-sm text-gray-700 leading-relaxed mb-6">
+                  <li className="flex gap-2">
+                    <span className="text-primary flex-shrink-0">・</span>
+                    <span>表示されている価格は1回分の価格です。</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-primary flex-shrink-0">・</span>
+                    <span>
+                      2回目以降の決済はお届け日の直前になされます。
+                      <span className="block mt-1 text-xs text-amber-700">
+                        ※初回のみご注文時に第1便目の決済がされます
+                      </span>
+                    </span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-primary flex-shrink-0">・</span>
+                    <span>毎回送料がかかります。</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-primary flex-shrink-0">・</span>
+                    <span>
+                      ご注文分を確保させていただくため、1年の途中でのキャンセルはできかねます。
+                    </span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-primary flex-shrink-0">・</span>
+                    <span>
+                      定期便は単年でのご注文ではなく、キャンセルするまで続くため、毎年
+                      <span className="font-medium">6月〜8月末まで</span>
+                      の間にキャンセル希望がない場合、次年度も自動更新となります。
+                    </span>
+                  </li>
+                </ul>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setHasAgreedSubscription(true);
+                      setPurchaseType('subscription');
+                      setShowSubscriptionNotice(false);
+                    }}
+                    className="flex-1 py-3 px-4 bg-primary text-white text-sm tracking-widest hover:bg-gray-800 transition-colors"
+                  >
+                    同意して定期購入を選択
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowSubscriptionNotice(false)}
+                    className="flex-1 py-3 px-4 bg-white text-primary border border-gray-300 text-sm tracking-widest hover:bg-gray-50 transition-colors"
+                  >
+                    キャンセル
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {allProducts.length > 0 && (
           <div className="mt-32 border-t border-gray-100 pt-16">
             <h3 className="text-center text-lg font-serif tracking-[0.2em] mb-12">RECOMMEND</h3>

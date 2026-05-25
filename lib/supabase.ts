@@ -371,6 +371,29 @@ export const getOrders = async (userId: string): Promise<Order[]> => {
 
   console.log('[getOrders] 取得した注文明細数:', orderItemsData?.length || 0);
 
+  // 商品詳細ページへのリンク用に handle / 最新画像を取得
+  const productIds = Array.from(
+    new Set(
+      (orderItemsData || [])
+        .map((item: any) => item.product_id)
+        .filter((id: any): id is string => typeof id === 'string' && id.length > 0)
+    )
+  );
+  const handlesById: Record<string, { handle: string | null; image: string | null; images: string[] | null }> = {};
+  if (productIds.length > 0) {
+    const { data: productsData } = await supabase
+      .from('products')
+      .select('id, handle, image, images')
+      .in('id', productIds);
+    (productsData || []).forEach((p: any) => {
+      handlesById[p.id] = {
+        handle: p.handle ?? null,
+        image: p.image ?? null,
+        images: Array.isArray(p.images) ? p.images : null,
+      };
+    });
+  }
+
   // 注文IDごとにorder_itemsをグループ化
   const itemsByOrderId: Record<string, any[]> = {};
   (orderItemsData || []).forEach((item: any) => {
@@ -400,20 +423,25 @@ export const getOrders = async (userId: string): Promise<Order[]> => {
         updated_at: order.updated_at,
         order_items:
           orderItems.length > 0
-            ? orderItems.map((item: any) => ({
-                id: item.id,
-                product_id: item.product_id,
-                quantity: item.quantity,
-                price: item.product_price || (item.line_total ? item.line_total / item.quantity : 0) || 0,
-                product: {
-                  title: item.product_title || '商品情報なし',
-                  image: item.product_image || null,
-                  images: item.product_image ? [item.product_image] : null,
-                  handle: null,
-                },
-                variant: item.variant,
-                selected_options: item.selected_options,
-              }))
+            ? orderItems.map((item: any) => {
+                const productMeta = handlesById[item.product_id] ?? null;
+                return {
+                  id: item.id,
+                  product_id: item.product_id,
+                  quantity: item.quantity,
+                  price: item.product_price || (item.line_total ? item.line_total / item.quantity : 0) || 0,
+                  product: {
+                    title: item.product_title || '商品情報なし',
+                    image: item.product_image || productMeta?.image || null,
+                    images: item.product_image
+                      ? [item.product_image]
+                      : productMeta?.images || (productMeta?.image ? [productMeta.image] : null),
+                    handle: productMeta?.handle ?? null,
+                  },
+                  variant: item.variant,
+                  selected_options: item.selected_options,
+                };
+              })
             : fallbackItems.map((item, idx) => ({
                 id: `fallback-${order.id}-${idx}`,
                 product_id: `fallback-${idx}`,

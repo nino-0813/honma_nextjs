@@ -518,36 +518,55 @@ const MyPage = () => {
 
                   <div className="p-6">
                     <div className="space-y-4">
-                      {order.order_items?.map((item) => (
-                        <div key={item.id} className="flex gap-4">
-                          <Link
-                            href={`/products/${item.product?.handle || ''}`}
-                            className="flex-shrink-0 w-20 h-20 bg-gray-100 rounded overflow-hidden"
-                          >
-                            <FadeInImage
-                              src={
-                                item.product?.images && item.product.images.length > 0
-                                  ? item.product.images[0]
-                                  : item.product?.image || ''
-                              }
-                              alt={item.product?.title || ''}
-                              className="w-full h-full object-contain"
-                            />
-                          </Link>
-                          <div className="flex-1 min-w-0">
-                            <Link
-                              href={`/products/${item.product?.handle || ''}`}
-                              className="text-sm font-medium text-gray-900 hover:text-black transition-colors line-clamp-2"
-                            >
-                              {item.product?.title || '商品情報なし'}
-                            </Link>
-                            <div className="mt-1 flex items-center gap-4 text-xs text-gray-500">
-                              <span>数量: {item.quantity}</span>
-                              <span>¥{item.price.toLocaleString()}</span>
+                      {order.order_items?.map((item) => {
+                        const productHandle = item.product?.handle;
+                        const productHref = productHandle ? `/products/${productHandle}` : null;
+                        const ImageWrapper: any = productHref ? Link : 'div';
+                        const TextWrapper: any = productHref ? Link : 'span';
+                        const imageWrapperProps = productHref
+                          ? {
+                              href: productHref,
+                              className:
+                                'flex-shrink-0 w-20 h-20 bg-gray-100 rounded overflow-hidden cursor-pointer hover:opacity-80 transition-opacity',
+                            }
+                          : {
+                              className: 'flex-shrink-0 w-20 h-20 bg-gray-100 rounded overflow-hidden',
+                            };
+                        const textWrapperProps = productHref
+                          ? {
+                              href: productHref,
+                              className:
+                                'text-sm font-medium text-gray-900 hover:text-black hover:underline transition-colors line-clamp-2 cursor-pointer',
+                            }
+                          : {
+                              className:
+                                'text-sm font-medium text-gray-900 line-clamp-2',
+                            };
+                        return (
+                          <div key={item.id} className="flex gap-4">
+                            <ImageWrapper {...imageWrapperProps}>
+                              <FadeInImage
+                                src={
+                                  item.product?.images && item.product.images.length > 0
+                                    ? item.product.images[0]
+                                    : item.product?.image || ''
+                                }
+                                alt={item.product?.title || ''}
+                                className="w-full h-full object-contain"
+                              />
+                            </ImageWrapper>
+                            <div className="flex-1 min-w-0">
+                              <TextWrapper {...textWrapperProps}>
+                                {item.product?.title || '商品情報なし'}
+                              </TextWrapper>
+                              <div className="mt-1 flex items-center gap-4 text-xs text-gray-500">
+                                <span>数量: {item.quantity}</span>
+                                <span>¥{item.price.toLocaleString()}</span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                     <div className="mt-4 pt-4 border-t border-gray-200">
                       <Link

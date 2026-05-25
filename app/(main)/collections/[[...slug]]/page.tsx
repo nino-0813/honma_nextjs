@@ -6,6 +6,8 @@ import { useParams } from 'next/navigation';
 import { useProducts } from '@/hooks/useProducts';
 import { FadeInImage } from '@/components/UI';
 import type { Product } from '@/types';
+import { isProductPreorder, isProductSoldOut } from '@/lib/productStatus';
+import YearlySubscriptionLP, { YearlySubscriptionFooter } from '@/components/YearlySubscriptionLP';
 
 function getFilterNameFromParam(param: string) {
   if (param === 'rice') return 'お米';
@@ -36,46 +38,6 @@ function getProductSubcategories(p: Product): string[] {
   const subs = (p as Product & { subcategories?: string[] }).subcategories;
   if (Array.isArray(subs) && subs.length > 0) return subs;
   return p.subcategory ? [p.subcategory] : [];
-}
-
-function isProductPreorder(p: Product): boolean {
-  if (!p.scheduledShippingDate) return false;
-  // 日付ベースで比較（YYYY-MM-DD の辞書順で比較できる）
-  // 「発送開始予定日」が到来したらバッジを消す: today >= shipDate のとき false
-  const now = new Date();
-  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-  // scheduledShippingDate は "YYYY-MM-DD" 形式
-  const shipStr = String(p.scheduledShippingDate).slice(0, 10);
-  return shipStr > todayStr;
-}
-
-function isProductSoldOut(p: Product): boolean {
-  if (p.soldOut) return true;
-
-  if (p.hasVariants && p.variants_config && p.variants_config.length > 0) {
-    // 在庫管理ありのタイプのみ判定対象
-    const managedTypes = p.variants_config.filter(
-      (t) => t.stockManagement === 'individual' || t.stockManagement === 'shared'
-    );
-    if (managedTypes.length === 0) return false;
-    // 全タイプで在庫切れなら売り切れ
-    return managedTypes.every((t) => {
-      // sharedStock が設定されていればそれを最優先（実データはほぼこのケース）
-      if (t.sharedStock !== null && t.sharedStock !== undefined) {
-        return Number(t.sharedStock) <= 0;
-      }
-      // sharedStock が無い場合は個別の option.stock を判定
-      const opts = t.options.filter((o) => o.stock !== null && o.stock !== undefined);
-      if (opts.length === 0) return false; // 在庫管理されていない＝売り切れ扱いしない
-      return opts.every((o) => Number(o.stock) <= 0);
-    });
-  }
-
-  // バリエーション無し: 基本在庫が0以下
-  if (p.stock !== undefined && p.stock !== null) {
-    return Number(p.stock) <= 0;
-  }
-  return false;
 }
 
 export default function CollectionsPage() {
@@ -220,6 +182,9 @@ export default function CollectionsPage() {
           </div>
         )}
 
+        {/* 年間契約ページではLPセクションを商品一覧の上に表示 */}
+        {!loading && !error && currentSubcategory === 'yearly' && <YearlySubscriptionLP />}
+
         {!loading && !error && filteredProducts.length === 0 && (
           <div className="flex items-center justify-center py-32">
             <div className="text-center">
@@ -241,13 +206,6 @@ export default function CollectionsPage() {
                 style={{ animationDelay: `${index * 60}ms` }}
               >
                 <div className="relative aspect-square bg-white border border-gray-100 overflow-hidden mb-5 flex items-center justify-center">
-                  <div className="absolute top-2 left-2 z-20 flex flex-col gap-2">
-                    {preorder && (
-                      <span className="bg-amber-600 text-white px-3 py-1 text-[10px] font-bold tracking-widest uppercase shadow-sm">
-                        予約商品
-                      </span>
-                    )}
-                  </div>
                   <div className="absolute inset-0 z-10 bg-white transition-opacity duration-700 ease-in-out group-hover:opacity-0 flex items-center justify-center p-2">
                     <FadeInImage
                       src={product.images?.length ? product.images[0] : product.image || ''}
@@ -281,7 +239,7 @@ export default function CollectionsPage() {
                       </span>
                     )}
                     {preorder && (
-                      <span className="text-[10px] font-bold tracking-widest uppercase text-amber-700 border border-amber-600 px-2 py-0.5">
+                      <span className="text-[10px] font-bold tracking-widest uppercase text-sky-700 border border-sky-700 px-2 py-0.5">
                         予約商品
                       </span>
                     )}
@@ -292,6 +250,9 @@ export default function CollectionsPage() {
             })}
           </div>
         )}
+
+        {/* 年間契約ページではフッターセクション（FAQ・送料）を表示 */}
+        {!loading && !error && currentSubcategory === 'yearly' && <YearlySubscriptionFooter />}
       </div>
     </div>
   );

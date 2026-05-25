@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Product } from '@/types';
 import { useProducts } from '@/hooks/useProducts';
 import { FadeInImage } from '@/components/UI';
+import { isProductPreorder, isProductSoldOut } from '@/lib/productStatus';
 
 const ProductGrid = () => {
   const { products, loading, error } = useProducts();
@@ -56,11 +57,13 @@ const ProductGrid = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-10 md:gap-x-6 md:gap-y-12">
           {displayProducts.map((product, index) => {
             const productPath = `/products/${product.handle || product.id}`;
+            const soldOut = isProductSoldOut(product);
+            const preorder = !soldOut && isProductPreorder(product); // 在庫切れ優先
             return (
           <Link key={product.id} href={productPath} className="group flex flex-col opacity-0 animate-fade-in-up" style={{ animationDelay: `${index * 100}ms` }}>
               <div className="relative aspect-square overflow-hidden bg-[#f9f9f9] mb-4">
                 <div className="absolute top-2 left-2 z-20 flex flex-col gap-2">
-                  {product.soldOut && (
+                  {soldOut && (
                     <span className="bg-primary text-white px-3 py-1 text-[10px] font-bold tracking-wider uppercase shadow-sm">
                       Sold Out
                     </span>
@@ -94,8 +97,15 @@ const ProductGrid = () => {
                 <h3 className="text-sm font-medium text-primary leading-relaxed group-hover:text-gray-600 transition-colors line-clamp-2 min-h-[2.8em]">
                   {product.title}
                 </h3>
-                <p className="text-sm text-gray-900 font-serif tracking-wide">
-                  ¥{product.price.toLocaleString()} {product.title.includes('〜') ? '〜' : ''}
+                <p className="text-sm text-gray-900 font-serif tracking-wide flex items-center justify-center gap-2">
+                  <span>
+                    ¥{product.price.toLocaleString()} {product.title.includes('〜') ? '〜' : ''}
+                  </span>
+                  {preorder && (
+                    <span className="text-[10px] font-bold tracking-widest uppercase text-sky-700 border border-sky-700 px-2 py-0.5">
+                      予約商品
+                    </span>
+                  )}
                 </p>
               </div>
           </Link>
