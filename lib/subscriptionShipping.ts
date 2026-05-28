@@ -1,11 +1,22 @@
 /**
- * 定期購入の発送日計算ロジック
+ * 定期購入の発送日 / 請求日 計算ロジック
  *
  * オーナー仕様:
  *  - 当月の10日までに決済 → その月の15日に発送（1回目）
  *  - 11日以降の決済 → 翌月の15日に発送（1回目）
  *  - 2回目以降は毎月15日発送（インターバルが2か月以上ならそのスパン）
+ *  - Stripe 請求は「お届け月の10日」に走る
  *  - 週次/隔週は 15日ルール対象外
+ *
+ * 重要 — タイムゾーンの取り扱い:
+ *  - 業務は日本（JST = UTC+9）。
+ *  - サーバー（Vercel）は UTC、ブラウザは Asia/Tokyo の想定。
+ *  - 「○月○日」を判定するときは必ず JST で行う（UTCで判定すると深夜にズレる）。
+ *  - Stripe へ渡す anchor は「JST 10日 05:00」を表す UTC 秒。
+ *    Stripe推奨: 0:00 ぴったりを避けて 04:00〜05:00 を使う。請求書は支払の約2h前に作成されるため、
+ *    日本の "朝5時" タイミングが安全帯になる。
+ *
+ * すべての関数は呼び出し側のタイムゾーン設定に依存しない（純粋関数）。
  */
 
 export type SubscriptionIntervalKey =
@@ -16,6 +27,10 @@ export type SubscriptionIntervalKey =
   | 'quarterly'
   | 'semiannual'
   | 'annual';
+
+const JST_OFFSET_MS = 9 * 60 * 60 * 1000;
+/** Stripe請求の安全時間 (JST 05:00) — 0:00を避けることでTZズレを回避 */
+const SAFE_HOUR_JST = 5;
 
 /** インターバル → 月数（週次系は 0 を返す） */
 function intervalMonths(interval: string | null | undefined): number {
@@ -35,18 +50,57 @@ function intervalMonths(interval: string | null | undefined): number {
   }
 }
 
+/** インターバル → 月数 を外部にも公開 */
+export function intervalToMonths(interval: string | null | undefined): number {
+  return intervalMonths(interval);
+}
+
+/** Date を JST の {year, month, day, hour, minute} に分解 */
+function toJSTParts(date: Date): {
+  year: number;
+  month: number; // 0-11
+  day: number;
+  hour: number;
+  minute: number;
+} {
+  const shifted = new Date(date.getTime() + JST_OFFSET_MS);
+  return {
+    year: shifted.getUTCFullYear(),
+    month: shifted.getUTCMonth(),
+    day: shifted.getUTCDate(),
+    hour: shifted.getUTCHours(),
+    minute: shifted.getUTCMinutes(),
+  };
+}
+
 /**
- * 「N日までは当月の15日、11日以降は翌月の15日」のルールで発送日を返す。
+ * JST の年/月/日/時を表す瞬間を、UTC ベースの Date として返す。
+ * 例: jstMomentToUtcDate(2026, 5, 10, 5) → JST 2026/6/10 05:00 = UTC 2026/6/9 20:00 (month=5は0-indexedで6月)
+ *
+ * Date.UTC は month +1 や day overflow を自動補正してくれるので、月末・年末の越境も安全。
+ */
+function jstMomentToUtcDate(year: number, month: number, day: number, hour: number = 0): Date {
+  const utcMs = Date.UTC(year, month, day, hour, 0, 0) - JST_OFFSET_MS;
+  return new Date(utcMs);
+}
+
+/**
+ * JST の年/月/日（00:00時点）を表す瞬間を Date として返す。表示・比較用。
+ */
+function jstDateOnlyToUtcDate(year: number, month: number, day: number): Date {
+  return jstMomentToUtcDate(year, month, day, 0);
+}
+
+/**
+ * 「N日までは当月の15日、11日以降は翌月の15日」のルールで「JST 15日 00:00」を Date で返す。
  * 主に「決済日 → 初回お届け日」の計算に使う。
  */
 export function computeFirstShippingDate(checkoutDate: Date): Date {
-  const day = checkoutDate.getDate();
-  const y = checkoutDate.getFullYear();
-  const m = checkoutDate.getMonth();
+  const { year, month, day } = toJSTParts(checkoutDate);
   if (day <= 10) {
-    return new Date(y, m, 15);
+    return jstDateOnlyToUtcDate(year, month, 15);
   }
-  return new Date(y, m + 1, 15);
+  return jstDateOnlyToUtcDate(year, month + 1, 15);
 }
 
 /**
@@ -62,6 +116,7 @@ export function computeNextShippingDate(sub: {
   interval: string | null | undefined;
 }): Date | null {
   const today = new Date();
+  const todayJstStart = jstStartOfDay(today);
 
   // 週次/隔週は 15日ルール対象外
   if (sub.interval === 'weekly' || sub.interval === 'biweekly') {
@@ -73,20 +128,25 @@ export function computeNextShippingDate(sub: {
     const createdAt = new Date(sub.created_at);
     if (!isNaN(createdAt.getTime())) {
       const firstShipping = computeFirstShippingDate(createdAt);
-      if (firstShipping >= startOfDay(today)) {
+      if (firstShipping >= todayJstStart) {
         return firstShipping;
       }
     }
   }
 
-  // 2) 2回目以降: next_billing_at の月の15日（未来になるまで interval 月ずつ進める）
+  // 2) 2回目以降: next_billing_at の月（JST）の15日。未来になるまで interval 月ずつ進める
   if (sub.next_billing_at) {
     const billing = new Date(sub.next_billing_at);
     if (!isNaN(billing.getTime())) {
-      let candidate = new Date(billing.getFullYear(), billing.getMonth(), 15);
+      const billingJst = toJSTParts(billing);
+      let candidate = jstDateOnlyToUtcDate(billingJst.year, billingJst.month, 15);
       const months = intervalMonths(sub.interval) || 1;
-      while (candidate < startOfDay(today)) {
-        candidate = new Date(candidate.getFullYear(), candidate.getMonth() + months, 15);
+      // 月数を加算。Date.UTC が month overflow を補正してくれる
+      let yr = billingJst.year;
+      let mo = billingJst.month;
+      while (candidate < todayJstStart) {
+        mo += months;
+        candidate = jstDateOnlyToUtcDate(yr, mo, 15);
       }
       return candidate;
     }
@@ -95,27 +155,30 @@ export function computeNextShippingDate(sub: {
   return null;
 }
 
-function startOfDay(d: Date): Date {
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+/** その日(JST)の 00:00 を表す Date */
+function jstStartOfDay(d: Date): Date {
+  const p = toJSTParts(d);
+  return jstDateOnlyToUtcDate(p.year, p.month, p.day);
 }
 
-/** 「2026年6月15日」形式でフォーマット */
+/** 「2026年6月15日」形式でフォーマット（JST基準） */
 export function formatJapaneseDate(date: Date | null): string {
   if (!date) return '-';
-  return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+  const { year, month, day } = toJSTParts(date);
+  return `${year}年${month + 1}月${day}日`;
 }
 
 /**
  * Stripe Subscription の billing_cycle_anchor (Unix秒) を返す。
  *
  * 仕様:
- *  - 「初回お届け月の "interval月後" の 10日」を anchor にする
- *  - これにより 2回目以降の Stripe 請求が毎月（または間隔ごとの）10日に走る
- *  - 月跨ぎの計算は Date コンストラクタが自動補正
+ *  - 「初回お届け月の "interval月後" の 10日 05:00 JST」を anchor にする
+ *  - Stripe推奨に従い 0:00ジャストではなく 05:00 JST を使う（タイムゾーン境界の事故防止）
+ *  - 月跨ぎ・年跨ぎは Date.UTC の自動補正に任せる
  *
  * 例（monthly）:
- *  - 5/8 契約 → 初回発送 5/15 → anchor = 6/10
- *  - 5/20契約 → 初回発送 6/15 → anchor = 7/10
+ *  - 5/8 契約 → 初回発送 5/15 → anchor = 2026/6/10 05:00 JST = Unix秒
+ *  - 5/20契約 → 初回発送 6/15 → anchor = 2026/7/10 05:00 JST = Unix秒
  *
  * 週次/隔週は対象外（null を返す → 呼び出し側で anchor を指定しない）
  */
@@ -127,16 +190,9 @@ export function computeBillingCycleAnchor(
   if (interval === 'weekly' || interval === 'biweekly') return null;
   const months = intervalMonths(interval);
   if (months <= 0) return null;
-  const firstShipping = computeFirstShippingDate(checkoutDate);
-  const anchor = new Date(
-    firstShipping.getFullYear(),
-    firstShipping.getMonth() + months,
-    10
-  );
-  return Math.floor(anchor.getTime() / 1000);
-}
 
-// 既存のローカル定数をエクスポート
-export function intervalToMonths(interval: string | null | undefined): number {
-  return intervalMonths(interval);
+  const firstShipping = computeFirstShippingDate(checkoutDate);
+  const fs = toJSTParts(firstShipping);
+  const anchor = jstMomentToUtcDate(fs.year, fs.month + months, 10, SAFE_HOUR_JST);
+  return Math.floor(anchor.getTime() / 1000);
 }
