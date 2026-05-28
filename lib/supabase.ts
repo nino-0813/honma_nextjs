@@ -268,6 +268,8 @@ export interface Order {
   total: number;
   payment_status: string;
   shipping_method?: string | null;
+  subscription_interval?: string | null;
+  stripe_subscription_id?: string | null;
   created_at: string;
   updated_at: string;
   order_items?: OrderItem[];
@@ -438,6 +440,8 @@ export const getOrders = async (userId: string): Promise<Order[]> => {
         total: order.total,
         payment_status: order.payment_status,
         shipping_method: order.shipping_method ?? null,
+        subscription_interval: order.subscription_interval ?? null,
+        stripe_subscription_id: order.stripe_subscription_id ?? null,
         created_at: order.created_at,
         updated_at: order.updated_at,
         order_items:
