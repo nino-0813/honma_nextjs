@@ -62,6 +62,152 @@ async function postToGAS(payload: any) {
   }
 }
 
+/**
+ * 注文に対してイベントマイルを付与する（ログインユーザーのみ）。
+ *
+ * - 同一 order_id に対する 'earn' 履歴があれば再付与しない（idempotent）
+ * - 計算式: (subtotal + shipping_cost) × カート内最大 mile_earn_rate / 100
+ * - event_miles_used が指定されている場合は先に 'use' 履歴を記録して残高を引き落とす
+ * - 失敗してもwebhook全体のレスポンスは止めない（ログ出力のみ）
+ */
+async function grantEventMilesForOrder(supabaseAdmin: any, orderId: string) {
+  try {
+    const { data: order, error: orderErr } = await supabaseAdmin
+      .from('orders')
+      .select('id, auth_user_id, subtotal, shipping_cost, event_miles_used')
+      .eq('id', orderId)
+      .maybeSingle();
+    if (orderErr || !order) {
+      console.warn('[EventMile] order not found', orderId, orderErr);
+      return;
+    }
+    if (!order.auth_user_id) {
+      console.log('[EventMile] guest order, no miles granted', orderId);
+      return;
+    }
+
+    // 多重実行ガード
+    const { data: existingEarn } = await supabaseAdmin
+      .from('event_mile_transactions')
+      .select('id')
+      .eq('order_id', orderId)
+      .eq('type', 'earn')
+      .maybeSingle();
+    if (existingEarn) {
+      console.log('[EventMile] already granted, skipping', orderId);
+      return;
+    }
+
+    // 注文明細 + 商品の mile_earn_rate を集計
+    const { data: items } = await supabaseAdmin
+      .from('order_items')
+      .select('product_id, quantity')
+      .eq('order_id', orderId);
+    if (!items || items.length === 0) {
+      console.log('[EventMile] no order_items', orderId);
+      return;
+    }
+
+    const productIds = Array.from(
+      new Set(items.map((it: any) => it.product_id).filter((v: any): v is string => !!v))
+    );
+    let maxRate = 0;
+    if (productIds.length > 0) {
+      const { data: products } = await supabaseAdmin
+        .from('products')
+        .select('id, mile_earn_rate')
+        .in('id', productIds);
+      const rateById: Record<string, number> = {};
+      (products || []).forEach((p: any) => {
+        rateById[p.id] = Math.max(0, Math.min(100, Math.round(Number(p.mile_earn_rate ?? 0))));
+      });
+      for (const it of items) {
+        const rate = rateById[it.product_id] ?? 0;
+        if (rate > maxRate) maxRate = rate;
+      }
+    }
+
+    // 現在の残高を取得
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('event_mile_balance')
+      .eq('id', order.auth_user_id)
+      .maybeSingle();
+    const currentBalance = Math.max(0, Math.round(Number(profile?.event_mile_balance ?? 0)));
+
+    // (a) 利用マイル（注文で指定されていれば残高から引き落とし）
+    const milesRequested = Math.max(0, Math.round(Number(order.event_miles_used ?? 0)));
+    let runningBalance = currentBalance;
+    if (milesRequested > 0) {
+      const actualUse = Math.min(milesRequested, runningBalance);
+      if (actualUse < milesRequested) {
+        console.error('[EventMile] insufficient balance for use', {
+          orderId,
+          milesRequested,
+          currentBalance,
+          actualUse,
+        });
+      }
+      if (actualUse > 0) {
+        runningBalance -= actualUse;
+        await supabaseAdmin.from('event_mile_transactions').insert([
+          {
+            auth_user_id: order.auth_user_id,
+            order_id: orderId,
+            type: 'use',
+            amount: -actualUse,
+            balance_after: runningBalance,
+            description:
+              actualUse < milesRequested
+                ? `イベントチケット購入で利用（残高不足のため${actualUse}マイルのみ）`
+                : 'イベントチケット購入で利用',
+          },
+        ]);
+      }
+    }
+
+    // (b) 付与マイル: (subtotal + shipping_cost) × maxRate%
+    if (maxRate > 0) {
+      const grossAmount = Number(order.subtotal ?? 0) + Number(order.shipping_cost ?? 0);
+      const milesToGrant = grossAmount > 0 ? Math.floor((grossAmount * maxRate) / 100) : 0;
+      if (milesToGrant > 0) {
+        runningBalance += milesToGrant;
+        await supabaseAdmin.from('event_mile_transactions').insert([
+          {
+            auth_user_id: order.auth_user_id,
+            order_id: orderId,
+            type: 'earn',
+            amount: milesToGrant,
+            balance_after: runningBalance,
+            description: `ご注文の購入特典マイル（付与率 ${maxRate}%）`,
+          },
+        ]);
+      }
+    }
+
+    // (c) profile残高を最終値に更新（earn/useの結果合算）
+    if (runningBalance !== currentBalance) {
+      const { error: balErr } = await supabaseAdmin
+        .from('profiles')
+        .update({ event_mile_balance: runningBalance })
+        .eq('id', order.auth_user_id);
+      if (balErr) {
+        console.error('[EventMile] update balance error', balErr);
+      } else {
+        console.log('[EventMile] granted/used', {
+          orderId,
+          before: currentBalance,
+          after: runningBalance,
+          delta: runningBalance - currentBalance,
+        });
+      }
+    }
+  } catch (e: any) {
+    // 失敗してもwebhook全体は壊さない
+    console.error('[EventMile] grant error (ignored)', e?.message || e);
+  }
+}
+
 function generateOrderNumber(now = new Date()) {
   const year = now.getFullYear().toString().slice(-2);
   const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -254,6 +400,9 @@ export async function POST(request: Request) {
             console.error('increment_coupon_usage failed', { couponId: order.coupon_id, couponErr });
           }
         }
+
+        // イベントマイル付与（ログインユーザーかつ対象商品が含まれる場合）
+        await grantEventMilesForOrder(supabaseAdmin, order.id);
       }
 
       return NextResponse.json({ received: true });
@@ -502,6 +651,9 @@ export async function POST(request: Request) {
       } catch (gasErr: any) {
         console.error('[GAS] recurring order notify error (ignored)', gasErr?.message || gasErr);
       }
+
+      // イベントマイル付与（定期購入も支払い完了の都度付与）
+      await grantEventMilesForOrder(supabaseAdmin, inserted.id);
 
       // subscriptions テーブルの next_billing_at を進める
       try {

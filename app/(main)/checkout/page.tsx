@@ -454,6 +454,10 @@ const Checkout = () => {
   const [authUser, setAuthUser] = useState<any>(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
 
+  // イベントマイル
+  const [eventMileBalance, setEventMileBalance] = useState<number>(0);
+  const [eventMilesUsed, setEventMilesUsed] = useState<number>(0);
+
   // フォームの状態
   const [formData, setFormData] = useState({
     email: '',
@@ -660,6 +664,9 @@ const Checkout = () => {
           .single();
 
         if (profile && !error) {
+          // イベントマイル残高をセット
+          const bal = Math.max(0, Math.round(Number((profile as any).event_mile_balance ?? 0)));
+          setEventMileBalance(bal);
           // 都道府県と建物名を取得（prefectureカラムが存在する場合はそれを使用）
           let prefecture = (profile as any).prefecture || '';
           let building = (profile as any).building || '';
@@ -1368,7 +1375,31 @@ const Checkout = () => {
     }
   }, [appliedCoupon, subtotal]);
   
-  const total = subtotal + shippingCost - discountAmount;
+  // イベントマイル使用判定
+  // ルール: カート内の全商品がイベントチケットのときのみマイル使用可
+  const cartIsAllEventTickets = useMemo(() => {
+    if (!cartItems.length) return false;
+    return cartItems.every((it) => Boolean(it.product?.isEventTicket));
+  }, [cartItems]);
+
+  // 利用上限: 残高 と (subtotal + shipping - discount) の小さい方
+  const maxMileUsable = useMemo(() => {
+    if (!cartIsAllEventTickets) return 0;
+    const cap = Math.max(0, subtotal + shippingCost - discountAmount);
+    return Math.min(eventMileBalance, cap);
+  }, [cartIsAllEventTickets, eventMileBalance, subtotal, shippingCost, discountAmount]);
+
+  // 利用マイル数が上限/0未満にならないよう補正
+  useEffect(() => {
+    if (eventMilesUsed > maxMileUsable) {
+      setEventMilesUsed(maxMileUsable);
+    } else if (eventMilesUsed < 0) {
+      setEventMilesUsed(0);
+    }
+  }, [eventMilesUsed, maxMileUsable]);
+
+  // 合計（マイル使用分を減額）
+  const total = Math.max(0, subtotal + shippingCost - discountAmount - eventMilesUsed);
 
   // PaymentIntent / Subscription 作成（ElementsにclientSecretを渡すため、ここで作る）
   useEffect(() => {
@@ -1775,6 +1806,7 @@ const Checkout = () => {
           discount_amount: discountAmount,
           coupon_id: appliedCoupon?.id || null,
         total: total,
+          event_miles_used: eventMilesUsed,
           payment_status: 'pending',
           payment_intent_id: paymentIntentId,
           stripe_subscription_id: stripeSubscriptionId,
@@ -1823,7 +1855,7 @@ const Checkout = () => {
   };
 
     upsertOrderDraft();
-  }, [supabase, authUser, paymentIntentId, cartItems, total, subtotal, shippingCost, discountAmount, appliedCoupon, formData, shippingPlan, useDifferentShippingAddress, shippingAddressData, stripeSubscriptionId, stripeCustomerId, subscriptionCartInfo.interval]);
+  }, [supabase, authUser, paymentIntentId, cartItems, total, subtotal, shippingCost, discountAmount, eventMilesUsed, appliedCoupon, formData, shippingPlan, useDifferentShippingAddress, shippingAddressData, stripeSubscriptionId, stripeCustomerId, subscriptionCartInfo.interval]);
 
   // 決済ボタン押下時に必ず注文ドラフトを作成する（レース回避）
   const ensureOrderDraft = async (shippingData: any) => {
@@ -1887,6 +1919,7 @@ const Checkout = () => {
       discount_amount: discountAmount,
       coupon_id: appliedCoupon?.id || null,
       total: total,
+      event_miles_used: eventMilesUsed,
       payment_status: 'pending',
       payment_intent_id: paymentIntentId,
       stripe_subscription_id: stripeSubscriptionId,
@@ -2917,6 +2950,52 @@ const Checkout = () => {
                   </div>
                   )}
 
+                  {/* イベントマイル使用UI（カート全てがイベントチケット & ログイン & 残高あり時のみ） */}
+                  {Boolean(authUser?.id) && cartIsAllEventTickets && eventMileBalance > 0 && (
+                    <div className="pt-4 border-t border-gray-200">
+                      <h3 className="text-sm font-medium mb-2 flex items-center gap-2">
+                        <span className="inline-flex w-5 h-5 items-center justify-center bg-amber-600 text-white text-[10px] font-bold rounded">M</span>
+                        イベントマイル利用
+                      </h3>
+                      <p className="text-xs text-gray-500 mb-3">
+                        保有マイル: <span className="font-medium text-gray-800">{eventMileBalance.toLocaleString()}</span> マイル / 最大 <span className="font-medium text-gray-800">{maxMileUsable.toLocaleString()}</span> マイル利用可能
+                      </p>
+                      <div className="flex gap-2 items-center">
+                        <input
+                          type="number"
+                          min={0}
+                          max={maxMileUsable}
+                          step={1}
+                          value={eventMilesUsed}
+                          onChange={(e) => {
+                            const n = Number(e.target.value);
+                            if (Number.isNaN(n)) return;
+                            setEventMilesUsed(Math.max(0, Math.min(maxMileUsable, Math.floor(n))));
+                          }}
+                          className="flex-1 px-3 py-2 text-sm bg-white border border-gray-200 rounded focus:outline-none focus:border-black focus:ring-1 focus:ring-black"
+                        />
+                        <span className="text-sm text-gray-500">マイル</span>
+                        <button
+                          type="button"
+                          onClick={() => setEventMilesUsed(maxMileUsable)}
+                          className="px-3 py-2 text-xs bg-white border border-gray-200 rounded hover:bg-gray-50 transition-colors"
+                        >
+                          全額
+                        </button>
+                        {eventMilesUsed > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => setEventMilesUsed(0)}
+                            className="px-3 py-2 text-xs text-gray-500 hover:text-black"
+                          >
+                            クリア
+                          </button>
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-500 mt-2">1マイル = 1円として支払いに充当されます。</p>
+                    </div>
+                  )}
+
                   {/* 合計 */}
                   <div className="space-y-2 pt-4 border-t border-gray-200">
                     <div className="flex justify-between text-sm">
@@ -2933,6 +3012,12 @@ const Checkout = () => {
                       <span className="text-gray-600">送料</span>
                       <span className="font-serif">¥{shippingCost.toLocaleString()}</span>
                     </div>
+                    {eventMilesUsed > 0 && (
+                      <div className="flex justify-between text-sm text-amber-700">
+                        <span>イベントマイル利用</span>
+                        <span className="font-serif">-¥{eventMilesUsed.toLocaleString()}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between text-lg font-bold pt-2 border-t border-gray-200">
                       <span>合計</span>
                       <span className="font-serif">¥{total.toLocaleString()}</span>

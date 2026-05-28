@@ -30,6 +30,12 @@ ALTER TABLE public.profiles
 COMMENT ON COLUMN public.profiles.event_mile_balance IS
   'イベントマイル残高（1マイル=1円）。負数にならないようロジック側で制御。';
 
+-- 2.5 orders: この注文で利用したマイル数（チェックアウトで指定 → webhookで残高引き落とし）
+ALTER TABLE public.orders
+  ADD COLUMN IF NOT EXISTS event_miles_used INTEGER NOT NULL DEFAULT 0;
+COMMENT ON COLUMN public.orders.event_miles_used IS
+  'この注文で利用したイベントマイル数。0=未使用。決済額は (subtotal + shipping_cost - event_miles_used) になる。';
+
 -- 3. マイル取引履歴
 CREATE TABLE IF NOT EXISTS public.event_mile_transactions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
