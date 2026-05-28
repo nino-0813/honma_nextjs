@@ -484,11 +484,6 @@ const MyPage = () => {
             }`}
           >
             イベントマイル
-            {mileBalance > 0 && (
-              <span className="ml-2 inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs bg-amber-600 text-white rounded-full">
-                {mileBalance.toLocaleString()}
-              </span>
-            )}
           </button>
           <button
             onClick={() => setActiveTab('profile')}

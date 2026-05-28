@@ -37,6 +37,8 @@ interface OrderDetailData {
   payment_method: string | null;
   paid_at: string | null;
   order_status: string;
+  notes: string | null;
+  delivery_time_slot?: string | null;
   created_at: string;
   updated_at?: string | null;
   order_items: Array<{
@@ -475,6 +477,16 @@ const OrderDetail = () => {
                   {order.phone && <p>{order.phone}</p>}
                 </div>
               </div>
+
+              {/* 備考 */}
+              {order.notes && order.notes.trim() && (
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900 mb-3">備考</h3>
+                  <div className="bg-white border border-gray-200 rounded p-3 text-sm text-gray-700 whitespace-pre-wrap">
+                    {order.notes}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
