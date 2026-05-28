@@ -1462,6 +1462,7 @@ const Checkout = () => {
           }
           const cs = responseData?.clientSecret;
           const piId = responseData?.paymentIntentId;
+          // ※ 新仕様: 定期購入の Subscription は webhook 側で作成するため、ここでは null
           const subId = responseData?.subscriptionId;
           const custId = responseData?.customerId;
           const livemode = responseData?.livemode;

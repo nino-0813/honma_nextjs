@@ -5,6 +5,26 @@
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { computeBillingCycleAnchor, intervalToMonths } from '@/lib/subscriptionShipping';
+
+type SubscriptionIntervalKey =
+  | 'weekly'
+  | 'biweekly'
+  | 'monthly'
+  | 'bimonthly'
+  | 'quarterly'
+  | 'semiannual'
+  | 'annual';
+
+const STRIPE_INTERVAL_MAP: Record<SubscriptionIntervalKey, { interval: 'day' | 'week' | 'month' | 'year'; interval_count: number }> = {
+  weekly: { interval: 'week', interval_count: 1 },
+  biweekly: { interval: 'week', interval_count: 2 },
+  monthly: { interval: 'month', interval_count: 1 },
+  bimonthly: { interval: 'month', interval_count: 2 },
+  quarterly: { interval: 'month', interval_count: 3 },
+  semiannual: { interval: 'month', interval_count: 6 },
+  annual: { interval: 'year', interval_count: 1 },
+};
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -59,6 +79,140 @@ async function postToGAS(payload: any) {
     console.error('[GAS] request error (ignored)', err?.message || err, err);
   } finally {
     clearTimeout(timeout);
+  }
+}
+
+/**
+ * 初回決済成功後に Stripe Subscription を遅延作成する。
+ *
+ * - billing_cycle_anchor を「2回目決済日」（10日ルール）に設定
+ * - trial_end を anchor と同じにして、anchor まで自動請求が走らないようにする
+ * - 1回目の決済は別途完了済み（このwebhookのトリガー）
+ * - default_payment_method をPaymentIntentから引き継ぐ
+ * - metadata.auth_user_id を持たせ、subscription.created webhookでフォールバック可能に
+ *
+ * 失敗してもこのwebhookハンドラ全体は壊さない（ログのみ）。
+ * 失敗時の影響: お客さんは初回分は決済済み・発送される。Subscriptionが無いので2回目以降が来ない。
+ *   → 管理画面で気付いて手動で復旧する想定。
+ */
+async function createDeferredSubscription(
+  stripe: any,
+  supabaseAdmin: any,
+  pi: any,
+  order: any
+) {
+  try {
+    const intervalKey = String(pi?.metadata?.interval || '') as SubscriptionIntervalKey;
+    if (!STRIPE_INTERVAL_MAP[intervalKey]) {
+      console.error('[DeferredSub] invalid interval', { pi: pi?.id, interval: intervalKey });
+      return;
+    }
+    const recurring = STRIPE_INTERVAL_MAP[intervalKey];
+
+    // metadata.items_json から定期購入アイテムを復元
+    let itemsRaw: any[] = [];
+    try {
+      itemsRaw = JSON.parse(String(pi?.metadata?.items_json || '[]'));
+    } catch (e) {
+      console.error('[DeferredSub] items_json parse error', e);
+      return;
+    }
+    if (!Array.isArray(itemsRaw) || itemsRaw.length === 0) {
+      console.error('[DeferredSub] empty items', { pi: pi?.id });
+      return;
+    }
+
+    const shippingCost = Math.max(0, Number(pi?.metadata?.shipping_cost ?? 0));
+
+    // Stripe Product と Price を作成（recurring）
+    const subscriptionItems: any[] = [];
+    for (const it of itemsRaw) {
+      const product = await stripe.products.create({
+        name: String(it.t || '商品'),
+        metadata: {
+          product_id: String(it.id || ''),
+          source: 'ikevege_subscription',
+        },
+      });
+      subscriptionItems.push({
+        quantity: Number(it.q || 1),
+        price_data: {
+          currency: 'jpy',
+          product: product.id,
+          unit_amount: Math.round(Number(it.p || 0)),
+          recurring,
+        },
+      });
+    }
+
+    // 送料も毎回請求
+    if (shippingCost > 0) {
+      const shippingProduct = await stripe.products.create({
+        name: '送料',
+        metadata: {
+          product_id: '__shipping__',
+          source: 'ikevege_subscription',
+        },
+      });
+      subscriptionItems.push({
+        quantity: 1,
+        price_data: {
+          currency: 'jpy',
+          product: shippingProduct.id,
+          unit_amount: Math.round(shippingCost),
+          recurring,
+        },
+      });
+    }
+
+    // billing_cycle_anchor（=2回目決済日）を計算
+    // 基準日は PaymentIntent の作成時刻（=お客様のチェックアウト時刻）
+    const checkoutDate = new Date((pi?.created ?? Math.floor(Date.now() / 1000)) * 1000);
+    const anchorUnix = computeBillingCycleAnchor(checkoutDate, intervalKey);
+    if (!anchorUnix) {
+      // 週次/隔週は anchor 不要。Stripe デフォルト挙動でOK
+      console.warn('[DeferredSub] no anchor for interval', intervalKey);
+    }
+
+    // Subscription を作成
+    const subscriptionParams: any = {
+      customer: pi.customer,
+      items: subscriptionItems,
+      default_payment_method: pi.payment_method,
+      metadata: {
+        interval: intervalKey,
+        auth_user_id: String(order.auth_user_id || ''),
+        order_id: String(order.id || ''),
+        first_payment_intent_id: String(pi.id || ''),
+      },
+    };
+    if (anchorUnix) {
+      subscriptionParams.billing_cycle_anchor = anchorUnix;
+      subscriptionParams.trial_end = anchorUnix;
+      subscriptionParams.proration_behavior = 'none';
+    }
+
+    const subscription = await stripe.subscriptions.create(subscriptionParams);
+
+    // orders テーブルに stripe_subscription_id を保存
+    const updates: any = {
+      stripe_subscription_id: subscription.id,
+      stripe_customer_id: pi.customer,
+      updated_at: new Date().toISOString(),
+    };
+    if (!order.subscription_interval) {
+      updates.subscription_interval = intervalKey;
+    }
+    await supabaseAdmin.from('orders').update(updates).eq('id', order.id);
+
+    console.log('[DeferredSub] created', {
+      orderId: order.id,
+      subscriptionId: subscription.id,
+      interval: intervalKey,
+      anchorUnix,
+    });
+  } catch (e: any) {
+    console.error('[DeferredSub] create error', e?.message || e, e?.stack);
   }
 }
 
@@ -272,7 +426,7 @@ export async function POST(request: Request) {
         const result = await supabaseAdmin
           .from('orders')
           .select(
-            'id, created_at, order_number, first_name, last_name, email, phone, shipping_address, shipping_city, shipping_postal_code, subtotal, shipping_cost, total, payment_status, order_status, coupon_id, notes'
+            'id, created_at, order_number, first_name, last_name, email, phone, shipping_address, shipping_city, shipping_postal_code, subtotal, shipping_cost, total, payment_status, order_status, coupon_id, notes, auth_user_id, stripe_subscription_id, subscription_interval'
           )
           .eq('payment_intent_id', paymentIntentId)
           .maybeSingle();
@@ -403,6 +557,11 @@ export async function POST(request: Request) {
 
         // イベントマイル付与（ログインユーザーかつ対象商品が含まれる場合）
         await grantEventMilesForOrder(supabaseAdmin, order.id);
+
+        // 定期購入の場合: ここで初めて Stripe Subscription を作成する
+        if (pi?.metadata?.type === 'subscription_init' && !order.stripe_subscription_id) {
+          await createDeferredSubscription(stripe, supabaseAdmin, pi, order);
+        }
       }
 
       return NextResponse.json({ received: true });
@@ -441,13 +600,31 @@ export async function POST(request: Request) {
       const canceledAt = sub.canceled_at ? new Date(sub.canceled_at * 1000).toISOString() : null;
 
       // 元注文から auth_user_id / email を取得
-      const { data: originalOrder } = await supabaseAdmin
-        .from('orders')
-        .select('auth_user_id, email, subscription_interval')
-        .eq('stripe_subscription_id', stripeSubscriptionId)
-        .order('created_at', { ascending: true })
-        .limit(1)
-        .maybeSingle();
+      // metadata.order_id があればそれで直接引く（最も確実）
+      const orderIdFromMeta = String(sub.metadata?.order_id || '');
+      let originalOrder: any = null;
+      if (orderIdFromMeta) {
+        const r = await supabaseAdmin
+          .from('orders')
+          .select('auth_user_id, email, subscription_interval')
+          .eq('id', orderIdFromMeta)
+          .maybeSingle();
+        originalOrder = r.data;
+      }
+      // フォールバック: stripe_subscription_id で検索（旧フローや retry 時用）
+      if (!originalOrder) {
+        const r = await supabaseAdmin
+          .from('orders')
+          .select('auth_user_id, email, subscription_interval')
+          .eq('stripe_subscription_id', stripeSubscriptionId)
+          .order('created_at', { ascending: true })
+          .limit(1)
+          .maybeSingle();
+        originalOrder = r.data;
+      }
+
+      // metadata からの fallback（レースで order がまだ更新されていない場合に有用）
+      const authUserIdFromMeta = String(sub.metadata?.auth_user_id || '') || null;
 
       // Stripe Customer からメールを取得（フォールバック）
       let email = originalOrder?.email ?? null;
@@ -465,7 +642,7 @@ export async function POST(request: Request) {
       const row = {
         stripe_subscription_id: stripeSubscriptionId,
         stripe_customer_id: stripeCustomerId,
-        auth_user_id: originalOrder?.auth_user_id ?? null,
+        auth_user_id: originalOrder?.auth_user_id ?? authUserIdFromMeta,
         email: email ?? 'unknown@example.com',
         status,
         interval: intervalFromMeta || originalOrder?.subscription_interval || 'monthly',

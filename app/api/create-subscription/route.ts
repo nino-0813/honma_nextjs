@@ -1,3 +1,19 @@
+/**
+ * 定期購入チェックアウト用 API
+ *
+ * 仕様（オーナー合意済み）:
+ *  - 1回目の決済はチェックアウト時（PaymentIntent）
+ *  - 2回目以降は「毎月10日」など（Stripe Subscription の billing_cycle_anchor で制御）
+ *
+ * ここで Stripe Subscription は作らず、PaymentIntent のみ作成する。
+ * 初回決済が成功した瞬間に webhook(payment_intent.succeeded) が:
+ *  1) metadata.type === 'subscription_init' を検知
+ *  2) Stripe Subscription を trial_end / billing_cycle_anchor 付きで作成
+ *  3) order.stripe_subscription_id を更新
+ *
+ * 詳細は app/api/stripe-webhook/route.ts を参照。
+ */
+
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
@@ -10,15 +26,15 @@ type IntervalKey =
   | 'semiannual'
   | 'annual';
 
-const INTERVAL_MAP: Record<IntervalKey, { interval: 'day' | 'week' | 'month' | 'year'; interval_count: number }> = {
-  weekly: { interval: 'week', interval_count: 1 },
-  biweekly: { interval: 'week', interval_count: 2 },
-  monthly: { interval: 'month', interval_count: 1 },
-  bimonthly: { interval: 'month', interval_count: 2 },
-  quarterly: { interval: 'month', interval_count: 3 },
-  semiannual: { interval: 'month', interval_count: 6 },
-  annual: { interval: 'year', interval_count: 1 },
-};
+const VALID_INTERVALS: IntervalKey[] = [
+  'weekly',
+  'biweekly',
+  'monthly',
+  'bimonthly',
+  'quarterly',
+  'semiannual',
+  'annual',
+];
 
 export async function OPTIONS() {
   return new NextResponse(null, {
@@ -61,7 +77,7 @@ export async function POST(request: Request) {
     if (!email || !email.trim()) {
       return NextResponse.json({ error: 'メールアドレスが必要です' }, { status: 400 });
     }
-    if (!interval || !(interval in INTERVAL_MAP)) {
+    if (!interval || !VALID_INTERVALS.includes(interval)) {
       return NextResponse.json({ error: '配送間隔が不正です' }, { status: 400 });
     }
     if (!Array.isArray(items) || items.length === 0) {
@@ -74,7 +90,6 @@ export async function POST(request: Request) {
     }
 
     const stripe = new Stripe(stripeSecretKey);
-    const recurring = INTERVAL_MAP[interval];
 
     // 1) Customer を取得 or 作成
     let customer: Stripe.Customer;
@@ -92,98 +107,53 @@ export async function POST(request: Request) {
       });
     }
 
-    // 1.5) 既存の 'incomplete' な Subscription を掃除（重複防止）
-    //   チェックアウトページのtotal変化等で複数作成される問題を防ぐ
-    try {
-      const incompleteSubs = await stripe.subscriptions.list({
-        customer: customer.id,
-        status: 'incomplete',
-        limit: 10,
-      });
-      for (const old of incompleteSubs.data) {
-        try {
-          await stripe.subscriptions.cancel(old.id);
-        } catch (e: any) {
-          console.warn('[create-subscription] cancel orphan incomplete failed:', old.id, e?.message);
-        }
-      }
-    } catch (e: any) {
-      console.warn('[create-subscription] list incomplete failed:', e?.message);
+    // 2) 初回決済額（=1か月分の総額）を計算
+    const itemsTotal = items.reduce((sum, it) => sum + it.unit_price * it.quantity, 0);
+    const total = itemsTotal + Math.max(0, Number(shipping_cost || 0));
+    if (total <= 0) {
+      return NextResponse.json({ error: '金額が不正です' }, { status: 400 });
     }
 
-    // 2) Subscription items 構築（Stripe Productを動的に作成）
-    const subscriptionItems: Stripe.SubscriptionCreateParams.Item[] = [];
-    for (const item of items) {
-      const stripeProduct = await stripe.products.create({
-        name: item.product_title,
-        metadata: {
-          product_id: item.product_id,
-          source: 'ikevege_subscription',
-        },
-      });
-      subscriptionItems.push({
-        quantity: item.quantity,
-        price_data: {
-          currency: 'jpy',
-          product: stripeProduct.id,
-          unit_amount: Math.round(item.unit_price),
-          recurring,
-        },
-      });
-    }
-
-    // 3) 送料を recurring line item として追加（地域別送料は呼び出し側で計算済み）
-    if (shipping_cost && shipping_cost > 0) {
-      const shippingProduct = await stripe.products.create({
-        name: '送料',
-        metadata: {
-          product_id: '__shipping__',
-          source: 'ikevege_subscription',
-        },
-      });
-      subscriptionItems.push({
-        quantity: 1,
-        price_data: {
-          currency: 'jpy',
-          product: shippingProduct.id,
-          unit_amount: Math.round(shipping_cost),
-          recurring,
-        },
-      });
-    }
-
-    // 4) Subscription 作成（default_incomplete でPaymentIntentを得る）
-    const subscription = await stripe.subscriptions.create({
+    // 3) Subscription 用 PaymentIntent を作成
+    //    - setup_future_usage='off_session' でカードを保存（webhook 側で Subscription に紐付け）
+    //    - metadata に Subscription 作成に必要な情報を持たせる
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(total),
+      currency: 'jpy',
       customer: customer.id,
-      items: subscriptionItems,
-      payment_behavior: 'default_incomplete',
-      payment_settings: {
-        save_default_payment_method: 'on_subscription',
-      },
-      expand: ['latest_invoice.payment_intent'],
+      setup_future_usage: 'off_session',
+      automatic_payment_methods: { enabled: true },
       metadata: {
         ...metadata,
+        type: 'subscription_init',
         interval,
         item_count: String(items.length),
+        items_json: JSON.stringify(
+          items.map((it) => ({
+            id: it.product_id,
+            t: it.product_title.slice(0, 60), // 長すぎ防止
+            p: Math.round(it.unit_price),
+            q: it.quantity,
+          }))
+        ).slice(0, 480), // Stripe metadata 1値の上限 500 char に収める
+        shipping_cost: String(Math.max(0, Number(shipping_cost || 0))),
       },
     });
 
-    const latestInvoice = subscription.latest_invoice as Stripe.Invoice | null;
-    const paymentIntent = (latestInvoice as any)?.payment_intent as Stripe.PaymentIntent | null;
-
     if (!paymentIntent?.client_secret) {
       return NextResponse.json(
-        { error: '初回決済のClientSecretを取得できませんでした' },
+        { error: '初回決済の ClientSecret を取得できませんでした' },
         { status: 500 }
       );
     }
 
     return NextResponse.json({
-      subscriptionId: subscription.id,
+      // ※ Subscription は webhook 側で作成するため、ここでは null を返す
+      subscriptionId: null,
       customerId: customer.id,
       clientSecret: paymentIntent.client_secret,
       paymentIntentId: paymentIntent.id,
-      livemode: subscription.livemode,
+      livemode: paymentIntent.livemode,
       secretKeyPrefix: stripeSecretKey.startsWith('sk_test')
         ? 'sk_test'
         : stripeSecretKey.startsWith('sk_live')

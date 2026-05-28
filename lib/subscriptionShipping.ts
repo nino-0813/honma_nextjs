@@ -104,3 +104,39 @@ export function formatJapaneseDate(date: Date | null): string {
   if (!date) return '-';
   return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
 }
+
+/**
+ * Stripe Subscription の billing_cycle_anchor (Unix秒) を返す。
+ *
+ * 仕様:
+ *  - 「初回お届け月の "interval月後" の 10日」を anchor にする
+ *  - これにより 2回目以降の Stripe 請求が毎月（または間隔ごとの）10日に走る
+ *  - 月跨ぎの計算は Date コンストラクタが自動補正
+ *
+ * 例（monthly）:
+ *  - 5/8 契約 → 初回発送 5/15 → anchor = 6/10
+ *  - 5/20契約 → 初回発送 6/15 → anchor = 7/10
+ *
+ * 週次/隔週は対象外（null を返す → 呼び出し側で anchor を指定しない）
+ */
+export function computeBillingCycleAnchor(
+  checkoutDate: Date,
+  interval: string | null | undefined
+): number | null {
+  if (!interval) return null;
+  if (interval === 'weekly' || interval === 'biweekly') return null;
+  const months = intervalMonths(interval);
+  if (months <= 0) return null;
+  const firstShipping = computeFirstShippingDate(checkoutDate);
+  const anchor = new Date(
+    firstShipping.getFullYear(),
+    firstShipping.getMonth() + months,
+    10
+  );
+  return Math.floor(anchor.getTime() / 1000);
+}
+
+// 既存のローカル定数をエクスポート
+export function intervalToMonths(interval: string | null | undefined): number {
+  return intervalMonths(interval);
+}
