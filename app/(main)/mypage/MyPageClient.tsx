@@ -643,9 +643,18 @@ const MyPage = () => {
           </div>
         )}
 
-        {activeTab === 'subscriptions' && (
+        {activeTab === 'subscriptions' && (() => {
+          // 支払いが完了して有効になった定期購入のみ表示。
+          // incomplete / incomplete_expired / unpaid は初回決済が未完了なので除外。
+          const visibleSubscriptions = subscriptions.filter(
+            (s) =>
+              s.status !== 'incomplete' &&
+              s.status !== 'incomplete_expired' &&
+              s.status !== 'unpaid'
+          );
+          return (
           <div className="space-y-6">
-            {subscriptions.length === 0 ? (
+            {visibleSubscriptions.length === 0 ? (
               <div className="text-center py-16">
                 <p className="text-gray-500 mb-4">定期購入はまだありません</p>
                 <Link href="/collections" className="text-sm text-black underline hover:no-underline">
@@ -665,7 +674,7 @@ const MyPage = () => {
                   </button>
                 </div>
                 {(
-              subscriptions.map((sub) => {
+              visibleSubscriptions.map((sub) => {
                 const statusInfo = SUBSCRIPTION_STATUS_LABELS[sub.status] || {
                   label: sub.status,
                   cls: 'bg-gray-100 text-gray-600',
@@ -743,7 +752,8 @@ const MyPage = () => {
               </>
             )}
           </div>
-        )}
+          );
+        })()}
 
         {activeTab === 'miles' && (
           <div className="space-y-6 max-w-3xl">
