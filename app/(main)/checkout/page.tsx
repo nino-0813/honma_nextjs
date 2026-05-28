@@ -10,6 +10,7 @@ import { FadeInImage } from '@/components/UI';
 import AuthForm from '@/components/AuthForm';
 import { supabase, checkStockAvailability } from '@/lib/supabase';
 import { ShippingMethod, AreaFees, Product, CartItem, SUBSCRIPTION_INTERVAL_LABELS } from '@/types';
+import { calculateEarnableMiles } from '@/lib/eventMiles';
 
 // Stripe公開可能キー（環境変数から取得）
 // NOTE: 未設定だとPaymentElementが無言で出ないことがあるため、フォールバック文字列は使わない
@@ -2937,6 +2938,17 @@ const Checkout = () => {
                       <span className="font-serif">¥{total.toLocaleString()}</span>
                     </div>
                   </div>
+
+                  {/* イベントマイル付与予定 */}
+                  {(() => {
+                    const miles = calculateEarnableMiles(cartItems, shippingCost);
+                    if (miles <= 0) return null;
+                    return (
+                      <div className="pt-3 border-t border-gray-200">
+                        <EventMileEarnPanel miles={miles} isLoggedIn={Boolean(authUser?.id)} />
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
             </div>
@@ -2946,5 +2958,94 @@ const Checkout = () => {
     </div>
   );
 };
+
+/** チェックアウトのマイル付与予定パネル（詳細ポップアップ付き） */
+function EventMileEarnPanel({ miles, isLoggedIn }: { miles: number; isLoggedIn: boolean }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex w-6 h-6 items-center justify-center bg-amber-600 text-white text-xs font-bold rounded">
+              M
+            </span>
+            <span className="text-amber-900 font-medium">
+              {isLoggedIn
+                ? `この購入で ${miles.toLocaleString()} マイル付与予定`
+                : `この購入で 最大 ${miles.toLocaleString()} マイル付与予定`}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="text-xs text-amber-800 underline underline-offset-2 hover:text-amber-900"
+          >
+            詳細
+          </button>
+        </div>
+        {!isLoggedIn && (
+          <p className="text-xs text-amber-700 mt-2">
+            ※ ゲスト購入ではイベントマイルは付与されません。会員ログインしてご注文ください。
+          </p>
+        )}
+      </div>
+
+      {open && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-8"
+          onClick={() => setOpen(false)}
+        >
+          <div
+            className="relative bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              aria-label="閉じる"
+              className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <div className="p-6">
+              <h3 className="text-lg font-medium text-primary mb-3 tracking-wider">
+                イベントマイルとは
+              </h3>
+              <p className="text-sm text-gray-700 leading-relaxed mb-4">
+                対象商品のご購入で、佐渡で開催する各種イベント（田植えリトリート等）の参加費として
+                <span className="font-medium">1マイル＝1円</span>として使えるポイントです。
+              </p>
+              <ul className="text-sm text-gray-700 space-y-2 mb-2">
+                <li className="flex gap-2">
+                  <span className="text-amber-600">・</span>
+                  <span>送料を含む注文合計に対して、商品ごとの付与率が適用されます。</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-amber-600">・</span>
+                  <span>会員ログイン状態でのご注文時のみ付与されます。</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-amber-600">・</span>
+                  <span>有効期限はありません。</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-amber-600">・</span>
+                  <span>商品の購入には使えません（イベント参加費のみ）。</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-amber-600">・</span>
+                  <span>残高はマイページ「イベントマイル」よりご確認いただけます。</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
 
 export default Checkout;

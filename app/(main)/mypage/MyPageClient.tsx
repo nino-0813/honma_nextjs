@@ -6,7 +6,13 @@ import Link from 'next/link';
 import { supabase, getProfile, updateProfile, getOrders, Order, Profile } from '@/lib/supabase';
 import { FadeInImage, LoadingButton } from '@/components/UI';
 import AuthForm from '@/components/AuthForm';
-import { SUBSCRIPTION_INTERVAL_LABELS, SubscriptionInterval } from '@/types';
+import {
+  SUBSCRIPTION_INTERVAL_LABELS,
+  SubscriptionInterval,
+  EventMileTransaction,
+  EVENT_MILE_TYPE_LABELS,
+} from '@/types';
+import { getEventMileBalance, getEventMileTransactions } from '@/lib/eventMiles';
 
 interface SubscriptionRow {
   id: string;
@@ -55,7 +61,9 @@ const MyPage = () => {
   const [subscriptions, setSubscriptions] = useState<SubscriptionRow[]>([]);
   const [cancelingId, setCancelingId] = useState<string | null>(null);
   const [syncingSubscriptions, setSyncingSubscriptions] = useState(false);
-  const [activeTab, setActiveTab] = useState<'orders' | 'subscriptions' | 'profile'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'subscriptions' | 'miles' | 'profile'>('orders');
+  const [mileBalance, setMileBalance] = useState<number>(0);
+  const [mileTransactions, setMileTransactions] = useState<EventMileTransaction[]>([]);
   const [editingProfile, setEditingProfile] = useState(false);
   const [saving, setSaving] = useState(false);
   const [showWelcomeMessage, setShowWelcomeMessage] = useState(false);
@@ -65,6 +73,7 @@ const MyPage = () => {
     const tab = searchParams?.get('tab');
     if (tab === 'orders') setActiveTab('orders');
     if (tab === 'subscriptions') setActiveTab('subscriptions');
+    if (tab === 'miles') setActiveTab('miles');
     if (tab === 'profile') setActiveTab('profile');
   }, [searchParams]);
 
@@ -196,6 +205,18 @@ const MyPage = () => {
           .eq('auth_user_id', userId)
           .order('created_at', { ascending: false });
         setSubscriptions((subs ?? []) as SubscriptionRow[]);
+      }
+
+      // イベントマイル残高 + 履歴
+      try {
+        const [balance, txns] = await Promise.all([
+          getEventMileBalance(userId),
+          getEventMileTransactions(userId, 50),
+        ]);
+        setMileBalance(balance);
+        setMileTransactions(txns);
+      } catch (e) {
+        console.warn('イベントマイル取得失敗:', e);
       }
     } catch (error) {
       console.error('データ読み込みエラー:', error);
@@ -455,6 +476,21 @@ const MyPage = () => {
             )}
           </button>
           <button
+            onClick={() => setActiveTab('miles')}
+            className={`px-6 py-3 text-sm font-medium tracking-wider transition-colors whitespace-nowrap ${
+              activeTab === 'miles'
+                ? 'border-b-2 border-black text-black'
+                : 'text-gray-500 hover:text-black'
+            }`}
+          >
+            イベントマイル
+            {mileBalance > 0 && (
+              <span className="ml-2 inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs bg-amber-600 text-white rounded-full">
+                {mileBalance.toLocaleString()}
+              </span>
+            )}
+          </button>
+          <button
             onClick={() => setActiveTab('profile')}
             className={`px-6 py-3 text-sm font-medium tracking-wider transition-colors whitespace-nowrap ${
               activeTab === 'profile'
@@ -690,6 +726,64 @@ const MyPage = () => {
               )}
               </>
             )}
+          </div>
+        )}
+
+        {activeTab === 'miles' && (
+          <div className="space-y-6 max-w-3xl">
+            <div className="rounded-lg border border-amber-200 bg-gradient-to-br from-amber-50 to-amber-100 p-6">
+              <p className="text-xs text-amber-800 tracking-widest uppercase mb-2">Event Miles Balance</p>
+              <p className="text-3xl font-serif font-bold text-amber-900">
+                {mileBalance.toLocaleString()} <span className="text-base font-medium">マイル</span>
+              </p>
+              <p className="text-xs text-amber-800 mt-3 leading-relaxed">
+                佐渡で開催する各種イベント（田植えリトリート等）の参加費に使えるポイントです。<br />
+                1マイル = 1円。有効期限はありません。
+              </p>
+            </div>
+
+            <div>
+              <h2 className="text-base font-medium mb-3">取引履歴</h2>
+              {mileTransactions.length === 0 ? (
+                <div className="border border-gray-200 rounded-lg p-8 text-center text-sm text-gray-500">
+                  まだイベントマイルの取得・利用履歴はありません。
+                </div>
+              ) : (
+                <div className="border border-gray-200 rounded-lg overflow-hidden">
+                  <ul className="divide-y divide-gray-200">
+                    {mileTransactions.map((t) => {
+                      const sign = t.amount >= 0 ? '+' : '';
+                      const colorClass = t.amount >= 0 ? 'text-green-700' : 'text-red-600';
+                      return (
+                        <li key={t.id} className="flex items-center justify-between gap-4 p-4">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span
+                                className={`text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded ${
+                                  t.amount >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-50 text-red-600'
+                                }`}
+                              >
+                                {EVENT_MILE_TYPE_LABELS[t.type] || t.type}
+                              </span>
+                              <span className="text-xs text-gray-500">{formatDate(t.created_at)}</span>
+                            </div>
+                            {t.description && (
+                              <p className="text-sm text-gray-700 truncate">{t.description}</p>
+                            )}
+                          </div>
+                          <div className="text-right">
+                            <p className={`text-base font-serif font-bold ${colorClass}`}>
+                              {sign}{t.amount.toLocaleString()}
+                            </p>
+                            <p className="text-xs text-gray-500">残高 {t.balance_after.toLocaleString()}</p>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
+            </div>
           </div>
         )}
 

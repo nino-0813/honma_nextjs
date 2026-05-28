@@ -60,6 +60,9 @@ export interface DatabaseProduct {
   subscription_enabled?: boolean | null;
   subscription_discount_percent?: number | null;
   subscription_intervals?: unknown; // jsonb 配列
+  subscription_rice_season?: string | null; // '10' | '11' | null
+  mile_earn_rate?: number | null;
+  is_event_ticket?: boolean | null;
   created_at: string;
   updated_at: string;
 }
@@ -96,6 +99,12 @@ export const convertDatabaseProductToProduct = (dbProduct: DatabaseProduct): Pro
     subscriptionEnabled: dbProduct.subscription_enabled ?? false,
     subscriptionDiscountPercent: dbProduct.subscription_discount_percent ?? 0,
     subscriptionIntervals: normalizeSubscriptionIntervals(dbProduct.subscription_intervals),
+    subscriptionRiceSeason:
+      dbProduct.subscription_rice_season === '10' || dbProduct.subscription_rice_season === '11'
+        ? dbProduct.subscription_rice_season
+        : null,
+    mileEarnRate: Math.max(0, Math.min(100, Math.round(Number(dbProduct.mile_earn_rate ?? 0)))),
+    isEventTicket: Boolean(dbProduct.is_event_ticket),
   };
 };
 
@@ -155,6 +164,16 @@ export const convertProductToDatabaseProduct = (product: Partial<Product> & { st
     subscription_enabled: (product as any).subscriptionEnabled ?? false,
     subscription_discount_percent: (product as any).subscriptionDiscountPercent ?? 0,
     subscription_intervals: normalizeSubscriptionIntervals((product as any).subscriptionIntervals),
+    subscription_rice_season:
+      (product as any).subscriptionRiceSeason === '10' || (product as any).subscriptionRiceSeason === '11'
+        ? (product as any).subscriptionRiceSeason
+        : null,
+    mile_earn_rate: (() => {
+      const n = Number((product as any).mileEarnRate ?? 0);
+      if (Number.isNaN(n)) return 0;
+      return Math.max(0, Math.min(100, Math.round(n)));
+    })(),
+    is_event_ticket: Boolean((product as any).isEventTicket),
   };
 };
 

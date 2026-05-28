@@ -84,6 +84,12 @@ const ProductEditor = () => {
   const [subscriptionEnabled, setSubscriptionEnabled] = useState(false);
   const [subscriptionDiscountPercent, setSubscriptionDiscountPercent] = useState<string>('0');
   const [subscriptionIntervals, setSubscriptionIntervals] = useState<SubscriptionInterval[]>([]);
+  const [subscriptionRiceSeason, setSubscriptionRiceSeason] = useState<'' | '10' | '11'>('');
+
+  // イベントマイル設定
+  const [mileEarnEnabled, setMileEarnEnabled] = useState(false);
+  const [mileEarnRate, setMileEarnRate] = useState<string>('10');
+  const [isEventTicket, setIsEventTicket] = useState(false);
 
   const [images, setImages] = useState<string[]>([]);
   const [draggedImageIndex, setDraggedImageIndex] = useState<number | null>(null);
@@ -183,6 +189,14 @@ const ProductEditor = () => {
           )
         : [];
       setSubscriptionIntervals(loadedIntervals);
+      const loadedRiceSeason = data.subscription_rice_season;
+      setSubscriptionRiceSeason(loadedRiceSeason === '10' || loadedRiceSeason === '11' ? loadedRiceSeason : '');
+
+      const loadedMileRate = Number(data.mile_earn_rate ?? 0);
+      const safeMileRate = Number.isNaN(loadedMileRate) ? 0 : Math.max(0, Math.min(100, Math.round(loadedMileRate)));
+      setMileEarnEnabled(safeMileRate > 0);
+      setMileEarnRate(String(safeMileRate || 10));
+      setIsEventTicket(Boolean(data.is_event_ticket));
 
       const hasVariantsFromConfig = Array.isArray(data.variants_config) && data.variants_config.length > 0;
       const hasVariantsFromLegacy = Array.isArray(data.variants) && data.variants.length > 0;
@@ -412,6 +426,14 @@ const ProductEditor = () => {
           return Math.max(0, Math.min(100, Math.round(n)));
         })(),
         subscription_intervals: subscriptionEnabled ? subscriptionIntervals : [],
+        subscription_rice_season: subscriptionEnabled && subscriptionRiceSeason ? subscriptionRiceSeason : null,
+        mile_earn_rate: (() => {
+          if (!mileEarnEnabled) return 0;
+          const n = Number(mileEarnRate);
+          if (Number.isNaN(n)) return 0;
+          return Math.max(0, Math.min(100, Math.round(n)));
+        })(),
+        is_event_ticket: isEventTicket,
         updated_at: new Date().toISOString(),
       };
 
@@ -946,8 +968,105 @@ const ProductEditor = () => {
                     <p className="text-xs text-amber-600 mt-2">配送間隔を1つ以上選択してください</p>
                   )}
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    新米切り替わり月
+                  </label>
+                  <select
+                    value={subscriptionRiceSeason}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      setSubscriptionRiceSeason(v === '10' || v === '11' ? v : '');
+                    }}
+                    className="w-full md:w-48 p-2 border border-gray-200 rounded-md text-sm bg-white"
+                  >
+                    <option value="">表示しない</option>
+                    <option value="10">10月</option>
+                    <option value="11">11月</option>
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    商品ページの定期購入ポップアップに「新米の切り替わる時期は毎年「◯月」となっております。」と表示されます。
+                  </p>
+                </div>
               </div>
             )}
+          </div>
+
+          {/* イベントマイル設定 */}
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-base font-medium text-gray-900 mb-1">イベントマイル</h3>
+                <p className="text-xs text-gray-500">
+                  佐渡で行うイベントで使えるポイントを購入時に付与・利用設定する。
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-5 pt-2">
+              {/* 付与設定 */}
+              <div className="border-t border-gray-100 pt-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">マイル付与対象</p>
+                    <p className="text-xs text-gray-500">
+                      購入時に「送料込みの注文合計 × 付与率%」のマイルを付与する。
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={mileEarnEnabled}
+                      onChange={(e) => setMileEarnEnabled(e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black" />
+                  </label>
+                </div>
+                {mileEarnEnabled && (
+                  <div className="mt-3">
+                    <label className="block text-xs text-gray-600 mb-1">付与率 (%)</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        min={0}
+                        max={100}
+                        step={1}
+                        value={mileEarnRate}
+                        onChange={(e) => setMileEarnRate(e.target.value)}
+                        className="w-32 p-2 border border-gray-200 rounded-md text-sm"
+                        placeholder="例: 10"
+                      />
+                      <span className="text-sm text-gray-500">%</span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      0〜100。複数商品が混在するときは「カート内最大率」が適用されます。
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* イベントチケット商品設定 */}
+              <div className="border-t border-gray-100 pt-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">イベントチケット商品</p>
+                    <p className="text-xs text-gray-500">
+                      ON にすると、この商品の購入時にお客様の保有マイルで支払い可能になります（1マイル=1円）。
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={isEventTicket}
+                      onChange={(e) => setIsEventTicket(e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-black" />
+                  </label>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">

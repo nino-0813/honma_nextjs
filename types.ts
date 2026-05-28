@@ -37,7 +37,38 @@ export interface Product {
   subscriptionEnabled?: boolean;
   subscriptionDiscountPercent?: number; // 0-100
   subscriptionIntervals?: SubscriptionInterval[];
+  subscriptionRiceSeason?: SubscriptionRiceSeason | null; // 新米切り替わり月（ポップアップに表示）
+  // イベントマイル設定
+  mileEarnRate?: number; // 0-100。0なら付与なし。送料込み総額に率を掛ける
+  isEventTicket?: boolean; // true ならイベントチケット商品（決済でマイル使用可能）
 }
+
+/** イベントマイル取引履歴 */
+export interface EventMileTransaction {
+  id: string;
+  auth_user_id: string;
+  order_id: string | null;
+  type: 'earn' | 'use' | 'expire' | 'adjust';
+  amount: number;          // 正=増加 / 負=減少
+  balance_after: number;
+  description: string | null;
+  created_at: string;
+}
+
+export const EVENT_MILE_TYPE_LABELS: Record<EventMileTransaction['type'], string> = {
+  earn: '取得',
+  use: '利用',
+  expire: '失効',
+  adjust: '調整',
+};
+
+/** 定期購入ポップアップに表示する新米切り替わり月。null/undefined は非表示。 */
+export type SubscriptionRiceSeason = '10' | '11';
+
+export const SUBSCRIPTION_RICE_SEASON_LABELS: Record<SubscriptionRiceSeason, string> = {
+  '10': '10月',
+  '11': '11月',
+};
 
 export type SubscriptionInterval =
   | 'weekly'

@@ -7,6 +7,7 @@ import { IconClose, IconInstagram, IconYoutube, IconChevronDown, IconPlus, IconT
 import { CartItem, SubscriptionInterval, SUBSCRIPTION_INTERVAL_LABELS } from '@/types';
 import { FadeInImage } from './UI';
 import { supabase, checkStockAvailability } from '@/lib/supabase';
+import { calculateEarnableMiles } from '@/lib/eventMiles';
 
 interface DrawerProps {
   isOpen: boolean;
@@ -203,6 +204,19 @@ export const CartDrawer = ({ isOpen, onClose, cartItems, onRemove, onUpdateQuant
                 ¥{total.toLocaleString()}
               </span>
             </div>
+            {/* イベントマイル付与予定（送料はチェックアウトで確定するため、ここでは送料0で概算） */}
+            {(() => {
+              const miles = calculateEarnableMiles(cartItems, 0);
+              if (miles <= 0) return null;
+              return (
+                <div className="rounded bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-900">
+                  この購入で <span className="font-bold">最大 {miles.toLocaleString()} マイル</span> 付与予定
+                  <span className="block text-amber-700 mt-0.5">
+                    ※ ゲスト購入では付与されません。送料込みでチェックアウト時に確定します。
+                  </span>
+                </div>
+              );
+            })()}
             <button
               onClick={handleCheckout}
               className="w-full py-3 bg-primary text-white text-sm tracking-widest uppercase hover:bg-gray-800 transition-colors"

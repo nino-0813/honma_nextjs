@@ -8,6 +8,7 @@ import { IconChevronDown } from '@/components/Icons';
 import { FadeInImage, LoadingButton } from '@/components/UI';
 import { CartContext } from '@/providers/CartProvider';
 import { supabase, checkStockAvailability, getStockForVariant } from '@/lib/supabase';
+import { productEarnableMilesPreview } from '@/lib/eventMiles';
 
 type PurchaseType = 'one_time' | 'subscription';
 
@@ -30,10 +31,65 @@ export default function ProductDetailView({ product }: { product: Product }) {
     subscriptionIntervals[0] ?? 'monthly'
   );
   const subscriptionPrice = Math.round(calculatedPrice * (1 - subscriptionDiscountPercent / 100));
+  const subscriptionRiceSeason = product.subscriptionRiceSeason ?? null;
 
   // 定期購入の注意事項モーダル
   const [showSubscriptionNotice, setShowSubscriptionNotice] = useState(false);
-  const [hasAgreedSubscription, setHasAgreedSubscription] = useState(false);
+
+  // 定期購入で同意した後に呼ばれる実カート追加処理
+  const executeSubscriptionAddToCart = () => {
+    if (!product) return;
+    setStockError('');
+    const variantString =
+      product.hasVariants
+        ? (() => {
+            // 旧 / 新 両対応
+            if (product.variants_config && product.variants_config.length > 0) {
+              const parts: string[] = [];
+              product.variants_config.forEach((type) => {
+                const opt = type.options.find((o) => o.id === selectedOptions[type.id]);
+                if (opt) parts.push(opt.value);
+              });
+              return parts.join(' / ') || undefined;
+            }
+            if (product.variants && product.variants.length > 0) {
+              return selectedOptions['legacy'] || product.variants[0];
+            }
+            return undefined;
+          })()
+        : undefined;
+
+    // バリエーション付きは在庫チェック
+    if (product.hasVariants) {
+      const existingCartItem = cartItems.find(
+        (item) => item.product.id === product.id && item.variant === variantString
+      );
+      const currentCartQuantity = existingCartItem?.quantity || 0;
+      const stockCheck = checkStockAvailability(
+        product,
+        selectedOptions,
+        quantity,
+        currentCartQuantity
+      );
+      if (!stockCheck.available) {
+        setStockError(stockCheck.message);
+        return;
+      }
+    }
+
+    addToCart(product, quantity, {
+      variant: variantString,
+      finalPrice: product.hasVariants ? calculatedPrice : undefined,
+      selectedOptions: product.hasVariants ? selectedOptions : undefined,
+      subscription: {
+        purchaseType: 'subscription',
+        subscriptionInterval,
+        subscriptionDiscountPercent,
+      },
+    });
+    setShowSubscriptionNotice(false);
+    openCart();
+  };
 
   // 配送間隔の選択肢が変わったら有効な値に補正
   useEffect(() => {
@@ -338,6 +394,29 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 );
               })()}
 
+              {/* イベントマイル付与予定（対象商品のみ表示） */}
+              {(() => {
+                const previewMiles = productEarnableMilesPreview(product);
+                if (previewMiles <= 0) return null;
+                return (
+                  <div className="mb-4 rounded-lg bg-amber-50 border border-amber-200 p-3">
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex w-6 h-6 items-center justify-center bg-amber-600 text-white text-xs font-bold rounded">
+                        M
+                      </span>
+                      <span className="text-sm text-amber-900 font-medium">
+                        この商品の購入で <span className="font-bold">{previewMiles.toLocaleString()}</span> マイル付与予定
+                      </span>
+                    </div>
+                    <p className="text-xs text-amber-700 mt-2 leading-relaxed">
+                      ※ 佐渡で開催するイベントの参加費に使えるポイントです（1マイル=1円）。
+                      <br />
+                      ※ 会員ログイン時のみ付与。送料込みの注文合計と数量に応じて加算されます。
+                    </p>
+                  </div>
+                );
+              })()}
+
               {/* 販売期間の表示（片方だけでも自然な日本語で出す） */}
               {(product?.saleStartAt || product?.saleEndAt) && (
                 <div className="mb-4">
@@ -408,14 +487,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                   </button>
                   <button
                     type="button"
-                    onClick={() => {
-                      if (purchaseType === 'subscription') return; // 既に選択中なら何もしない
-                      if (hasAgreedSubscription) {
-                        setPurchaseType('subscription');
-                      } else {
-                        setShowSubscriptionNotice(true);
-                      }
-                    }}
+                    onClick={() => setPurchaseType('subscription')}
                     className={`relative flex flex-col items-center justify-center py-6 px-4 border-2 rounded transition-colors ${
                       purchaseType === 'subscription'
                         ? 'border-primary bg-white'
@@ -503,22 +575,16 @@ export default function ProductDetailView({ product }: { product: Product }) {
                          </div>
                          <LoadingButton
                            onClick={() => {
-                             if (product) {
-                               setStockError('');
-                               const variantString = getSelectedVariantString();
-                               addToCart(product, quantity, {
-                                 variant: variantString,
-                                 subscription:
-                                   purchaseType === 'subscription'
-                                     ? {
-                                         purchaseType: 'subscription',
-                                         subscriptionInterval,
-                                         subscriptionDiscountPercent,
-                                       }
-                                     : undefined,
-                               });
-                               openCart();
+                             if (!product) return;
+                             // 定期購入モード時は注意事項ポップアップを表示してゲートする
+                             if (purchaseType === 'subscription') {
+                               setShowSubscriptionNotice(true);
+                               return;
                              }
+                             setStockError('');
+                             const variantString = getSelectedVariantString();
+                             addToCart(product, quantity, { variant: variantString });
+                             openCart();
                            }}
                            className="w-full py-4 text-sm tracking-widest uppercase bg-black text-white hover:bg-gray-800 transition-colors"
                          >
@@ -572,46 +638,38 @@ export default function ProductDetailView({ product }: { product: Product }) {
                          <button disabled className="w-full py-4 text-sm tracking-widest uppercase bg-gray-200 text-gray-400 cursor-not-allowed">SOLD OUT</button>
                        ) : (
                          <>
-                           <LoadingButton 
+                           <LoadingButton
                              onClick={() => {
-                               if (product) {
-                                 setStockError('');
-                                 const variantString = getSelectedVariantString();
-                                 
-                                 // カート内の既存数量を取得
-                                 const existingCartItem = cartItems.find(
-                                   item => item.product.id === product.id && item.variant === variantString
-                                 );
-                                 const currentCartQuantity = existingCartItem?.quantity || 0;
-                                 
-                                 // 在庫チェック
-                                 const stockCheck = checkStockAvailability(
-                                   product,
-                                   selectedOptions,
-                                   quantity,
-                                   currentCartQuantity
-                                 );
-                                 
-                                 if (!stockCheck.available) {
-                                   setStockError(stockCheck.message);
-                                   return;
-                                 }
-                                 
-                                 addToCart(product, quantity, {
-                                   variant: variantString,
-                                   finalPrice: calculatedPrice,
-                                   selectedOptions,
-                                   subscription:
-                                     purchaseType === 'subscription'
-                                       ? {
-                                           purchaseType: 'subscription',
-                                           subscriptionInterval,
-                                           subscriptionDiscountPercent,
-                                         }
-                                       : undefined,
-                                 });
-                                 openCart();
+                               if (!product) return;
+                               // 定期購入モード時は注意事項ポップアップを表示してゲートする
+                               if (purchaseType === 'subscription') {
+                                 setShowSubscriptionNotice(true);
+                                 return;
                                }
+                               setStockError('');
+                               const variantString = getSelectedVariantString();
+                               // カート内の既存数量を取得
+                               const existingCartItem = cartItems.find(
+                                 item => item.product.id === product.id && item.variant === variantString
+                               );
+                               const currentCartQuantity = existingCartItem?.quantity || 0;
+                               // 在庫チェック
+                               const stockCheck = checkStockAvailability(
+                                 product,
+                                 selectedOptions,
+                                 quantity,
+                                 currentCartQuantity
+                               );
+                               if (!stockCheck.available) {
+                                 setStockError(stockCheck.message);
+                                 return;
+                               }
+                               addToCart(product, quantity, {
+                                 variant: variantString,
+                                 finalPrice: calculatedPrice,
+                                 selectedOptions,
+                               });
+                               openCart();
                              }}
                              className="w-full py-4 text-sm tracking-widest bg-white text-black border border-black hover:bg-gray-50 transition-colors group relative"
                            >
@@ -713,43 +771,54 @@ export default function ProductDetailView({ product }: { product: Product }) {
                   </li>
                   <li className="flex gap-2">
                     <span className="text-primary flex-shrink-0">・</span>
+                    <span>毎回表示価格に加えて送料がかかります。</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-primary flex-shrink-0">・</span>
                     <span>
-                      2回目以降の決済はお届け日の直前になされます。
+                      2回目以降の決済はお届け月の10日になされます。
                       <span className="block mt-1 text-xs text-amber-700">
-                        ※初回のみご注文時に第1便目の決済がされます
+                        ※初回のみご注文時に第1回目の決済がされます
                       </span>
                     </span>
                   </li>
                   <li className="flex gap-2">
                     <span className="text-primary flex-shrink-0">・</span>
-                    <span>毎回送料がかかります。</span>
+                    <span>発送は毎月15日を予定しております。</span>
                   </li>
                   <li className="flex gap-2">
                     <span className="text-primary flex-shrink-0">・</span>
                     <span>
-                      ご注文分を確保させていただくため、1年の途中でのキャンセルはできかねます。
+                      次回のお届け日は、マイページ「定期購入」の「次回お届け日」から変更できます。
                     </span>
                   </li>
                   <li className="flex gap-2">
                     <span className="text-primary flex-shrink-0">・</span>
                     <span>
-                      定期便は単年でのご注文ではなく、キャンセルするまで続くため、毎年
-                      <span className="font-medium">6月〜8月末まで</span>
-                      の間にキャンセル希望がない場合、次年度も自動更新となります。
+                      変更・解約は、<span className="font-medium">次回発送予定月の10日終日まで</span>にお手続きください。
                     </span>
                   </li>
+                  {(subscriptionRiceSeason === '10' || subscriptionRiceSeason === '11') && (
+                    <li className="flex gap-2">
+                      <span className="text-primary flex-shrink-0">・</span>
+                      <span>
+                        新米の切り替わる時期は毎年「
+                        <span className="font-medium">{subscriptionRiceSeason}月</span>
+                        」となっております。
+                      </span>
+                    </li>
+                  )}
                 </ul>
+                {stockError && (
+                  <p className="text-sm text-red-600 mb-3 text-center">{stockError}</p>
+                )}
                 <div className="flex flex-col sm:flex-row gap-3">
                   <button
                     type="button"
-                    onClick={() => {
-                      setHasAgreedSubscription(true);
-                      setPurchaseType('subscription');
-                      setShowSubscriptionNotice(false);
-                    }}
+                    onClick={executeSubscriptionAddToCart}
                     className="flex-1 py-3 px-4 bg-primary text-white text-sm tracking-widest hover:bg-gray-800 transition-colors"
                   >
-                    同意して定期購入を選択
+                    カートに追加する
                   </button>
                   <button
                     type="button"
