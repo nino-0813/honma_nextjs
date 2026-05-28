@@ -9,6 +9,7 @@ import { FadeInImage, LoadingButton } from '@/components/UI';
 import { CartContext } from '@/providers/CartProvider';
 import { supabase, checkStockAvailability, getStockForVariant } from '@/lib/supabase';
 import { productEarnableMilesPreview } from '@/lib/eventMiles';
+import { computeFirstShippingDate, formatJapaneseDate } from '@/lib/subscriptionShipping';
 
 type PurchaseType = 'one_time' | 'subscription';
 
@@ -491,9 +492,15 @@ export default function ProductDetailView({ product }: { product: Product }) {
                       </span>
                     </div>
                   </div>
-                  <p className="text-xs text-sky-700 mt-3 pt-3 border-t border-sky-200 leading-relaxed">
-                    ※ 2回目以降のお届けは毎月15日発送となります。
-                  </p>
+                  <div className="text-xs text-sky-700 mt-3 pt-3 border-t border-sky-200 leading-relaxed space-y-1">
+                    <p>
+                      ※ 本日ご注文の場合の初回お届け予定日：
+                      <span className="font-bold text-sky-900 ml-1">
+                        {formatJapaneseDate(computeFirstShippingDate(new Date()))}
+                      </span>
+                    </p>
+                    <p>※ 2回目以降のお届けは毎月15日発送となります。</p>
+                  </div>
                 </div>
               )}
 

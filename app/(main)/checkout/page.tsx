@@ -11,6 +11,7 @@ import AuthForm from '@/components/AuthForm';
 import { supabase, checkStockAvailability } from '@/lib/supabase';
 import { ShippingMethod, AreaFees, Product, CartItem, SUBSCRIPTION_INTERVAL_LABELS } from '@/types';
 import { calculateEarnableMiles } from '@/lib/eventMiles';
+import { computeFirstShippingDate, formatJapaneseDate } from '@/lib/subscriptionShipping';
 
 // Stripe公開可能キー（環境変数から取得）
 // NOTE: 未設定だとPaymentElementが無言で出ないことがあるため、フォールバック文字列は使わない
@@ -2993,6 +2994,26 @@ const Checkout = () => {
                         )}
                       </div>
                       <p className="text-xs text-gray-500 mt-2">1マイル = 1円として支払いに充当されます。</p>
+                    </div>
+                  )}
+
+                  {/* 定期購入カートのとき: 初回お届け予定を表示 */}
+                  {subscriptionCartInfo.isSubscriptionCart && !subscriptionCartInfo.blocked && (
+                    <div className="pt-4 border-t border-gray-200">
+                      <div className="rounded-lg border border-sky-200 bg-sky-50 p-3 text-sm">
+                        <div className="flex items-center gap-2 mb-1">
+                          <svg className="w-4 h-4 text-sky-700" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                          </svg>
+                          <span className="text-xs font-medium text-sky-900">初回お届け予定</span>
+                        </div>
+                        <p className="text-sky-900 font-medium">
+                          {formatJapaneseDate(computeFirstShippingDate(new Date()))} 発送予定
+                        </p>
+                        <p className="text-xs text-sky-700 mt-1">
+                          ※ ご決済日が当月10日までは当月15日、11日以降は翌月15日発送となります。
+                        </p>
+                      </div>
                     </div>
                   )}
 

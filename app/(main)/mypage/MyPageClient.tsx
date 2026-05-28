@@ -13,6 +13,7 @@ import {
   EVENT_MILE_TYPE_LABELS,
 } from '@/types';
 import { getEventMileBalance, getEventMileTransactions } from '@/lib/eventMiles';
+import { computeNextShippingDate, formatJapaneseDate } from '@/lib/subscriptionShipping';
 
 interface SubscriptionRow {
   id: string;
@@ -718,10 +719,16 @@ const MyPage = () => {
                         </div>
                         <div>
                           <p className="text-xs text-gray-500 mb-1">
-                            {cancelAtPeriodEnd ? '停止日' : '次回お届け予定'}
+                            {cancelAtPeriodEnd ? '最終お届け予定' : '次回お届け予定'}
                           </p>
                           <p className="text-gray-900">
-                            {sub.next_billing_at ? formatDate(sub.next_billing_at) : '-'}
+                            {formatJapaneseDate(
+                              computeNextShippingDate({
+                                created_at: sub.created_at,
+                                next_billing_at: sub.next_billing_at,
+                                interval: sub.interval,
+                              })
+                            )}
                           </p>
                         </div>
                       </div>

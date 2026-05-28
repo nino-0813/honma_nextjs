@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { SUBSCRIPTION_INTERVAL_LABELS, SubscriptionInterval } from '@/types';
+import { computeNextShippingDate, formatJapaneseDate } from '@/lib/subscriptionShipping';
 
 interface AdminSubscriptionRow {
   id: string;
@@ -382,7 +383,7 @@ const Subscriptions: React.FC = () => {
                           )}
                         </td>
                         <td className="px-4 py-3 text-gray-900">{intervalLabel}</td>
-                        <td className="px-4 py-3 text-gray-700">{formatDate(sub.next_billing_at)}</td>
+                        <td className="px-4 py-3 text-gray-700">{formatJapaneseDate(computeNextShippingDate({ created_at: sub.created_at, next_billing_at: sub.next_billing_at, interval: sub.interval }))}</td>
                         <td className="px-4 py-3 text-gray-600">{formatDate(sub.created_at)}</td>
                         <td className="px-4 py-3 text-right">
                           <button
@@ -470,7 +471,7 @@ const Subscriptions: React.FC = () => {
                   </div>
                   <div>
                     <span className="text-xs text-gray-500">次回お届け: </span>
-                    <span className="text-gray-900">{formatDate(activeSub.next_billing_at)}</span>
+                    <span className="text-gray-900">{formatJapaneseDate(computeNextShippingDate({ created_at: activeSub.created_at, next_billing_at: activeSub.next_billing_at, interval: activeSub.interval }))}</span>
                   </div>
                   <div>
                     <span className="text-xs text-gray-500">開始日: </span>
