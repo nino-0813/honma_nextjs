@@ -71,6 +71,14 @@ const MyPage = () => {
   // 定期購入の商品情報（stripe_subscription_id -> [items]）
   const [subscriptionItems, setSubscriptionItems] = useState<Record<string, SubscriptionItemView[]>>({});
   const [cancelingId, setCancelingId] = useState<string | null>(null);
+
+  // キャンセルフロー（多段モーダル）
+  type CancelStep = 'closed' | 'survey' | 'confirm' | 'completed';
+  const [cancelStep, setCancelStep] = useState<CancelStep>('closed');
+  const [cancelTargetSubId, setCancelTargetSubId] = useState<string | null>(null);
+  const [cancelReasons, setCancelReasons] = useState<string[]>([]);
+  const [cancelOtherText, setCancelOtherText] = useState('');
+  const [cancelError, setCancelError] = useState<string | null>(null);
   const [syncingSubscriptions, setSyncingSubscriptions] = useState(false);
   const [activeTab, setActiveTab] = useState<'orders' | 'subscriptions' | 'miles' | 'profile'>('orders');
   const [mileBalance, setMileBalance] = useState<number>(0);
@@ -305,19 +313,41 @@ const MyPage = () => {
     }
   };
 
-  const handleCancelSubscription = async (stripeSubscriptionId: string) => {
-    if (!supabase) return;
-    const confirmed = window.confirm(
-      '定期購入をキャンセルしますか？\n現在のサイクルの配送は予定通り行われ、その後の自動更新が停止します。'
-    );
-    if (!confirmed) return;
+  /** キャンセル多段モーダルを開く（アンケートから開始） */
+  const openCancelModal = (stripeSubscriptionId: string) => {
+    setCancelTargetSubId(stripeSubscriptionId);
+    setCancelReasons([]);
+    setCancelOtherText('');
+    setCancelError(null);
+    setCancelStep('survey');
+  };
 
+  /** モーダルを閉じてリセット */
+  const closeCancelModal = () => {
+    setCancelStep('closed');
+    setCancelTargetSubId(null);
+    setCancelReasons([]);
+    setCancelOtherText('');
+    setCancelError(null);
+  };
+
+  /** 「次へ」: アンケート → 確認 */
+  const goToCancelConfirm = () => {
+    setCancelError(null);
+    setCancelStep('confirm');
+  };
+
+  /** 確認ではい → 実際にキャンセル実行 + アンケート保存 */
+  const submitCancelSubscription = async () => {
+    if (!supabase || !cancelTargetSubId) return;
+    setCancelError(null);
     try {
-      setCancelingId(stripeSubscriptionId);
+      setCancelingId(cancelTargetSubId);
       const { data: { session } } = await supabase.auth.getSession();
       const accessToken = session?.access_token;
       if (!accessToken) throw new Error('セッションが切れています。再度ログインしてください。');
 
+      // 1) Stripe側のキャンセルAPIを叩く
       const res = await fetch('/api/cancel-subscription', {
         method: 'POST',
         headers: {
@@ -325,7 +355,7 @@ const MyPage = () => {
           Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
-          subscription_id: stripeSubscriptionId,
+          subscription_id: cancelTargetSubId,
           cancel_at_period_end: true,
         }),
       });
@@ -333,15 +363,37 @@ const MyPage = () => {
       if (!res.ok) {
         throw new Error(data?.error || 'キャンセルに失敗しました');
       }
-      alert('定期購入のキャンセルを受け付けました。');
-      // 再読込
+
+      // 2) アンケート結果を保存（失敗してもキャンセル自体は完了とみなす）
+      try {
+        await supabase.from('subscription_cancellation_surveys').insert([{
+          stripe_subscription_id: cancelTargetSubId,
+          auth_user_id: user?.id ?? null,
+          email: profile?.email ?? user?.email ?? null,
+          reasons: cancelReasons,
+          other_text: cancelReasons.includes('other') && cancelOtherText.trim() ? cancelOtherText.trim().slice(0, 500) : null,
+        }]);
+      } catch (surveyErr) {
+        console.warn('アンケート保存失敗（キャンセルは正常）:', surveyErr);
+      }
+
+      // 3) 完了画面へ
+      setCancelStep('completed');
+      // 4) サブスク情報リロード
       if (user?.id) await loadUserData(user.id);
     } catch (e: any) {
       console.error('キャンセルエラー:', e);
-      alert(e?.message || 'キャンセルに失敗しました');
+      setCancelError(e?.message || 'キャンセルに失敗しました');
     } finally {
       setCancelingId(null);
     }
+  };
+
+  /** チェックボックスのトグル */
+  const toggleCancelReason = (key: string) => {
+    setCancelReasons((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    );
   };
 
   const handlePostalCodeSearch = async () => {
@@ -828,7 +880,7 @@ const MyPage = () => {
                         <div className="pt-3 border-t border-gray-100 flex justify-end">
                           <button
                             type="button"
-                            onClick={() => handleCancelSubscription(sub.stripe_subscription_id)}
+                            onClick={() => openCancelModal(sub.stripe_subscription_id)}
                             disabled={cancelingId === sub.stripe_subscription_id}
                             className="text-sm text-red-600 hover:text-red-700 underline underline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
@@ -1176,6 +1228,177 @@ const MyPage = () => {
           </div>
         )}
       </div>
+
+      {/* 定期購入キャンセル 多段モーダル */}
+      {cancelStep !== 'closed' && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-8"
+          onClick={() => {
+            // 完了画面では背景クリックで閉じる、その他はキャンセル可能
+            if (cancelStep === 'completed' || cancelingId === null) {
+              closeCancelModal();
+            }
+          }}
+        >
+          <div
+            className="relative bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 閉じるボタン（処理中は隠す） */}
+            {cancelingId === null && (
+              <button
+                type="button"
+                onClick={closeCancelModal}
+                aria-label="閉じる"
+                className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+
+            {/* === STEP 1: アンケート === */}
+            {cancelStep === 'survey' && (
+              <div className="p-6 md:p-8">
+                <h3 className="text-lg md:text-xl font-medium text-primary mb-2 tracking-wider">
+                  解約理由をお聞かせください
+                </h3>
+                <p className="text-xs text-gray-500 mb-4 leading-relaxed">
+                  今後のサービス改善のため、解約理由を教えていただけると幸いです。<br />
+                  （任意・複数選択可能・回答しなくてもキャンセル可能です）
+                </p>
+                <div className="space-y-2 mb-6">
+                  {[
+                    { key: 'price_high', label: '価格が高かった' },
+                    { key: 'frequency_too_often', label: 'お届け頻度が多かった' },
+                    { key: 'frequency_too_rare', label: 'お届け頻度が少なかった' },
+                    { key: 'quantity_too_much', label: '量が多すぎた' },
+                    { key: 'quantity_too_small', label: '量が少なかった' },
+                    { key: 'other_attractive_product', label: '他に魅力的な商品があった' },
+                    { key: 'not_satisfied_quality', label: '品質に満足できなかった' },
+                    { key: 'not_needed', label: '必要なくなった' },
+                    { key: 'other', label: 'その他' },
+                  ].map((opt) => (
+                    <label
+                      key={opt.key}
+                      className={`flex items-center gap-3 p-3 border rounded cursor-pointer transition-colors ${
+                        cancelReasons.includes(opt.key)
+                          ? 'border-primary bg-gray-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={cancelReasons.includes(opt.key)}
+                        onChange={() => toggleCancelReason(opt.key)}
+                        className="rounded border-gray-300 text-primary focus:ring-primary"
+                      />
+                      <span className="text-sm text-gray-800">{opt.label}</span>
+                    </label>
+                  ))}
+                </div>
+                {cancelReasons.includes('other') && (
+                  <div className="mb-4">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                      その他の理由（任意）
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={cancelOtherText}
+                      onChange={(e) => setCancelOtherText(e.target.value)}
+                      maxLength={500}
+                      placeholder="自由にご記入ください（500文字まで）"
+                      className="w-full p-2 border border-gray-200 rounded text-sm focus:outline-none focus:border-primary"
+                    />
+                  </div>
+                )}
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    type="button"
+                    onClick={goToCancelConfirm}
+                    className="flex-1 py-3 px-4 bg-primary text-white text-sm tracking-widest hover:bg-gray-800 transition-colors"
+                  >
+                    次へ
+                  </button>
+                  <button
+                    type="button"
+                    onClick={closeCancelModal}
+                    className="flex-1 py-3 px-4 bg-white text-primary border border-gray-300 text-sm tracking-widest hover:bg-gray-50 transition-colors"
+                  >
+                    閉じる
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* === STEP 2: 確認 === */}
+            {cancelStep === 'confirm' && (
+              <div className="p-6 md:p-8">
+                <h3 className="text-lg md:text-xl font-medium text-primary mb-4 tracking-wider">
+                  キャンセルしますか？
+                </h3>
+                <p className="text-sm text-gray-700 leading-relaxed mb-2">
+                  現在のサイクルの配送は予定通り行われ、その後の自動更新が停止します。
+                </p>
+                <p className="text-xs text-gray-500 mb-6">
+                  本当にキャンセルしてよろしいですか？
+                </p>
+                {cancelError && (
+                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700">
+                    {cancelError}
+                  </div>
+                )}
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    type="button"
+                    onClick={submitCancelSubscription}
+                    disabled={cancelingId !== null}
+                    className="flex-1 py-3 px-4 bg-red-600 text-white text-sm tracking-widest hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {cancelingId !== null ? '処理中…' : 'はい'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCancelStep('survey')}
+                    disabled={cancelingId !== null}
+                    className="flex-1 py-3 px-4 bg-white text-primary border border-gray-300 text-sm tracking-widest hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    いいえ
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* === STEP 3: 完了 === */}
+            {cancelStep === 'completed' && (
+              <div className="p-6 md:p-8 text-center">
+                <div className="mb-4 flex justify-center">
+                  <div className="w-14 h-14 rounded-full bg-green-50 border-2 border-green-200 flex items-center justify-center">
+                    <svg className="w-7 h-7 text-green-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                </div>
+                <h3 className="text-lg md:text-xl font-medium text-primary mb-3 tracking-wider">
+                  キャンセルが確定しました
+                </h3>
+                <p className="text-sm text-gray-700 leading-relaxed mb-6">
+                  定期購入のキャンセルが確定しました。<br />
+                  またのご利用をお待ちしております。
+                </p>
+                <button
+                  type="button"
+                  onClick={closeCancelModal}
+                  className="w-full py-3 px-4 bg-primary text-white text-sm tracking-widest hover:bg-gray-800 transition-colors"
+                >
+                  閉じる
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </section>
   );
 };
