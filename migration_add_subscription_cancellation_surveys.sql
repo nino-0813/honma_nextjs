@@ -43,3 +43,11 @@ CREATE POLICY "users can read own cancellation surveys"
   ON public.subscription_cancellation_surveys
   FOR SELECT
   USING (auth.uid() = auth_user_id);
+
+-- 管理者はすべて参照可能（集計・サポート用途）
+DROP POLICY IF EXISTS "admins can read all cancellation surveys"
+  ON public.subscription_cancellation_surveys;
+CREATE POLICY "admins can read all cancellation surveys"
+  ON public.subscription_cancellation_surveys
+  FOR SELECT
+  USING (public.is_admin());

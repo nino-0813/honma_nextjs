@@ -63,6 +63,10 @@ const Subscriptions: React.FC = () => {
   const [detailId, setDetailId] = useState<string | null>(null);
   const [detailOrders, setDetailOrders] = useState<OrderSummary[]>([]);
   const [loadingDetail, setLoadingDetail] = useState(false);
+  // 解約アンケート（subscription_cancellation_surveys）
+  const [detailSurveys, setDetailSurveys] = useState<
+    Array<{ id: string; reasons: string[]; other_text: string | null; created_at: string; email: string | null }>
+  >([]);
   const [cancelingId, setCancelingId] = useState<string | null>(null);
   const [cleaningUp, setCleaningUp] = useState(false);
 
@@ -115,16 +119,40 @@ const Subscriptions: React.FC = () => {
   const openDetail = async (sub: AdminSubscriptionRow) => {
     setDetailId(sub.stripe_subscription_id);
     setDetailOrders([]);
+    setDetailSurveys([]);
     if (!supabase) return;
     try {
       setLoadingDetail(true);
-      const { data, error: err } = await supabase
+      // 関連注文
+      const ordersRes = await supabase
         .from('orders')
         .select('id, order_number, created_at, total, payment_status, order_status')
         .eq('stripe_subscription_id', sub.stripe_subscription_id)
         .order('created_at', { ascending: false });
-      if (err) throw err;
-      setDetailOrders((data ?? []) as OrderSummary[]);
+      if (ordersRes.error) throw ordersRes.error;
+      setDetailOrders((ordersRes.data ?? []) as OrderSummary[]);
+
+      // 解約アンケート（service role 経由なら全件参照可能）
+      try {
+        const surveysRes = await supabase
+          .from('subscription_cancellation_surveys')
+          .select('id, reasons, other_text, created_at, email')
+          .eq('stripe_subscription_id', sub.stripe_subscription_id)
+          .order('created_at', { ascending: false });
+        if (!surveysRes.error && surveysRes.data) {
+          setDetailSurveys(
+            surveysRes.data.map((row: any) => ({
+              id: row.id,
+              reasons: Array.isArray(row.reasons) ? row.reasons : [],
+              other_text: row.other_text ?? null,
+              created_at: row.created_at,
+              email: row.email ?? null,
+            }))
+          );
+        }
+      } catch (surveyErr) {
+        console.warn('解約アンケート取得失敗:', surveyErr);
+      }
     } catch (e) {
       console.error('detail orders fetch error:', e);
     } finally {
@@ -135,6 +163,20 @@ const Subscriptions: React.FC = () => {
   const closeDetail = () => {
     setDetailId(null);
     setDetailOrders([]);
+    setDetailSurveys([]);
+  };
+
+  /** アンケート理由キーを日本語ラベルに変換 */
+  const SURVEY_REASON_LABELS: Record<string, string> = {
+    price_high: '価格が高かった',
+    frequency_too_often: 'お届け頻度が多かった',
+    frequency_too_rare: 'お届け頻度が少なかった',
+    quantity_too_much: '量が多すぎた',
+    quantity_too_small: '量が少なかった',
+    other_attractive_product: '他に魅力的な商品があった',
+    not_satisfied_quality: '品質に満足できなかった',
+    not_needed: '必要なくなった',
+    other: 'その他',
   };
 
   const handleCancel = async (sub: AdminSubscriptionRow, immediate: boolean) => {
@@ -517,6 +559,51 @@ const Subscriptions: React.FC = () => {
                           </div>
                         </div>
                       </Link>
+                    ))}
+                  </div>
+                )}
+              </section>
+
+              {/* 解約アンケート */}
+              <section>
+                <h3 className="font-semibold text-gray-900 mb-3">
+                  解約アンケート ({detailSurveys.length}件)
+                </h3>
+                {loadingDetail ? (
+                  <div className="text-gray-500 text-xs">読み込み中...</div>
+                ) : detailSurveys.length === 0 ? (
+                  <div className="text-gray-500 text-xs">
+                    アンケート回答はまだありません。
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {detailSurveys.map((s) => (
+                      <div key={s.id} className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm">
+                        <div className="text-xs text-gray-500 mb-2">
+                          {formatDate(s.created_at)}
+                          {s.email && <span className="ml-2 text-gray-400">{s.email}</span>}
+                        </div>
+                        {s.reasons.length > 0 ? (
+                          <div className="flex flex-wrap gap-1.5 mb-2">
+                            {s.reasons.map((r) => (
+                              <span
+                                key={r}
+                                className="inline-block px-2 py-0.5 text-xs bg-white border border-amber-300 text-amber-900 rounded"
+                              >
+                                {SURVEY_REASON_LABELS[r] || r}
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-xs text-gray-400 italic">理由選択なし</p>
+                        )}
+                        {s.other_text && (
+                          <div className="mt-2 pt-2 border-t border-amber-200">
+                            <p className="text-xs text-gray-500 mb-1">その他の理由:</p>
+                            <p className="text-sm text-gray-800 whitespace-pre-wrap">{s.other_text}</p>
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
                 )}
