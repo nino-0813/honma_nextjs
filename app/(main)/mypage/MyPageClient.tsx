@@ -774,6 +774,10 @@ const MyPage = () => {
                                 created_at: sub.created_at,
                                 next_billing_at: sub.next_billing_at,
                                 interval: sub.interval,
+                                firstShippingOverride:
+                                  typeof (sub.metadata as any)?.first_shipping_override === 'string'
+                                    ? (sub.metadata as any).first_shipping_override
+                                    : null,
                               })
                             )}
                           </p>

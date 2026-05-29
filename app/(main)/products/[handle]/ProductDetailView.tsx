@@ -472,7 +472,9 @@ export default function ProductDetailView({ product }: { product: Product }) {
                     <p className="font-medium text-sky-900">
                       本日ご注文いただいた場合、初回の発送は
                       <span className="font-bold ml-0.5">
-                        {formatJapaneseDate(computeFirstShippingDate(new Date()))}
+                        {formatJapaneseDate(
+                          computeFirstShippingDate(new Date(), product.firstShippingOverrideDate ?? null)
+                        )}
                       </span>
                       予定となります。
                     </p>

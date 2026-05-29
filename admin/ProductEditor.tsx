@@ -85,6 +85,7 @@ const ProductEditor = () => {
   const [subscriptionDiscountPercent, setSubscriptionDiscountPercent] = useState<string>('0');
   const [subscriptionIntervals, setSubscriptionIntervals] = useState<SubscriptionInterval[]>([]);
   const [subscriptionRiceSeason, setSubscriptionRiceSeason] = useState<'' | '10' | '11'>('');
+  const [firstShippingOverrideDate, setFirstShippingOverrideDate] = useState<string>('');
 
   // イベントマイル設定
   const [mileEarnEnabled, setMileEarnEnabled] = useState(false);
@@ -191,6 +192,9 @@ const ProductEditor = () => {
       setSubscriptionIntervals(loadedIntervals);
       const loadedRiceSeason = data.subscription_rice_season;
       setSubscriptionRiceSeason(loadedRiceSeason === '10' || loadedRiceSeason === '11' ? loadedRiceSeason : '');
+      setFirstShippingOverrideDate(
+        typeof data.first_shipping_override_date === 'string' ? data.first_shipping_override_date.slice(0, 10) : ''
+      );
 
       const loadedMileRate = Number(data.mile_earn_rate ?? 0);
       const safeMileRate = Number.isNaN(loadedMileRate) ? 0 : Math.max(0, Math.min(100, Math.round(loadedMileRate)));
@@ -427,6 +431,7 @@ const ProductEditor = () => {
         })(),
         subscription_intervals: subscriptionEnabled ? subscriptionIntervals : [],
         subscription_rice_season: subscriptionEnabled && subscriptionRiceSeason ? subscriptionRiceSeason : null,
+        first_shipping_override_date: subscriptionEnabled && firstShippingOverrideDate ? firstShippingOverrideDate : null,
         mile_earn_rate: (() => {
           if (!mileEarnEnabled) return 0;
           const n = Number(mileEarnRate);
@@ -986,6 +991,34 @@ const ProductEditor = () => {
                   </select>
                   <p className="text-xs text-gray-500 mt-1">
                     商品ページの定期購入ポップアップに「新米の切り替わる時期は毎年「◯月」となっております。」と表示されます。
+                  </p>
+                </div>
+                <div className="pt-3 border-t border-gray-100">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    初回発送日（指定）
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="date"
+                      value={firstShippingOverrideDate}
+                      onChange={(e) => setFirstShippingOverrideDate(e.target.value)}
+                      className="w-48 p-2 border border-gray-200 rounded-md text-sm bg-white"
+                    />
+                    {firstShippingOverrideDate && (
+                      <button
+                        type="button"
+                        onClick={() => setFirstShippingOverrideDate('')}
+                        className="text-xs text-gray-500 hover:text-black underline"
+                      >
+                        クリア
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2 leading-relaxed">
+                    指定した日が「全員の初回発送日」になります（例: 新米契約の <span className="font-medium">2026/10/15</span>）。<br />
+                    指定なし = 通常の15日ルール（〜10日 → 当月15日 / 11日〜 → 翌月15日）。<br />
+                    過去日になった場合は自動的に15日ルールに戻ります。<br />
+                    <span className="text-amber-700">※ 初回決済はチェックアウト時に実施。発送だけがこの日に揃います。</span>
                   </p>
                 </div>
               </div>

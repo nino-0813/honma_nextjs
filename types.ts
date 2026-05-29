@@ -38,6 +38,7 @@ export interface Product {
   subscriptionDiscountPercent?: number; // 0-100
   subscriptionIntervals?: SubscriptionInterval[];
   subscriptionRiceSeason?: SubscriptionRiceSeason | null; // 新米切り替わり月（ポップアップに表示）
+  firstShippingOverrideDate?: string | null; // 初回発送日のオーバーライド YYYY-MM-DD（未来日のとき有効）
   // イベントマイル設定
   mileEarnRate?: number; // 0-100。0なら付与なし。送料込み総額に率を掛ける
   isEventTicket?: boolean; // true ならイベントチケット商品（決済でマイル使用可能）

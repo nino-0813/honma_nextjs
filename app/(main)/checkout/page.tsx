@@ -2999,24 +2999,36 @@ const Checkout = () => {
                   )}
 
                   {/* 定期購入カートのとき: 初回お届け予定を表示 */}
-                  {subscriptionCartInfo.isSubscriptionCart && !subscriptionCartInfo.blocked && (
-                    <div className="pt-4 border-t border-gray-200">
-                      <div className="rounded-lg border border-sky-200 bg-sky-50 p-3 text-sm">
-                        <div className="flex items-center gap-2 mb-1">
-                          <svg className="w-4 h-4 text-sky-700" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-                          </svg>
-                          <span className="text-xs font-medium text-sky-900">初回お届け予定</span>
+                  {subscriptionCartInfo.isSubscriptionCart && !subscriptionCartInfo.blocked && (() => {
+                    // カート内の override 日（最も遅い日）を取得
+                    const overrides = subscriptionCartInfo.subscriptionItems
+                      .map((it) => it.product?.firstShippingOverrideDate ?? null)
+                      .filter((d): d is string => Boolean(d))
+                      .sort();
+                    const overrideMax = overrides.length > 0 ? overrides[overrides.length - 1] : null;
+                    const firstShipping = computeFirstShippingDate(new Date(), overrideMax);
+                    const isOverride = Boolean(overrideMax) && formatJapaneseDate(firstShipping) === formatJapaneseDate(computeFirstShippingDate(new Date(), overrideMax));
+                    return (
+                      <div className="pt-4 border-t border-gray-200">
+                        <div className="rounded-lg border border-sky-200 bg-sky-50 p-3 text-sm">
+                          <div className="flex items-center gap-2 mb-1">
+                            <svg className="w-4 h-4 text-sky-700" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                            </svg>
+                            <span className="text-xs font-medium text-sky-900">初回お届け予定</span>
+                          </div>
+                          <p className="text-sky-900 font-medium">
+                            {formatJapaneseDate(firstShipping)} 発送予定
+                          </p>
+                          <p className="text-xs text-sky-700 mt-1">
+                            {overrideMax && isOverride
+                              ? '※ 商品設定により、この商品は全員同じ日に初回発送されます。'
+                              : '※ ご決済日が当月10日までは当月15日、11日以降は翌月15日発送となります。'}
+                          </p>
                         </div>
-                        <p className="text-sky-900 font-medium">
-                          {formatJapaneseDate(computeFirstShippingDate(new Date()))} 発送予定
-                        </p>
-                        <p className="text-xs text-sky-700 mt-1">
-                          ※ ご決済日が当月10日までは当月15日、11日以降は翌月15日発送となります。
-                        </p>
                       </div>
-                    </div>
-                  )}
+                    );
+                  })()}
 
                   {/* 合計 */}
                   <div className="space-y-2 pt-4 border-t border-gray-200">

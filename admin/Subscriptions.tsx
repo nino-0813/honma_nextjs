@@ -383,7 +383,7 @@ const Subscriptions: React.FC = () => {
                           )}
                         </td>
                         <td className="px-4 py-3 text-gray-900">{intervalLabel}</td>
-                        <td className="px-4 py-3 text-gray-700">{formatJapaneseDate(computeNextShippingDate({ created_at: sub.created_at, next_billing_at: sub.next_billing_at, interval: sub.interval }))}</td>
+                        <td className="px-4 py-3 text-gray-700">{formatJapaneseDate(computeNextShippingDate({ created_at: sub.created_at, next_billing_at: sub.next_billing_at, interval: sub.interval, firstShippingOverride: typeof (sub.metadata as any)?.first_shipping_override === 'string' ? (sub.metadata as any).first_shipping_override : null }))}</td>
                         <td className="px-4 py-3 text-gray-600">{formatDate(sub.created_at)}</td>
                         <td className="px-4 py-3 text-right">
                           <button
@@ -471,7 +471,7 @@ const Subscriptions: React.FC = () => {
                   </div>
                   <div>
                     <span className="text-xs text-gray-500">次回お届け: </span>
-                    <span className="text-gray-900">{formatJapaneseDate(computeNextShippingDate({ created_at: activeSub.created_at, next_billing_at: activeSub.next_billing_at, interval: activeSub.interval }))}</span>
+                    <span className="text-gray-900">{formatJapaneseDate(computeNextShippingDate({ created_at: activeSub.created_at, next_billing_at: activeSub.next_billing_at, interval: activeSub.interval, firstShippingOverride: typeof (activeSub.metadata as any)?.first_shipping_override === 'string' ? (activeSub.metadata as any).first_shipping_override : null }))}</span>
                   </div>
                   <div>
                     <span className="text-xs text-gray-500">開始日: </span>

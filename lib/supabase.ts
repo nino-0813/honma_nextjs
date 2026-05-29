@@ -61,6 +61,7 @@ export interface DatabaseProduct {
   subscription_discount_percent?: number | null;
   subscription_intervals?: unknown; // jsonb 配列
   subscription_rice_season?: string | null; // '10' | '11' | null
+  first_shipping_override_date?: string | null; // YYYY-MM-DD or null
   mile_earn_rate?: number | null;
   is_event_ticket?: boolean | null;
   created_at: string;
@@ -102,6 +103,10 @@ export const convertDatabaseProductToProduct = (dbProduct: DatabaseProduct): Pro
     subscriptionRiceSeason:
       dbProduct.subscription_rice_season === '10' || dbProduct.subscription_rice_season === '11'
         ? dbProduct.subscription_rice_season
+        : null,
+    firstShippingOverrideDate:
+      typeof dbProduct.first_shipping_override_date === 'string' && dbProduct.first_shipping_override_date
+        ? dbProduct.first_shipping_override_date.slice(0, 10)
         : null,
     mileEarnRate: Math.max(0, Math.min(100, Math.round(Number(dbProduct.mile_earn_rate ?? 0)))),
     isEventTicket: Boolean(dbProduct.is_event_ticket),
@@ -167,6 +172,10 @@ export const convertProductToDatabaseProduct = (product: Partial<Product> & { st
     subscription_rice_season:
       (product as any).subscriptionRiceSeason === '10' || (product as any).subscriptionRiceSeason === '11'
         ? (product as any).subscriptionRiceSeason
+        : null,
+    first_shipping_override_date:
+      typeof (product as any).firstShippingOverrideDate === 'string' && (product as any).firstShippingOverrideDate
+        ? String((product as any).firstShippingOverrideDate).slice(0, 10)
         : null,
     mile_earn_rate: (() => {
       const n = Number((product as any).mileEarnRate ?? 0);

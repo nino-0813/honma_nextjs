@@ -187,8 +187,31 @@ async function createDeferredSubscription(
     }
 
     // 6) billing_cycle_anchor を計算（2回目決済日 = JST 10日 05:00）
+    //    products テーブルから first_shipping_override_date を取得して anchor 計算に反映する
     const checkoutDate = new Date((pi?.created ?? Math.floor(Date.now() / 1000)) * 1000);
-    const anchorUnix = computeBillingCycleAnchor(checkoutDate, intervalKey);
+    let firstShippingOverride: string | null = null;
+    try {
+      const productIds = Array.from(
+        new Set(subItems.map((it: any) => it.product_id).filter((v: any) => typeof v === 'string' && v.length > 0))
+      );
+      if (productIds.length > 0) {
+        const { data: prods } = await supabaseAdmin
+          .from('products')
+          .select('id, first_shipping_override_date')
+          .in('id', productIds);
+        const overrides = (prods || [])
+          .map((p: any) => (typeof p.first_shipping_override_date === 'string' ? p.first_shipping_override_date.slice(0, 10) : null))
+          .filter((d: any): d is string => Boolean(d));
+        if (overrides.length > 0) {
+          // 複数商品の場合は最も遅い日を採用
+          overrides.sort();
+          firstShippingOverride = overrides[overrides.length - 1];
+        }
+      }
+    } catch (e) {
+      console.warn('[DeferredSub] override 取得失敗（フォールバックして15日ルールで継続）', e);
+    }
+    const anchorUnix = computeBillingCycleAnchor(checkoutDate, intervalKey, firstShippingOverride);
 
     // 7) Subscription を作成
     //
@@ -205,6 +228,7 @@ async function createDeferredSubscription(
         auth_user_id: String(order.auth_user_id || ''),
         order_id: String(order.id || ''),
         first_payment_intent_id: String(pi.id || ''),
+        ...(firstShippingOverride ? { first_shipping_override: firstShippingOverride } : {}),
       },
     };
     if (anchorUnix) {

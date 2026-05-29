@@ -94,13 +94,35 @@ function jstDateOnlyToUtcDate(year: number, month: number, day: number): Date {
 /**
  * 「N日までは当月の15日、11日以降は翌月の15日」のルールで「JST 15日 00:00」を Date で返す。
  * 主に「決済日 → 初回お届け日」の計算に使う。
+ *
+ * override が指定されており未来日なら、override を優先する（全員その日が初回発送）。
+ * override が過去日なら無視（15日ルールにフォールバック）。
  */
-export function computeFirstShippingDate(checkoutDate: Date): Date {
+export function computeFirstShippingDate(checkoutDate: Date, override?: string | null): Date {
+  // override 優先（未来日のみ）
+  if (override) {
+    const overrideDate = parseJstDateString(override);
+    if (overrideDate && overrideDate >= jstStartOfDay(checkoutDate)) {
+      return overrideDate;
+    }
+  }
+  // 15日ルール
   const { year, month, day } = toJSTParts(checkoutDate);
   if (day <= 10) {
     return jstDateOnlyToUtcDate(year, month, 15);
   }
   return jstDateOnlyToUtcDate(year, month + 1, 15);
+}
+
+/** "YYYY-MM-DD" を JST の 00:00 とみなして Date を返す */
+function parseJstDateString(s: string): Date | null {
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!m) return null;
+  const y = Number(m[1]);
+  const mo = Number(m[2]) - 1;
+  const d = Number(m[3]);
+  if (!y || isNaN(mo) || !d) return null;
+  return jstDateOnlyToUtcDate(y, mo, d);
 }
 
 /**
@@ -114,6 +136,7 @@ export function computeNextShippingDate(sub: {
   created_at: string | null | undefined;
   next_billing_at: string | null | undefined;
   interval: string | null | undefined;
+  firstShippingOverride?: string | null;
 }): Date | null {
   const today = new Date();
   const todayJstStart = jstStartOfDay(today);
@@ -123,11 +146,11 @@ export function computeNextShippingDate(sub: {
     return sub.next_billing_at ? new Date(sub.next_billing_at) : null;
   }
 
-  // 1) 初回未発送なら初回日
+  // 1) 初回未発送なら初回日（override 対応）
   if (sub.created_at) {
     const createdAt = new Date(sub.created_at);
     if (!isNaN(createdAt.getTime())) {
-      const firstShipping = computeFirstShippingDate(createdAt);
+      const firstShipping = computeFirstShippingDate(createdAt, sub.firstShippingOverride ?? null);
       if (firstShipping >= todayJstStart) {
         return firstShipping;
       }
@@ -184,14 +207,15 @@ export function formatJapaneseDate(date: Date | null): string {
  */
 export function computeBillingCycleAnchor(
   checkoutDate: Date,
-  interval: string | null | undefined
+  interval: string | null | undefined,
+  firstShippingOverride?: string | null
 ): number | null {
   if (!interval) return null;
   if (interval === 'weekly' || interval === 'biweekly') return null;
   const months = intervalMonths(interval);
   if (months <= 0) return null;
 
-  const firstShipping = computeFirstShippingDate(checkoutDate);
+  const firstShipping = computeFirstShippingDate(checkoutDate, firstShippingOverride ?? null);
   const fs = toJSTParts(firstShipping);
   const anchor = jstMomentToUtcDate(fs.year, fs.month + months, 10, SAFE_HOUR_JST);
   return Math.floor(anchor.getTime() / 1000);
