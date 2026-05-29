@@ -713,7 +713,16 @@ export async function POST(request: Request) {
         email: email ?? 'unknown@example.com',
         status,
         interval: intervalFromMeta || originalOrder?.subscription_interval || 'monthly',
-        metadata: sub.metadata ?? {},
+        // Stripeのmetadataに加えて、Stripe Subscriptionトップレベルの cancel_at_period_end も保存
+        // これにより「期末解約予約中」の状態がwebhook再受信でも消えなくなる
+        metadata: {
+          ...(sub.metadata ?? {}),
+          cancel_at_period_end: Boolean(sub.cancel_at_period_end),
+          // cancel_at（将来のキャンセル予定時刻）も入れておく
+          ...(sub.cancel_at
+            ? { cancel_at: new Date(sub.cancel_at * 1000).toISOString() }
+            : {}),
+        },
         next_billing_at: currentPeriodEnd,
         canceled_at: canceledAt,
         updated_at: new Date().toISOString(),

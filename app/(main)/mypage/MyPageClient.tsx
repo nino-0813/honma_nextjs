@@ -870,11 +870,24 @@ const MyPage = () => {
                         );
                       })()}
 
-                      {sub.canceled_at && (
+                      {/* 解約・停止に関する日付表示 */}
+                      {sub.status === 'canceled' && sub.canceled_at && (
                         <p className="text-xs text-gray-500">
                           解約日: {formatDate(sub.canceled_at)}
                         </p>
                       )}
+                      {cancelAtPeriodEnd && sub.status !== 'canceled' && (() => {
+                        const cancelAt =
+                          typeof (sub.metadata as any)?.cancel_at === 'string'
+                            ? (sub.metadata as any).cancel_at
+                            : sub.next_billing_at;
+                        if (!cancelAt) return null;
+                        return (
+                          <p className="text-xs text-amber-700">
+                            停止予定日: {formatDate(cancelAt)}（この日までは現サイクルの配送が予定通り行われます）
+                          </p>
+                        );
+                      })()}
 
                       {canCancel && (
                         <div className="pt-3 border-t border-gray-100 flex justify-end">

@@ -69,7 +69,7 @@ export async function POST(request: Request) {
     // 自分の subscription かどうかを検証
     const { data: ownership } = await supabaseAdmin
       .from('subscriptions')
-      .select('id, auth_user_id, status')
+      .select('id, auth_user_id, status, metadata')
       .eq('stripe_subscription_id', subscription_id)
       .maybeSingle();
 

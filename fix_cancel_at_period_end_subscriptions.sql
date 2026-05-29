@@ -1,0 +1,24 @@
+-- 修正用 SQL
+-- 過去にキャンセル予約された Subscription で metadata.cancel_at_period_end が
+-- 消えてしまっているレコードを救済するためのもの。
+--
+-- Stripe Webhook 修正後は自動的に正しく更新されるため、これは
+-- 「Stripeダッシュボードを開いて手動で見るのが面倒なので、まとめて見たい」場合の応急処置。
+--
+-- 実行する必要があるのは、修正をデプロイした直後だけ。それ以降は不要。
+--
+-- 使い方:
+--   1. Stripe Dashboard → Subscriptions → 期末キャンセル予約中のもののIDを控える
+--   2. このSQLを編集して該当IDのところに UPDATE を流す
+--
+-- もしくは「次のwebhookが届くまで待つ」が最も簡単（数秒〜数分で同期される）。
+--
+-- 即時で同期したい場合: マイページの「最新情報を取得」ボタンを押すと sync-subscription
+-- が走り、その中でStripeから最新状態を取得する。今回の修正でこのフローも cancel_at_period_end
+-- を保存するため、ボタンを押せば正しい表示になる。
+
+-- 参考: 全期末キャンセル予約中のsubsを確認するクエリ
+-- SELECT stripe_subscription_id, status, metadata->>'cancel_at_period_end' AS cap, canceled_at
+-- FROM subscriptions
+-- WHERE status IN ('active', 'trialing')
+-- ORDER BY updated_at DESC;
