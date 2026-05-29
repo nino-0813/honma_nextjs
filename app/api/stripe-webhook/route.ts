@@ -191,6 +191,11 @@ async function createDeferredSubscription(
     const anchorUnix = computeBillingCycleAnchor(checkoutDate, intervalKey);
 
     // 7) Subscription を作成
+    //
+    // ※ Stripe仕様: billing_cycle_anchor と trial_end を同時指定すると proration 必須になり
+    //   proration_behavior='none' と矛盾してエラーになる。
+    //   解決策: trial_end のみを指定すれば Stripe は trial_end を起点に請求サイクルを開始する。
+    //   trial_end=「次の10日 05:00 JST」だと、その日から毎月10日 05:00 JST に自動請求が走る。
     const subscriptionParams: any = {
       customer: pi.customer,
       items: stripeItems,
@@ -203,9 +208,7 @@ async function createDeferredSubscription(
       },
     };
     if (anchorUnix) {
-      subscriptionParams.billing_cycle_anchor = anchorUnix;
       subscriptionParams.trial_end = anchorUnix;
-      subscriptionParams.proration_behavior = 'none';
     }
 
     console.log('[DeferredSub] 作成パラメータ', {
