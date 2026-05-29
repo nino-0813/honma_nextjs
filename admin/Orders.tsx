@@ -58,6 +58,8 @@ interface Order {
   payment_method: string | null;
   paid_at?: string | null;
   order_status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  stripe_subscription_id?: string | null;
+  subscription_interval?: string | null;
   delivery_time_slot?: string | null;
   notes?: string | null;
   created_at: string;
@@ -67,6 +69,7 @@ interface Order {
 
 type PaymentStatusFilter = Order['payment_status'] | 'all';
 type MappedStatus = 'payment_pending' | 'before_shipping' | 'shipped' | 'cancelled' | 'all';
+type PurchasePatternFilter = 'all' | 'one_time' | 'subscription';
 
 type ShippingMethodBreakdown = {
   shipping_method_id?: string;
@@ -210,6 +213,7 @@ const Orders = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [statusFilter, setStatusFilter] = useState<MappedStatus>('all');
   const [paymentFilter, setPaymentFilter] = useState<PaymentStatusFilter>('all');
+  const [patternFilter, setPatternFilter] = useState<PurchasePatternFilter>('all');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -565,6 +569,11 @@ const Orders = () => {
       }
       if (statusFilter !== 'all' && getMappedStatus(order.order_status) !== statusFilter) return false;
       if (paymentFilter !== 'all' && order.payment_status !== paymentFilter) return false;
+      if (patternFilter !== 'all') {
+        const isSubscriptionOrder = Boolean(order.stripe_subscription_id || order.subscription_interval);
+        if (patternFilter === 'subscription' && !isSubscriptionOrder) return false;
+        if (patternFilter === 'one_time' && isSubscriptionOrder) return false;
+      }
       if (dateFrom) {
         const from = new Date(`${dateFrom}T00:00:00.000Z`).getTime();
         if (new Date(order.created_at).getTime() < from) return false;
@@ -575,7 +584,7 @@ const Orders = () => {
       }
       return true;
     });
-  }, [orders, searchQuery, statusFilter, paymentFilter, dateFrom, dateTo]);
+  }, [orders, searchQuery, statusFilter, paymentFilter, patternFilter, dateFrom, dateTo]);
 
   const stats = useMemo(
     () => ({
@@ -845,6 +854,18 @@ const Orders = () => {
                   </select>
                 </div>
                 <div>
+                  <label className="block text-xs text-gray-500 mb-1">購入パターン</label>
+                  <select
+                    value={patternFilter}
+                    onChange={(e) => setPatternFilter(e.target.value as PurchasePatternFilter)}
+                    className="w-full p-2 border border-gray-200 rounded-md bg-white text-sm"
+                  >
+                    <option value="all">すべて</option>
+                    <option value="one_time">通常購入</option>
+                    <option value="subscription">定期購入</option>
+                  </select>
+                </div>
+                <div>
                   <label className="block text-xs text-gray-500 mb-1">開始日</label>
                   <input
                     type="date"
@@ -900,7 +921,7 @@ const Orders = () => {
 
           {filteredOrders.length === 0 ? (
             <div className="p-12 text-center text-gray-500">
-              {searchQuery || statusFilter !== 'all' || paymentFilter !== 'all' || dateFrom || dateTo
+              {searchQuery || statusFilter !== 'all' || paymentFilter !== 'all' || patternFilter !== 'all' || dateFrom || dateTo
                 ? '検索条件に一致する注文はありません。'
                 : '注文はまだありません。'}
             </div>
@@ -940,12 +961,19 @@ const Orders = () => {
                           />
                         </td>
                         <td className="px-6 py-4">
-                          <button
-                            onClick={() => setDetailOrder(order)}
-                            className="font-medium text-gray-900 hover:text-primary transition-colors"
-                          >
-                            {getOrderNumber(order)}
-                          </button>
+                          <div className="flex flex-col items-start gap-1">
+                            <button
+                              onClick={() => setDetailOrder(order)}
+                              className="font-medium text-gray-900 hover:text-primary transition-colors"
+                            >
+                              {getOrderNumber(order)}
+                            </button>
+                            {Boolean(order.stripe_subscription_id || order.subscription_interval) && (
+                              <span className="inline-block px-1.5 py-0.5 text-[9px] font-bold tracking-wider uppercase bg-red-50 text-red-600 border border-red-200 rounded">
+                                定期購入
+                              </span>
+                            )}
+                          </div>
                         </td>
                         <td className="px-6 py-4 text-gray-600">{getCustomerName(order)}</td>
                         <td className="px-6 py-4 text-gray-500">{new Date(order.created_at).toLocaleDateString('ja-JP')}</td>

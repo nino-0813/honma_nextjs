@@ -29,6 +29,14 @@ interface SubscriptionRow {
   updated_at: string;
 }
 
+interface SubscriptionItemView {
+  product_id: string | null;
+  product_title: string;
+  product_image: string | null;
+  product_price: number;
+  quantity: number;
+}
+
 const SUBSCRIPTION_STATUS_LABELS: Record<string, { label: string; cls: string }> = {
   active: { label: '有効', cls: 'bg-green-100 text-green-700' },
   trialing: { label: '次回発送待ち', cls: 'bg-blue-100 text-blue-700' },
@@ -60,6 +68,8 @@ const MyPage = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [subscriptions, setSubscriptions] = useState<SubscriptionRow[]>([]);
+  // 定期購入の商品情報（stripe_subscription_id -> [items]）
+  const [subscriptionItems, setSubscriptionItems] = useState<Record<string, SubscriptionItemView[]>>({});
   const [cancelingId, setCancelingId] = useState<string | null>(null);
   const [syncingSubscriptions, setSyncingSubscriptions] = useState(false);
   const [activeTab, setActiveTab] = useState<'orders' | 'subscriptions' | 'miles' | 'profile'>('orders');
@@ -205,7 +215,54 @@ const MyPage = () => {
           .select('*')
           .eq('auth_user_id', userId)
           .order('created_at', { ascending: false });
-        setSubscriptions((subs ?? []) as SubscriptionRow[]);
+        const subsRows = (subs ?? []) as SubscriptionRow[];
+        setSubscriptions(subsRows);
+
+        // 各定期購入の元注文(orders)から定期購入アイテム(order_items)を引いて商品情報をまとめる
+        try {
+          const subIds = subsRows.map((s) => s.stripe_subscription_id).filter(Boolean);
+          if (subIds.length > 0) {
+            // 最初の注文を取得 (subscription_id + created_at asc で最古を1件)
+            const { data: ordersForSubs } = await supabase
+              .from('orders')
+              .select('id, stripe_subscription_id, created_at')
+              .in('stripe_subscription_id', subIds)
+              .order('created_at', { ascending: true });
+            // subscription_id -> 最古のorder.id を構築
+            const firstOrderBySub: Record<string, string> = {};
+            (ordersForSubs ?? []).forEach((o: any) => {
+              if (!firstOrderBySub[o.stripe_subscription_id]) {
+                firstOrderBySub[o.stripe_subscription_id] = o.id;
+              }
+            });
+            const orderIds = Object.values(firstOrderBySub);
+            if (orderIds.length > 0) {
+              const { data: itemsData } = await supabase
+                .from('order_items')
+                .select('order_id, product_id, product_title, product_image, product_price, quantity, is_subscription')
+                .in('order_id', orderIds);
+              const itemsByOrderId: Record<string, any[]> = {};
+              (itemsData ?? []).forEach((it: any) => {
+                if (!itemsByOrderId[it.order_id]) itemsByOrderId[it.order_id] = [];
+                itemsByOrderId[it.order_id].push(it);
+              });
+              const result: Record<string, SubscriptionItemView[]> = {};
+              for (const [subId, orderId] of Object.entries(firstOrderBySub)) {
+                const items = (itemsByOrderId[orderId] || []).filter((it: any) => it.is_subscription);
+                result[subId] = items.map((it: any) => ({
+                  product_id: it.product_id,
+                  product_title: it.product_title || '商品',
+                  product_image: it.product_image || null,
+                  product_price: Number(it.product_price || 0),
+                  quantity: Number(it.quantity || 1),
+                }));
+              }
+              setSubscriptionItems(result);
+            }
+          }
+        } catch (e) {
+          console.warn('定期購入の商品情報取得失敗:', e);
+        }
       }
 
       // イベントマイル残高 + 履歴
@@ -548,6 +605,11 @@ const MyPage = () => {
                           )}
                         </div>
                         <p className="text-xs text-gray-500 mt-1">{formatDate(order.created_at)}</p>
+                        {isSubscriptionOrder && order.stripe_subscription_id && (
+                          <p className="text-[10px] text-gray-400 mt-1 break-all">
+                            定期購入ID: <span className="font-mono">{order.stripe_subscription_id}</span>
+                          </p>
+                        )}
                       </div>
                       <div className="flex items-center gap-4">
                         <span
@@ -571,32 +633,14 @@ const MyPage = () => {
                   <div className="p-6">
                     <div className="space-y-4">
                       {order.order_items?.map((item) => {
-                        const productHandle = item.product?.handle;
-                        const productHref = productHandle ? `/products/${productHandle}` : null;
-                        const ImageWrapper: any = productHref ? Link : 'div';
-                        const TextWrapper: any = productHref ? Link : 'span';
-                        const imageWrapperProps = productHref
-                          ? {
-                              href: productHref,
-                              className:
-                                'flex-shrink-0 w-20 h-20 bg-gray-100 rounded overflow-hidden cursor-pointer hover:opacity-80 transition-opacity',
-                            }
-                          : {
-                              className: 'flex-shrink-0 w-20 h-20 bg-gray-100 rounded overflow-hidden',
-                            };
-                        const textWrapperProps = productHref
-                          ? {
-                              href: productHref,
-                              className:
-                                'text-sm font-medium text-gray-900 hover:text-black hover:underline transition-colors line-clamp-2 cursor-pointer',
-                            }
-                          : {
-                              className:
-                                'text-sm font-medium text-gray-900 line-clamp-2',
-                            };
+                        // 画像・商品名クリックで注文詳細ページへ遷移
+                        const orderDetailHref = `/mypage/orders/${order.id}`;
                         return (
                           <div key={item.id} className="flex gap-4">
-                            <ImageWrapper {...imageWrapperProps}>
+                            <Link
+                              href={orderDetailHref}
+                              className="flex-shrink-0 w-20 h-20 bg-gray-100 rounded overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
+                            >
                               <FadeInImage
                                 src={
                                   item.product?.images && item.product.images.length > 0
@@ -606,11 +650,14 @@ const MyPage = () => {
                                 alt={item.product?.title || ''}
                                 className="w-full h-full object-contain"
                               />
-                            </ImageWrapper>
+                            </Link>
                             <div className="flex-1 min-w-0">
-                              <TextWrapper {...textWrapperProps}>
+                              <Link
+                                href={orderDetailHref}
+                                className="text-sm font-medium text-gray-900 hover:text-black hover:underline transition-colors line-clamp-2 cursor-pointer"
+                              >
                                 {item.product?.title || '商品情報なし'}
-                              </TextWrapper>
+                              </Link>
                               <div className="mt-1 flex items-center gap-4 text-xs text-gray-500">
                                 <span>数量: {item.quantity}</span>
                                 <span>¥{item.price.toLocaleString()}</span>
@@ -733,6 +780,40 @@ const MyPage = () => {
                         </div>
                       </div>
 
+                      {/* 商品情報 */}
+                      {(() => {
+                        const items = subscriptionItems[sub.stripe_subscription_id] || [];
+                        if (items.length === 0) return null;
+                        return (
+                          <div className="pt-3 border-t border-gray-100 space-y-3">
+                            {items.map((item, idx) => (
+                              <div key={idx} className="flex gap-3">
+                                <div className="flex-shrink-0 w-16 h-16 bg-gray-100 rounded overflow-hidden">
+                                  {item.product_image ? (
+                                    <FadeInImage
+                                      src={item.product_image}
+                                      alt={item.product_title}
+                                      className="w-full h-full object-contain"
+                                    />
+                                  ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                                      No Image
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-gray-900 line-clamp-2">{item.product_title}</p>
+                                  <div className="mt-1 flex items-center gap-4 text-xs text-gray-500">
+                                    <span>数量: {item.quantity}</span>
+                                    <span className="font-serif">¥{item.product_price.toLocaleString()}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      })()}
+
                       {sub.canceled_at && (
                         <p className="text-xs text-gray-500">
                           解約日: {formatDate(sub.canceled_at)}
@@ -770,7 +851,7 @@ const MyPage = () => {
                 {mileBalance.toLocaleString()} <span className="text-base font-medium">マイル</span>
               </p>
               <p className="text-xs text-amber-800 mt-3 leading-relaxed">
-                佐渡で開催する各種イベント（田植えリトリート等）の参加費に使えるポイントです。<br />
+                イケベジが開催する各種イベント（田植えリトリート等）の参加費に使えるポイントです。<br />
                 1マイル = 1円。有効期限はありません。
               </p>
             </div>

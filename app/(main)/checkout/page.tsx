@@ -3122,7 +3122,7 @@ function EventMileEarnPanel({ miles, isLoggedIn }: { miles: number; isLoggedIn: 
                 イベントマイルとは
               </h3>
               <p className="text-sm text-gray-700 leading-relaxed mb-4">
-                対象商品のご購入で、佐渡で開催する各種イベント（田植えリトリート等）の参加費として
+                対象商品のご購入で、イケベジが開催する各種イベント（田植えリトリート等）の参加費として
                 <span className="font-medium">1マイル＝1円</span>として使えるポイントです。
               </p>
               <ul className="text-sm text-gray-700 space-y-2 mb-2">

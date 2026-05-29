@@ -8,7 +8,6 @@ import { IconChevronDown } from '@/components/Icons';
 import { FadeInImage, LoadingButton } from '@/components/UI';
 import { CartContext } from '@/providers/CartProvider';
 import { supabase, checkStockAvailability, getStockForVariant } from '@/lib/supabase';
-import { productEarnableMilesPreview } from '@/lib/eventMiles';
 import { computeFirstShippingDate, formatJapaneseDate } from '@/lib/subscriptionShipping';
 
 type PurchaseType = 'one_time' | 'subscription';
@@ -395,29 +394,6 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 );
               })()}
 
-              {/* イベントマイル付与予定（対象商品のみ表示） */}
-              {(() => {
-                const previewMiles = productEarnableMilesPreview(product);
-                if (previewMiles <= 0) return null;
-                return (
-                  <div className="mb-4 rounded-lg bg-amber-50 border border-amber-200 p-3">
-                    <div className="flex items-center gap-2">
-                      <span className="inline-flex w-6 h-6 items-center justify-center bg-amber-600 text-white text-xs font-bold rounded">
-                        M
-                      </span>
-                      <span className="text-sm text-amber-900 font-medium">
-                        この商品の購入で <span className="font-bold">{previewMiles.toLocaleString()}</span> マイル付与予定
-                      </span>
-                    </div>
-                    <p className="text-xs text-amber-700 mt-2 leading-relaxed">
-                      ※ 佐渡で開催するイベントの参加費に使えるポイントです（1マイル=1円）。
-                      <br />
-                      ※ 会員ログイン時のみ付与。送料込みの注文合計と数量に応じて加算されます。
-                    </p>
-                  </div>
-                );
-              })()}
-
               {/* 販売期間の表示（片方だけでも自然な日本語で出す） */}
               {(product?.saleStartAt || product?.saleEndAt) && (
                 <div className="mb-4">
@@ -493,11 +469,12 @@ export default function ProductDetailView({ product }: { product: Product }) {
                     </div>
                   </div>
                   <div className="text-xs text-sky-700 mt-3 pt-3 border-t border-sky-200 leading-relaxed space-y-1">
-                    <p>
-                      ※ 本日ご注文の場合の初回お届け予定日：
-                      <span className="font-bold text-sky-900 ml-1">
+                    <p className="font-medium text-sky-900">
+                      本日ご注文いただいた場合、初回の発送は
+                      <span className="font-bold ml-0.5">
                         {formatJapaneseDate(computeFirstShippingDate(new Date()))}
                       </span>
+                      予定となります。
                     </p>
                     <p>※ 2回目以降のお届けは毎月15日発送となります。</p>
                   </div>
@@ -825,6 +802,13 @@ export default function ProductDetailView({ product }: { product: Product }) {
                   <li className="flex gap-2">
                     <span className="text-primary flex-shrink-0">・</span>
                     <span>発送は毎月15日を予定しております。</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-primary flex-shrink-0">・</span>
+                    <span>
+                      毎月<span className="font-medium">10日まで</span>のご注文で、初回分を<span className="font-medium">当月発送</span>いたします。
+                      <span className="font-medium">11日以降</span>のご注文は、<span className="font-medium">翌月からの発送開始</span>となります。
+                    </span>
                   </li>
                   <li className="flex gap-2">
                     <span className="text-primary flex-shrink-0">・</span>
