@@ -31,7 +31,7 @@ interface SubscriptionRow {
 
 const SUBSCRIPTION_STATUS_LABELS: Record<string, { label: string; cls: string }> = {
   active: { label: '有効', cls: 'bg-green-100 text-green-700' },
-  trialing: { label: 'お試し中', cls: 'bg-blue-100 text-blue-700' },
+  trialing: { label: '次回発送待ち', cls: 'bg-blue-100 text-blue-700' },
   past_due: { label: '支払い遅延', cls: 'bg-red-100 text-red-700' },
   unpaid: { label: '未払い', cls: 'bg-red-100 text-red-700' },
   canceled: { label: '解約済み', cls: 'bg-gray-100 text-gray-600' },
