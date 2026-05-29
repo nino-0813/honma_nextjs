@@ -101,60 +101,81 @@ async function createDeferredSubscription(
   pi: any,
   order: any
 ) {
+  const logCtx = { orderId: order?.id, paymentIntentId: pi?.id };
   try {
-    const intervalKey = String(pi?.metadata?.interval || '') as SubscriptionIntervalKey;
+    // 1) Customer / PaymentMethod 検証
+    if (!pi?.customer) {
+      console.error('[DeferredSub] PI に customer がありません', logCtx);
+      return;
+    }
+    if (!pi?.payment_method) {
+      console.error('[DeferredSub] PI に payment_method がありません', logCtx);
+      return;
+    }
+
+    // 2) interval を決定（order.subscription_interval を優先、なければ pi.metadata.interval）
+    const intervalKey = String(
+      order?.subscription_interval || pi?.metadata?.interval || ''
+    ) as SubscriptionIntervalKey;
     if (!STRIPE_INTERVAL_MAP[intervalKey]) {
-      console.error('[DeferredSub] invalid interval', { pi: pi?.id, interval: intervalKey });
+      console.error('[DeferredSub] interval が不正', { ...logCtx, interval: intervalKey });
       return;
     }
     const recurring = STRIPE_INTERVAL_MAP[intervalKey];
 
-    // metadata.items_json から定期購入アイテムを復元
-    let itemsRaw: any[] = [];
-    try {
-      itemsRaw = JSON.parse(String(pi?.metadata?.items_json || '[]'));
-    } catch (e) {
-      console.error('[DeferredSub] items_json parse error', e);
+    // 3) order_items から定期購入アイテムを取得（is_subscription=true）
+    const { data: orderItems, error: itemsErr } = await supabaseAdmin
+      .from('order_items')
+      .select('product_id, product_title, product_price, quantity, is_subscription')
+      .eq('order_id', order.id);
+    if (itemsErr) {
+      console.error('[DeferredSub] order_items 取得失敗', { ...logCtx, err: itemsErr });
       return;
     }
-    if (!Array.isArray(itemsRaw) || itemsRaw.length === 0) {
-      console.error('[DeferredSub] empty items', { pi: pi?.id });
+    const subItems = (orderItems || []).filter((it: any) => Boolean(it.is_subscription));
+    if (subItems.length === 0) {
+      console.error('[DeferredSub] 注文に定期購入アイテムがありません', logCtx);
       return;
     }
 
-    const shippingCost = Math.max(0, Number(pi?.metadata?.shipping_cost ?? 0));
-
-    // Stripe Product と Price を作成（recurring）
-    const subscriptionItems: any[] = [];
-    for (const it of itemsRaw) {
+    // 4) Stripe Product / Price (recurring) を作成
+    const stripeItems: any[] = [];
+    for (const it of subItems) {
+      const unitPrice = Math.round(Number(it.product_price || 0));
+      if (unitPrice <= 0) {
+        console.error('[DeferredSub] アイテム単価が無効', { ...logCtx, item: it });
+        continue;
+      }
       const product = await stripe.products.create({
-        name: String(it.t || '商品'),
+        name: String(it.product_title || '商品').slice(0, 250),
         metadata: {
-          product_id: String(it.id || ''),
+          product_id: String(it.product_id || ''),
           source: 'ikevege_subscription',
         },
       });
-      subscriptionItems.push({
-        quantity: Number(it.q || 1),
+      stripeItems.push({
+        quantity: Math.max(1, Number(it.quantity || 1)),
         price_data: {
           currency: 'jpy',
           product: product.id,
-          unit_amount: Math.round(Number(it.p || 0)),
+          unit_amount: unitPrice,
           recurring,
         },
       });
     }
+    if (stripeItems.length === 0) {
+      console.error('[DeferredSub] 有効なアイテムが0件になりました', logCtx);
+      return;
+    }
 
-    // 送料も毎回請求
+    // 5) 送料も毎回 recurring 請求として追加
+    const shippingCost = Math.max(0, Number(order.shipping_cost || 0));
     if (shippingCost > 0) {
       const shippingProduct = await stripe.products.create({
         name: '送料',
-        metadata: {
-          product_id: '__shipping__',
-          source: 'ikevege_subscription',
-        },
+        metadata: { product_id: '__shipping__', source: 'ikevege_subscription' },
       });
-      subscriptionItems.push({
+      stripeItems.push({
         quantity: 1,
         price_data: {
           currency: 'jpy',
@@ -165,19 +186,14 @@ async function createDeferredSubscription(
       });
     }
 
-    // billing_cycle_anchor（=2回目決済日）を計算
-    // 基準日は PaymentIntent の作成時刻（=お客様のチェックアウト時刻）
+    // 6) billing_cycle_anchor を計算（2回目決済日 = JST 10日 05:00）
     const checkoutDate = new Date((pi?.created ?? Math.floor(Date.now() / 1000)) * 1000);
     const anchorUnix = computeBillingCycleAnchor(checkoutDate, intervalKey);
-    if (!anchorUnix) {
-      // 週次/隔週は anchor 不要。Stripe デフォルト挙動でOK
-      console.warn('[DeferredSub] no anchor for interval', intervalKey);
-    }
 
-    // Subscription を作成
+    // 7) Subscription を作成
     const subscriptionParams: any = {
       customer: pi.customer,
-      items: subscriptionItems,
+      items: stripeItems,
       default_payment_method: pi.payment_method,
       metadata: {
         interval: intervalKey,
@@ -192,9 +208,18 @@ async function createDeferredSubscription(
       subscriptionParams.proration_behavior = 'none';
     }
 
+    console.log('[DeferredSub] 作成パラメータ', {
+      ...logCtx,
+      interval: intervalKey,
+      itemsCount: stripeItems.length,
+      anchorUnix,
+      customer: pi.customer,
+      paymentMethod: pi.payment_method,
+    });
+
     const subscription = await stripe.subscriptions.create(subscriptionParams);
 
-    // orders テーブルに stripe_subscription_id を保存
+    // 8) orders に stripe_subscription_id を保存
     const updates: any = {
       stripe_subscription_id: subscription.id,
       stripe_customer_id: pi.customer,
@@ -203,16 +228,31 @@ async function createDeferredSubscription(
     if (!order.subscription_interval) {
       updates.subscription_interval = intervalKey;
     }
-    await supabaseAdmin.from('orders').update(updates).eq('id', order.id);
+    const { error: updErr } = await supabaseAdmin
+      .from('orders')
+      .update(updates)
+      .eq('id', order.id);
+    if (updErr) {
+      console.error('[DeferredSub] order 更新エラー', { ...logCtx, err: updErr });
+    }
 
-    console.log('[DeferredSub] created', {
-      orderId: order.id,
+    console.log('[DeferredSub] 作成成功', {
+      ...logCtx,
       subscriptionId: subscription.id,
       interval: intervalKey,
-      anchorUnix,
+      status: subscription.status,
     });
   } catch (e: any) {
-    console.error('[DeferredSub] create error', e?.message || e, e?.stack);
+    // Stripe API のエラー詳細を全部出す（type/code/raw も含む）
+    console.error('[DeferredSub] 作成失敗', {
+      ...logCtx,
+      message: e?.message,
+      type: e?.type,
+      code: e?.code,
+      decline_code: e?.decline_code,
+      raw: e?.raw,
+      stack: e?.stack,
+    });
   }
 }
 

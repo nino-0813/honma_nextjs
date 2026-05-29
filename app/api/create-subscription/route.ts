@@ -116,7 +116,8 @@ export async function POST(request: Request) {
 
     // 3) Subscription 用 PaymentIntent を作成
     //    - setup_future_usage='off_session' でカードを保存（webhook 側で Subscription に紐付け）
-    //    - metadata に Subscription 作成に必要な情報を持たせる
+    //    - metadata.type='subscription_init' をフラグとして使う
+    //    - 詳細（items / shipping_cost）は order / order_items から webhook が直接取得する
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(total),
       currency: 'jpy',
@@ -128,15 +129,6 @@ export async function POST(request: Request) {
         type: 'subscription_init',
         interval,
         item_count: String(items.length),
-        items_json: JSON.stringify(
-          items.map((it) => ({
-            id: it.product_id,
-            t: it.product_title.slice(0, 60), // 長すぎ防止
-            p: Math.round(it.unit_price),
-            q: it.quantity,
-          }))
-        ).slice(0, 480), // Stripe metadata 1値の上限 500 char に収める
-        shipping_cost: String(Math.max(0, Number(shipping_cost || 0))),
       },
     });
 
