@@ -60,18 +60,6 @@ export default function YearlySubscriptionLP() {
         </p>
       </div>
 
-      {/* ヒーロー直下の画像 */}
-      <div className="relative w-full aspect-[16/9] md:aspect-[21/9] rounded-2xl overflow-hidden mb-12 md:mb-16 shadow-[0_15px_40px_-12px_rgba(0,0,0,0.18)]">
-        <Image
-          src="/images/home/parallax/sunset_riceplanting_7.jpg"
-          alt="佐渡の田んぼで田植え"
-          fill
-          sizes="(max-width: 768px) 100vw, 1200px"
-          className="object-cover"
-          priority={false}
-        />
-      </div>
-
       {/* 02 2つの理由（画像付き横並びカード） */}
       <div className="space-y-6 md:space-y-8 mb-10 md:mb-14">
         {REASONS.map((r, idx) => (
