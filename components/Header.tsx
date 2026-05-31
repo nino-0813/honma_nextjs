@@ -107,11 +107,20 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
               ABOUT US
               <span className={`absolute -bottom-2 left-0 w-full h-px ${isHomePage && !isScrolled ? 'bg-white' : 'bg-black'} transition-transform duration-300 origin-left ${isActive('/about') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`} />
             </Link>
-            <Link href="/collections/rice/yearly?view=lp" className={`text-sm font-medium tracking-[0.15em] transition-colors relative group ${
-              isActive('/collections/rice/yearly') ? (isHomePage && !isScrolled ? 'text-white' : 'text-black') : (isHomePage && !isScrolled ? 'text-white hover:text-white/80' : 'text-gray-500 hover:text-black')
-            }`}>
+            <Link
+              href="/collections/rice/yearly?view=lp"
+              className={`relative inline-flex items-center gap-1.5 text-xs md:text-[13px] font-semibold tracking-[0.2em] px-3.5 md:px-4 py-1.5 rounded-full border transition-all duration-300 ${
+                isActive('/collections/rice/yearly')
+                  ? isHomePage && !isScrolled
+                    ? 'text-black bg-white border-white shadow-[0_0_0_3px_rgba(255,255,255,0.18)]'
+                    : 'text-white bg-black border-black'
+                  : isHomePage && !isScrolled
+                    ? 'text-white border-white/85 bg-white/5 backdrop-blur-[2px] hover:bg-white hover:text-black shadow-[0_0_0_3px_rgba(255,255,255,0.12)]'
+                    : 'text-primary border-primary/60 hover:bg-primary hover:text-white'
+              }`}
+            >
+              <span className="block w-1.5 h-1.5 rounded-full bg-current opacity-90" aria-hidden />
               SUBSCRIPTION
-              <span className={`absolute -bottom-2 left-0 w-full h-px ${isHomePage && !isScrolled ? 'bg-white' : 'bg-black'} transition-transform duration-300 origin-left ${isActive('/collections/rice/yearly') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`} />
             </Link>
             <Link href="/collections" className={`text-sm font-medium tracking-[0.15em] transition-colors relative group ${
               isActive('/collections') ? (isHomePage && !isScrolled ? 'text-white' : 'text-black') : (isHomePage && !isScrolled ? 'text-white hover:text-white/80' : 'text-gray-500 hover:text-black')
