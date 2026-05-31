@@ -106,7 +106,7 @@ export default function YearlySubscriptionLP() {
       <div className="relative bg-amber-50/70 border border-amber-200 rounded-2xl overflow-hidden mb-10 md:mb-14">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
           {/* 画像 */}
-          <div className="relative aspect-[4/3] md:aspect-auto md:min-h-[480px] bg-amber-100/50 overflow-hidden">
+          <div className="relative aspect-[4/3] md:aspect-auto md:min-h-[420px] bg-amber-100/50 overflow-hidden">
             <Image
               src="/images/rice-keep-bag.jpg"
               alt="新規お申し込み特典のお米保存袋"
@@ -133,13 +133,21 @@ export default function YearlySubscriptionLP() {
           </div>
 
           {/* テキスト */}
-          <div className="p-6 md:p-10 flex flex-col justify-center">
+          <div className="p-6 md:py-8 md:px-10 flex flex-col justify-center">
             <p className="text-[11px] md:text-sm text-amber-700 tracking-[0.25em] uppercase mb-3 font-medium">
               New Member Gift
             </p>
-            <h3 className="text-lg md:text-2xl font-semibold text-amber-900 mb-4 leading-snug tracking-[0.04em]">
-              新規お申し込み特典／お米保存袋をプレゼント
-            </h3>
+
+            {/* 見出し: 小さなラベル＋大きなメイン */}
+            <div className="mb-5">
+              <p className="text-sm md:text-base text-amber-800 mb-2 font-semibold tracking-[0.05em]">
+                新規お申し込み特典
+              </p>
+              <h3 className="text-2xl md:text-[1.875rem] font-bold text-amber-900 leading-[1.4] tracking-[0.04em]">
+                お米保存袋をプレゼント
+              </h3>
+            </div>
+
             <p className="text-sm md:text-base text-amber-900/80 leading-loose mb-5 font-semibold">
               新しく定期便をお申し込みいただいた方に、
               <br className="hidden md:block" />
@@ -163,7 +171,7 @@ export default function YearlySubscriptionLP() {
                 ),
               )}
             </ul>
-            <p className="mt-5 text-[11px] md:text-xs text-amber-700/70 font-bold">
+            <p className="mt-4 text-[11px] md:text-xs text-amber-700/70 font-bold">
               ※数量限定・なくなり次第終了
             </p>
           </div>
