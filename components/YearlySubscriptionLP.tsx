@@ -112,8 +112,8 @@ export default function YearlySubscriptionLP() {
               alt="新規お申し込み特典のお米保存袋"
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover"
-              style={{ objectPosition: '50% 55%' }}
+              className="object-cover scale-105"
+              style={{ objectPosition: '15% 55%' }}
             />
             {/* 画像の左上に乗せる読みやすさ用のグラデーション */}
             <div className="absolute top-0 left-0 right-0 h-32 md:h-40 z-[5] bg-gradient-to-b from-black/45 via-black/20 to-transparent pointer-events-none" />
