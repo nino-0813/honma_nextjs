@@ -281,7 +281,10 @@ export const MenuDrawer = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
           <button onClick={() => navigate('/about')} className="text-left border-b border-gray-100 py-4 hover:text-gray-500 transition-colors block w-full">
             ABOUT US
           </button>
-          
+          <button onClick={() => navigate('/collections/rice/yearly')} className="text-left border-b border-gray-100 py-4 hover:text-gray-500 transition-colors block w-full">
+            SUBSCRIPTION
+          </button>
+
           {/* CATEGORY with Accordion */}
           <div className="border-b border-gray-100">
             <div className="w-full flex items-center justify-between py-4">
@@ -347,11 +350,11 @@ export const MenuDrawer = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
                       >
                         にこまる
                       </button>
-                      <button 
-                        onClick={() => navigate('/collections/rice/yearly')} 
+                      <button
+                        onClick={() => navigate('/collections/rice/yearly')}
                         className="text-left py-2 text-gray-500 hover:text-black transition-colors block w-full text-xs"
                       >
-                        年間契約
+                        イケベジ定期便
                       </button>
                     </div>
                   )}
