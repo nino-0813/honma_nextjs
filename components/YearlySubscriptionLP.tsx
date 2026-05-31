@@ -385,13 +385,13 @@ export function YearlySubscriptionFooter() {
               key={i}
               className="group border border-gray-200 rounded-xl bg-white open:shadow-sm open:border-amber-200 transition-all"
             >
-              <summary className="flex items-center justify-between cursor-pointer p-4 md:p-5 list-none">
-                <span className="text-sm md:text-base font-medium text-primary pr-4">
-                  <span className="text-amber-600 mr-2">Q.</span>
-                  {item.q}
+              <summary className="flex items-start justify-between cursor-pointer p-4 md:p-5 list-none gap-3">
+                <span className="text-sm md:text-base font-medium text-primary flex gap-2 flex-1 min-w-0">
+                  <span className="text-amber-600 flex-shrink-0">Q.</span>
+                  <span>{item.q}</span>
                 </span>
                 <svg
-                  className="w-4 h-4 text-gray-400 group-open:rotate-180 transition-transform flex-shrink-0"
+                  className="w-4 h-4 text-gray-400 group-open:rotate-180 transition-transform flex-shrink-0 mt-1"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -399,9 +399,9 @@ export function YearlySubscriptionFooter() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </summary>
-              <div className="px-4 md:px-5 pb-4 md:pb-5 text-xs md:text-sm text-gray-600 leading-relaxed whitespace-pre-line">
-                <span className="text-amber-600 font-medium mr-2">A.</span>
-                {item.a}
+              <div className="px-4 md:px-5 pb-4 md:pb-5 text-xs md:text-sm text-gray-600 leading-relaxed flex gap-2">
+                <span className="text-amber-600 font-medium flex-shrink-0">A.</span>
+                <span className="whitespace-pre-line">{item.a}</span>
               </div>
             </details>
           ))}
