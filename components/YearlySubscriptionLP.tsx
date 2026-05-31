@@ -5,7 +5,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 type Reason = {
-  eyebrow: string;
   title: string;
   paragraphs: string[];
   image: string;
@@ -14,25 +13,22 @@ type Reason = {
 
 const REASONS: Reason[] = [
   {
-    eyebrow: 'Reason 01',
-    title: '毎月、いつでも10%OFF。',
+    title: 'いつでも10%OFF',
     paragraphs: [
       '毎日食べるものだから、おいしさと続けやすさの両方を大事にしました。',
       '定期便でお申し込みいただくと、通常価格よりいつでも10%OFFでお届けします。',
-      '一度きりのお買い得ではなく、イケベジのお米を日々のごはんとして選んでくださる方への定期便価格です。',
-      '毎日の食卓をおいしく長く食べ続けてもらうための、イケベジの定期便です。',
+      '食べてくれる方がいるから、田んぼを続けていける。',
+      '定期的なお届けを通して、お客様とイケベジが一緒に歩んでいくための定期便価格です。',
     ],
     image: '/images/usage-scene.jpg',
     imageAlt: 'お米を毎日の食卓に',
   },
   {
-    eyebrow: 'Reason 02',
     title: '専用保冷庫で保管。お届けに合わせて精米。',
     paragraphs: [
-      'お米のおいしさは、田んぼで育つ時間だけでなく、収穫後の保管と、精米のタイミングでも変わります。',
+      'お米のおいしさは、田んぼで育つ時間だけでなく、収穫後の保管と、精米のタイミングにも大きく左右されます。',
       'イケベジでは、収穫したお米を専用保冷庫で保管しています。温度を管理しながら、お米の状態をできるだけ良く保つこと。そして、お届けに合わせて精米すること。',
       '田んぼから食卓までのあいだに、できることを一つずつ積み重ねてお届けします。',
-      '精米したてのおいしさを、ご自宅でお楽しみください。',
     ],
     image: '/images/about/stories/IMG_8832.jpg',
     imageAlt: '佐渡の田んぼでお米を育てるイケベジ',
@@ -81,9 +77,6 @@ export default function YearlySubscriptionLP() {
 
               {/* テキスト */}
               <div className="p-6 md:p-10 flex flex-col justify-center">
-                <p className="text-[11px] md:text-xs text-amber-700 tracking-[0.3em] uppercase mb-3 font-medium">
-                  {r.eyebrow}
-                </p>
                 <h3 className="text-xl md:text-2xl font-bold text-primary mb-5 leading-snug tracking-[0.03em]">
                   {r.title}
                 </h3>
