@@ -5,59 +5,37 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 type Reason = {
+  eyebrow: string;
   title: string;
-  description: string;
-  icon: React.ReactNode;
+  paragraphs: string[];
+  image: string;
+  imageAlt: string;
 };
 
 const REASONS: Reason[] = [
   {
-    title: '毎月、いつでも10%OFF',
-    description: '毎日食べるお米を、通常価格より10%OFFでお届けします。',
-    icon: (
-      <svg className="w-6 h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" strokeWidth={1.4} viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 14l6-6M9.5 9.5h.01M14.5 14.5h.01M5.25 4.5h13.5a1.5 1.5 0 011.5 1.5v13.5a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5V6a1.5 1.5 0 011.5-1.5z" />
-      </svg>
-    ),
+    eyebrow: 'Reason 01',
+    title: '毎月、いつでも10%OFF。',
+    paragraphs: [
+      '毎日食べるものだから、おいしさと続けやすさの両方を大事にしました。',
+      '定期便でお申し込みいただくと、通常価格よりいつでも10%OFFでお届けします。',
+      '一度きりのお買い得ではなく、イケベジのお米を日々のごはんとして選んでくださる方への定期便価格です。',
+      '毎日の食卓をおいしく長く食べ続けてもらうための、イケベジの定期便です。',
+    ],
+    image: '/images/usage-scene.jpg',
+    imageAlt: 'お米を毎日の食卓に',
   },
   {
-    title: '保冷庫で保管。お届けに合わせて精米',
-    description: '収穫したお米を専用保冷庫で保管し、お届けに合わせて精米します。',
-    icon: (
-      <svg className="w-6 h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" strokeWidth={1.4} viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M6 3h12a1.5 1.5 0 011.5 1.5v15a1.5 1.5 0 01-1.5 1.5H6a1.5 1.5 0 01-1.5-1.5v-15A1.5 1.5 0 016 3z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 11h15M9 6.5v2M9 14v2" />
-      </svg>
-    ),
-  },
-  {
-    title: '買い忘れの心配を減らせる',
-    description: '必要な量を毎月ご自宅へ。お米が余りそうな月はスキップや休止も可能です。',
-    icon: (
-      <svg className="w-6 h-6 md:w-7 md:h-7" fill="none" stroke="currentColor" strokeWidth={1.4} viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
-  },
-];
-
-type RiceVariety = {
-  name: string;
-  description: string;
-};
-
-const RICE_VARIETIES: RiceVariety[] = [
-  {
-    name: 'コシヒカリ',
-    description: '佐渡の自然で育った定番米。炊き上がりの香り、甘み、もっちり感を楽しみたい方へ。',
-  },
-  {
-    name: '亀の尾',
-    description: '昔ながらの品種。派手さよりも、じんわりとした旨みや素朴な味わいを楽しめるお米です。',
-  },
-  {
-    name: 'にこまる',
-    description: '粒感があり、冷めてもおいしさを感じやすいお米。お弁当やおにぎりにもおすすめです。',
+    eyebrow: 'Reason 02',
+    title: '専用保冷庫で保管。お届けに合わせて精米。',
+    paragraphs: [
+      'お米のおいしさは、田んぼで育つ時間だけでなく、収穫後の保管と、精米のタイミングでも変わります。',
+      'イケベジでは、収穫したお米を専用保冷庫で保管しています。温度を管理しながら、お米の状態をできるだけ良く保つこと。そして、お届けに合わせて精米すること。',
+      '田んぼから食卓までのあいだに、できることを一つずつ積み重ねてお届けします。',
+      '精米したてのおいしさを、ご自宅でお楽しみください。',
+    ],
+    image: '/images/about/stories/IMG_8832.jpg',
+    imageAlt: '佐渡の田んぼでお米を育てるイケベジ',
   },
 ];
 
@@ -67,7 +45,7 @@ export default function YearlySubscriptionLP() {
       {/* 01 キャッチコピー */}
       <div className="max-w-3xl mx-auto text-center mb-8 md:mb-12">
         <p className="text-[11px] md:text-xs text-amber-700 tracking-[0.3em] uppercase mb-3 font-medium">
-          Annual Subscription
+          Subscription
         </p>
         <h2 className="text-xl md:text-3xl font-serif font-semibold text-primary leading-[1.55] md:leading-[1.4] mb-4">
           毎日のごはんに、
@@ -82,21 +60,51 @@ export default function YearlySubscriptionLP() {
         </p>
       </div>
 
-      {/* 02 3つの理由 */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-5 mb-4 md:mb-6">
-        {REASONS.map((r) => (
+      {/* ヒーロー直下の画像 */}
+      <div className="relative w-full aspect-[16/9] md:aspect-[21/9] rounded-2xl overflow-hidden mb-12 md:mb-16 shadow-[0_15px_40px_-12px_rgba(0,0,0,0.18)]">
+        <Image
+          src="/images/home/parallax/sunset_riceplanting_7.jpg"
+          alt="佐渡の田んぼで田植え"
+          fill
+          sizes="(max-width: 768px) 100vw, 1200px"
+          className="object-cover"
+          priority={false}
+        />
+      </div>
+
+      {/* 02 2つの理由（画像付き横並びカード） */}
+      <div className="space-y-6 md:space-y-8 mb-10 md:mb-14">
+        {REASONS.map((r, idx) => (
           <div
             key={r.title}
-            className="bg-white border border-gray-200 rounded-2xl p-4 md:p-6 flex md:flex-col items-center md:items-start gap-4 md:gap-4 hover:shadow-md hover:border-amber-200 transition-all"
+            className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-md transition-all shadow-[0_10px_30px_-12px_rgba(0,0,0,0.12)]"
           >
-            <div className="flex-shrink-0 w-11 h-11 md:w-14 md:h-14 bg-primary text-white rounded-xl flex items-center justify-center">
-              {r.icon}
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="text-sm md:text-base font-semibold text-primary mb-1 md:mb-2 leading-snug">
-                {r.title}
-              </h3>
-              <p className="text-xs md:text-sm text-gray-600 leading-relaxed">{r.description}</p>
+            <div className={`grid grid-cols-1 md:grid-cols-2 ${idx % 2 === 1 ? 'md:[&>*:first-child]:order-2' : ''}`}>
+              {/* 画像 */}
+              <div className="relative aspect-[4/3] md:aspect-auto md:min-h-[360px] bg-stone-100 overflow-hidden">
+                <Image
+                  src={r.image}
+                  alt={r.imageAlt}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="object-cover"
+                />
+              </div>
+
+              {/* テキスト */}
+              <div className="p-6 md:p-10 flex flex-col justify-center">
+                <p className="text-[11px] md:text-xs text-amber-700 tracking-[0.3em] uppercase mb-3 font-medium">
+                  {r.eyebrow}
+                </p>
+                <h3 className="text-xl md:text-2xl font-bold text-primary mb-5 leading-snug tracking-[0.03em]">
+                  {r.title}
+                </h3>
+                <div className="space-y-3 text-sm md:text-base text-gray-700 leading-loose">
+                  {r.paragraphs.map((p, i) => (
+                    <p key={i}>{p}</p>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         ))}
@@ -179,15 +187,13 @@ export default function YearlySubscriptionLP() {
       </div>
 
       {/* 04 商品一覧見出し */}
-      <div className="text-center mb-6 mt-10 md:mt-14 pt-6 border-t border-gray-100">
+      <div id="ikevege-subscription" className="text-center mb-6 mt-10 md:mt-14 pt-6 border-t border-gray-100 scroll-mt-28">
         <p className="text-[11px] text-gray-500 tracking-[0.25em] uppercase mb-3">Products</p>
         <h3 className="text-xl md:text-2xl font-serif font-medium text-primary tracking-wider mb-2">
-          定期便商品一覧
+          イケベジ定期便
         </h3>
         <p className="text-xs md:text-sm text-gray-600 leading-relaxed">
-          ご家庭に合った量と品種をお選びください。
-          <br className="md:hidden" />
-          定期便なら、いつでも<span className="text-amber-700 font-medium">10%OFF</span>でお届けします。
+          すべて<span className="text-amber-700 font-medium">10%OFF</span>でお届けします。
         </p>
       </div>
     </section>
@@ -218,38 +224,63 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
 ];
 
 export function YearlySubscriptionFooter() {
+  const handleScrollToProducts = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const el = document.getElementById('ikevege-subscription');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
     <section className="mt-16 md:mt-24 border-t border-gray-100 pt-12 md:pt-16">
-      {/* 05 イケベジのお米について */}
-      <div className="max-w-4xl mx-auto px-2 mb-16 md:mb-24">
-        <div className="text-center mb-8">
-          <p className="text-[11px] text-gray-500 tracking-[0.25em] uppercase mb-3">About Our Rice</p>
-          <h3 className="text-xl md:text-2xl font-serif font-semibold text-primary tracking-wider mb-3">
-            イケベジのお米について
-          </h3>
-          <p className="text-base md:text-lg font-serif text-amber-700">余計なものは足さない。</p>
-        </div>
-        <p className="text-sm md:text-[15px] text-gray-700 leading-loose text-center max-w-2xl mx-auto mb-8 md:mb-10">
-          自然栽培の考えをベースに、佐渡ヶ島の有機資源を活かして土を育てています。
-          品種がもともと持っている旨みや香りを、できるだけまっすぐお届けします。
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
-          {RICE_VARIETIES.map((v) => (
-            <div
-              key={v.name}
-              className="bg-white border border-gray-200 rounded-xl p-5 md:p-6 hover:shadow-md hover:border-amber-200 transition-all"
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-amber-600">●</span>
-                <h4 className="text-base md:text-lg font-serif font-medium text-primary">{v.name}</h4>
-              </div>
-              <p className="text-xs md:text-sm text-gray-600 leading-relaxed">{v.description}</p>
+      {/* 05 私たちの想い（画像左 + テキスト右） */}
+      <div className="max-w-6xl mx-auto px-2 mb-16 md:mb-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+          {/* 画像（左） */}
+          <div className="relative aspect-[4/5] md:aspect-[4/5] rounded-2xl overflow-hidden shadow-[0_15px_40px_-12px_rgba(0,0,0,0.2)]">
+            <Image
+              src="/images/about/stories/about_story_taue_123.jpg"
+              alt="佐渡の田んぼで田植えをするイケベジ"
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover"
+            />
+          </div>
+
+          {/* テキスト（右） */}
+          <div className="md:pl-2">
+            <p className="text-[11px] md:text-xs text-amber-700 tracking-[0.3em] uppercase mb-3 font-medium">
+              Our Thoughts
+            </p>
+            <h3 className="text-2xl md:text-3xl font-serif font-semibold text-primary tracking-wider mb-6 md:mb-8">
+              私たちの想い
+            </h3>
+            <div className="space-y-5 text-sm md:text-base text-gray-700 leading-loose">
+              <p>
+                みなさんに安心して、美味しいお米を食べてほしい。
+                <br />
+                必要な量を、必要なタイミングで、いつでも新鮮な状態で食卓に届けること。
+                <br />
+                それが、私たちイケベジがこのサブスクを始めた一番の理由です。
+              </p>
+              <p>
+                イケベジ定期便は私たち農家にとっても大きな支えになります。
+                <br />
+                繁忙期に販売の心配をすることなく100%「最高の米作り」に集中できる。
+                <br />
+                そして子どもたちの体験活動も積極的に受け入れることができます。
+              </p>
+              <p>
+                食べる人と、作る人が、お米を通じてゆるやかにつながる。
+                <br />
+                私たちにとって、これ以上ないほどありがたく、大切な、お客様との新しい関係のカタチです。
+              </p>
             </div>
-          ))}
+          </div>
         </div>
-        <p className="mt-5 text-[11px] md:text-xs text-gray-500 text-center">
-          ※販売商品・在庫状況により、選べる品種は変更になる場合があります。
-        </p>
       </div>
 
       {/* 06 定期便のご利用について */}
@@ -352,7 +383,6 @@ export function YearlySubscriptionFooter() {
       {/* 08 最後のCTA */}
       <div className="relative max-w-4xl mx-auto px-2">
         <div className="bg-gradient-to-b from-stone-50 to-amber-50/40 rounded-3xl px-6 md:px-12 py-14 md:py-20 text-center">
-          <p className="text-[11px] text-amber-700 tracking-[0.3em] uppercase mb-4 font-medium">Closing</p>
           <h3 className="text-xl md:text-3xl font-serif font-semibold text-primary leading-[1.6] md:leading-[1.5] mb-6">
             毎日のごはんに、
             <br className="md:hidden" />
@@ -363,11 +393,8 @@ export function YearlySubscriptionFooter() {
             イケベジのお米の定期便、はじめてみませんか。
           </p>
           <a
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
+            href="#ikevege-subscription"
+            onClick={handleScrollToProducts}
             className="inline-flex items-center gap-2 bg-primary text-white text-xs md:text-sm tracking-[0.2em] uppercase px-8 md:px-10 py-4 rounded-full hover:bg-amber-700 transition-colors"
           >
             定期便の商品を見る

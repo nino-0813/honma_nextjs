@@ -21,7 +21,7 @@ function getSubcategoryNameFromParam(param: string): string {
     koshihikari: 'コシヒカリ',
     kamenoo: '亀の尾',
     nikomaru: 'にこまる',
-    yearly: '年間契約',
+    yearly: 'イケベジ定期便',
   };
   return mapping[param] ?? param;
 }
@@ -114,7 +114,7 @@ export default function CollectionsPage() {
       if (currentSubcategory === 'koshihikari') return 'コシヒカリ';
       if (currentSubcategory === 'kamenoo') return '亀の尾';
       if (currentSubcategory === 'nikomaru') return 'にこまる';
-      if (currentSubcategory === 'yearly') return '年間契約';
+      if (currentSubcategory === 'yearly') return 'イケベジ定期便';
       return 'お米';
     }
     if (currentCategory === 'ALL') return 'ALL ITEM';
@@ -133,7 +133,7 @@ export default function CollectionsPage() {
                   ALL
                 </Link>
                 <Link href="/collections/rice/yearly" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentSubcategory === 'yearly' ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
-                  年間契約
+                  イケベジ定期便
                 </Link>
                 <Link href="/collections/rice/koshihikari" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentSubcategory === 'koshihikari' ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
                   コシヒカリ
