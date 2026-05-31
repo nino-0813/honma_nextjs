@@ -129,12 +129,12 @@ export default function YearlySubscriptionLP() {
             <h3 className="text-lg md:text-2xl font-semibold text-amber-900 mb-4 leading-snug tracking-tight">
               新規お申し込み特典／お米保存袋をプレゼント
             </h3>
-            <p className="text-sm md:text-base text-amber-900/80 leading-loose mb-5">
+            <p className="text-sm md:text-base text-amber-900/80 leading-loose mb-5 font-semibold">
               新しく定期便をお申し込みいただいた方に、
               <br className="hidden md:block" />
               「冷蔵庫のいらないお米保存袋」をプレゼントします。
             </p>
-            <ul className="space-y-2">
+            <ul className="space-y-2 font-semibold">
               {['防虫・防湿に強い専用素材', '冷蔵庫不要でシンク下にも収まる', '繰り返し使えるジッパー付き'].map(
                 (item) => (
                   <li key={item} className="flex items-start gap-2.5 text-xs md:text-sm text-amber-900/80">
@@ -152,7 +152,7 @@ export default function YearlySubscriptionLP() {
                 ),
               )}
             </ul>
-            <p className="mt-5 text-[11px] md:text-xs text-amber-700/70">
+            <p className="mt-5 text-[11px] md:text-xs text-amber-700/70 font-bold">
               ※数量限定・なくなり次第終了
             </p>
           </div>
