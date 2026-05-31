@@ -561,7 +561,15 @@ export default function ProductDetailView({ product }: { product: Product }) {
                             </span>
                             <span className="text-sm text-primary">{SUBSCRIPTION_INTERVAL_LABELS[interval]}</span>
                           </div>
-                          <span className="text-sm font-serif text-primary">¥{subscriptionPrice.toLocaleString()}</span>
+                          <div className="flex items-baseline gap-2">
+                            {subscriptionDiscountPercent > 0 && (
+                              <span className="text-xs text-gray-400 line-through">¥{calculatedPrice.toLocaleString()}</span>
+                            )}
+                            <span className="text-sm font-serif text-primary">¥{subscriptionPrice.toLocaleString()}</span>
+                            {subscriptionDiscountPercent > 0 && (
+                              <span className="text-[10px] text-red-600 font-medium">{subscriptionDiscountPercent}%OFF</span>
+                            )}
+                          </div>
                           <input
                             type="radio"
                             name="subscription-interval"
