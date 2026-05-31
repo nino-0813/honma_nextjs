@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useContext } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { IconBag, IconMenu, IconUser } from './Icons';
 import { CartContext } from '@/providers/CartProvider';
 import { supabase } from '@/lib/supabase';
@@ -14,7 +14,11 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const location = pathname ?? '/';
+  // SUBSCRIPTIONリンク（/collections/rice/yearly?view=lp）かどうかの判定用
+  const isSubscriptionLp =
+    location === '/collections/rice/yearly' && searchParams?.get('view') === 'lp';
   const [isScrolled, setIsScrolled] = useState(false);
   const { cartItems } = useContext(CartContext);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -48,10 +52,12 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
   }, []);
 
   const isActive = (path: string) => {
-    if (path === '/collections/rice/yearly') return location === '/collections/rice/yearly';
+    // SUBSCRIPTIONリンクは ?view=lp が付いている時だけアクティブ
+    if (path === '/collections/rice/yearly') return isSubscriptionLp;
+    // CATEGORYは /collections* すべて。ただし SUBSCRIPTION LP表示時は除外
     if (path === '/collections') {
       return (location === '/collections' || location.startsWith('/collections/'))
-        && location !== '/collections/rice/yearly';
+        && !isSubscriptionLp;
     }
     return location === path;
   };
