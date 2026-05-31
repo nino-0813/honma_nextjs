@@ -119,14 +119,14 @@ export default function YearlySubscriptionLP() {
             <div className="absolute top-0 left-0 right-0 h-32 md:h-40 z-[5] bg-gradient-to-b from-black/45 via-black/20 to-transparent pointer-events-none" />
 
             {/* GIFTラベル（明朝＋細罫線でロゴ風） */}
-            <div className="absolute top-5 left-5 md:top-8 md:left-8 z-10 text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
-              <div className="flex items-center gap-2.5 md:gap-3 mb-2 md:mb-2.5">
-                <span className="w-6 md:w-10 h-px bg-white/90" />
-                <span className="text-[9px] md:text-[11px] tracking-[0.35em] font-medium uppercase">
+            <div className="absolute top-6 left-6 md:top-10 md:left-10 z-10 text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.55)]">
+              <div className="flex items-center gap-3 md:gap-4 mb-3 md:mb-4">
+                <span className="w-8 md:w-14 h-px bg-white" />
+                <span className="text-[11px] md:text-sm tracking-[0.35em] font-medium uppercase">
                   For New Members
                 </span>
               </div>
-              <p className="font-serif text-3xl md:text-5xl tracking-[0.2em] leading-none">
+              <p className="font-serif text-5xl md:text-7xl tracking-[0.2em] leading-none">
                 Gift
               </p>
             </div>
