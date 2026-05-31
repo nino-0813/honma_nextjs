@@ -119,7 +119,6 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
                     : 'text-primary border-primary/60 hover:bg-primary hover:text-white'
               }`}
             >
-              <span className="block w-1.5 h-1.5 rounded-full bg-current opacity-90" aria-hidden />
               SUBSCRIPTION
             </Link>
             <Link href="/collections" className={`text-sm font-medium tracking-[0.15em] transition-colors relative group ${
