@@ -144,7 +144,7 @@ export default function YearlySubscriptionLP() {
                 新規お申し込み特典
               </p>
               <h3 className="text-2xl md:text-[1.875rem] font-bold text-amber-900 leading-[1.4] tracking-[0.04em]">
-                お米保存袋をプレゼント
+                究極のお米保存袋をプレゼント
               </h3>
             </div>
 
