@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useContext } from 'react';
 import Link from 'next/link';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { IconBag, IconMenu, IconUser } from './Icons';
 import { CartContext } from '@/providers/CartProvider';
 import { supabase } from '@/lib/supabase';
@@ -14,11 +14,18 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const location = pathname ?? '/';
   // SUBSCRIPTIONリンク（/collections/rice/yearly?view=lp）かどうかの判定用
-  const isSubscriptionLp =
-    location === '/collections/rice/yearly' && searchParams?.get('view') === 'lp';
+  // ※ useSearchParams は静的プリレンダリングのバウンダリ要件があるため、
+  //   useEffect+window.location.searchで代替してビルドエラーを回避
+  const [isSubscriptionLp, setIsSubscriptionLp] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    setIsSubscriptionLp(
+      location === '/collections/rice/yearly' && params.get('view') === 'lp'
+    );
+  }, [location]);
   const [isScrolled, setIsScrolled] = useState(false);
   const { cartItems } = useContext(CartContext);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
