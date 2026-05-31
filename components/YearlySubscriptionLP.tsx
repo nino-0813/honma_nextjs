@@ -115,9 +115,20 @@ export default function YearlySubscriptionLP() {
               className="object-cover scale-[1.05] md:scale-110"
               style={{ objectPosition: '62% 52%' }}
             />
-            {/* GIFTラベル（白文字・白枠・うっすら黒背景） */}
-            <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10 px-5 py-2 md:px-7 md:py-3 border-2 border-white text-white font-serif text-xl md:text-4xl tracking-[0.2em] bg-black/35 backdrop-blur-[2px] drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)]">
-              GIFT
+            {/* 画像の左上に乗せる読みやすさ用のグラデーション */}
+            <div className="absolute top-0 left-0 right-0 h-32 md:h-40 z-[5] bg-gradient-to-b from-black/45 via-black/20 to-transparent pointer-events-none" />
+
+            {/* GIFTラベル（明朝＋細罫線でロゴ風） */}
+            <div className="absolute top-5 left-5 md:top-8 md:left-8 z-10 text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
+              <div className="flex items-center gap-2.5 md:gap-3 mb-2 md:mb-2.5">
+                <span className="w-6 md:w-10 h-px bg-white/90" />
+                <span className="text-[9px] md:text-[11px] tracking-[0.35em] font-medium uppercase">
+                  For New Members
+                </span>
+              </div>
+              <p className="font-serif text-3xl md:text-5xl tracking-[0.2em] leading-none">
+                Gift
+              </p>
             </div>
           </div>
 
