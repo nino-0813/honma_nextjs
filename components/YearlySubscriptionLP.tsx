@@ -19,8 +19,8 @@ const REASONS: Reason[] = [
       '定期便でお申し込みいただくと、通常価格よりいつでも10%OFFでお届けします。',
       '定期的なお届けを通して、お客様とイケベジが一緒に歩んでいくための定期便価格です。',
     ],
-    image: '/images/usage-scene.jpg',
-    imageAlt: 'お米を毎日の食卓に',
+    image: '/images/sunset-family.jpg',
+    imageAlt: '夕陽のなかで子どもを抱き上げる親子',
   },
   {
     title: '専用保冷庫から「瑞々しいお米」をお届け',
