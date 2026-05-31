@@ -127,6 +127,7 @@ export default function CollectionsPage() {
       <div className="max-w-[1400px] mx-auto px-6 md:px-12">
         <div className="text-center mb-8 md:mb-12 animate-fade-in">
           <h1 className="text-xl md:text-2xl font-serif tracking-[0.15em] font-normal mb-4">{getPageTitle()}</h1>
+          {currentSubcategory !== 'yearly' && (
           <div className="overflow-x-auto pb-4 -mx-6 px-6 scrollbar-hide w-full">
             {currentCategory === 'お米' ? (
               <div className="flex gap-4 min-w-max justify-center md:justify-center">
@@ -163,6 +164,7 @@ export default function CollectionsPage() {
               </div>
             )}
           </div>
+          )}
         </div>
 
         {loading && (
