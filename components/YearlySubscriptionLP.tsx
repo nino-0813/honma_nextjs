@@ -112,8 +112,8 @@ export default function YearlySubscriptionLP() {
               alt="新規お申し込み特典のお米保存袋"
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover scale-[1.35] md:scale-150"
-              style={{ objectPosition: '68% 55%' }}
+              className="object-cover scale-[1.05] md:scale-110"
+              style={{ objectPosition: '62% 52%' }}
             />
             {/* GIFTラベル（白文字・白枠・うっすら黒背景） */}
             <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10 px-5 py-2 md:px-7 md:py-3 border-2 border-white text-white font-serif text-xl md:text-4xl tracking-[0.2em] bg-black/35 backdrop-blur-[2px] drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)]">
