@@ -169,7 +169,7 @@ export default function YearlySubscriptionLP() {
 
       {/* 04 商品一覧見出し */}
       <div id="ikevege-subscription" className="text-center mb-6 mt-20 md:mt-28 pt-6 border-t border-gray-100 scroll-mt-28">
-        <p className="text-[11px] text-gray-500 tracking-[0.25em] uppercase mb-3">Products</p>
+        <p className="text-[11px] md:text-xs text-amber-700 tracking-[0.3em] uppercase mb-3 font-medium">Products</p>
         <h3 className="text-xl md:text-2xl font-serif font-medium text-primary tracking-wider mb-2">
           イケベジ定期便
         </h3>
@@ -307,7 +307,7 @@ export function YearlySubscriptionFooter() {
       {/* 06 定期便のご利用について */}
       <div className="max-w-3xl mx-auto px-2 mb-16 md:mb-24">
         <div className="text-center mb-8">
-          <p className="text-[11px] text-gray-500 tracking-[0.25em] uppercase mb-3">How It Works</p>
+          <p className="text-[11px] md:text-xs text-amber-700 tracking-[0.3em] uppercase mb-3 font-medium">How It Works</p>
           <h3 className="text-xl md:text-2xl font-serif font-semibold text-primary tracking-wider">
             定期便のご利用について
           </h3>
@@ -374,7 +374,7 @@ export function YearlySubscriptionFooter() {
       {/* 07 よくある質問 */}
       <div className="max-w-3xl mx-auto px-2 mb-16 md:mb-24">
         <div className="text-center mb-8">
-          <p className="text-[11px] text-gray-500 tracking-[0.25em] uppercase mb-3">FAQ</p>
+          <p className="text-[11px] md:text-xs text-amber-700 tracking-[0.3em] uppercase mb-3 font-medium">FAQ</p>
           <h3 className="text-xl md:text-2xl font-serif font-medium text-primary tracking-wider">
             よくある質問
           </h3>
@@ -411,7 +411,7 @@ export function YearlySubscriptionFooter() {
       {/* 送料について */}
       <div className="max-w-3xl mx-auto px-2 mb-16 md:mb-24">
         <div className="text-center mb-6">
-          <p className="text-[11px] text-gray-500 tracking-[0.25em] uppercase mb-3">Shipping</p>
+          <p className="text-[11px] md:text-xs text-amber-700 tracking-[0.3em] uppercase mb-3 font-medium">Shipping</p>
           <h3 className="text-xl md:text-2xl font-serif font-medium text-primary tracking-wider">
             送料について
           </h3>
