@@ -137,7 +137,7 @@ export default function YearlySubscriptionLP() {
             <p className="text-[11px] md:text-sm text-amber-700 tracking-[0.25em] uppercase mb-3 font-medium">
               New Member Gift
             </p>
-            <h3 className="text-lg md:text-2xl font-semibold text-amber-900 mb-4 leading-snug tracking-tight">
+            <h3 className="text-lg md:text-2xl font-semibold text-amber-900 mb-4 leading-snug tracking-[0.04em]">
               新規お申し込み特典／お米保存袋をプレゼント
             </h3>
             <p className="text-sm md:text-base text-amber-900/80 leading-loose mb-5 font-semibold">
