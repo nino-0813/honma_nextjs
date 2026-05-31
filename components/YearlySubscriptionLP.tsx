@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 type Reason = {
   title: string;
@@ -102,22 +103,64 @@ export default function YearlySubscriptionLP() {
       </div>
 
       {/* 03 新規お申し込み特典 */}
-      <div className="bg-amber-50/70 border border-amber-200 rounded-2xl p-5 md:p-7 flex items-center gap-4 md:gap-6 mb-10 md:mb-14">
-        <div className="flex-shrink-0 w-14 h-14 md:w-20 md:h-20 bg-amber-600 text-white rounded-xl md:rounded-2xl flex items-center justify-center">
-          <svg className="w-7 h-7 md:w-10 md:h-10" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+      <div className="relative bg-amber-50/70 border border-amber-200 rounded-2xl overflow-hidden mb-10 md:mb-14">
+        {/* GIFTバッジ */}
+        <div className="absolute top-3 left-3 md:top-4 md:left-4 z-10 inline-flex items-center gap-1.5 bg-amber-600 text-white px-3 py-1.5 rounded-full shadow-sm">
+          <svg className="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
           </svg>
+          <span className="text-[10px] md:text-xs font-medium tracking-[0.15em]">GIFT</span>
         </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-[10px] md:text-xs text-amber-700 tracking-[0.2em] uppercase mb-1 font-medium">
-            New Member Gift
-          </p>
-          <h3 className="text-base md:text-xl font-medium text-amber-900 mb-1 md:mb-2">
-            新規お申し込み特典／お米保存袋をプレゼント
-          </h3>
-          <p className="text-xs md:text-sm text-amber-800 leading-relaxed">
-            新しく定期便をお申し込みいただいた方に、「冷蔵庫のいらないお米保存袋」をプレゼントします。
-          </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+          {/* 画像 */}
+          <div className="relative aspect-[4/3] md:aspect-auto md:min-h-[260px] bg-amber-100/50">
+            <Image
+              src="/images/rice-keep-bag.jpg"
+              alt="新規お申し込み特典のお米保存袋"
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover"
+            />
+          </div>
+
+          {/* テキスト */}
+          <div className="p-5 md:p-8 flex flex-col justify-center">
+            <p className="text-[10px] md:text-xs text-amber-700 tracking-[0.25em] uppercase mb-2 font-medium">
+              New Member Gift
+            </p>
+            <h3 className="text-base md:text-xl font-semibold text-amber-900 mb-3 leading-snug">
+              新規お申し込み特典／
+              <br className="hidden md:block" />
+              お米保存袋をプレゼント
+            </h3>
+            <p className="text-xs md:text-sm text-amber-900/80 leading-loose mb-4">
+              新しく定期便をお申し込みいただいた方に、
+              <br className="hidden md:block" />
+              「冷蔵庫のいらないお米保存袋」をプレゼントします。
+            </p>
+            <ul className="space-y-1.5">
+              {['防虫・防湿に強い専用素材', '冷蔵庫不要でシンク下にも収まる', '繰り返し使えるジッパー付き'].map(
+                (item) => (
+                  <li key={item} className="flex items-start gap-2 text-[11px] md:text-xs text-amber-900/70">
+                    <svg
+                      className="w-3.5 h-3.5 md:w-4 md:h-4 text-amber-600 flex-shrink-0 mt-0.5"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2.5}
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                    <span>{item}</span>
+                  </li>
+                ),
+              )}
+            </ul>
+            <p className="mt-4 text-[10px] md:text-[11px] text-amber-700/70">
+              ※数量限定・なくなり次第終了
+            </p>
+          </div>
         </div>
       </div>
 
