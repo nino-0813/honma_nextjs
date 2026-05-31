@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { useProducts } from '@/hooks/useProducts';
 import { FadeInImage } from '@/components/UI';
 import type { Product } from '@/types';
@@ -43,9 +43,12 @@ function getProductSubcategories(p: Product): string[] {
 
 export default function CollectionsPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const slug = (params?.slug as string[] | undefined) ?? [];
   const categoryParam = slug[0];
   const subcategoryParam = slug[1];
+  // SUBSCRIPTIONメニュー経由のときだけLPを表示するためのフラグ
+  const isLpView = searchParams?.get('view') === 'lp' && subcategoryParam === 'yearly';
 
   const currentCategory = useMemo((): CategoryLabel => {
     if (categoryParam === 'rice' && subcategoryParam) return 'お米';
@@ -127,7 +130,12 @@ export default function CollectionsPage() {
       <div className="max-w-[1400px] mx-auto px-6 md:px-12">
         <div className="text-center mb-8 md:mb-12 animate-fade-in">
           <h1 className="text-xl md:text-2xl font-serif tracking-[0.15em] font-normal mb-4">{getPageTitle()}</h1>
-          {currentSubcategory !== 'yearly' && (
+          {currentSubcategory === 'yearly' && !isLpView && (
+            <p className="text-xs md:text-sm text-gray-600 leading-relaxed mb-6">
+              すべて<span className="text-amber-700 font-medium">10%OFF</span>でお届けします。
+            </p>
+          )}
+          {!isLpView && (
           <div className="overflow-x-auto pb-4 -mx-6 px-6 scrollbar-hide w-full">
             {currentCategory === 'お米' ? (
               <div className="flex gap-4 min-w-max justify-center md:justify-center">
@@ -186,7 +194,7 @@ export default function CollectionsPage() {
         )}
 
         {/* 年間契約ページではLPセクションを商品一覧の上に表示 */}
-        {!loading && !error && currentSubcategory === 'yearly' && <YearlySubscriptionLP />}
+        {!loading && !error && isLpView && <YearlySubscriptionLP />}
 
         {!loading && !error && filteredProducts.length === 0 && (
           <div className="flex items-center justify-center py-32">
@@ -255,7 +263,7 @@ export default function CollectionsPage() {
         )}
 
         {/* 年間契約ページではフッターセクション（FAQ・送料）を表示 */}
-        {!loading && !error && currentSubcategory === 'yearly' && <YearlySubscriptionFooter />}
+        {!loading && !error && isLpView && <YearlySubscriptionFooter />}
       </div>
     </div>
   );

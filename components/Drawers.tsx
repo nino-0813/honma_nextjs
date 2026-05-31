@@ -281,7 +281,7 @@ export const MenuDrawer = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
           <button onClick={() => navigate('/about')} className="text-left border-b border-gray-100 py-4 hover:text-gray-500 transition-colors block w-full">
             ABOUT US
           </button>
-          <button onClick={() => navigate('/collections/rice/yearly')} className="text-left border-b border-gray-100 py-4 hover:text-gray-500 transition-colors block w-full">
+          <button onClick={() => navigate('/collections/rice/yearly?view=lp')} className="text-left border-b border-gray-100 py-4 hover:text-gray-500 transition-colors block w-full">
             SUBSCRIPTION
           </button>
 
