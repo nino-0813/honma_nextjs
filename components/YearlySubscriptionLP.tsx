@@ -106,7 +106,7 @@ export default function YearlySubscriptionLP() {
       <div className="relative bg-amber-50/70 border border-amber-200 rounded-2xl overflow-hidden mb-10 md:mb-14">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
           {/* 画像 */}
-          <div className="relative aspect-[4/3] md:aspect-auto md:min-h-[380px] bg-amber-100/50 overflow-hidden">
+          <div className="relative aspect-[4/3] md:aspect-auto md:min-h-[480px] bg-amber-100/50 overflow-hidden">
             <Image
               src="/images/rice-keep-bag.jpg"
               alt="新規お申し込み特典のお米保存袋"
@@ -116,32 +116,30 @@ export default function YearlySubscriptionLP() {
               style={{ objectPosition: '68% 55%' }}
             />
             {/* GIFTラベル（白文字・白枠） */}
-            <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10 px-5 py-2 md:px-6 md:py-2.5 border-2 border-white text-white font-serif text-xl md:text-3xl tracking-[0.2em] drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)]">
+            <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10 px-5 py-2 md:px-7 md:py-3 border-2 border-white text-white font-serif text-xl md:text-4xl tracking-[0.2em] drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)]">
               GIFT
             </div>
           </div>
 
           {/* テキスト */}
-          <div className="p-5 md:p-8 flex flex-col justify-center">
-            <p className="text-[10px] md:text-xs text-amber-700 tracking-[0.25em] uppercase mb-2 font-medium">
+          <div className="p-6 md:p-10 flex flex-col justify-center">
+            <p className="text-[11px] md:text-sm text-amber-700 tracking-[0.25em] uppercase mb-3 font-medium">
               New Member Gift
             </p>
-            <h3 className="text-base md:text-xl font-semibold text-amber-900 mb-3 leading-snug">
-              新規お申し込み特典／
-              <br className="hidden md:block" />
-              お米保存袋をプレゼント
+            <h3 className="text-lg md:text-2xl font-semibold text-amber-900 mb-4 leading-snug tracking-tight">
+              新規お申し込み特典／お米保存袋をプレゼント
             </h3>
-            <p className="text-xs md:text-sm text-amber-900/80 leading-loose mb-4">
+            <p className="text-sm md:text-base text-amber-900/80 leading-loose mb-5">
               新しく定期便をお申し込みいただいた方に、
               <br className="hidden md:block" />
               「冷蔵庫のいらないお米保存袋」をプレゼントします。
             </p>
-            <ul className="space-y-1.5">
+            <ul className="space-y-2">
               {['防虫・防湿に強い専用素材', '冷蔵庫不要でシンク下にも収まる', '繰り返し使えるジッパー付き'].map(
                 (item) => (
-                  <li key={item} className="flex items-start gap-2 text-[11px] md:text-xs text-amber-900/70">
+                  <li key={item} className="flex items-start gap-2.5 text-xs md:text-sm text-amber-900/80">
                     <svg
-                      className="w-3.5 h-3.5 md:w-4 md:h-4 text-amber-600 flex-shrink-0 mt-0.5"
+                      className="w-4 h-4 md:w-5 md:h-5 text-amber-600 flex-shrink-0 mt-0.5"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth={2.5}
@@ -154,7 +152,7 @@ export default function YearlySubscriptionLP() {
                 ),
               )}
             </ul>
-            <p className="mt-4 text-[10px] md:text-[11px] text-amber-700/70">
+            <p className="mt-5 text-[11px] md:text-xs text-amber-700/70">
               ※数量限定・なくなり次第終了
             </p>
           </div>
