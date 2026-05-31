@@ -16,12 +16,13 @@ function getFilterNameFromParam(param: string) {
   return 'ALL';
 }
 
+// DB上のsubcategory値とのマッチ用（表示名ではなくフィルタキー）
 function getSubcategoryNameFromParam(param: string): string {
   const mapping: Record<string, string> = {
     koshihikari: 'コシヒカリ',
     kamenoo: '亀の尾',
     nikomaru: 'にこまる',
-    yearly: 'イケベジ定期便',
+    yearly: '年間契約',
   };
   return mapping[param] ?? param;
 }
