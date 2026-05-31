@@ -4,10 +4,10 @@ import { Collection } from '../types';
 
 // 400px/600px/800px/1200px の srcset でレスポンシブ配信（モバイル最適化）
 const collections: Collection[] = [
+  { id: '4', title: 'イケベジ定期便', handle: 'yearly', image: '/images/home/collections/2_1200.webp', imageMobile: '/images/home/collections/2_800.webp', imageMobile600: '/images/home/collections/2_600.webp', imageMobile400: '/images/home/collections/2_400.webp', path: '/collections/rice/yearly?view=lp' },
   { id: '1', title: 'コシヒカリ', handle: 'koshihikari', image: '/images/home/collections/collection_koshihikari_1200.webp', imageMobile: '/images/home/collections/collection_koshihikari_800.webp', imageMobile600: '/images/home/collections/collection_koshihikari_600.webp', imageMobile400: '/images/home/collections/collection_koshihikari_400.webp', path: '/collections/rice/koshihikari' },
-  { id: '2', title: '亀の尾', handle: 'kamenoo', image: '/images/home/collections/collection_kamenoo_1200.webp', imageMobile: '/images/home/collections/collection_kamenoo_800.webp', imageMobile600: '/images/home/collections/collection_kamenoo_600.webp', imageMobile400: '/images/home/collections/collection_kamenoo_400.webp', path: '/collections/rice/kamenoo' },
   { id: '3', title: 'にこまる', handle: 'nikomaru', image: '/images/home/collections/4_1200.webp', imageMobile: '/images/home/collections/4_800.webp', imageMobile600: '/images/home/collections/4_600.webp', imageMobile400: '/images/home/collections/4_400.webp', path: '/collections/rice/nikomaru' },
-  { id: '4', title: '年間契約', handle: 'yearly', image: '/images/home/collections/2_1200.webp', imageMobile: '/images/home/collections/2_800.webp', imageMobile600: '/images/home/collections/2_600.webp', imageMobile400: '/images/home/collections/2_400.webp', path: '/collections/rice/yearly' },
+  { id: '2', title: '亀の尾', handle: 'kamenoo', image: '/images/home/collections/collection_kamenoo_1200.webp', imageMobile: '/images/home/collections/collection_kamenoo_800.webp', imageMobile600: '/images/home/collections/collection_kamenoo_600.webp', imageMobile400: '/images/home/collections/collection_kamenoo_400.webp', path: '/collections/rice/kamenoo' },
 ];
 
 const Collections = () => {
