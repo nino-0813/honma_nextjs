@@ -104,16 +104,16 @@ export default function YearlySubscriptionLP() {
 
       {/* 03 新規お申し込み特典 */}
       <div className="relative bg-amber-50/70 border border-amber-200 rounded-2xl overflow-hidden mb-10 md:mb-14">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-0">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
           {/* 画像 */}
-          <div className="relative aspect-[4/3] md:aspect-auto md:col-span-3 md:min-h-[420px] bg-amber-100/50">
+          <div className="relative aspect-[4/3] md:aspect-auto md:min-h-[380px] bg-amber-100/50 overflow-hidden">
             <Image
               src="/images/rice-keep-bag.jpg"
               alt="新規お申し込み特典のお米保存袋"
               fill
-              sizes="(max-width: 768px) 100vw, 60vw"
-              className="object-cover scale-110 md:scale-125 origin-[70%_50%]"
-              style={{ objectPosition: '70% 50%' }}
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover scale-[1.35] md:scale-150"
+              style={{ objectPosition: '68% 55%' }}
             />
             {/* GIFTラベル（白文字・白枠） */}
             <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10 px-5 py-2 md:px-6 md:py-2.5 border-2 border-white text-white font-serif text-xl md:text-3xl tracking-[0.2em] drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)]">
@@ -122,7 +122,7 @@ export default function YearlySubscriptionLP() {
           </div>
 
           {/* テキスト */}
-          <div className="p-5 md:p-8 md:col-span-2 flex flex-col justify-center">
+          <div className="p-5 md:p-8 flex flex-col justify-center">
             <p className="text-[10px] md:text-xs text-amber-700 tracking-[0.25em] uppercase mb-2 font-medium">
               New Member Gift
             </p>
