@@ -41,9 +41,9 @@ const REASONS: Reason[] = [
 
 export default function YearlySubscriptionLP() {
   return (
-    <section className="mb-10 md:mb-16">
+    <section className="mt-12 md:mt-16 mb-10 md:mb-16">
       {/* 01 キャッチコピー */}
-      <div className="max-w-3xl mx-auto text-center mb-8 md:mb-12">
+      <div className="max-w-3xl mx-auto text-center mb-16 md:mb-20">
         <p className="text-[11px] md:text-xs text-amber-700 tracking-[0.3em] uppercase mb-3 font-medium">
           Subscription
         </p>
@@ -175,7 +175,7 @@ export default function YearlySubscriptionLP() {
       </div>
 
       {/* 04 商品一覧見出し */}
-      <div id="ikevege-subscription" className="text-center mb-6 mt-10 md:mt-14 pt-6 border-t border-gray-100 scroll-mt-28">
+      <div id="ikevege-subscription" className="text-center mb-6 mt-20 md:mt-28 pt-6 border-t border-gray-100 scroll-mt-28">
         <p className="text-[11px] text-gray-500 tracking-[0.25em] uppercase mb-3">Products</p>
         <h3 className="text-xl md:text-2xl font-serif font-medium text-primary tracking-wider mb-2">
           イケベジ定期便
