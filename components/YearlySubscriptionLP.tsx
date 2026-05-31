@@ -104,28 +104,25 @@ export default function YearlySubscriptionLP() {
 
       {/* 03 新規お申し込み特典 */}
       <div className="relative bg-amber-50/70 border border-amber-200 rounded-2xl overflow-hidden mb-10 md:mb-14">
-        {/* GIFTバッジ */}
-        <div className="absolute top-3 left-3 md:top-4 md:left-4 z-10 inline-flex items-center gap-1.5 bg-amber-600 text-white px-3 py-1.5 rounded-full shadow-sm">
-          <svg className="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
-          </svg>
-          <span className="text-[10px] md:text-xs font-medium tracking-[0.15em]">GIFT</span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-0">
           {/* 画像 */}
-          <div className="relative aspect-[4/3] md:aspect-auto md:min-h-[260px] bg-amber-100/50">
+          <div className="relative aspect-[4/3] md:aspect-auto md:col-span-3 md:min-h-[420px] bg-amber-100/50">
             <Image
               src="/images/rice-keep-bag.jpg"
               alt="新規お申し込み特典のお米保存袋"
               fill
-              sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 60vw"
+              className="object-cover scale-110 md:scale-125 origin-[70%_50%]"
+              style={{ objectPosition: '70% 50%' }}
             />
+            {/* GIFTラベル（白文字・白枠） */}
+            <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10 px-5 py-2 md:px-6 md:py-2.5 border-2 border-white text-white font-serif text-xl md:text-3xl tracking-[0.2em] drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)]">
+              GIFT
+            </div>
           </div>
 
           {/* テキスト */}
-          <div className="p-5 md:p-8 flex flex-col justify-center">
+          <div className="p-5 md:p-8 md:col-span-2 flex flex-col justify-center">
             <p className="text-[10px] md:text-xs text-amber-700 tracking-[0.25em] uppercase mb-2 font-medium">
               New Member Gift
             </p>
