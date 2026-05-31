@@ -16,10 +16,11 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'ja_JP',
     siteName: SITE_NAME,
-    images: [{ url: '/favicon.webp', width: 512, height: 512, alt: 'IKEVEGE' }],
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: SITE_NAME }],
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
+    images: ['/og-image.png'],
   },
   alternates: { canonical: '/' },
 };

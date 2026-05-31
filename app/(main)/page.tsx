@@ -14,6 +14,7 @@ export const metadata: Metadata = {
     description:
       '自然栽培の考えをベースに、品種が秘めた旨みと香りをまっすぐに届けるため、島の有機資源で土を磨き上げ、農薬に頼らず育てました。新潟県佐渡産の自然栽培米を販売するIKEVEGE（イケベジ）の公式サイト。',
     url: '/',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'イケベジ | 佐渡ヶ島のオーガニックファーム' }],
   },
   alternates: { canonical: '/' },
 };

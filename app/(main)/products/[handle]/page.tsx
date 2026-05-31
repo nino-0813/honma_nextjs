@@ -25,7 +25,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: `${title} | イケベジ`,
       description,
       url,
-      images: image ? [{ url: image, width: 1200, height: 1200, alt: title }] : undefined,
+      images: image
+        ? [{ url: image, width: 1200, height: 1200, alt: title }]
+        : [{ url: `${getBaseUrl()}/og-image.png`, width: 1200, height: 630, alt: title }],
     },
     alternates: { canonical: path },
   };
