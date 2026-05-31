@@ -103,7 +103,7 @@ export default function YearlySubscriptionLP() {
       </div>
 
       {/* 03 新規お申し込み特典 */}
-      <div className="relative bg-amber-50/70 border border-amber-200 rounded-2xl overflow-hidden mb-10 md:mb-14">
+      <div className="relative bg-amber-50/70 border border-amber-200 rounded-2xl overflow-hidden mb-10 md:mb-14 shadow-[0_15px_40px_-12px_rgba(0,0,0,0.22)]">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
           {/* 画像 */}
           <div className="relative aspect-[4/3] md:aspect-auto md:min-h-[420px] bg-amber-100/50 overflow-hidden">
@@ -112,8 +112,8 @@ export default function YearlySubscriptionLP() {
               alt="新規お申し込み特典のお米保存袋"
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover scale-[1.05] md:scale-110"
-              style={{ objectPosition: '62% 52%' }}
+              className="object-cover"
+              style={{ objectPosition: '50% 55%' }}
             />
             {/* 画像の左上に乗せる読みやすさ用のグラデーション */}
             <div className="absolute top-0 left-0 right-0 h-32 md:h-40 z-[5] bg-gradient-to-b from-black/45 via-black/20 to-transparent pointer-events-none" />
