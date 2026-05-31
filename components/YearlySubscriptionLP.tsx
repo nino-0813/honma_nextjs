@@ -121,13 +121,8 @@ export default function YearlySubscriptionLP() {
           </div>
 
           {/* テキスト */}
-          <div className="p-6 md:py-8 md:px-10 flex flex-col justify-center">
-            <p className="text-[11px] md:text-sm text-amber-700 tracking-[0.25em] uppercase mb-3 font-medium">
-              New Member Gift
-            </p>
-
-            {/* 見出し: 小さなラベル＋大きなメイン */}
-            <div className="mb-5">
+          <div className="p-6 md:py-10 md:px-10 flex flex-col justify-center">
+            <div className="mb-6">
               <p className="text-sm md:text-base text-amber-800 mb-2 font-semibold tracking-[0.05em]">
                 新規お申し込み特典
               </p>
@@ -136,12 +131,13 @@ export default function YearlySubscriptionLP() {
               </h3>
             </div>
 
-            <p className="text-sm md:text-base text-amber-900/80 leading-loose mb-5 font-semibold">
+            <p className="text-sm md:text-base text-amber-900/80 leading-loose mb-6 font-semibold">
               新しく定期便をお申し込みいただいた方に、
               <br className="hidden md:block" />
               「冷蔵庫のいらないお米保存袋」をプレゼントします。
             </p>
-            <ul className="space-y-2 font-semibold">
+
+            <ul className="space-y-2.5 font-semibold mb-6">
               {['防虫・防湿に強い専用素材', '冷蔵庫不要でシンク下にも収まる', '繰り返し使えるジッパー付き'].map(
                 (item) => (
                   <li key={item} className="flex items-start gap-2.5 text-xs md:text-sm text-amber-900/80">
@@ -159,7 +155,8 @@ export default function YearlySubscriptionLP() {
                 ),
               )}
             </ul>
-            <p className="mt-4 text-[11px] md:text-xs text-amber-700/70 font-bold">
+
+            <p className="pt-4 border-t border-amber-200/60 text-[11px] md:text-xs text-amber-700/70 font-bold">
               ※数量限定・なくなり次第終了
             </p>
           </div>
@@ -284,10 +281,10 @@ export function YearlySubscriptionFooter() {
                 <br />
                 必要な量を、必要なタイミングで、いつでも新鮮な状態で食卓に届けること。
                 <br />
-                それが、私たちイケベジがこのサブスクを始めた一番の理由です。
+                それが、私たちがイケベジ定期便を始めた一番の理由です。
               </p>
               <p>
-                イケベジ定期便は私たち農家にとっても大きな支えになります。
+                定期便は私たち農家にとっても大きな支えになります。
                 <br />
                 繁忙期に販売の心配をすることなく100%「最高の米作り」に集中できる。
                 <br />
