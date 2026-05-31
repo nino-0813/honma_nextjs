@@ -17,17 +17,16 @@ const REASONS: Reason[] = [
     paragraphs: [
       '毎日食べるものだから、おいしさと続けやすさの両方を大事にしました。',
       '定期便でお申し込みいただくと、通常価格よりいつでも10%OFFでお届けします。',
-      '食べてくれる方がいるから、田んぼを続けていける。',
       '定期的なお届けを通して、お客様とイケベジが一緒に歩んでいくための定期便価格です。',
     ],
     image: '/images/usage-scene.jpg',
     imageAlt: 'お米を毎日の食卓に',
   },
   {
-    title: '専用保冷庫で保管。お届けに合わせて精米。',
+    title: '専用保冷庫から「いつでも新米の美味しさ」をお届け',
     paragraphs: [
       'お米のおいしさは、田んぼで育つ時間だけでなく、収穫後の保管と、精米のタイミングにも大きく左右されます。',
-      'イケベジでは、収穫したお米を専用保冷庫で保管しています。温度を管理しながら、お米の状態をできるだけ良く保つこと。そして、お届けに合わせて精米すること。',
+      'イケベジでは、収穫したお米を専用保冷庫で保管しています。そして、お届けに合わせて出荷直前に精米。',
       '田んぼから食卓までのあいだに、できることを一つずつ積み重ねてお届けします。',
     ],
     image: '/images/about/stories/IMG_8832.jpg',
@@ -261,7 +260,7 @@ export function YearlySubscriptionFooter() {
       <div className="max-w-6xl mx-auto px-2 mb-16 md:mb-24">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
           {/* 画像（左） */}
-          <div className="relative aspect-[4/5] md:aspect-[4/5] rounded-2xl overflow-hidden shadow-[0_15px_40px_-12px_rgba(0,0,0,0.2)]">
+          <div className="relative aspect-[4/5] md:aspect-[4/5] overflow-hidden shadow-[0_15px_40px_-12px_rgba(0,0,0,0.2)]">
             <Image
               src="/images/about/stories/about_story_taue_123.jpg"
               alt="佐渡の田んぼで田植えをするイケベジ"
