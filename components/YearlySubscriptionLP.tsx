@@ -282,28 +282,57 @@ export function YearlySubscriptionFooter() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
           {[
             {
-              title: 'お届けサイクル',
-              body: '毎月1回、ご指定のサイクルでお届けします。お届け日や時間帯の指定が可能な場合は、ご注文画面にてお選びください。',
+              number: '01',
+              title: 'お届けについて',
+              body: '毎月1回、発送予定月の15日頃にお届けします。お申し込みの締切は、毎月10日です。',
+              notes: [
+                'お届け日の指定は承っておりません。',
+                '初回発送の時期は品種によって異なります。',
+              ],
             },
             {
-              title: 'スキップ・休止',
-              body: '旅行や外食が続いた月など、お米が余りそうな場合は、次回分のスキップや休止が可能です。',
+              number: '02',
+              title: '変更・スキップについて',
+              body: 'お米が余りそうな月は、マイページより次回配送のスキップができます。配送先やお届けサイクルの変更も可能です。',
+              notes: [
+                '各種変更は、次回発送予定月の10日までにお手続きください。',
+              ],
             },
             {
-              title: '解約について',
-              body: '定期便はいつでも解約できます。次回発送準備の都合上、変更・解約には締切日を設ける場合があります。',
+              number: '03',
+              title: '量の変更・解約について',
+              body: '定期便の解約に回数制限はありません。次回発送予定月の10日までであれば、いつでも解約できます。',
+              notes: [
+                '毎月の量を変更する場合は、一度解約後、ご希望の量で新しくお申し込みください。',
+              ],
             },
             {
-              title: '精米について',
-              body: '白米は、お届けに合わせて精米します。玄米をご希望の方は、玄米商品をお選びください。',
+              number: '04',
+              title: '精米・保存について',
+              body: 'お米は、発送前に精米してお届けします。届いたあとは、直射日光・高温多湿を避け、涼しい場所で保管してください。',
+              notes: [
+                '精米後1か月程度を目安にお召し上がりください。',
+              ],
             },
           ].map((item) => (
             <div key={item.title} className="bg-white border border-gray-200 rounded-xl p-5 md:p-6">
+              <p className="text-[10px] md:text-xs font-serif tracking-[0.2em] text-amber-700 mb-1.5">
+                {item.number}
+              </p>
               <h4 className="text-sm md:text-base font-semibold text-primary mb-2 flex items-center gap-2">
                 <span className="w-1 h-4 bg-amber-600 rounded-full" />
                 {item.title}
               </h4>
               <p className="text-xs md:text-sm text-gray-600 leading-relaxed">{item.body}</p>
+              {item.notes && item.notes.length > 0 && (
+                <ul className="mt-2.5 space-y-1">
+                  {item.notes.map((note) => (
+                    <li key={note} className="text-[11px] md:text-xs text-gray-500 leading-relaxed">
+                      ※{note}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           ))}
         </div>
