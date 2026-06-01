@@ -14,6 +14,7 @@ import {
 } from '@/types';
 import { getEventMileBalance, getEventMileTransactions } from '@/lib/eventMiles';
 import { computeNextShippingDate, formatJapaneseDate, isWithinChangeDeadline, getChangeDeadline } from '@/lib/subscriptionShipping';
+import SubscriptionCardChangeModal from '@/components/SubscriptionCardChangeModal';
 
 interface SubscriptionRow {
   id: string;
@@ -97,6 +98,25 @@ const MyPage = () => {
   const [intervalChoice, setIntervalChoice] = useState<SubscriptionInterval | null>(null);
   const [intervalError, setIntervalError] = useState<string | null>(null);
   const [intervalSaving, setIntervalSaving] = useState(false);
+
+  // カード変更フロー（独立モーダル）
+  const [cardChangeOpen, setCardChangeOpen] = useState(false);
+  const [cardChangeSubId, setCardChangeSubId] = useState<string | null>(null);
+
+  // 配送先変更フロー
+  type AddressStep = 'closed' | 'edit' | 'completed';
+  const [addressStep, setAddressStep] = useState<AddressStep>('closed');
+  const [addressTargetSubId, setAddressTargetSubId] = useState<string | null>(null);
+  const [addressForm, setAddressForm] = useState({
+    name: '',
+    phone: '',
+    postal: '',
+    city: '',
+    address: '',
+  });
+  const [addressError, setAddressError] = useState<string | null>(null);
+  const [addressSaving, setAddressSaving] = useState(false);
+  const [addressPostalSearching, setAddressPostalSearching] = useState(false);
   const [activeTab, setActiveTab] = useState<'orders' | 'subscriptions' | 'miles' | 'profile'>('orders');
   const [mileBalance, setMileBalance] = useState<number>(0);
   const [mileTransactions, setMileTransactions] = useState<EventMileTransaction[]>([]);
@@ -486,6 +506,97 @@ const MyPage = () => {
       setIntervalError(e?.message || 'サイクル変更に失敗しました');
     } finally {
       setIntervalSaving(false);
+    }
+  };
+
+  /** 配送先変更モーダルを開く */
+  const openAddressModal = (sub: SubscriptionRow) => {
+    const meta = (sub.metadata as any) || {};
+    const stored = meta.shipping || {};
+    setAddressTargetSubId(sub.stripe_subscription_id);
+    setAddressForm({
+      name: stored.name || '',
+      phone: stored.phone || '',
+      postal: stored.postal_code || '',
+      city: stored.city || '',
+      address: stored.address || '',
+    });
+    setAddressError(null);
+    setAddressStep('edit');
+  };
+
+  const closeAddressModal = () => {
+    setAddressStep('closed');
+    setAddressTargetSubId(null);
+    setAddressError(null);
+  };
+
+  /** 郵便番号から都道府県＋市区町村を取得 */
+  const lookupAddressPostal = async () => {
+    const zip = addressForm.postal.replace(/[^0-9]/g, '');
+    if (zip.length !== 7) {
+      setAddressError('郵便番号は7桁で入力してください');
+      return;
+    }
+    setAddressError(null);
+    setAddressPostalSearching(true);
+    try {
+      const res = await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${zip}`);
+      const json = await res.json();
+      const r = json?.results?.[0];
+      if (!r) throw new Error('該当する住所が見つかりませんでした');
+      setAddressForm((p) => ({
+        ...p,
+        postal: `${zip.slice(0, 3)}-${zip.slice(3)}`,
+        city: `${r.address1 || ''}${r.address2 || ''}`,
+      }));
+    } catch (e: any) {
+      setAddressError(e?.message || '郵便番号検索に失敗しました');
+    } finally {
+      setAddressPostalSearching(false);
+    }
+  };
+
+  /** 配送先変更を実行 */
+  const submitAddressUpdate = async () => {
+    if (!supabase || !addressTargetSubId) return;
+    if (!addressForm.postal || !addressForm.city || !addressForm.address) {
+      setAddressError('郵便番号・住所（都道府県＋市区町村）・番地は必須です');
+      return;
+    }
+    setAddressError(null);
+    setAddressSaving(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const accessToken = session?.access_token;
+      if (!accessToken) throw new Error('セッションが切れています。再度ログインしてください。');
+
+      const res = await fetch('/api/update-subscription-address', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          subscription_id: addressTargetSubId,
+          shipping_name: addressForm.name || undefined,
+          shipping_phone: addressForm.phone || undefined,
+          shipping_postal_code: addressForm.postal,
+          shipping_city: addressForm.city,
+          shipping_address: addressForm.address,
+        }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error(data?.error || '配送先の更新に失敗しました');
+      }
+      setAddressStep('completed');
+      if (user?.id) await loadUserData(user.id);
+    } catch (e: any) {
+      console.error('配送先更新エラー:', e);
+      setAddressError(e?.message || '配送先の更新に失敗しました');
+    } finally {
+      setAddressSaving(false);
     }
   };
 
@@ -1073,6 +1184,25 @@ const MyPage = () => {
                               </button>
                               <button
                                 type="button"
+                                onClick={() => openAddressModal(sub)}
+                                disabled={!withinDeadline}
+                                title={!withinDeadline ? '次回発送月の9日終日を過ぎているため変更できません' : '配送先を変更'}
+                                className="text-sm text-emerald-700 hover:text-emerald-800 underline underline-offset-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:no-underline"
+                              >
+                                配送先を変更
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setCardChangeSubId(sub.stripe_subscription_id);
+                                  setCardChangeOpen(true);
+                                }}
+                                className="text-sm text-indigo-700 hover:text-indigo-800 underline underline-offset-2"
+                              >
+                                カードを変更
+                              </button>
+                              <button
+                                type="button"
                                 onClick={() => openCancelModal(sub.stripe_subscription_id)}
                                 disabled={cancelingId === sub.stripe_subscription_id}
                                 className="text-sm text-red-600 hover:text-red-700 underline underline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -1485,6 +1615,139 @@ const MyPage = () => {
                 <button
                   type="button"
                   onClick={closeSkipModal}
+                  className="w-full py-2.5 px-4 bg-primary text-white text-sm tracking-widest hover:bg-gray-800 transition-colors"
+                >
+                  閉じる
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* カード変更モーダル */}
+      <SubscriptionCardChangeModal
+        isOpen={cardChangeOpen}
+        subscriptionId={cardChangeSubId}
+        onClose={() => setCardChangeOpen(false)}
+        onSuccess={() => {
+          if (user?.id) loadUserData(user.id);
+        }}
+      />
+
+      {/* 配送先変更モーダル */}
+      {addressStep !== 'closed' && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-8"
+          onClick={() => {
+            if (addressStep === 'completed' || !addressSaving) closeAddressModal();
+          }}
+        >
+          <div
+            className="bg-white max-w-md w-full max-h-[90vh] overflow-y-auto p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {addressStep === 'edit' && (
+              <>
+                <h3 className="text-base font-medium mb-3">配送先を変更</h3>
+                <p className="text-xs text-gray-600 leading-relaxed mb-4">
+                  次回のお届けからこの住所に発送します。<br />
+                  配送地域が変わると送料が変動する場合があります。
+                </p>
+                <div className="space-y-3 mb-5">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">お受け取り人名（任意）</label>
+                    <input
+                      type="text"
+                      value={addressForm.name}
+                      onChange={(e) => setAddressForm((p) => ({ ...p, name: e.target.value }))}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-primary"
+                      placeholder="例: 山田太郎"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">電話番号（任意）</label>
+                    <input
+                      type="tel"
+                      value={addressForm.phone}
+                      onChange={(e) => setAddressForm((p) => ({ ...p, phone: e.target.value }))}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-primary"
+                      placeholder="例: 09012345678"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">郵便番号</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={addressForm.postal}
+                        onChange={(e) => setAddressForm((p) => ({ ...p, postal: e.target.value }))}
+                        className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-primary"
+                        placeholder="000-0000 / 0000000"
+                      />
+                      <button
+                        type="button"
+                        onClick={lookupAddressPostal}
+                        disabled={addressPostalSearching}
+                        className="px-3 py-2 text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors disabled:opacity-50"
+                      >
+                        {addressPostalSearching ? '検索中…' : '住所検索'}
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">都道府県・市区町村</label>
+                    <input
+                      type="text"
+                      value={addressForm.city}
+                      onChange={(e) => setAddressForm((p) => ({ ...p, city: e.target.value }))}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-primary"
+                      placeholder="例: 新潟県佐渡市"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">番地・建物名</label>
+                    <input
+                      type="text"
+                      value={addressForm.address}
+                      onChange={(e) => setAddressForm((p) => ({ ...p, address: e.target.value }))}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-primary"
+                      placeholder="例: 1-2-3 ○○マンション101"
+                    />
+                  </div>
+                </div>
+                {addressError && (
+                  <p className="text-sm text-red-600 mb-3">{addressError}</p>
+                )}
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={submitAddressUpdate}
+                    disabled={addressSaving}
+                    className="flex-1 py-2.5 px-4 bg-primary text-white text-sm tracking-widest hover:bg-gray-800 transition-colors disabled:opacity-50"
+                  >
+                    {addressSaving ? '保存中…' : '保存する'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={closeAddressModal}
+                    disabled={addressSaving}
+                    className="flex-1 py-2.5 px-4 bg-white text-primary border border-gray-300 text-sm tracking-widest hover:bg-gray-50 transition-colors"
+                  >
+                    キャンセル
+                  </button>
+                </div>
+              </>
+            )}
+            {addressStep === 'completed' && (
+              <>
+                <h3 className="text-base font-medium mb-3">配送先を更新しました</h3>
+                <p className="text-sm text-gray-700 leading-relaxed mb-5">
+                  次回のお届けから新しい住所に発送します。
+                </p>
+                <button
+                  type="button"
+                  onClick={closeAddressModal}
                   className="w-full py-2.5 px-4 bg-primary text-white text-sm tracking-widest hover:bg-gray-800 transition-colors"
                 >
                   閉じる
