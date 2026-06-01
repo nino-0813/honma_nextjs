@@ -836,13 +836,22 @@ export default function ProductDetailView({ product }: { product: Product }) {
                   <li className="flex gap-2">
                     <span className="text-primary flex-shrink-0">・</span>
                     <span>
-                      次回のお届け日は、マイページ「定期購入」の「次回お届け日」から変更できます。
+                      マイページより次回配送の<span className="font-medium">1ヶ月スキップ</span>ができます。
+                      <span className="text-amber-700">（2回連続は不可）</span>
+                      配送先やお届けサイクルの変更も可能です。
                     </span>
                   </li>
                   <li className="flex gap-2">
                     <span className="text-primary flex-shrink-0">・</span>
                     <span>
-                      変更・解約は、<span className="font-medium">次回発送予定月の10日終日まで</span>にお手続きください。
+                      スキップ・解約は、<span className="font-medium">次回発送予定月の9日終日まで</span>にお手続きください。
+                    </span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-primary flex-shrink-0">・</span>
+                    <span>
+                      2回目以降の発送分に関しては当該発送月の<span className="font-medium">9日</span>までの解約申込でストップできます。
+                      <span className="text-amber-700">お申し込み完了後、初回分のキャンセルはできかねますのでご了承ください。</span>
                     </span>
                   </li>
                   {(subscriptionRiceSeason === '10' || subscriptionRiceSeason === '11') && (
