@@ -13,7 +13,7 @@ import {
   EVENT_MILE_TYPE_LABELS,
 } from '@/types';
 import { getEventMileBalance, getEventMileTransactions } from '@/lib/eventMiles';
-import { computeNextShippingDate, formatJapaneseDate } from '@/lib/subscriptionShipping';
+import { computeNextShippingDate, formatJapaneseDate, isWithinChangeDeadline, getChangeDeadline } from '@/lib/subscriptionShipping';
 
 interface SubscriptionRow {
   id: string;
@@ -80,6 +80,23 @@ const MyPage = () => {
   const [cancelOtherText, setCancelOtherText] = useState('');
   const [cancelError, setCancelError] = useState<string | null>(null);
   const [syncingSubscriptions, setSyncingSubscriptions] = useState(false);
+
+  // スキップフロー（シンプル確認モーダル）
+  type SkipStep = 'closed' | 'confirm' | 'completed';
+  const [skipStep, setSkipStep] = useState<SkipStep>('closed');
+  const [skipTargetSubId, setSkipTargetSubId] = useState<string | null>(null);
+  const [skipError, setSkipError] = useState<string | null>(null);
+  const [skipping, setSkipping] = useState(false);
+  const [skippedToDate, setSkippedToDate] = useState<string | null>(null);
+
+  // 配送頻度変更フロー
+  type IntervalStep = 'closed' | 'select' | 'completed';
+  const [intervalStep, setIntervalStep] = useState<IntervalStep>('closed');
+  const [intervalTargetSubId, setIntervalTargetSubId] = useState<string | null>(null);
+  const [intervalCurrent, setIntervalCurrent] = useState<SubscriptionInterval | null>(null);
+  const [intervalChoice, setIntervalChoice] = useState<SubscriptionInterval | null>(null);
+  const [intervalError, setIntervalError] = useState<string | null>(null);
+  const [intervalSaving, setIntervalSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<'orders' | 'subscriptions' | 'miles' | 'profile'>('orders');
   const [mileBalance, setMileBalance] = useState<number>(0);
   const [mileTransactions, setMileTransactions] = useState<EventMileTransaction[]>([]);
@@ -394,6 +411,117 @@ const MyPage = () => {
     setCancelReasons((prev) =>
       prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
     );
+  };
+
+  /** スキップ確認モーダルを開く */
+  const openSkipModal = (stripeSubscriptionId: string) => {
+    setSkipTargetSubId(stripeSubscriptionId);
+    setSkipError(null);
+    setSkippedToDate(null);
+    setSkipStep('confirm');
+  };
+
+  /** スキップモーダルを閉じる */
+  const closeSkipModal = () => {
+    setSkipStep('closed');
+    setSkipTargetSubId(null);
+    setSkipError(null);
+    setSkippedToDate(null);
+  };
+
+  /** 配送頻度変更モーダルを開く */
+  const openIntervalModal = (
+    stripeSubscriptionId: string,
+    current: SubscriptionInterval | null,
+  ) => {
+    setIntervalTargetSubId(stripeSubscriptionId);
+    setIntervalCurrent(current);
+    setIntervalChoice(null);
+    setIntervalError(null);
+    setIntervalStep('select');
+  };
+
+  /** 配送頻度モーダルを閉じる */
+  const closeIntervalModal = () => {
+    setIntervalStep('closed');
+    setIntervalTargetSubId(null);
+    setIntervalCurrent(null);
+    setIntervalChoice(null);
+    setIntervalError(null);
+  };
+
+  /** 配送頻度の更新を実行 */
+  const submitIntervalUpdate = async () => {
+    if (!supabase || !intervalTargetSubId || !intervalChoice) return;
+    if (intervalChoice === intervalCurrent) {
+      setIntervalError('現在と同じ配送頻度です');
+      return;
+    }
+    setIntervalError(null);
+    setIntervalSaving(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const accessToken = session?.access_token;
+      if (!accessToken) throw new Error('セッションが切れています。再度ログインしてください。');
+
+      const res = await fetch('/api/update-subscription-interval', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          subscription_id: intervalTargetSubId,
+          new_interval: intervalChoice,
+        }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error(data?.error || 'サイクル変更に失敗しました');
+      }
+      setIntervalStep('completed');
+      if (user?.id) await loadUserData(user.id);
+    } catch (e: any) {
+      console.error('サイクル変更エラー:', e);
+      setIntervalError(e?.message || 'サイクル変更に失敗しました');
+    } finally {
+      setIntervalSaving(false);
+    }
+  };
+
+  /** スキップを実行 */
+  const submitSkipSubscription = async () => {
+    if (!supabase || !skipTargetSubId) return;
+    setSkipError(null);
+    setSkipping(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const accessToken = session?.access_token;
+      if (!accessToken) throw new Error('セッションが切れています。再度ログインしてください。');
+
+      const res = await fetch('/api/skip-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ subscription_id: skipTargetSubId }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error(data?.error || 'スキップに失敗しました');
+      }
+      // 成功 → 完了画面
+      setSkippedToDate(data?.next_billing_at ?? null);
+      setSkipStep('completed');
+      // サブスク情報リロード
+      if (user?.id) await loadUserData(user.id);
+    } catch (e: any) {
+      console.error('スキップエラー:', e);
+      setSkipError(e?.message || 'スキップに失敗しました');
+    } finally {
+      setSkipping(false);
+    }
   };
 
   const handlePostalCodeSearch = async () => {
@@ -889,18 +1017,77 @@ const MyPage = () => {
                         );
                       })()}
 
-                      {canCancel && (
-                        <div className="pt-3 border-t border-gray-100 flex justify-end">
-                          <button
-                            type="button"
-                            onClick={() => openCancelModal(sub.stripe_subscription_id)}
-                            disabled={cancelingId === sub.stripe_subscription_id}
-                            className="text-sm text-red-600 hover:text-red-700 underline underline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            {cancelingId === sub.stripe_subscription_id ? '処理中...' : '定期購入をキャンセル'}
-                          </button>
-                        </div>
-                      )}
+                      {canCancel && (() => {
+                        const nextShipping = computeNextShippingDate({
+                          created_at: sub.created_at,
+                          next_billing_at: sub.next_billing_at,
+                          interval: sub.interval,
+                          firstShippingOverride:
+                            typeof (sub.metadata as any)?.first_shipping_override === 'string'
+                              ? (sub.metadata as any).first_shipping_override
+                              : null,
+                        });
+                        const withinDeadline = isWithinChangeDeadline(new Date(), nextShipping);
+                        const deadline = nextShipping ? getChangeDeadline(nextShipping) : null;
+                        const skippedUntilSec = (sub.metadata as any)?.skipped_until as number | undefined;
+                        const consecutiveSkipBlocked = Boolean(
+                          typeof skippedUntilSec === 'number' &&
+                            sub.next_billing_at &&
+                            Math.abs(new Date(sub.next_billing_at).getTime() / 1000 - skippedUntilSec) < 60
+                        );
+                        const skipDisabled = !withinDeadline || consecutiveSkipBlocked;
+                        let skipDisabledReason = '';
+                        if (consecutiveSkipBlocked) {
+                          skipDisabledReason = '2回連続スキップはできません';
+                        } else if (!withinDeadline) {
+                          skipDisabledReason = '次回発送月の9日終日を過ぎているためスキップできません';
+                        }
+                        return (
+                          <div className="pt-3 border-t border-gray-100 space-y-3">
+                            {deadline && withinDeadline && (
+                              <p className="text-[11px] text-gray-500">
+                                スキップ・解約の締切: {formatJapaneseDate(deadline)}
+                              </p>
+                            )}
+                            <div className="flex flex-wrap gap-3 justify-end">
+                              <button
+                                type="button"
+                                onClick={() => openSkipModal(sub.stripe_subscription_id)}
+                                disabled={skipDisabled}
+                                title={skipDisabled ? skipDisabledReason : '次回お届けを1ヶ月スキップ'}
+                                className="text-sm text-amber-700 hover:text-amber-800 underline underline-offset-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:no-underline"
+                              >
+                                次回をスキップ
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => openIntervalModal(
+                                  sub.stripe_subscription_id,
+                                  sub.interval as SubscriptionInterval | null,
+                                )}
+                                disabled={!withinDeadline}
+                                title={!withinDeadline ? '次回発送月の9日終日を過ぎているため変更できません' : 'お届けサイクルを変更'}
+                                className="text-sm text-sky-700 hover:text-sky-800 underline underline-offset-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:no-underline"
+                              >
+                                サイクルを変更
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => openCancelModal(sub.stripe_subscription_id)}
+                                disabled={cancelingId === sub.stripe_subscription_id}
+                                className="text-sm text-red-600 hover:text-red-700 underline underline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                {cancelingId === sub.stripe_subscription_id ? '処理中...' : '定期購入をキャンセル'}
+                              </button>
+                            </div>
+                            {skipDisabled && skipDisabledReason && (
+                              <p className="text-[11px] text-gray-400 text-right">
+                                ※ {skipDisabledReason}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
                 );
@@ -1241,6 +1428,161 @@ const MyPage = () => {
           </div>
         )}
       </div>
+
+      {/* 定期購入スキップ 確認モーダル */}
+      {skipStep !== 'closed' && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-8"
+          onClick={() => {
+            if (skipStep === 'completed' || !skipping) closeSkipModal();
+          }}
+        >
+          <div
+            className="bg-white max-w-md w-full max-h-[90vh] overflow-y-auto p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {skipStep === 'confirm' && (
+              <>
+                <h3 className="text-base font-medium mb-3">次回お届けをスキップしますか？</h3>
+                <p className="text-sm text-gray-700 leading-relaxed mb-4">
+                  次回の発送・決済を1ヶ月先送りします。
+                </p>
+                <ul className="text-xs text-gray-600 space-y-1.5 mb-5 list-disc list-inside leading-relaxed">
+                  <li>2回連続のスキップはできません。</li>
+                  <li>締切は次回発送月の9日終日までです。</li>
+                </ul>
+                {skipError && (
+                  <p className="text-sm text-red-600 mb-3">{skipError}</p>
+                )}
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={submitSkipSubscription}
+                    disabled={skipping}
+                    className="flex-1 py-2.5 px-4 bg-amber-700 text-white text-sm tracking-widest hover:bg-amber-800 transition-colors disabled:opacity-50"
+                  >
+                    {skipping ? '処理中...' : 'スキップする'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={closeSkipModal}
+                    disabled={skipping}
+                    className="flex-1 py-2.5 px-4 bg-white text-primary border border-gray-300 text-sm tracking-widest hover:bg-gray-50 transition-colors"
+                  >
+                    キャンセル
+                  </button>
+                </div>
+              </>
+            )}
+            {skipStep === 'completed' && (
+              <>
+                <h3 className="text-base font-medium mb-3">スキップを受け付けました</h3>
+                {skippedToDate && (
+                  <p className="text-sm text-gray-700 leading-relaxed mb-5">
+                    次回の発送予定は {formatJapaneseDate(new Date(skippedToDate))} となります。
+                  </p>
+                )}
+                <button
+                  type="button"
+                  onClick={closeSkipModal}
+                  className="w-full py-2.5 px-4 bg-primary text-white text-sm tracking-widest hover:bg-gray-800 transition-colors"
+                >
+                  閉じる
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* 配送頻度変更モーダル */}
+      {intervalStep !== 'closed' && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-8"
+          onClick={() => {
+            if (intervalStep === 'completed' || !intervalSaving) closeIntervalModal();
+          }}
+        >
+          <div
+            className="bg-white max-w-md w-full max-h-[90vh] overflow-y-auto p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {intervalStep === 'select' && (
+              <>
+                <h3 className="text-base font-medium mb-3">お届けサイクルを変更</h3>
+                <p className="text-sm text-gray-600 leading-relaxed mb-4">
+                  次回課金分から新しいサイクルでお届けします。
+                </p>
+                {intervalCurrent && (
+                  <p className="text-xs text-gray-500 mb-3">
+                    現在: {SUBSCRIPTION_INTERVAL_LABELS[intervalCurrent] || intervalCurrent}
+                  </p>
+                )}
+                <div className="space-y-2 mb-5">
+                  {(['monthly', 'bimonthly', 'quarterly'] as SubscriptionInterval[]).map((iv) => {
+                    const isCurrent = iv === intervalCurrent;
+                    const isSelected = iv === intervalChoice;
+                    return (
+                      <button
+                        key={iv}
+                        type="button"
+                        onClick={() => !isCurrent && setIntervalChoice(iv)}
+                        disabled={isCurrent}
+                        className={`w-full text-left px-4 py-3 border rounded transition-colors ${
+                          isSelected
+                            ? 'border-primary bg-primary/5'
+                            : 'border-gray-200 hover:border-gray-400'
+                        } ${isCurrent ? 'opacity-40 cursor-not-allowed' : ''}`}
+                      >
+                        <span className="text-sm">{SUBSCRIPTION_INTERVAL_LABELS[iv] || iv}</span>
+                        {isCurrent && (
+                          <span className="ml-2 text-[10px] text-gray-500">（現在）</span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+                {intervalError && (
+                  <p className="text-sm text-red-600 mb-3">{intervalError}</p>
+                )}
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={submitIntervalUpdate}
+                    disabled={intervalSaving || !intervalChoice}
+                    className="flex-1 py-2.5 px-4 bg-primary text-white text-sm tracking-widest hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {intervalSaving ? '処理中...' : '変更する'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={closeIntervalModal}
+                    disabled={intervalSaving}
+                    className="flex-1 py-2.5 px-4 bg-white text-primary border border-gray-300 text-sm tracking-widest hover:bg-gray-50 transition-colors"
+                  >
+                    キャンセル
+                  </button>
+                </div>
+              </>
+            )}
+            {intervalStep === 'completed' && (
+              <>
+                <h3 className="text-base font-medium mb-3">サイクル変更を受け付けました</h3>
+                <p className="text-sm text-gray-700 leading-relaxed mb-5">
+                  次回課金分から新しい配送頻度でお届けします。
+                </p>
+                <button
+                  type="button"
+                  onClick={closeIntervalModal}
+                  className="w-full py-2.5 px-4 bg-primary text-white text-sm tracking-widest hover:bg-gray-800 transition-colors"
+                >
+                  閉じる
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* 定期購入キャンセル 多段モーダル */}
       {cancelStep !== 'closed' && (

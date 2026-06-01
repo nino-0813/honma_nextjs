@@ -205,6 +205,32 @@ export function formatJapaneseDate(date: Date | null): string {
  *
  * 週次/隔週は対象外（null を返す → 呼び出し側で anchor を指定しない）
  */
+/**
+ * スキップ・変更・解約の締切日（JST）を返す。
+ *
+ * 仕様:
+ *  - 次回発送予定月の "9日 23:59:59 JST" が締切（決済が10日に走るため）
+ *  - 例: 次回発送 = 2026/7/15 → 締切 = 2026/7/9 23:59:59 JST
+ */
+export function getChangeDeadline(nextShipping: Date): Date {
+  const p = toJSTParts(nextShipping);
+  // 9日の 23:59:59 JST = 10日 00:00 JST から1秒前
+  return new Date(jstMomentToUtcDate(p.year, p.month, 10, 0).getTime() - 1000);
+}
+
+/**
+ * 今この瞬間が、次回発送に対するスキップ/変更/解約の締切内かどうか判定。
+ *
+ * @param now - 判定基準日時（通常は new Date()）
+ * @param nextShipping - 次回発送予定日
+ * @returns true: まだ操作可能 / false: 締切超過
+ */
+export function isWithinChangeDeadline(now: Date, nextShipping: Date | null): boolean {
+  if (!nextShipping) return false;
+  const deadline = getChangeDeadline(nextShipping);
+  return now.getTime() <= deadline.getTime();
+}
+
 export function computeBillingCycleAnchor(
   checkoutDate: Date,
   interval: string | null | undefined,
