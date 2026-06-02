@@ -12,6 +12,7 @@ import {
   IconUpload,
   IconDownload,
   IconGripVertical,
+  IconCopy,
 } from '@/components/Icons';
 
 interface ProductRow {
@@ -123,6 +124,82 @@ const ProductList = () => {
     } catch (error) {
       console.error('削除エラー:', error);
       alert('削除に失敗しました');
+    }
+  };
+
+  /**
+   * 商品を複製する。
+   * - title に「（複製）」を付与
+   * - handle はユニーク制約に違反しないよう連番で生成
+   * - status='draft', is_visible=false, stock=0 にセットし、誤公開を防止
+   * - 複製後は編集画面へ遷移してユーザーが内容を仕上げる前提
+   */
+  const handleDuplicate = async (id: string) => {
+    if (!supabase) return;
+    if (!window.confirm('この商品を複製しますか？\n複製後の商品は「下書き・非表示・在庫0」で作成されます。')) return;
+    try {
+      // 元商品の全フィールド取得
+      const { data: source, error: fetchErr } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', id)
+        .single();
+      if (fetchErr) throw fetchErr;
+      if (!source) throw new Error('元の商品が見つかりません');
+
+      // 新しい handle を一意に生成: handle-copy, handle-copy-2, ...
+      let newHandle = `${source.handle}-copy`;
+      let suffix = 2;
+      // 既存handleがある間は連番を進める
+      // 最大20回まででガード
+      for (let i = 0; i < 20; i++) {
+        const { data: existing } = await supabase
+          .from('products')
+          .select('id')
+          .eq('handle', newHandle)
+          .maybeSingle();
+        if (!existing) break;
+        newHandle = `${source.handle}-copy-${suffix}`;
+        suffix += 1;
+      }
+
+      // id / 日付 / 関連IDを除いて複製
+      const {
+        id: _omitId,
+        created_at: _omitCreated,
+        updated_at: _omitUpdated,
+        ...rest
+      } = source as any;
+
+      const newProduct = {
+        ...rest,
+        handle: newHandle,
+        title: `${source.title}（複製）`,
+        status: 'draft',
+        is_active: false,
+        is_visible: false,
+        stock: 0,
+        sold_out: false,
+        sku: source.sku ? `${source.sku}-COPY` : null,
+        // 表示順は元商品より大きい値（最後尾相当）に
+        display_order: 9999,
+      };
+
+      const { data: inserted, error: insertErr } = await supabase
+        .from('products')
+        .insert([newProduct])
+        .select('id, handle')
+        .single();
+      if (insertErr) throw insertErr;
+      if (!inserted) throw new Error('複製の作成に失敗しました');
+
+      alert(
+        `複製しました。\n編集画面に移動します。\n（下書き・非表示で作成されているので、内容を確認してから公開してください）`
+      );
+      router.push(`/admin/products/${inserted.id}`);
+    } catch (error: any) {
+      console.error('複製エラー:', error);
+      alert(`複製に失敗しました: ${error?.message || 'unknown'}`);
     }
   };
 
@@ -876,6 +953,16 @@ const ProductList = () => {
                           title="編集"
                         >
                           <IconEdit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDuplicate(product.id);
+                          }}
+                          className="p-1 text-gray-400 hover:text-sky-600"
+                          title="複製"
+                        >
+                          <IconCopy className="w-4 h-4" />
                         </button>
                         <button
                           onClick={(e) => {
