@@ -266,7 +266,7 @@ export default function AmbassadorPage() {
 
             {/* 画像（右） */}
             <FadeInSection>
-              <div className="md:order-2 order-1 relative w-full aspect-[4/3] bg-stone-100 overflow-hidden rounded-2xl shadow-[0_15px_40px_-12px_rgba(0,0,0,0.18)]">
+              <div className="md:order-2 order-1 relative w-full aspect-[4/3] bg-stone-100 overflow-hidden rounded-2xl shadow-[0_20px_45px_-10px_rgba(0,0,0,0.25)]">
                 <Image
                   src="/images/joinus/sadokids-fieldwork.jpg"
                   alt="佐渡Kids生きもの調査隊で生きものを観察する子どもたち"
@@ -283,22 +283,22 @@ export default function AmbassadorPage() {
       {/* Project 03: クラウドファンディング */}
       <section className="bg-white py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
-            {/* 画像（左） */}
-            <FadeInSection>
-              <div className="relative w-full aspect-[3/2] bg-stone-100 overflow-hidden rounded-2xl shadow-[0_15px_40px_-12px_rgba(0,0,0,0.18)]">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center">
+            {/* 画像（左・少しだけ控えめ） */}
+            <FadeInSection className="md:col-span-7">
+              <div className="relative w-full bg-white overflow-hidden rounded-2xl shadow-[0_20px_45px_-12px_rgba(0,0,0,0.22)]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   ref={rightImageRef}
                   src="/images/joinus/crowdfunding-main.jpg"
-                  className="w-full h-full object-cover"
-                  alt="クラウドファンディング：子どもが農家を夢見る島〜たった一羽のトキがもたらしたもの〜"
+                  className="w-full h-auto block"
+                  alt="クラウドファンディング達成: 4,358,749円 / 149人 / 290%"
                 />
               </div>
             </FadeInSection>
 
-            {/* テキスト（右） */}
-            <FadeInSection>
+            {/* テキスト（右・読み込ませる文字幅） */}
+            <FadeInSection className="md:col-span-5">
               <div className="md:pl-2">
                 <p className="text-[11px] md:text-xs tracking-[0.3em] text-amber-700 font-medium uppercase mb-2">Project 03 — Crowdfunding</p>
                 <h4 className="text-xl md:text-2xl font-serif font-semibold mb-2 leading-snug">
@@ -315,7 +315,7 @@ export default function AmbassadorPage() {
                   </p>
                   <p>
                     このたび、スマート農機を導入するためのクラウドファンディングに挑戦し、
-                    <span className="font-semibold text-amber-700">149名の方々から4,358,749円</span>
+                    <span className="font-semibold">149名の方々から4,358,749円</span>
                     ものご支援をいただくことができました。心より感謝申し上げます。
                   </p>
                 </div>
