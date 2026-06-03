@@ -167,7 +167,7 @@ export default function AmbassadorPage() {
                 <h4 className="text-xl md:text-2xl font-serif font-semibold mb-2 leading-snug">
                   イケてるパートナーズ
                 </h4>
-                <p className="text-sm md:text-base text-gray-600 mb-5">
+                <p className="text-sm md:text-base text-gray-600 leading-[2.1] mb-5">
                   1年を通して佐渡の田んぼとつながる、企業向けの「イケベジ版オーナー制度」。
                 </p>
                 <ul className="space-y-2.5 text-sm md:text-[15px] text-gray-700 mb-5">
@@ -221,7 +221,7 @@ export default function AmbassadorPage() {
                 <h4 className="text-xl md:text-2xl font-serif font-semibold mb-2 leading-snug">
                   佐渡Kids生きもの調査隊
                 </h4>
-                <p className="text-sm md:text-base text-gray-700 leading-loose mb-5">
+                <p className="text-sm md:text-base text-gray-700 leading-[2.1] mb-5">
                   佐渡の田んぼで、子どもたちが「環境や生きものにやさしい米づくり」と
                   「田んぼの生きもの調査」を1年かけて体験するプログラム。
                   田んぼはお米を育てる場所であると同時に、たくさんの生きものが育まれる場所。
@@ -258,7 +258,7 @@ export default function AmbassadorPage() {
                   <img
                     src="/images/joinus/sadokids-logo.png"
                     alt="SADO KIDS 生きもの調査隊"
-                    className="h-14 md:h-20 w-auto object-contain"
+                    className="h-20 md:h-28 w-auto object-contain"
                   />
                 </div>
               </div>
@@ -307,7 +307,7 @@ export default function AmbassadorPage() {
                 <p className="text-sm md:text-[15px] font-medium text-amber-700 mb-4">
                   「子どもが農家を夢見る島」たった一羽のトキがもたらしたもの
                 </p>
-                <div className="text-sm md:text-base text-gray-700 leading-loose space-y-3 mb-6">
+                <div className="text-sm md:text-base text-gray-700 leading-[2.1] space-y-4 mb-6">
                   <p>
                     佐渡の小学生たちが「農家になりたい」と言える島へ。
                     スマート農業の技術と佐渡の栽培技術を掛け合わせ、
