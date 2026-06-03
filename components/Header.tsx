@@ -133,11 +133,11 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
               BLOG
               <span className={`absolute -bottom-2 left-0 w-full h-px ${isHomePage && !isScrolled ? 'bg-white' : 'bg-black'} transition-transform duration-300 origin-left ${isActive('/blog') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`} />
             </Link>
-            <Link href="/ambassador" className={`text-sm font-medium tracking-[0.15em] transition-colors relative group ${
-              isActive('/ambassador') ? (isHomePage && !isScrolled ? 'text-white' : 'text-black') : (isHomePage && !isScrolled ? 'text-white hover:text-white/80' : 'text-gray-500 hover:text-black')
+            <Link href="/join-us" className={`text-sm font-medium tracking-[0.15em] transition-colors relative group ${
+              isActive('/join-us') ? (isHomePage && !isScrolled ? 'text-white' : 'text-black') : (isHomePage && !isScrolled ? 'text-white hover:text-white/80' : 'text-gray-500 hover:text-black')
             }`}>
               JOIN US
-              <span className={`absolute -bottom-2 left-0 w-full h-px ${isHomePage && !isScrolled ? 'bg-white' : 'bg-black'} transition-transform duration-300 origin-left ${isActive('/ambassador') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`} />
+              <span className={`absolute -bottom-2 left-0 w-full h-px ${isHomePage && !isScrolled ? 'bg-white' : 'bg-black'} transition-transform duration-300 origin-left ${isActive('/join-us') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`} />
             </Link>
             <Link href="/contact" className={`text-sm font-medium tracking-[0.15em] transition-colors relative group ${
               isActive('/contact') ? (isHomePage && !isScrolled ? 'text-white' : 'text-black') : (isHomePage && !isScrolled ? 'text-white hover:text-white/80' : 'text-gray-500 hover:text-black')
