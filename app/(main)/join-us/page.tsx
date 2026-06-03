@@ -81,21 +81,12 @@ export default function AmbassadorPage() {
 
       <section className="pt-12 md:pt-16 pb-16 md:pb-24 bg-white relative overflow-hidden">
         <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-          <p className="text-xs font-bold tracking-[0.3em] text-gray-400 uppercase mb-2 md:mb-4">CONCEPT</p>
+          <p className="text-xs font-bold tracking-[0.3em] text-gray-400 uppercase mb-4 md:mb-6">CONCEPT</p>
           <div className="mb-12 md:mb-16">
-            <div className="flex justify-center mb-4 md:mb-6">
-              <span className="relative inline-block">
-                <Image
-                  src="/images/joinus/Iketeru_partner_logo_RGB_2409005.webp"
-                  alt="イケてるパートナーズ"
-                  width={200}
-                  height={80}
-                  className="h-20 md:h-32 w-auto object-contain"
-                />
-                <span className="absolute left-1/2 transform -translate-x-1/2 w-3/4 h-px bg-primary -bottom-2 md:-bottom-4" />
-              </span>
-            </div>
-            <span className="text-base md:text-2xl block text-gray-600 mt-10 md:mt-12">社会を共に創る</span>
+            <h2 className="text-2xl md:text-4xl font-serif font-medium tracking-[0.15em] text-primary mb-6 md:mb-8">
+              社会を共に創る
+            </h2>
+            <div className="w-12 md:w-16 h-px bg-amber-600 mx-auto" />
           </div>
           <div className="text-sm md:text-base font-light leading-loose md:leading-loose text-gray-700 space-y-4 md:space-y-6 max-w-2xl mx-auto text-center">
             <p>子どもたちから借りている</p>
@@ -112,14 +103,9 @@ export default function AmbassadorPage() {
       <section className="pt-16 md:pt-24 pb-10 md:pb-14 bg-secondary/30 relative">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center">
-            <p className="text-[11px] md:text-xs tracking-[0.3em] text-amber-700 font-medium uppercase mb-3">Our Project</p>
+            <p className="text-[11px] md:text-xs tracking-[0.3em] text-amber-700 font-medium uppercase mb-3">JOIN US</p>
             <h3 className="text-2xl md:text-4xl font-serif tracking-widest mb-4">OUR PROJECT</h3>
-            <div className="w-12 h-px bg-amber-600 mx-auto mb-6" />
-            <p className="text-sm md:text-base text-gray-600 leading-relaxed max-w-2xl mx-auto">
-              佐渡の里山と都市をつなげるための、3つの取り組みをご紹介します。
-              <br className="hidden md:block" />
-              ご自身に合うかたちで、ぜひ一緒に動かしていきましょう。
-            </p>
+            <div className="w-12 h-px bg-amber-600 mx-auto" />
           </div>
         </div>
       </section>
@@ -130,12 +116,12 @@ export default function AmbassadorPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
             {/* 画像 */}
             <FadeInSection>
-              <div className="relative w-full aspect-[4/5] bg-stone-100 overflow-hidden rounded-2xl shadow-[0_15px_40px_-12px_rgba(0,0,0,0.18)]">
+              <div className="relative w-full aspect-[4/5] bg-white overflow-hidden rounded-2xl shadow-[0_15px_40px_-12px_rgba(0,0,0,0.18)] flex items-center justify-center p-10 md:p-16">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   ref={leftImageRef}
-                  src="/images/joinus/artboard_1_copy.webp"
-                  className="w-full h-full object-cover"
+                  src="/images/joinus/Iketeru_partner_logo_RGB_2409005.webp"
+                  className="w-full h-auto max-h-[60%] object-contain"
                   alt="イケてるパートナーズ"
                 />
               </div>
