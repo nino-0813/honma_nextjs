@@ -241,12 +241,12 @@ export default function AmbassadorPage() {
                     </li>
                   ))}
                 </ul>
-                <div className="flex flex-wrap items-center gap-4 md:gap-5">
+                <div className="flex flex-nowrap items-center gap-4 md:gap-6">
                   <a
                     href="https://sado-ikimonoken.jp/sadokids2025/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-white text-primary border border-primary text-xs md:text-sm tracking-[0.2em] uppercase px-6 md:px-8 py-3 rounded-full hover:bg-primary hover:text-white transition-colors"
+                    className="inline-flex items-center gap-2 bg-white text-primary border border-primary text-xs md:text-sm tracking-[0.2em] uppercase px-6 md:px-8 py-3 rounded-full hover:bg-primary hover:text-white transition-colors flex-shrink-0 whitespace-nowrap"
                   >
                     公式ホームページを見る
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -258,7 +258,7 @@ export default function AmbassadorPage() {
                   <img
                     src="/images/joinus/sadokids-logo.png"
                     alt="SADO KIDS 生きもの調査隊"
-                    className="h-40 md:h-56 w-auto object-contain"
+                    className="h-32 md:h-40 w-auto object-contain flex-shrink min-w-0"
                   />
                 </div>
               </div>
@@ -309,9 +309,14 @@ export default function AmbassadorPage() {
                 </p>
                 <div className="text-sm md:text-base text-gray-700 leading-[2.1] space-y-4 mb-6">
                   <p>
-                    佐渡の小学生たちが「農家になりたい」と言える島へ。
-                    スマート農業の技術と佐渡の栽培技術を掛け合わせ、
-                    世界一のお米づくりに、地域の子どもたちと挑戦しています。
+                    佐渡の小学生たちが「農家になりたい」と言える島を目指して。
+                    私たちは、スマート農業の技術と佐渡の栽培技術を掛け合わせ、
+                    地域の子どもたちと「世界一のお米づくり」に挑戦しています。
+                  </p>
+                  <p>
+                    このたび、スマート農機を導入するためのクラウドファンディングに挑戦し、
+                    <span className="font-semibold text-amber-700">149名の方々から4,358,749円</span>
+                    ものご支援をいただくことができました。心より感謝申し上げます。
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
