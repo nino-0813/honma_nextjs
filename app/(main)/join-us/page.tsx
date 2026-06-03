@@ -241,17 +241,26 @@ export default function AmbassadorPage() {
                     </li>
                   ))}
                 </ul>
-                <a
-                  href="https://sado-ikimonoken.jp/sadokids2025/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-white text-primary border border-primary text-xs md:text-sm tracking-[0.2em] uppercase px-6 md:px-8 py-3 rounded-full hover:bg-primary hover:text-white transition-colors"
-                >
-                  プロジェクトを見る
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                  </svg>
-                </a>
+                <div className="flex flex-wrap items-center gap-4 md:gap-5">
+                  <a
+                    href="https://sado-ikimonoken.jp/sadokids2025/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-white text-primary border border-primary text-xs md:text-sm tracking-[0.2em] uppercase px-6 md:px-8 py-3 rounded-full hover:bg-primary hover:text-white transition-colors"
+                  >
+                    プロジェクトを見る
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                    </svg>
+                  </a>
+                  {/* SADO KIDS ロゴ */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/images/joinus/sadokids-logo.png"
+                    alt="SADO KIDS 生きもの調査隊"
+                    className="h-14 md:h-20 w-auto object-contain"
+                  />
+                </div>
               </div>
             </FadeInSection>
 
@@ -259,8 +268,8 @@ export default function AmbassadorPage() {
             <FadeInSection>
               <div className="md:order-2 order-1 relative w-full aspect-[4/3] bg-stone-100 overflow-hidden rounded-2xl shadow-[0_15px_40px_-12px_rgba(0,0,0,0.18)]">
                 <Image
-                  src="/images/about/stories/about_story_taue_123.jpg"
-                  alt="佐渡の田んぼでの生き物調査"
+                  src="/images/joinus/sadokids-fieldwork.jpg"
+                  alt="佐渡Kids生きもの調査隊で生きものを観察する子どもたち"
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover"
