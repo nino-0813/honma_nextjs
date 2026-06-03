@@ -334,32 +334,7 @@ export default function AmbassadorPage() {
         </div>
       </section>
 
-      {/* クロージング */}
-      <section className="relative w-full pb-24 md:pb-32 flex justify-center mt-4">
-        <div className="bg-gradient-to-b from-stone-50 to-amber-50/40 rounded-3xl px-6 md:px-12 py-14 md:py-20 max-w-4xl w-full mx-4 text-center">
-          <p className="text-[11px] text-amber-700 tracking-[0.3em] uppercase mb-4 font-medium">Closing</p>
-          <h3 className="text-xl md:text-3xl font-serif font-semibold text-primary leading-[1.6] md:leading-[1.5] mb-4">
-            佐渡の田んぼから、
-            <br className="md:hidden" />
-            一緒に未来をつくりませんか。
-          </h3>
-          <div className="w-10 h-px bg-amber-600 mx-auto mb-6" />
-          <p className="text-sm md:text-base text-gray-700 leading-loose mb-8">
-            気になるプロジェクトが見つかったら、お気軽にご連絡ください。
-            <br className="hidden md:block" />
-            あなたに合うかたちで、ご一緒できる方法をお伝えします。
-          </p>
-          <a
-            href="/contact"
-            className="inline-flex items-center gap-2 bg-primary text-white text-xs md:text-sm tracking-[0.2em] uppercase px-8 md:px-10 py-4 rounded-full hover:bg-amber-700 transition-colors"
-          >
-            お問い合わせ
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-            </svg>
-          </a>
-        </div>
-      </section>
+      <div className="pb-16 md:pb-24" />
     </div>
   );
 }
