@@ -219,17 +219,19 @@ export default function AmbassadorPage() {
               <div className="md:order-1 order-2">
                 <p className="text-[11px] md:text-xs tracking-[0.3em] text-amber-700 font-medium uppercase mb-2">Project 02 — Biodiversity</p>
                 <h4 className="text-xl md:text-2xl font-serif font-semibold mb-2 leading-snug">
-                  いきもの調査隊
+                  佐渡Kids生きもの調査隊
                 </h4>
                 <p className="text-sm md:text-base text-gray-700 leading-loose mb-5">
-                  佐渡の田んぼに集まる生きものたちと、その自然環境を一緒に観察する取り組み。
-                  田んぼの上の暮らしを知ることが、おいしいお米のはじまりです。
+                  佐渡の田んぼで、子どもたちが「環境や生きものにやさしい米づくり」と
+                  「田んぼの生きもの調査」を1年かけて体験するプログラム。
+                  田んぼはお米を育てる場所であると同時に、たくさんの生きものが育まれる場所。
+                  その気づきを実体験から学んでいきます。
                 </p>
                 <ul className="space-y-2 text-sm md:text-[15px] text-gray-700 mb-6">
                   {[
-                    '子どもも大人も、地域の方も参加できる学びのプログラム',
-                    'お米と生きものがつながる「里山の物語」を体感できる',
-                    '専用サイトで活動レポート・募集情報を随時公開',
+                    '対象は佐渡島内の小学3〜6年生（低学年・幼稚園向け「さど里山こびりぃ隊」も併設）',
+                    '2025年度で18年目を迎える、佐渡生きもの語り研究所の長期プログラム',
+                    'イケベジも田んぼのフィールド提供などで連携しています',
                   ].map((t) => (
                     <li key={t} className="flex items-start gap-2.5">
                       <svg className="w-4 h-4 md:w-5 md:h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
@@ -240,12 +242,12 @@ export default function AmbassadorPage() {
                   ))}
                 </ul>
                 <a
-                  href="https://www.ikimono-sado.com/"
+                  href="https://sado-ikimonoken.jp/sadokids2025/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 bg-white text-primary border border-primary text-xs md:text-sm tracking-[0.2em] uppercase px-6 md:px-8 py-3 rounded-full hover:bg-primary hover:text-white transition-colors"
                 >
-                  公式サイトを見る
+                  プロジェクトを見る
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                   </svg>
