@@ -286,13 +286,13 @@ export default function AmbassadorPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
             {/* 画像（左） */}
             <FadeInSection>
-              <div className="relative w-full aspect-[3/4] bg-stone-100 overflow-hidden rounded-2xl shadow-[0_15px_40px_-12px_rgba(0,0,0,0.18)]">
+              <div className="relative w-full aspect-[3/2] bg-stone-100 overflow-hidden rounded-2xl shadow-[0_15px_40px_-12px_rgba(0,0,0,0.18)]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   ref={rightImageRef}
-                  src="/images/joinus/crowdfunding_poster.webp"
-                  className="w-full h-full object-contain bg-white"
-                  alt="クラウドファンディング"
+                  src="/images/joinus/crowdfunding-main.jpg"
+                  className="w-full h-full object-cover"
+                  alt="クラウドファンディング：子どもが農家を夢見る島〜たった一羽のトキがもたらしたもの〜"
                 />
               </div>
             </FadeInSection>
