@@ -231,7 +231,7 @@ export default function AmbassadorPage() {
                   {[
                     '佐渡島内の小学1〜6年生の定員40名',
                     '2026年度で19年目を迎える、佐渡の環境学習を支えるプログラム',
-                    '首都圏でのお米の販売や活動報告もします',
+                    '首都圏でのお米の販売や活動報告',
                   ].map((t) => (
                     <li key={t} className="flex items-start gap-2.5">
                       <svg className="w-4 h-4 md:w-5 md:h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
