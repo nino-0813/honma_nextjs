@@ -109,7 +109,7 @@ export default function AmbassadorPage() {
       </section>
 
       {/* OUR PROJECT セクション見出し */}
-      <section className="pt-16 md:pt-24 pb-10 md:pb-14 bg-secondary/30 relative w-full">
+      <section className="py-10 md:py-14 bg-secondary/30 relative w-full">
         <div className="w-full flex flex-col items-center justify-center px-6">
           <p className="text-[11px] md:text-xs tracking-[0.3em] text-amber-700 font-medium uppercase mb-3 text-center">JOIN US</p>
           <h3 className="text-2xl md:text-4xl font-serif tracking-widest mb-4 text-center">OUR PROJECT</h3>
