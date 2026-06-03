@@ -258,7 +258,7 @@ export default function AmbassadorPage() {
                   <img
                     src="/images/joinus/sadokids-logo.png"
                     alt="SADO KIDS 生きもの調査隊"
-                    className="h-20 md:h-28 w-auto object-contain"
+                    className="h-40 md:h-56 w-auto object-contain"
                   />
                 </div>
               </div>
