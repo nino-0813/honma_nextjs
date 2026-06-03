@@ -229,9 +229,9 @@ export default function AmbassadorPage() {
                 </p>
                 <ul className="space-y-2 text-sm md:text-[15px] text-gray-700 mb-6">
                   {[
-                    '対象は佐渡島内の小学3〜6年生（低学年・幼稚園向け「さど里山こびりぃ隊」も併設）',
-                    '2025年度で18年目を迎える、佐渡生きもの語り研究所の長期プログラム',
-                    'イケベジも田んぼのフィールド提供などで連携しています',
+                    '佐渡島内の小学1〜6年生の定員40名',
+                    '2026年度で19年目を迎える、佐渡の環境学習を支えるプログラム',
+                    '首都圏でのお米の販売や活動報告もします',
                   ].map((t) => (
                     <li key={t} className="flex items-start gap-2.5">
                       <svg className="w-4 h-4 md:w-5 md:h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
@@ -248,7 +248,7 @@ export default function AmbassadorPage() {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 bg-white text-primary border border-primary text-xs md:text-sm tracking-[0.2em] uppercase px-6 md:px-8 py-3 rounded-full hover:bg-primary hover:text-white transition-colors"
                   >
-                    プロジェクトを見る
+                    公式ホームページを見る
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                     </svg>
