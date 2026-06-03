@@ -83,10 +83,10 @@ export default function AmbassadorPage() {
         <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
           <p className="text-xs font-bold tracking-[0.3em] text-gray-400 uppercase mb-4 md:mb-6">CONCEPT</p>
           <div className="mb-12 md:mb-16">
-            <h2 className="text-2xl md:text-4xl font-serif font-medium tracking-[0.15em] text-primary mb-6 md:mb-8">
+            <h2 className="text-2xl md:text-4xl font-serif font-medium tracking-[0.15em] text-primary mb-5 md:mb-7">
               社会を共に創る
             </h2>
-            <div className="w-12 md:w-16 h-px bg-amber-600 mx-auto" />
+            <div className="w-44 md:w-72 h-px bg-amber-600 mx-auto" />
           </div>
           <div className="text-sm md:text-base font-light leading-loose md:leading-loose text-gray-700 space-y-4 md:space-y-6 max-w-2xl mx-auto text-center">
             <p>子どもたちから借りている</p>
@@ -100,13 +100,11 @@ export default function AmbassadorPage() {
       </section>
 
       {/* OUR PROJECT セクション見出し */}
-      <section className="pt-16 md:pt-24 pb-10 md:pb-14 bg-secondary/30 relative">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center">
-            <p className="text-[11px] md:text-xs tracking-[0.3em] text-amber-700 font-medium uppercase mb-3">JOIN US</p>
-            <h3 className="text-2xl md:text-4xl font-serif tracking-widest mb-4">OUR PROJECT</h3>
-            <div className="w-12 h-px bg-amber-600 mx-auto" />
-          </div>
+      <section className="pt-16 md:pt-24 pb-10 md:pb-14 bg-secondary/30 relative w-full">
+        <div className="w-full flex flex-col items-center justify-center px-6">
+          <p className="text-[11px] md:text-xs tracking-[0.3em] text-amber-700 font-medium uppercase mb-3 text-center">JOIN US</p>
+          <h3 className="text-2xl md:text-4xl font-serif tracking-widest mb-4 text-center">OUR PROJECT</h3>
+          <div className="w-12 h-px bg-amber-600" />
         </div>
       </section>
 
