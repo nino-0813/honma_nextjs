@@ -296,16 +296,13 @@ export default function AmbassadorPage() {
                   佐渡の小学生と世界一へ！
                 </h4>
                 <p className="text-sm md:text-[15px] font-medium text-amber-700 mb-4">
-                  スマート農業で創る「子どもが農家を夢見る島」
+                  「子どもが農家を夢見る島」たった一羽のトキがもたらしたもの
                 </p>
                 <div className="text-sm md:text-base text-gray-700 leading-loose space-y-3 mb-6">
                   <p>
                     佐渡の小学生たちが「農家になりたい」と言える島へ。
-                    スマート農業の技術と佐渡の自然栽培を掛け合わせ、
+                    スマート農業の技術と佐渡の栽培技術を掛け合わせ、
                     世界一のお米づくりに、地域の子どもたちと挑戦しています。
-                  </p>
-                  <p className="text-gray-600 text-sm">
-                    プロジェクトの背景・リターン・支援方法は、for Good のページからご覧いただけます。
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
@@ -315,7 +312,7 @@ export default function AmbassadorPage() {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 bg-amber-700 text-white text-xs md:text-sm tracking-[0.2em] uppercase px-6 md:px-8 py-3 rounded-full hover:bg-amber-800 transition-colors"
                   >
-                    プロジェクトを応援する
+                    プロジェクトの詳細を見る
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                     </svg>
