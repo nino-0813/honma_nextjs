@@ -172,8 +172,8 @@ export default function AmbassadorPage() {
                 </p>
                 <ul className="space-y-2.5 text-sm md:text-[15px] text-gray-700 mb-5">
                   {[
-                    { t: '佐渡の里山で田植え／生き物調査／稲刈り／新嘗祭への招待' },
-                    { t: 'コシヒカリ約30kg分のお米を、用途に合わせて社内配布・贈答・自宅用に' },
+                    { t: '田植え／生き物調査／稲刈り／新嘗祭への招待' },
+                    { t: '収穫できたお米を、用途に合わせて社内配布・贈答・自宅用に' },
                     { t: '公式HPへ企業ロゴを掲載／オリジナル米袋プランも選択可' },
                     { t: 'TOKItoWAの研修・リトリート・ワーケーション特別割引' },
                   ].map((item) => (
@@ -189,7 +189,7 @@ export default function AmbassadorPage() {
                 <div className="bg-stone-50 rounded-xl p-4 md:p-5 mb-5">
                   <p className="text-[11px] md:text-xs tracking-[0.2em] text-gray-500 mb-3">YEAR-ROUND TIMELINE</p>
                   <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-xs md:text-sm text-gray-700">
-                    <div className="flex items-center gap-2"><span className="text-amber-700 font-medium">春</span><span>田植え（6月）</span></div>
+                    <div className="flex items-center gap-2"><span className="text-amber-700 font-medium">春</span><span>田植え</span></div>
                     <div className="flex items-center gap-2"><span className="text-amber-700 font-medium">夏</span><span>生き物調査・草刈り</span></div>
                     <div className="flex items-center gap-2"><span className="text-amber-700 font-medium">秋</span><span>稲刈り・収穫体験</span></div>
                     <div className="flex items-center gap-2"><span className="text-amber-700 font-medium">冬</span><span>新嘗祭・新米お届け</span></div>
