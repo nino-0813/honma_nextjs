@@ -28,6 +28,15 @@ function FadeInSection({ children, className = '' }: { children: React.ReactNode
   );
 }
 
+/**
+ * イケてるパートナーズ 協賛企業ロゴ一覧
+ * - 必要に応じてここに追記するだけでグリッドが自動的に増えます（最大8社想定）
+ */
+const PARTNER_LOGOS: { name: string; src: string }[] = [
+  { name: 'ClearHome', src: '/images/partners/clearhome.png' },
+  { name: 'BLUE ADVANCE', src: '/images/partners/blue-advance.png' },
+];
+
 export default function AmbassadorPage() {
   const leftImageRef = useRef<HTMLImageElement>(null);
   const rightImageRef = useRef<HTMLImageElement>(null);
@@ -112,16 +121,42 @@ export default function AmbassadorPage() {
       <section ref={imagesSectionRef} className="bg-white pt-16 md:pt-24 pb-10 md:pb-14">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
-            {/* 画像 */}
+            {/* パートナー企業ロゴ一覧 */}
             <FadeInSection>
-              <div className="relative w-full aspect-[4/5] bg-white overflow-hidden rounded-2xl shadow-[0_15px_40px_-12px_rgba(0,0,0,0.18)] flex items-center justify-center p-10 md:p-16">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  ref={leftImageRef}
-                  src="/images/joinus/Iketeru_partner_logo_RGB_2409005.webp"
-                  className="w-full h-auto max-h-[60%] object-contain"
-                  alt="イケてるパートナーズ"
-                />
+              <div className="relative w-full bg-white rounded-2xl shadow-[0_15px_40px_-12px_rgba(0,0,0,0.18)] p-6 md:p-10">
+                {/* 見出し: イケてるパートナーズロゴ */}
+                <div className="flex flex-col items-center mb-6 md:mb-8 pb-5 md:pb-6 border-b border-gray-100">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/images/joinus/Iketeru_partner_logo_RGB_2409005.webp"
+                    className="h-12 md:h-16 w-auto object-contain"
+                    alt="イケてるパートナーズ"
+                  />
+                  <p className="mt-3 md:mt-4 text-[10px] md:text-xs tracking-[0.3em] text-gray-500 uppercase">
+                    Partner Companies
+                  </p>
+                </div>
+
+                {/* 協賛企業ロゴグリッド（最大8社） */}
+                <div className="grid grid-cols-2 gap-3 md:gap-4">
+                  {PARTNER_LOGOS.map((p) => (
+                    <div
+                      key={p.name}
+                      className="aspect-[16/9] bg-white border border-gray-200 rounded-lg flex items-center justify-center p-4 hover:border-amber-200 hover:shadow-sm transition-all"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={p.src}
+                        alt={p.name}
+                        className="max-w-full max-h-full object-contain"
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                <p className="mt-5 md:mt-6 text-[10px] md:text-[11px] text-gray-400 text-center">
+                  ※ 順不同・敬称略
+                </p>
               </div>
             </FadeInSection>
 
