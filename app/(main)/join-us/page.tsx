@@ -170,7 +170,7 @@ export default function AmbassadorPage() {
                 <p className="text-sm md:text-base text-gray-600 leading-[2.1] mb-5">
                   1年を通して佐渡の田んぼとつながる、企業向けの「イケベジ版オーナー制度」。
                 </p>
-                <ul className="space-y-2.5 text-sm md:text-[15px] text-gray-700 mb-5">
+                <ul className="space-y-4 md:space-y-5 text-sm md:text-[15px] text-gray-700 mb-5">
                   {[
                     { t: '田植え／生き物調査／稲刈り／新嘗祭への招待' },
                     { t: '収穫できたお米を、用途に合わせて社内配布・贈答・自宅用に' },
@@ -227,7 +227,7 @@ export default function AmbassadorPage() {
                   田んぼはお米を育てる場所であると同時に、たくさんの生きものが育まれる場所。
                   その気づきを実体験から学んでいきます。
                 </p>
-                <ul className="space-y-2 text-sm md:text-[15px] text-gray-700 mb-6">
+                <ul className="space-y-4 md:space-y-5 text-sm md:text-[15px] text-gray-700 mb-6">
                   {[
                     '佐渡島内の小学1〜6年生の定員40名',
                     '2026年度で19年目を迎える、佐渡の環境学習を支えるプログラム',
