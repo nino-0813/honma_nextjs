@@ -114,7 +114,19 @@ export async function POST(request: Request) {
     const stripe = new Stripe(stripeSecretKey);
     const sub = await stripe.subscriptions.retrieve(subscription_id);
     const currentPeriodEnd = sub.current_period_end; // unix秒
-    const skippedUntil = (ownership.metadata as any)?.skipped_until as number | undefined;
+
+    // DB側に保存された skipped_until は webhook が Stripe metadata で上書きすると
+    // 文字列になるため、Number() で受けつつ NaN チェック
+    const skippedUntilRawDb = (ownership.metadata as any)?.skipped_until;
+    const skippedUntilDb = Number(skippedUntilRawDb);
+    // Stripe 側 metadata にも保存しているのでそちらも確認（より信頼できる）
+    const skippedUntilRawStripe = (sub.metadata as any)?.skipped_until;
+    const skippedUntilStripe = Number(skippedUntilRawStripe);
+    const skippedUntil = !Number.isNaN(skippedUntilStripe)
+      ? skippedUntilStripe
+      : !Number.isNaN(skippedUntilDb)
+        ? skippedUntilDb
+        : undefined;
     if (typeof skippedUntil === 'number' && skippedUntil === currentPeriodEnd) {
       return NextResponse.json(
         { error: '2回連続のスキップはできません' },
@@ -136,17 +148,28 @@ export async function POST(request: Request) {
     const newTrialEnd = new Date(oldEnd);
     newTrialEnd.setUTCMonth(newTrialEnd.getUTCMonth() + 1);
     const newTrialEndSec = Math.floor(newTrialEnd.getTime() / 1000);
+    const lastSkippedAt = new Date().toISOString();
 
+    // Stripe側 metadata にも記録しておく（重要）
+    //   理由: customer.subscription.updated webhook が DB metadata を
+    //   Stripe metadata で上書きするため、ここで Stripe metadata に書いておかないと
+    //   webhook 受信後に DB から skipped_until が消える。
+    //   Stripe metadata は string のみ受け付けるため、文字列で保存する。
     const updated = await stripe.subscriptions.update(subscription_id, {
       trial_end: newTrialEndSec,
       proration_behavior: 'none',
+      metadata: {
+        ...(sub.metadata || {}),
+        skipped_until: String(newTrialEndSec),
+        last_skipped_at: lastSkippedAt,
+      },
     });
 
-    // DB更新（metadata.skipped_until に記録 → 次回チェックで連続スキップ防止）
+    // DB側にも明示的に保存（即時反映用、webhook は後追いで上書きする）
     const newMetadata = {
       ...(ownership.metadata as any),
       skipped_until: updated.current_period_end,
-      last_skipped_at: new Date().toISOString(),
+      last_skipped_at: lastSkippedAt,
     };
     await supabaseAdmin
       .from('subscriptions')

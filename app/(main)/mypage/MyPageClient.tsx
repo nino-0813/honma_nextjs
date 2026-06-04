@@ -460,9 +460,11 @@ const MyPage = () => {
           : null,
     });
     const withinDeadline = isWithinChangeDeadline(new Date(), nextShipping);
-    const skippedUntilSec = (sub.metadata as any)?.skipped_until as number | undefined;
+    // metadata.skipped_until は API 経由保存時は number、webhook で Stripe metadata から
+    // 同期された後は string になる可能性があるため、Number() で受けて NaN チェック
+    const skippedUntilSec = Number((sub.metadata as any)?.skipped_until);
     const consecutiveSkipBlocked = Boolean(
-      typeof skippedUntilSec === 'number' &&
+      !Number.isNaN(skippedUntilSec) &&
         sub.next_billing_at &&
         Math.abs(new Date(sub.next_billing_at).getTime() / 1000 - skippedUntilSec) < 60
     );
@@ -1184,9 +1186,11 @@ const MyPage = () => {
                         });
                         const withinDeadline = isWithinChangeDeadline(new Date(), nextShipping);
                         const deadline = nextShipping ? getChangeDeadline(nextShipping) : null;
-                        const skippedUntilSec = (sub.metadata as any)?.skipped_until as number | undefined;
+                        // metadata.skipped_until は API 直書きで number、webhook 同期後は string
+                        // のことがあるため Number() で受けて NaN チェック
+                        const skippedUntilSec = Number((sub.metadata as any)?.skipped_until);
                         const consecutiveSkipBlocked = Boolean(
-                          typeof skippedUntilSec === 'number' &&
+                          !Number.isNaN(skippedUntilSec) &&
                             sub.next_billing_at &&
                             Math.abs(new Date(sub.next_billing_at).getTime() / 1000 - skippedUntilSec) < 60
                         );
