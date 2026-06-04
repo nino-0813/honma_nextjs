@@ -764,11 +764,36 @@ export async function POST(request: Request) {
     //   - 'subscription_create' → 初回（既存の payment_intent.succeeded で処理済み）
     //   - 'subscription_cycle' → 2回目以降の自動請求
     // ============================================================
-    if (event.type === 'invoice.paid') {
-      const invoice: any = event.data.object;
+    // ============================================================
+    // invoice.paid (旧API) / invoice_payment.paid (新API) のどちらでも受け付ける
+    //   新API: invoice_payment object に invoice 参照と payment.payment_intent
+    //          が入っているので、invoice 本体は Stripe API で取り直す。
+    // ============================================================
+    const eventType: string = event.type;
+    if (eventType === 'invoice.paid' || eventType === 'invoice_payment.paid') {
+      let invoice: any;
+      let stripePaymentIntentId: string | null;
+
+      if (eventType === 'invoice_payment.paid') {
+        const invoicePayment: any = event.data.object;
+        const invoiceId = invoicePayment.invoice as string | undefined;
+        if (!invoiceId) {
+          return NextResponse.json({ received: true, skipped: 'invoice_payment_no_invoice' });
+        }
+        // 完全な invoice を Stripe から取得
+        invoice = await stripe.invoices.retrieve(invoiceId);
+        // payment_intent は invoice_payment 側に入っているケースがあるので優先
+        stripePaymentIntentId =
+          (invoicePayment.payment?.payment_intent as string | null | undefined) ??
+          (invoice.payment_intent as string | null | undefined) ??
+          null;
+      } else {
+        invoice = (event.data as any).object;
+        stripePaymentIntentId = invoice.payment_intent as string | null;
+      }
+
       const billingReason = invoice.billing_reason as string;
       const stripeSubscriptionId = invoice.subscription as string | null;
-      const stripePaymentIntentId = invoice.payment_intent as string | null;
 
       if (!stripeSubscriptionId) {
         return NextResponse.json({ received: true, skipped: 'not_subscription_invoice' });
