@@ -83,12 +83,16 @@ const MyPage = () => {
   const [syncingSubscriptions, setSyncingSubscriptions] = useState(false);
 
   // スキップフロー（シンプル確認モーダル）
-  type SkipStep = 'closed' | 'confirm' | 'completed';
+  type SkipStep = 'closed' | 'confirm' | 'completed' | 'blocked';
+  type SkipBlockedReason = 'consecutive' | 'deadline' | null;
   const [skipStep, setSkipStep] = useState<SkipStep>('closed');
   const [skipTargetSubId, setSkipTargetSubId] = useState<string | null>(null);
   const [skipError, setSkipError] = useState<string | null>(null);
   const [skipping, setSkipping] = useState(false);
   const [skippedToDate, setSkippedToDate] = useState<string | null>(null);
+  // スキップ不可の場合の理由＋次回スキップ可能日（blocked時に表示）
+  const [skipBlockedReason, setSkipBlockedReason] = useState<SkipBlockedReason>(null);
+  const [skipNextAvailableDate, setSkipNextAvailableDate] = useState<Date | null>(null);
 
   // 配送頻度変更フロー
   type IntervalStep = 'closed' | 'select' | 'completed';
@@ -433,11 +437,49 @@ const MyPage = () => {
     );
   };
 
-  /** スキップ確認モーダルを開く */
-  const openSkipModal = (stripeSubscriptionId: string) => {
-    setSkipTargetSubId(stripeSubscriptionId);
+  /**
+   * スキップボタンを押した時のハンドラ。
+   *  - 9日終日締切を過ぎている → "deadline" 説明ポップ
+   *  - 既にスキップ済みで現サイクルが終わっていない → "consecutive" 説明ポップ
+   *  - 上記いずれでもなければ → 通常の確認モーダル
+   */
+  const openSkipModal = (sub: SubscriptionRow) => {
+    setSkipTargetSubId(sub.stripe_subscription_id);
     setSkipError(null);
     setSkippedToDate(null);
+    setSkipBlockedReason(null);
+    setSkipNextAvailableDate(null);
+
+    const nextShipping = computeNextShippingDate({
+      created_at: sub.created_at,
+      next_billing_at: sub.next_billing_at,
+      interval: sub.interval,
+      firstShippingOverride:
+        typeof (sub.metadata as any)?.first_shipping_override === 'string'
+          ? (sub.metadata as any).first_shipping_override
+          : null,
+    });
+    const withinDeadline = isWithinChangeDeadline(new Date(), nextShipping);
+    const skippedUntilSec = (sub.metadata as any)?.skipped_until as number | undefined;
+    const consecutiveSkipBlocked = Boolean(
+      typeof skippedUntilSec === 'number' &&
+        sub.next_billing_at &&
+        Math.abs(new Date(sub.next_billing_at).getTime() / 1000 - skippedUntilSec) < 60
+    );
+
+    if (consecutiveSkipBlocked) {
+      // 次回スキップ可能日 = 次の課金日(発送月10日)を過ぎたら可能
+      setSkipBlockedReason('consecutive');
+      setSkipNextAvailableDate(sub.next_billing_at ? new Date(sub.next_billing_at) : null);
+      setSkipStep('blocked');
+      return;
+    }
+    if (!withinDeadline) {
+      setSkipBlockedReason('deadline');
+      setSkipNextAvailableDate(null);
+      setSkipStep('blocked');
+      return;
+    }
     setSkipStep('confirm');
   };
 
@@ -447,6 +489,8 @@ const MyPage = () => {
     setSkipTargetSubId(null);
     setSkipError(null);
     setSkippedToDate(null);
+    setSkipBlockedReason(null);
+    setSkipNextAvailableDate(null);
   };
 
   /** 配送頻度変更モーダルを開く */
@@ -1163,10 +1207,13 @@ const MyPage = () => {
                             <div className="flex flex-wrap gap-3 justify-end">
                               <button
                                 type="button"
-                                onClick={() => openSkipModal(sub.stripe_subscription_id)}
-                                disabled={skipDisabled}
+                                onClick={() => openSkipModal(sub)}
                                 title={skipDisabled ? skipDisabledReason : '次回お届けを1ヶ月スキップ'}
-                                className="text-sm text-amber-700 hover:text-amber-800 underline underline-offset-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:no-underline"
+                                className={`text-sm underline underline-offset-2 ${
+                                  skipDisabled
+                                    ? 'text-gray-400 hover:text-gray-500'
+                                    : 'text-amber-700 hover:text-amber-800'
+                                }`}
                               >
                                 次回をスキップ
                               </button>
@@ -1210,11 +1257,6 @@ const MyPage = () => {
                                 {cancelingId === sub.stripe_subscription_id ? '処理中...' : '定期購入をキャンセル'}
                               </button>
                             </div>
-                            {skipDisabled && skipDisabledReason && (
-                              <p className="text-[11px] text-gray-400 text-right">
-                                ※ {skipDisabledReason}
-                              </p>
-                            )}
                           </div>
                         );
                       })()}
@@ -1612,6 +1654,69 @@ const MyPage = () => {
                     次回の発送予定は {formatJapaneseDate(new Date(skippedToDate))} となります。
                   </p>
                 )}
+                <button
+                  type="button"
+                  onClick={closeSkipModal}
+                  className="w-full py-2.5 px-4 bg-primary text-white text-sm tracking-widest hover:bg-gray-800 transition-colors"
+                >
+                  閉じる
+                </button>
+              </>
+            )}
+            {skipStep === 'blocked' && (
+              <>
+                <div className="flex items-start gap-3 mb-4">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+                    <svg
+                      className="w-5 h-5 text-amber-700"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base font-medium">
+                      {skipBlockedReason === 'consecutive'
+                        ? '今は次回のスキップができません'
+                        : '今はスキップを受け付けられません'}
+                    </h3>
+                  </div>
+                </div>
+                <div className="text-sm text-gray-700 leading-relaxed space-y-3 mb-5">
+                  {skipBlockedReason === 'consecutive' && (
+                    <>
+                      <p>
+                        スキップは <span className="font-medium">配送1回ごとに1回まで</span> ご利用いただけます。
+                        <br />
+                        前回スキップした分があるため、2回連続でのスキップはできません。
+                      </p>
+                      {skipNextAvailableDate && (
+                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                          <p className="text-xs text-amber-700 tracking-widest uppercase mb-1.5">
+                            次回スキップ可能
+                          </p>
+                          <p className="text-sm md:text-base font-medium text-amber-900">
+                            {formatJapaneseDate(skipNextAvailableDate)} のお届け以降
+                          </p>
+                          <p className="mt-1 text-[11px] text-amber-700/80">
+                            次回の決済（毎月10日）が完了した翌日以降に、再びスキップが可能になります。
+                          </p>
+                        </div>
+                      )}
+                    </>
+                  )}
+                  {skipBlockedReason === 'deadline' && (
+                    <p>
+                      次回発送月の <span className="font-medium">9日 終日</span> を過ぎているため、
+                      今回のお届けはスキップできません。
+                      <br />
+                      恐れ入りますが、次回のお届け以降にお手続きください。
+                    </p>
+                  )}
+                </div>
                 <button
                   type="button"
                   onClick={closeSkipModal}

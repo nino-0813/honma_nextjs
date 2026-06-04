@@ -4,7 +4,6 @@ import { createClient } from '@supabase/supabase-js';
 import {
   computeNextShippingDate,
   isWithinChangeDeadline,
-  intervalToMonths,
 } from '@/lib/subscriptionShipping';
 
 export const runtime = 'nodejs';
@@ -123,11 +122,19 @@ export async function POST(request: Request) {
       );
     }
 
-    // 次の課金日を1サイクル分後ろにずらす（trial_end方式）
-    const monthsToSkip = intervalToMonths(ownership.interval) || 1;
+    // 次の課金日を "必ず1ヶ月" 後ろにずらす（trial_end方式）
+    //
+    // 仕様（オーナー指示）:
+    //   配送サイクル（monthly / bimonthly / quarterly 等）に関わらず、
+    //   スキップ実行時は次回課金を「1ヶ月後の10日 05:00 JST」に固定する。
+    //   旧実装は intervalToMonths(interval) を使っていたため、
+    //   bimonthly では2ヶ月、quarterly では3ヶ月スキップしていた → ここを修正。
+    //
+    // current_period_end は通常 "10日 05:00 JST" を表す Unix秒なので、
+    // UTCで +1ヶ月する事で JST の月だけが進む（時刻と日付は維持される）。
     const oldEnd = new Date(currentPeriodEnd * 1000);
     const newTrialEnd = new Date(oldEnd);
-    newTrialEnd.setUTCMonth(newTrialEnd.getUTCMonth() + monthsToSkip);
+    newTrialEnd.setUTCMonth(newTrialEnd.getUTCMonth() + 1);
     const newTrialEndSec = Math.floor(newTrialEnd.getTime() / 1000);
 
     const updated = await stripe.subscriptions.update(subscription_id, {
