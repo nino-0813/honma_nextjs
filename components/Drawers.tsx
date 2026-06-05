@@ -351,7 +351,7 @@ export const MenuDrawer = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
                         にこまる
                       </button>
                       <button
-                        onClick={() => navigate('/collections/rice/yearly')}
+                        onClick={() => navigate('/collections/rice/yearly?view=lp')}
                         className="text-left py-2 text-gray-500 hover:text-black transition-colors block w-full text-xs"
                       >
                         イケベジ定期便
