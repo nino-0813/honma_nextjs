@@ -1758,47 +1758,117 @@ const MyPage = () => {
           >
             {addressStep === 'edit' && (
               <>
-                <h3 className="text-base font-medium mb-4">配送先を変更</h3>
-                <div className="text-sm text-gray-700 leading-relaxed mb-5 space-y-3">
-                  <p>
-                    次回以降の配送先を変更する場合は、下記の「<span className="font-medium">CONTACT</span>」より下記の情報をご連絡ください。
-                  </p>
-                  <p className="text-xs text-gray-600">
-                    また、配送先の変更により、送料が変動する場合がございます。
-                  </p>
-                  <ul className="text-sm text-gray-700 list-none space-y-1 bg-gray-50 rounded-lg p-4">
-                    <li className="flex items-start gap-2">
-                      <span className="text-amber-600">・</span>
-                      <span>配送先氏名</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-amber-600">・</span>
-                      <span>電話番号</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-amber-600">・</span>
-                      <span>郵便番号、ご住所</span>
-                    </li>
-                  </ul>
-                  <div className="space-y-1 text-xs text-gray-500">
-                    <p>※ 変更のない部分に関しては記載不要です。</p>
-                    <p>※ 配送先の変更は次回発送月の9日までにお願いいたします。</p>
+                <h3 className="text-base font-medium mb-3">配送先を変更</h3>
+                <p className="text-xs text-gray-600 leading-relaxed mb-4">
+                  以下を入力して送信すると、お問い合わせフォームに変更内容が反映された状態で開きます。<br />
+                  ※ 変更のない部分は空欄で結構です。<br />
+                  ※ 配送地域が変わると送料が変動する場合があります。
+                </p>
+                <div className="space-y-3 mb-5">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">配送先氏名</label>
+                    <input
+                      type="text"
+                      value={addressForm.name}
+                      onChange={(e) => setAddressForm((p) => ({ ...p, name: e.target.value }))}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-primary"
+                      placeholder="例: 山田太郎"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">電話番号</label>
+                    <input
+                      type="tel"
+                      value={addressForm.phone}
+                      onChange={(e) => setAddressForm((p) => ({ ...p, phone: e.target.value }))}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-primary"
+                      placeholder="例: 09012345678"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">郵便番号</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={addressForm.postal}
+                        onChange={(e) => setAddressForm((p) => ({ ...p, postal: e.target.value }))}
+                        className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-primary"
+                        placeholder="000-0000 / 0000000"
+                      />
+                      <button
+                        type="button"
+                        onClick={lookupAddressPostal}
+                        disabled={addressPostalSearching}
+                        className="px-3 py-2 text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors disabled:opacity-50"
+                      >
+                        {addressPostalSearching ? '検索中…' : '住所検索'}
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">都道府県・市区町村</label>
+                    <input
+                      type="text"
+                      value={addressForm.city}
+                      onChange={(e) => setAddressForm((p) => ({ ...p, city: e.target.value }))}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-primary"
+                      placeholder="例: 新潟県佐渡市"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">番地・建物名</label>
+                    <input
+                      type="text"
+                      value={addressForm.address}
+                      onChange={(e) => setAddressForm((p) => ({ ...p, address: e.target.value }))}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-primary"
+                      placeholder="例: 1-2-3 ○○マンション101"
+                    />
                   </div>
                 </div>
+                <p className="text-[11px] text-amber-700 mb-4">
+                  ※ 配送先の変更は次回発送月の9日までにお手続きください。
+                </p>
+                {addressError && (
+                  <p className="text-sm text-red-600 mb-3">{addressError}</p>
+                )}
                 <div className="flex gap-3">
-                  <Link
-                    href="/contact"
-                    className="flex-1 py-2.5 px-4 bg-primary text-white text-sm tracking-widest hover:bg-gray-800 transition-colors text-center"
-                    onClick={closeAddressModal}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      // 入力された情報からお問い合わせ用メッセージを組み立てて /contact へ
+                      const fields: string[] = [];
+                      if (addressForm.name) fields.push(`配送先氏名: ${addressForm.name}`);
+                      if (addressForm.phone) fields.push(`電話番号: ${addressForm.phone}`);
+                      if (addressForm.postal) fields.push(`郵便番号: ${addressForm.postal}`);
+                      if (addressForm.city) fields.push(`都道府県・市区町村: ${addressForm.city}`);
+                      if (addressForm.address) fields.push(`番地・建物名: ${addressForm.address}`);
+                      if (fields.length === 0) {
+                        setAddressError('変更したい項目を1つ以上入力してください');
+                        return;
+                      }
+                      const body =
+                        `【配送先変更のご依頼】\n` +
+                        (addressTargetSubId ? `定期購入ID: ${addressTargetSubId}\n` : '') +
+                        `\n` +
+                        fields.join('\n') +
+                        `\n\n` +
+                        `※ 変更のない部分は記載しておりません。\n` +
+                        `※ 配送先の変更により、送料が変動する場合がございます。`;
+                      const params = new URLSearchParams({ subject: '配送先変更', message: body });
+                      closeAddressModal();
+                      window.location.href = `/contact?${params.toString()}`;
+                    }}
+                    className="flex-1 py-2.5 px-4 bg-primary text-white text-sm tracking-widest hover:bg-gray-800 transition-colors"
                   >
-                    CONTACT
-                  </Link>
+                    お問い合わせに送信
+                  </button>
                   <button
                     type="button"
                     onClick={closeAddressModal}
                     className="flex-1 py-2.5 px-4 bg-white text-primary border border-gray-300 text-sm tracking-widest hover:bg-gray-50 transition-colors"
                   >
-                    閉じる
+                    キャンセル
                   </button>
                 </div>
               </>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 
 const ContactSection = () => {
@@ -12,6 +12,21 @@ const ContactSection = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+
+  // 配送先変更モーダル等から ?message=... で初期値を渡された場合に反映
+  // （useSearchParams は静的プリレンダリングの制約があるので window.location 経由で安全に取得）
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const m = params.get('message');
+    const sj = params.get('subject');
+    if (m) {
+      setMessage((current) => current ? current : m);
+    }
+    if (sj) {
+      setCompany((current) => current); // company は変更しない（subject用フィールドが無いので、本文に既に含めている前提）
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
