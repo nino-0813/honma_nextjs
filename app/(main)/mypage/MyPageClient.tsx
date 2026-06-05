@@ -1758,109 +1758,49 @@ const MyPage = () => {
           >
             {addressStep === 'edit' && (
               <>
-                <h3 className="text-base font-medium mb-3">配送先を変更</h3>
-                <p className="text-xs text-gray-600 leading-relaxed mb-4">
-                  次回のお届けからこの住所に発送します。<br />
-                  配送地域が変わると送料が変動する場合があります。
-                </p>
-                <div className="space-y-3 mb-5">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">お受け取り人名（任意）</label>
-                    <input
-                      type="text"
-                      value={addressForm.name}
-                      onChange={(e) => setAddressForm((p) => ({ ...p, name: e.target.value }))}
-                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-primary"
-                      placeholder="例: 山田太郎"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">電話番号（任意）</label>
-                    <input
-                      type="tel"
-                      value={addressForm.phone}
-                      onChange={(e) => setAddressForm((p) => ({ ...p, phone: e.target.value }))}
-                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-primary"
-                      placeholder="例: 09012345678"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">郵便番号</label>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={addressForm.postal}
-                        onChange={(e) => setAddressForm((p) => ({ ...p, postal: e.target.value }))}
-                        className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-primary"
-                        placeholder="000-0000 / 0000000"
-                      />
-                      <button
-                        type="button"
-                        onClick={lookupAddressPostal}
-                        disabled={addressPostalSearching}
-                        className="px-3 py-2 text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors disabled:opacity-50"
-                      >
-                        {addressPostalSearching ? '検索中…' : '住所検索'}
-                      </button>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">都道府県・市区町村</label>
-                    <input
-                      type="text"
-                      value={addressForm.city}
-                      onChange={(e) => setAddressForm((p) => ({ ...p, city: e.target.value }))}
-                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-primary"
-                      placeholder="例: 新潟県佐渡市"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">番地・建物名</label>
-                    <input
-                      type="text"
-                      value={addressForm.address}
-                      onChange={(e) => setAddressForm((p) => ({ ...p, address: e.target.value }))}
-                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-primary"
-                      placeholder="例: 1-2-3 ○○マンション101"
-                    />
+                <h3 className="text-base font-medium mb-4">配送先を変更</h3>
+                <div className="text-sm text-gray-700 leading-relaxed mb-5 space-y-3">
+                  <p>
+                    次回以降の配送先を変更する場合は、下記の「<span className="font-medium">CONTACT</span>」より下記の情報をご連絡ください。
+                  </p>
+                  <p className="text-xs text-gray-600">
+                    また、配送先の変更により、送料が変動する場合がございます。
+                  </p>
+                  <ul className="text-sm text-gray-700 list-none space-y-1 bg-gray-50 rounded-lg p-4">
+                    <li className="flex items-start gap-2">
+                      <span className="text-amber-600">・</span>
+                      <span>配送先氏名</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-amber-600">・</span>
+                      <span>電話番号</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-amber-600">・</span>
+                      <span>郵便番号、ご住所</span>
+                    </li>
+                  </ul>
+                  <div className="space-y-1 text-xs text-gray-500">
+                    <p>※ 変更のない部分に関しては記載不要です。</p>
+                    <p>※ 配送先の変更は次回発送月の9日までにお願いいたします。</p>
                   </div>
                 </div>
-                {addressError && (
-                  <p className="text-sm text-red-600 mb-3">{addressError}</p>
-                )}
                 <div className="flex gap-3">
-                  <button
-                    type="button"
-                    onClick={submitAddressUpdate}
-                    disabled={addressSaving}
-                    className="flex-1 py-2.5 px-4 bg-primary text-white text-sm tracking-widest hover:bg-gray-800 transition-colors disabled:opacity-50"
+                  <Link
+                    href="/contact"
+                    className="flex-1 py-2.5 px-4 bg-primary text-white text-sm tracking-widest hover:bg-gray-800 transition-colors text-center"
+                    onClick={closeAddressModal}
                   >
-                    {addressSaving ? '保存中…' : '保存する'}
-                  </button>
+                    CONTACT
+                  </Link>
                   <button
                     type="button"
                     onClick={closeAddressModal}
-                    disabled={addressSaving}
                     className="flex-1 py-2.5 px-4 bg-white text-primary border border-gray-300 text-sm tracking-widest hover:bg-gray-50 transition-colors"
                   >
-                    キャンセル
+                    閉じる
                   </button>
                 </div>
-              </>
-            )}
-            {addressStep === 'completed' && (
-              <>
-                <h3 className="text-base font-medium mb-3">配送先を更新しました</h3>
-                <p className="text-sm text-gray-700 leading-relaxed mb-5">
-                  次回のお届けから新しい住所に発送します。
-                </p>
-                <button
-                  type="button"
-                  onClick={closeAddressModal}
-                  className="w-full py-2.5 px-4 bg-primary text-white text-sm tracking-widest hover:bg-gray-800 transition-colors"
-                >
-                  閉じる
-                </button>
               </>
             )}
           </div>
@@ -1882,9 +1822,15 @@ const MyPage = () => {
             {intervalStep === 'select' && (
               <>
                 <h3 className="text-base font-medium mb-3">お届けサイクルを変更</h3>
-                <p className="text-sm text-gray-600 leading-relaxed mb-4">
+                <p className="text-sm text-gray-600 leading-relaxed mb-3">
                   次回課金分から新しいサイクルでお届けします。
                 </p>
+                <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                  <p className="text-xs md:text-[13px] text-amber-900 leading-relaxed">
+                    ⚠ 配送サイクルの変更は次回お届け分以降からの反映となるため、
+                    現在予定されているお届け日を早めることはできません。
+                  </p>
+                </div>
                 {intervalCurrent && (
                   <p className="text-xs text-gray-500 mb-3">
                     現在: {SUBSCRIPTION_INTERVAL_LABELS[intervalCurrent] || intervalCurrent}

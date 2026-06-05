@@ -778,10 +778,13 @@ export async function POST(request: Request) {
         const invoicePayment: any = event.data.object;
         const invoiceId = invoicePayment.invoice as string | undefined;
         if (!invoiceId) {
+          console.log('[Webhook] invoice_payment.paid: no invoice id');
           return NextResponse.json({ received: true, skipped: 'invoice_payment_no_invoice' });
         }
-        // 完全な invoice を Stripe から取得
-        invoice = await stripe.invoices.retrieve(invoiceId);
+        // 完全な invoice を Stripe から取得（parent 等を展開して新API構造も拾う）
+        invoice = await stripe.invoices.retrieve(invoiceId, {
+          expand: ['parent', 'subscription'],
+        });
         // payment_intent は invoice_payment 側に入っているケースがあるので優先
         stripePaymentIntentId =
           (invoicePayment.payment?.payment_intent as string | null | undefined) ??
@@ -792,17 +795,53 @@ export async function POST(request: Request) {
         stripePaymentIntentId = invoice.payment_intent as string | null;
       }
 
-      const billingReason = invoice.billing_reason as string;
-      const stripeSubscriptionId = invoice.subscription as string | null;
+      // 新API では invoice.subscription が deprecated → parent.subscription_details.subscription にある
+      // billing_reason も同様に複数候補をフォールバック
+      const extractSubId = (s: any): string | null => {
+        if (!s) return null;
+        if (typeof s === 'string') return s;
+        if (typeof s === 'object' && s.id) return s.id;
+        return null;
+      };
+      const stripeSubscriptionId =
+        extractSubId(invoice.subscription) ||
+        extractSubId(invoice.parent?.subscription_details?.subscription) ||
+        extractSubId(invoice.parent?.subscription) ||
+        null;
+
+      const billingReason =
+        (invoice.billing_reason as string | undefined) ||
+        (invoice.parent?.subscription_details?.billing_reason as string | undefined) ||
+        '';
+
+      console.log('[Webhook] invoice received:', {
+        eventType,
+        invoiceId: invoice.id,
+        stripeSubscriptionId,
+        billingReason,
+        stripePaymentIntentId,
+        hasParent: Boolean(invoice.parent),
+      });
 
       if (!stripeSubscriptionId) {
+        console.warn('[Webhook] no subscription id on invoice', {
+          eventType,
+          invoiceId: invoice.id,
+          invoiceSubscriptionField: invoice.subscription,
+          invoiceParent: invoice.parent ? JSON.stringify(invoice.parent).slice(0, 200) : null,
+        });
         return NextResponse.json({ received: true, skipped: 'not_subscription_invoice' });
       }
       if (billingReason === 'subscription_create') {
         // 初回は payment_intent.succeeded ハンドラに任せる
         return NextResponse.json({ received: true, skipped: 'first_cycle_handled_elsewhere' });
       }
-      if (billingReason !== 'subscription_cycle' && billingReason !== 'subscription_update') {
+      // 新APIで billing_reason が取れない/空のケースも、subscription_id があるなら処理続行
+      if (
+        billingReason &&
+        billingReason !== 'subscription_cycle' &&
+        billingReason !== 'subscription_update'
+      ) {
         return NextResponse.json({ received: true, skipped: `unhandled_billing_reason:${billingReason}` });
       }
 
