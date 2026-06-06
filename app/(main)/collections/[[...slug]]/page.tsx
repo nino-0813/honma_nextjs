@@ -212,7 +212,11 @@ export default function CollectionsPage() {
               return (
               <Link
                 key={product.id}
-                href={`/products/${product.handle || product.id}`}
+                href={
+                  isLpView
+                    ? `/products/${product.handle || product.id}?type=subscription`
+                    : `/products/${product.handle || product.id}`
+                }
                 className="group block opacity-0 animate-fade-in-up"
                 style={{ animationDelay: `${index * 60}ms` }}
               >

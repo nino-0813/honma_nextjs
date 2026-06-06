@@ -42,6 +42,17 @@ export default function ProductDetailView({ product }: { product: Product }) {
     setTodayJp(formatJapaneseDate(new Date()));
   }, []);
 
+  // URLに ?type=subscription が付いていれば「定期購入」を初期選択にする
+  // （SUBSCRIPTION LP の商品一覧から入ってきたケースで初期チェックを切り替え）
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('type') === 'subscription' && subscriptionEnabled) {
+      setPurchaseType('subscription');
+    }
+    // subscriptionEnabled は商品ロード時に確定するため依存に入れる
+  }, [subscriptionEnabled]);
+
   // 定期購入で同意した後に呼ばれる実カート追加処理
   const executeSubscriptionAddToCart = () => {
     if (!product) return;
