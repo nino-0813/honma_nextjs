@@ -8,6 +8,12 @@ import { CartItem, SubscriptionInterval, SUBSCRIPTION_INTERVAL_LABELS } from '@/
 import { FadeInImage } from './UI';
 import { supabase, checkStockAvailability } from '@/lib/supabase';
 import { calculateEarnableMiles } from '@/lib/eventMiles';
+import {
+  trackViewCart,
+  trackBeginCheckout,
+  trackRemoveFromCart,
+  toAnalyticsItem,
+} from '@/lib/analytics';
 
 interface DrawerProps {
   isOpen: boolean;
@@ -74,10 +80,37 @@ export const CartDrawer = ({ isOpen, onClose, cartItems, onRemove, onUpdateQuant
     return sum + (price * item.quantity);
   }, 0);
 
+  // GA4 イベント用に CartItem を AnalyticsItem に変換するヘルパー
+  const toAnalyticsItems = () =>
+    cartItems.map((it) =>
+      toAnalyticsItem({
+        id: it.product.id,
+        title: it.product.title,
+        price: it.finalPrice ?? it.product.price,
+        quantity: it.quantity,
+        category: it.product.category ?? null,
+        variant: it.variant || undefined,
+        brand: it.purchaseType === 'subscription' ? 'subscription' : 'one_time',
+      }),
+    );
+
+  // GA4: カートドロワーを開いたら view_cart を発火
+  useEffect(() => {
+    if (!isOpen) return;
+    if (cartItems.length === 0) return;
+    trackViewCart(toAnalyticsItems(), total);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
   const handleCheckout = () => {
+    // GA4: チェックアウト開始
+    if (cartItems.length > 0) {
+      trackBeginCheckout(toAnalyticsItems(), total);
+    }
     onClose();
     router.push('/checkout');
   };
+
 
   return (
     <Drawer isOpen={isOpen} onClose={onClose} title="カート">
@@ -184,6 +217,18 @@ export const CartDrawer = ({ isOpen, onClose, cartItems, onRemove, onUpdateQuant
                       type="button"
                       onClick={(e) => {
                         e.preventDefault();
+                        // GA4: カートから削除
+                        trackRemoveFromCart([
+                          toAnalyticsItem({
+                            id: item.product.id,
+                            title: item.product.title,
+                            price: item.finalPrice ?? item.product.price,
+                            quantity: item.quantity,
+                            category: item.product.category ?? null,
+                            variant: item.variant || undefined,
+                            brand: item.purchaseType === 'subscription' ? 'subscription' : 'one_time',
+                          }),
+                        ]);
                         onRemove(item.product.id, item.variant, item.subscriptionInterval);
                       }}
                       className="p-1 text-gray-400 hover:text-red-500 transition-colors"

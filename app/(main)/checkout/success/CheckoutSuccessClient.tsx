@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { CartContext } from '@/providers/CartProvider';
+import { trackPurchase, toAnalyticsItem } from '@/lib/analytics';
 
 const CheckoutSuccess = () => {
   const searchParams = useSearchParams();
@@ -12,6 +13,8 @@ const CheckoutSuccess = () => {
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const didClearCartRef = useRef(false);
+  // GA4 purchase イベント重複送信防止
+  const didFirePurchaseRef = useRef(false);
 
   // ページ表示時にカートをクリア（初回のみ実行して無限レンダーを防止）
   useEffect(() => {
@@ -30,7 +33,9 @@ const CheckoutSuccess = () => {
           try {
             const { data, error } = await client
               .from('orders')
-              .select('order_number, total, created_at, payment_status')
+              .select(
+                'id, order_number, total, subtotal, shipping_cost, created_at, payment_status, order_items(product_id, product_title, product_price, quantity)'
+              )
               .eq('payment_intent_id', paymentIntentId)
               .order('created_at', { ascending: false })
               .limit(1)
@@ -39,6 +44,36 @@ const CheckoutSuccess = () => {
             if (!error && data) {
               if (data.order_number) {
                 setOrderNumber(data.order_number);
+
+                // GA4: 購入完了イベント（1回だけ送信、リロード時の重複もガード）
+                if (!didFirePurchaseRef.current) {
+                  didFirePurchaseRef.current = true;
+                  try {
+                    const items = Array.isArray((data as any).order_items)
+                      ? (data as any).order_items.map((it: any) =>
+                          toAnalyticsItem({
+                            id: it.product_id ?? 'unknown',
+                            title: it.product_title ?? '',
+                            price: Number(it.product_price ?? 0),
+                            quantity: Number(it.quantity ?? 1),
+                          }),
+                        )
+                      : [];
+                    // 同じ payment_intent_id で1回しか送らないよう localStorage で多重送信防止
+                    const seenKey = `ga4_purchase_${paymentIntentId}`;
+                    if (typeof window !== 'undefined' && !localStorage.getItem(seenKey)) {
+                      trackPurchase({
+                        transactionId: data.order_number as string,
+                        value: Number(data.total ?? 0),
+                        shipping: Number((data as any).shipping_cost ?? 0),
+                        items,
+                      });
+                      localStorage.setItem(seenKey, '1');
+                    }
+                  } catch (gaErr) {
+                    console.warn('[GA4 purchase] failed', gaErr);
+                  }
+                }
                 break;
               }
             }

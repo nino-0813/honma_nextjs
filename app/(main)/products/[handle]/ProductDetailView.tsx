@@ -9,6 +9,11 @@ import { FadeInImage, LoadingButton } from '@/components/UI';
 import { CartContext } from '@/providers/CartProvider';
 import { supabase, checkStockAvailability, getStockForVariant } from '@/lib/supabase';
 import { computeFirstShippingDate, formatJapaneseDate } from '@/lib/subscriptionShipping';
+import {
+  trackViewItem,
+  trackAddToCart,
+  toAnalyticsItem,
+} from '@/lib/analytics';
 
 type PurchaseType = 'one_time' | 'subscription';
 
@@ -52,6 +57,22 @@ export default function ProductDetailView({ product }: { product: Product }) {
     }
     // subscriptionEnabled は商品ロード時に確定するため依存に入れる
   }, [subscriptionEnabled]);
+
+  // GA4: 商品詳細ページ閲覧イベント（view_item）
+  // product.id が変わるたびに1回だけ発火
+  useEffect(() => {
+    if (!product?.id) return;
+    trackViewItem([
+      toAnalyticsItem({
+        id: product.id,
+        title: product.title,
+        price: product.price,
+        category: product.category ?? null,
+        brand: purchaseType === 'subscription' ? 'subscription' : 'one_time',
+      }),
+    ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product?.id]);
 
   // 定期購入で同意した後に呼ばれる実カート追加処理
   const executeSubscriptionAddToCart = () => {
@@ -104,6 +125,18 @@ export default function ProductDetailView({ product }: { product: Product }) {
         subscriptionDiscountPercent,
       },
     });
+    // GA4: 定期購入のカート追加イベント
+    trackAddToCart([
+      toAnalyticsItem({
+        id: product.id,
+        title: product.title,
+        price: subscriptionPrice,
+        quantity,
+        category: product.category ?? null,
+        variant: variantString || undefined,
+        brand: 'subscription',
+      }),
+    ]);
     setShowSubscriptionNotice(false);
     openCart();
   };
@@ -635,6 +668,18 @@ export default function ProductDetailView({ product }: { product: Product }) {
                              setStockError('');
                              const variantString = getSelectedVariantString();
                              addToCart(product, quantity, { variant: variantString });
+                             // GA4: 通常購入のカート追加イベント
+                             trackAddToCart([
+                               toAnalyticsItem({
+                                 id: product.id,
+                                 title: product.title,
+                                 price: calculatedPrice,
+                                 quantity,
+                                 category: product.category ?? null,
+                                 variant: variantString || undefined,
+                                 brand: 'one_time',
+                               }),
+                             ]);
                              openCart();
                            }}
                            className="w-full py-4 text-sm tracking-widest uppercase bg-black text-white hover:bg-gray-800 transition-colors"
@@ -720,6 +765,18 @@ export default function ProductDetailView({ product }: { product: Product }) {
                                  finalPrice: calculatedPrice,
                                  selectedOptions,
                                });
+                               // GA4: バリアント有り商品のカート追加イベント
+                               trackAddToCart([
+                                 toAnalyticsItem({
+                                   id: product.id,
+                                   title: product.title,
+                                   price: calculatedPrice,
+                                   quantity,
+                                   category: product.category ?? null,
+                                   variant: variantString || undefined,
+                                   brand: 'one_time',
+                                 }),
+                               ]);
                                openCart();
                              }}
                              className="w-full py-4 text-sm tracking-widest bg-white text-black border border-black hover:bg-gray-50 transition-colors group relative"
