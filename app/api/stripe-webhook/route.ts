@@ -6,6 +6,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { computeBillingCycleAnchor, intervalToMonths } from '@/lib/subscriptionShipping';
+import { sendEmail } from '@/lib/resend';
 
 type SubscriptionIntervalKey =
   | 'weekly'
@@ -80,6 +81,101 @@ async function postToGAS(payload: any) {
   } finally {
     clearTimeout(timeout);
   }
+}
+
+const yen = (n: number) => `¥${Number(n || 0).toLocaleString('ja-JP')}`;
+
+/**
+ * 注文確認メール（ご注文ありがとうございます）をお客様へ送信する。
+ *
+ * - 決済成功（paidへ遷移）した瞬間に1回だけ呼ばれる想定。
+ * - 送信失敗しても Stripe webhook 全体を止めないよう、呼び出し側で try/catch すること。
+ * - RESEND_API_KEY が未設定の環境では sendEmail() が throw するため、ログに残してスキップされる。
+ */
+async function sendOrderConfirmationEmail(
+  supabaseAdmin: any,
+  order: any,
+  orderNumber: string
+): Promise<void> {
+  if (!order?.email) {
+    console.warn('[OrderMail] order has no email, skip', { orderId: order?.id });
+    return;
+  }
+
+  // 明細（注文時のスナップショットが order_items に保存されている）
+  const { data: items, error: itemsErr } = await supabaseAdmin
+    .from('order_items')
+    .select('product_title, product_price, variant, selected_options, quantity, line_total')
+    .eq('order_id', order.id);
+  if (itemsErr) {
+    console.error('[OrderMail] failed to load order_items', itemsErr);
+  }
+
+  const customerName =
+    `${order.last_name ?? ''}${order.first_name ? ` ${order.first_name}` : ''}`.trim() ||
+    'お客様';
+
+  const optionsLabel = (it: any): string => {
+    const opts = it.selected_options;
+    if (it.variant) return `（${it.variant}）`;
+    if (opts && typeof opts === 'object') {
+      const parts = Object.values(opts).filter(Boolean);
+      if (parts.length) return `（${parts.join(' / ')}）`;
+    }
+    return '';
+  };
+
+  const itemRows = (items || [])
+    .map((it: any) => {
+      const name = `${it.product_title ?? '商品'}${optionsLabel(it)}`;
+      const qty = Number(it.quantity || 0);
+      const line = Number(it.line_total ?? (Number(it.product_price || 0) * qty));
+      return `・${name} × ${qty}　${yen(line)}`;
+    })
+    .join('\n');
+
+  const addressBlock = [
+    order.shipping_postal_code ? `〒${order.shipping_postal_code}` : '',
+    `${order.shipping_city ?? ''}${order.shipping_address ?? ''}`.trim(),
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  const subject = `【イケベジ】ご注文ありがとうございます（注文番号: ${orderNumber}）`;
+
+  const body = [
+    `${customerName} 様`,
+    '',
+    'この度はイケベジをご利用いただき、誠にありがとうございます。',
+    '以下の内容でご注文を承りました。',
+    '',
+    `■ 注文番号：${orderNumber}`,
+    '',
+    '──────────────────',
+    '【ご注文内容】',
+    itemRows || '（明細を取得できませんでした）',
+    '──────────────────',
+    `小計　　：${yen(order.subtotal)}`,
+    `送料　　：${yen(order.shipping_cost)}`,
+    `合計　　：${yen(order.total)}`,
+    '──────────────────',
+    '',
+    '【お届け先】',
+    addressBlock || '（ご登録の住所へお届けします）',
+    '',
+    '商品の発送準備が整いましたら、改めてご連絡いたします。',
+    'ご不明な点がございましたら、本メールにご返信ください。',
+    '',
+    'イケベジ｜佐渡ヶ島のオーガニックファーム',
+  ].join('\n');
+
+  const result = await sendEmail([order.email], subject, body);
+  console.log('[OrderMail] sent', {
+    orderNumber,
+    to: order.email,
+    successful: result.successful,
+    failed: result.failed,
+  });
 }
 
 /**
@@ -590,6 +686,13 @@ export async function POST(request: Request) {
           await postToGAS(payload);
         } catch (gasErr: any) {
           console.error('[GAS] unexpected error (ignored)', gasErr?.message || gasErr, gasErr);
+        }
+
+        // お客様へ注文確認メールを送信（失敗してもwebhookは止めない）
+        try {
+          await sendOrderConfirmationEmail(supabaseAdmin, order, nextOrderNumber);
+        } catch (mailErr: any) {
+          console.error('[OrderMail] failed to send (ignored)', mailErr?.message || mailErr);
         }
 
         const { data: items, error: itemsErr } = await supabaseAdmin

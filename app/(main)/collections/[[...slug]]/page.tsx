@@ -244,10 +244,37 @@ export default function CollectionsPage() {
                   <h2 className="text-sm font-medium text-primary leading-relaxed group-hover:text-gray-600 transition-colors line-clamp-2 min-h-[2.8em]">
                     {product.title}
                   </h2>
-                  <p className="text-sm text-gray-900 font-serif tracking-wide flex items-center justify-center gap-2">
-                    <span>
-                      ¥{product.price.toLocaleString()} {product.title.includes('〜') ? '〜' : ''}
-                    </span>
+                  <p className="text-sm text-gray-900 font-serif tracking-wide flex items-center justify-center gap-2 flex-wrap">
+                    {(() => {
+                      // 定期便ページ（LPビュー）では10%OFFの値引き価格を表示する
+                      const discountPercent = isLpView
+                        ? (product.subscriptionDiscountPercent && product.subscriptionDiscountPercent > 0
+                            ? product.subscriptionDiscountPercent
+                            : 10)
+                        : 0;
+                      const suffix = product.title.includes('〜') ? '〜' : '';
+                      if (discountPercent > 0) {
+                        const discounted = Math.round(product.price * (1 - discountPercent / 100));
+                        return (
+                          <span className="flex items-center gap-2 flex-wrap justify-center">
+                            <span className="text-gray-400 line-through text-xs">
+                              ¥{product.price.toLocaleString()}
+                            </span>
+                            <span className="text-red-600 font-medium">
+                              ¥{discounted.toLocaleString()} {suffix}
+                            </span>
+                            <span className="text-[10px] bg-red-50 text-red-600 px-1.5 py-0.5 rounded">
+                              {discountPercent}%OFF
+                            </span>
+                          </span>
+                        );
+                      }
+                      return (
+                        <span>
+                          ¥{product.price.toLocaleString()} {suffix}
+                        </span>
+                      );
+                    })()}
                     {soldOut && (
                       <span className="text-[10px] font-bold tracking-widest uppercase text-red-600 border border-red-600 px-2 py-0.5">
                         Sold Out

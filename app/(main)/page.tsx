@@ -5,6 +5,7 @@ import ParallaxSection from '@/components/ParallaxSection';
 import ProductGrid from '@/components/ProductGrid';
 import ContactSection from '@/components/ContactSection';
 import Testimonials from '@/components/Testimonials';
+import AnnouncementPopup from '@/components/AnnouncementPopup';
 
 export const metadata: Metadata = {
   description:
@@ -22,6 +23,7 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <div className="animate-fade-in overflow-x-hidden w-full">
+      <AnnouncementPopup />
       <HeroVideo />
 
       <div className="pt-24 md:pt-32 pb-8 md:pb-16 text-left md:text-center px-4 animate-slide-up bg-white">
