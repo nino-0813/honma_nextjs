@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import Link from 'next/link';
 
 export default function TermsPage() {
   useEffect(() => {
@@ -108,7 +109,7 @@ export default function TermsPage() {
           <section className="space-y-4">
             <h2 className="text-xl md:text-2xl font-serif tracking-widest text-primary mt-12 mb-6">第13条（個人情報の取扱い）</h2>
             <p className="text-sm md:text-base leading-relaxed">
-              当社は、本サービスの利用によって取得する個人情報については、当社「プライバシーポリシー」に従い適切に取り扱うものとします。
+              当社は、本サービスの利用によって取得する個人情報については、当社<Link href="/privacy" className="text-primary hover:underline">「プライバシーポリシー」</Link>に従い適切に取り扱うものとします。
             </p>
           </section>
           <section className="space-y-4">

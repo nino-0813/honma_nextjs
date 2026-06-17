@@ -23,6 +23,7 @@ const Footer = () => {
             <ul className="space-y-4 text-xs tracking-[0.15em] text-gray-400">
               <li><Link href="/legal" className="hover:text-white transition-colors">特定商取引法に基づく表記</Link></li>
               <li><Link href="/terms" className="hover:text-white transition-colors">利用規約</Link></li>
+              <li><Link href="/privacy" className="hover:text-white transition-colors">プライバシーポリシー</Link></li>
               <li><Link href="/faq" className="hover:text-white transition-colors">よくあるご質問</Link></li>
               <li><Link href="/contact" className="hover:text-white transition-colors">お問い合わせ</Link></li>
             </ul>

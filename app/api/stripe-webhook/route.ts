@@ -6,7 +6,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { computeBillingCycleAnchor, intervalToMonths } from '@/lib/subscriptionShipping';
-import { sendEmail } from '@/lib/resend';
+import { sendBrevoEmail } from '@/lib/brevo';
 
 type SubscriptionIntervalKey =
   | 'weekly'
@@ -90,7 +90,7 @@ const yen = (n: number) => `¥${Number(n || 0).toLocaleString('ja-JP')}`;
  *
  * - 決済成功（paidへ遷移）した瞬間に1回だけ呼ばれる想定。
  * - 送信失敗しても Stripe webhook 全体を止めないよう、呼び出し側で try/catch すること。
- * - RESEND_API_KEY が未設定の環境では sendEmail() が throw するため、ログに残してスキップされる。
+ * - BREVO_API_KEY / BREVO_FROM_EMAIL が未設定の環境では sendBrevoEmail() が throw するため、ログに残してスキップされる。
  */
 async function sendOrderConfirmationEmail(
   supabaseAdmin: any,
@@ -169,12 +169,23 @@ async function sendOrderConfirmationEmail(
     'イケベジ｜佐渡ヶ島のオーガニックファーム',
   ].join('\n');
 
-  const result = await sendEmail([order.email], subject, body);
-  console.log('[OrderMail] sent', {
+  // プレーンテキスト本文を簡易HTMLに（改行を<br>へ）
+  const htmlContent = `<div style="font-family:sans-serif;line-height:1.7;color:#1c1d1d;white-space:pre-wrap;">${body
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\n/g, '<br>')}</div>`;
+
+  const result = await sendBrevoEmail({
+    to: [{ email: order.email, name: customerName }],
+    subject,
+    htmlContent,
+    textContent: body,
+  });
+  console.log('[OrderMail] sent via Brevo', {
     orderNumber,
     to: order.email,
-    successful: result.successful,
-    failed: result.failed,
+    messageId: result.messageId,
   });
 }
 
