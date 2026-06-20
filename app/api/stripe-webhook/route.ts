@@ -83,14 +83,22 @@ async function postToGAS(payload: any) {
   }
 }
 
-const yen = (n: number) => `¥${Number(n || 0).toLocaleString('ja-JP')}`;
+const numJa = (n: number) => Number(n || 0).toLocaleString('ja-JP');
+
+// Brevoの受注メールテンプレートID（未設定なら 1）
+const ORDER_TEMPLATE_ID = Number(process.env.BREVO_ORDER_TEMPLATE_ID || 1);
 
 /**
  * 注文確認メール（ご注文ありがとうございます）をお客様へ送信する。
  *
  * - 決済成功（paidへ遷移）した瞬間に1回だけ呼ばれる想定。
+ * - Brevoのトランザクションテンプレート（受注メール）を使用して送信する。
+ *   テンプレートの差し込み変数:
+ *     params.name / params.order_number / params.subtotal /
+ *     params.shipping_cost / params.total /
+ *     params.items[] = { product_name, quantity }
  * - 送信失敗しても Stripe webhook 全体を止めないよう、呼び出し側で try/catch すること。
- * - BREVO_API_KEY / BREVO_FROM_EMAIL が未設定の環境では sendBrevoEmail() が throw するため、ログに残してスキップされる。
+ * - BREVO_API_KEY が未設定の環境では sendBrevoEmail() が throw するため、ログに残してスキップされる。
  */
 async function sendOrderConfirmationEmail(
   supabaseAdmin: any,
@@ -115,9 +123,10 @@ async function sendOrderConfirmationEmail(
     `${order.last_name ?? ''}${order.first_name ? ` ${order.first_name}` : ''}`.trim() ||
     'お客様';
 
+  // バリエーション/オプション名を商品名に付与（テンプレは商品名+数量を表示）
   const optionsLabel = (it: any): string => {
-    const opts = it.selected_options;
     if (it.variant) return `（${it.variant}）`;
+    const opts = it.selected_options;
     if (opts && typeof opts === 'object') {
       const parts = Object.values(opts).filter(Boolean);
       if (parts.length) return `（${parts.join(' / ')}）`;
@@ -125,64 +134,25 @@ async function sendOrderConfirmationEmail(
     return '';
   };
 
-  const itemRows = (items || [])
-    .map((it: any) => {
-      const name = `${it.product_title ?? '商品'}${optionsLabel(it)}`;
-      const qty = Number(it.quantity || 0);
-      const line = Number(it.line_total ?? (Number(it.product_price || 0) * qty));
-      return `・${name} × ${qty}　${yen(line)}`;
-    })
-    .join('\n');
-
-  const addressBlock = [
-    order.shipping_postal_code ? `〒${order.shipping_postal_code}` : '',
-    `${order.shipping_city ?? ''}${order.shipping_address ?? ''}`.trim(),
-  ]
-    .filter(Boolean)
-    .join('\n');
-
-  const subject = `【イケベジ】ご注文ありがとうございます（注文番号: ${orderNumber}）`;
-
-  const body = [
-    `${customerName} 様`,
-    '',
-    'この度はイケベジをご利用いただき、誠にありがとうございます。',
-    '以下の内容でご注文を承りました。',
-    '',
-    `■ 注文番号：${orderNumber}`,
-    '',
-    '──────────────────',
-    '【ご注文内容】',
-    itemRows || '（明細を取得できませんでした）',
-    '──────────────────',
-    `小計　　：${yen(order.subtotal)}`,
-    `送料　　：${yen(order.shipping_cost)}`,
-    `合計　　：${yen(order.total)}`,
-    '──────────────────',
-    '',
-    '【お届け先】',
-    addressBlock || '（ご登録の住所へお届けします）',
-    '',
-    '商品の発送準備が整いましたら、改めてご連絡いたします。',
-    'ご不明な点がございましたら、本メールにご返信ください。',
-    '',
-    'イケベジ｜佐渡ヶ島のオーガニックファーム',
-  ].join('\n');
-
-  // プレーンテキスト本文を簡易HTMLに（改行を<br>へ）
-  const htmlContent = `<div style="font-family:sans-serif;line-height:1.7;color:#1c1d1d;white-space:pre-wrap;">${body
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/\n/g, '<br>')}</div>`;
+  const templateItems = (items || []).map((it: any) => ({
+    product_name: `${it.product_title ?? '商品'}${optionsLabel(it)}`,
+    quantity: Number(it.quantity || 0),
+  }));
 
   const result = await sendBrevoEmail({
     to: [{ email: order.email, name: customerName }],
-    subject,
-    htmlContent,
-    textContent: body,
+    templateId: ORDER_TEMPLATE_ID,
+    params: {
+      name: customerName,
+      order_number: orderNumber,
+      subtotal: numJa(order.subtotal),
+      shipping_cost: numJa(order.shipping_cost),
+      total: numJa(order.total),
+      items: templateItems,
+    },
   });
-  console.log('[OrderMail] sent via Brevo', {
+  console.log('[OrderMail] sent via Brevo template', {
+    templateId: ORDER_TEMPLATE_ID,
     orderNumber,
     to: order.email,
     messageId: result.messageId,
