@@ -5,8 +5,9 @@
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { computeBillingCycleAnchor, intervalToMonths } from '@/lib/subscriptionShipping';
+import { computeBillingCycleAnchor, intervalToMonths, computeFirstShippingDate } from '@/lib/subscriptionShipping';
 import { sendBrevoEmail } from '@/lib/brevo';
+import { SUBSCRIPTION_INTERVAL_LABELS } from '@/types';
 
 type SubscriptionIntervalKey =
   | 'weekly'
@@ -85,35 +86,40 @@ async function postToGAS(payload: any) {
 
 const numJa = (n: number) => Number(n || 0).toLocaleString('ja-JP');
 
-// Brevoの受注メールテンプレートID（未設定なら 1）
-const ORDER_TEMPLATE_ID = Number(process.env.BREVO_ORDER_TEMPLATE_ID || 1);
+// BrevoのテンプレートID（環境変数で上書き可能）
+const ORDER_TEMPLATE_ID = Number(process.env.BREVO_ORDER_TEMPLATE_ID || 1); // 通常注文（お客様向け）
+const SUBSCRIPTION_TEMPLATE_ID = Number(process.env.BREVO_SUBSCRIPTION_TEMPLATE_ID || 4); // 定期便（お客様向け）
+const ADMIN_NOTIFY_TEMPLATE_ID = Number(process.env.BREVO_ADMIN_TEMPLATE_ID || 3); // 受注通知（管理者向け）
+// 受注通知の宛先（管理者）
+const ADMIN_NOTIFY_EMAIL = process.env.BREVO_ADMIN_EMAIL || 'info@ikevege.com';
+
+// JSTで「YYYY年M月D日」表記
+const fmtJaDate = (d: Date): string =>
+  new Intl.DateTimeFormat('ja-JP', {
+    timeZone: 'Asia/Tokyo',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }).format(d);
 
 /**
- * 注文確認メール（ご注文ありがとうございます）をお客様へ送信する。
+ * 注文確認メールを送信する。
  *
  * - 決済成功（paidへ遷移）した瞬間に1回だけ呼ばれる想定。
- * - Brevoのトランザクションテンプレート（受注メール）を使用して送信する。
- *   テンプレートの差し込み変数:
- *     params.name / params.order_number / params.subtotal /
- *     params.shipping_cost / params.total /
- *     params.items[] = { product_name, quantity }
+ * - お客様向け: 通常注文はテンプレ #1、定期便（subscription_interval あり）はテンプレ #4。
+ *   #4 では お届け頻度(cycle) と 発送開始日(start) を追加で差し込む。
+ * - 管理者向け: 毎回テンプレ #3（受注通知）を ADMIN_NOTIFY_EMAIL へ送る。
  * - 送信失敗しても Stripe webhook 全体を止めないよう、呼び出し側で try/catch すること。
- * - BREVO_API_KEY が未設定の環境では sendBrevoEmail() が throw するため、ログに残してスキップされる。
  */
 async function sendOrderConfirmationEmail(
   supabaseAdmin: any,
   order: any,
   orderNumber: string
 ): Promise<void> {
-  if (!order?.email) {
-    console.warn('[OrderMail] order has no email, skip', { orderId: order?.id });
-    return;
-  }
-
   // 明細（注文時のスナップショットが order_items に保存されている）
   const { data: items, error: itemsErr } = await supabaseAdmin
     .from('order_items')
-    .select('product_title, product_price, variant, selected_options, quantity, line_total')
+    .select('product_id, product_title, product_price, variant, selected_options, quantity, line_total')
     .eq('order_id', order.id);
   if (itemsErr) {
     console.error('[OrderMail] failed to load order_items', itemsErr);
@@ -139,24 +145,89 @@ async function sendOrderConfirmationEmail(
     quantity: Number(it.quantity || 0),
   }));
 
-  const result = await sendBrevoEmail({
-    to: [{ email: order.email, name: customerName }],
-    templateId: ORDER_TEMPLATE_ID,
-    params: {
-      name: customerName,
-      order_number: orderNumber,
-      subtotal: numJa(order.subtotal),
-      shipping_cost: numJa(order.shipping_cost),
-      total: numJa(order.total),
-      items: templateItems,
-    },
-  });
-  console.log('[OrderMail] sent via Brevo template', {
-    templateId: ORDER_TEMPLATE_ID,
-    orderNumber,
-    to: order.email,
-    messageId: result.messageId,
-  });
+  // 全テンプレ共通の金額・明細パラメータ
+  const baseParams = {
+    order_number: orderNumber,
+    subtotal: numJa(order.subtotal),
+    shipping_cost: numJa(order.shipping_cost),
+    total: numJa(order.total),
+    items: templateItems,
+  };
+
+  // 定期便かどうか（subscription_interval が入っていれば定期便）
+  const isSubscription = Boolean(order.subscription_interval);
+
+  // ===== お客様向けメール =====
+  if (order.email) {
+    try {
+      let templateId = ORDER_TEMPLATE_ID;
+      const params: Record<string, unknown> = { name: customerName, ...baseParams };
+
+      if (isSubscription) {
+        templateId = SUBSCRIPTION_TEMPLATE_ID;
+        // お届け頻度ラベル
+        params.cycle =
+          SUBSCRIPTION_INTERVAL_LABELS[order.subscription_interval as keyof typeof SUBSCRIPTION_INTERVAL_LABELS] ||
+          order.subscription_interval;
+        // 発送開始日（商品の初回発送オーバーライドがあれば反映）
+        let firstShippingOverride: string | null = null;
+        try {
+          const productIds = Array.from(
+            new Set((items || []).map((it: any) => it.product_id).filter((v: any) => typeof v === 'string' && v.length > 0))
+          );
+          if (productIds.length > 0) {
+            const { data: prods } = await supabaseAdmin
+              .from('products')
+              .select('id, first_shipping_override_date')
+              .in('id', productIds);
+            const overrides = (prods || [])
+              .map((p: any) => (typeof p.first_shipping_override_date === 'string' ? p.first_shipping_override_date.slice(0, 10) : null))
+              .filter((d: any): d is string => Boolean(d))
+              .sort();
+            if (overrides.length > 0) firstShippingOverride = overrides[overrides.length - 1];
+          }
+        } catch (e) {
+          console.warn('[OrderMail] first_shipping_override 取得失敗（15日ルールで継続）', e);
+        }
+        const startDate = computeFirstShippingDate(new Date(order.created_at), firstShippingOverride);
+        params.start = fmtJaDate(startDate);
+      }
+
+      const result = await sendBrevoEmail({
+        to: [{ email: order.email, name: customerName }],
+        templateId,
+        params,
+      });
+      console.log('[OrderMail] customer mail sent', {
+        templateId,
+        isSubscription,
+        orderNumber,
+        to: order.email,
+        messageId: result.messageId,
+      });
+    } catch (e: any) {
+      console.error('[OrderMail] customer mail failed (ignored)', e?.message || e);
+    }
+  } else {
+    console.warn('[OrderMail] order has no email, skip customer mail', { orderId: order?.id });
+  }
+
+  // ===== 管理者向け受注通知メール（毎回） =====
+  try {
+    const result = await sendBrevoEmail({
+      to: [{ email: ADMIN_NOTIFY_EMAIL, name: 'イケベジ' }],
+      templateId: ADMIN_NOTIFY_TEMPLATE_ID,
+      params: baseParams,
+    });
+    console.log('[OrderMail] admin notify sent', {
+      templateId: ADMIN_NOTIFY_TEMPLATE_ID,
+      orderNumber,
+      to: ADMIN_NOTIFY_EMAIL,
+      messageId: result.messageId,
+    });
+  } catch (e: any) {
+    console.error('[OrderMail] admin notify failed (ignored)', e?.message || e);
+  }
 }
 
 /**
