@@ -222,7 +222,7 @@ const CheckoutForm = ({ formData, total, clientSecret, onSuccess, shippingCostIs
   formData: any;
   total: number;
   clientSecret: string;
-  onSuccess: () => void;
+  onSuccess: (paymentIntentId?: string) => void;
   shippingCostIssue?: string | null;
   salesPeriodIssue?: string | null;
   useDifferentShippingAddress?: boolean;
@@ -397,7 +397,8 @@ const CheckoutForm = ({ formData, total, clientSecret, onSuccess, shippingCostIs
         // フロントの confirmPayment 成功有無に依存しない設計。
         // リダイレクト前にonSuccessを呼ぶ（clearCartの前に実行）
         // clearCartは成功ページに遷移した後に実行するため、ここでは呼ばない
-        onSuccess();
+        // GA4 purchase を成功ページで発火させるため payment_intent ID を渡す
+        onSuccess(paymentIntent.id);
         // clearCart()は成功ページで実行するため、ここでは呼ばない
       }
     } catch (err: any) {
@@ -2092,10 +2093,14 @@ const Checkout = () => {
 
   const [isRedirectingToSuccess, setIsRedirectingToSuccess] = useState(false);
 
-  const handleSuccess = () => {
+  const handleSuccess = (paymentIntentId?: string) => {
     setIsRedirectingToSuccess(true);
     setTimeout(() => {
-      router.push('/checkout/success');
+      // payment_intent を付与して成功ページの GA4 purchase 発火を確実にする
+      const url = paymentIntentId
+        ? `/checkout/success?payment_intent=${encodeURIComponent(paymentIntentId)}`
+        : '/checkout/success';
+      router.push(url);
     }, 100);
   };
 
