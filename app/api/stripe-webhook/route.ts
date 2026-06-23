@@ -129,6 +129,15 @@ async function sendOrderConfirmationEmail(
     `${order.last_name ?? ''}${order.first_name ? ` ${order.first_name}` : ''}`.trim() ||
     'お客様';
 
+  // 配送先住所（受注通知メール #3 の {{ params.address }} 用）
+  const shippingAddress =
+    [
+      order.shipping_postal_code ? `〒${order.shipping_postal_code}` : '',
+      `${order.shipping_city ?? ''}${order.shipping_address ?? ''}`.trim(),
+    ]
+      .filter(Boolean)
+      .join(' ') || '（住所未登録）';
+
   // バリエーション/オプション名を商品名に付与（テンプレは商品名+数量を表示）
   const optionsLabel = (it: any): string => {
     if (it.variant) return `（${it.variant}）`;
@@ -213,11 +222,12 @@ async function sendOrderConfirmationEmail(
   }
 
   // ===== 管理者向け受注通知メール（毎回） =====
+  // テンプレ #3 は {{ params.name }} / {{ params.address }} を表示する
   try {
     const result = await sendBrevoEmail({
       to: [{ email: ADMIN_NOTIFY_EMAIL, name: 'イケベジ' }],
       templateId: ADMIN_NOTIFY_TEMPLATE_ID,
-      params: baseParams,
+      params: { name: customerName, address: shippingAddress, ...baseParams },
     });
     console.log('[OrderMail] admin notify sent', {
       templateId: ADMIN_NOTIFY_TEMPLATE_ID,
