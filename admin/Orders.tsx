@@ -10,6 +10,7 @@ import {
   IconMore,
   IconRefreshCw,
   IconSearch,
+  IconUpload,
 } from '@/components/Icons';
 
 interface OrderItem {
@@ -222,7 +223,9 @@ const Orders = () => {
   const [detailOrder, setDetailOrder] = useState<Order | null>(null);
   const [couponInfoById, setCouponInfoById] = useState<Record<string, { code: string | null; name: string | null }>>({});
   const [shippingEdits, setShippingEdits] = useState<Record<string, { carrier: string; tracking: string }>>({});
+  const [importing, setImporting] = useState(false);
   const exportRef = useRef<HTMLDivElement>(null);
+  const importFileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchOrders();
@@ -329,6 +332,34 @@ const Orders = () => {
     }));
   };
 
+  const sendShippingEmail = async (orderId: string) => {
+    const client = supabase;
+    if (!client) return;
+    try {
+      const {
+        data: { session },
+      } = await client.auth.getSession();
+      const accessToken = session?.access_token;
+      if (!accessToken) throw new Error('セッションが切れています');
+
+      const res = await fetch('/api/admin/send-shipping-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ orderId }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.error || '発送通知メールの送信に失敗しました');
+      return true;
+    } catch (e: any) {
+      console.error('発送通知メールの送信に失敗しました:', e);
+      alert(`発送通知メールの送信に失敗しました: ${e?.message || e}`);
+      return false;
+    }
+  };
+
   const saveShippingInfo = async (orderId: string) => {
     const client = supabase;
     if (!client) {
@@ -339,6 +370,7 @@ const Orders = () => {
     const order = orders.find((o) => o.id === orderId) || (detailOrder?.id === orderId ? detailOrder : null);
     if (!order) return;
     const { carrier, tracking } = getShippingEdit(order);
+    const isNewTracking = Boolean(tracking) && tracking !== (order.tracking_number || '');
 
     try {
       const now = new Date().toISOString();
@@ -375,6 +407,10 @@ const Orders = () => {
         delete next[orderId];
         return next;
       });
+
+      if (isNewTracking && window.confirm('こちらで発送通知を送信してもいいですか？')) {
+        await sendShippingEmail(orderId);
+      }
     } catch (err: any) {
       console.error('配送情報の更新に失敗しました:', err);
       const msg = err?.message || '配送情報の更新に失敗しました';
@@ -681,6 +717,213 @@ const Orders = () => {
     downloadText(`shipping-${new Date().toISOString().slice(0, 10)}.csv`, toCsv(rows));
   };
 
+  const exportTrackingImportCsv = () => {
+    const toExport = selectedCount > 0 ? filteredOrders.filter((o) => selectedIds.has(o.id)) : filteredOrders;
+    if (toExport.length === 0) {
+      alert(selectedCount > 0 ? '出力する注文を選択してください。' : '対象注文がありません。');
+      return;
+    }
+
+    const rows = toExport.map((o) => ({
+      order_number: getOrderNumber(o),
+      ステータス: getStatusLabel(o.order_status),
+      配送会社: o.shipping_carrier || '',
+      伝票番号: o.tracking_number || '',
+    }));
+
+    downloadText(`tracking-import-${new Date().toISOString().slice(0, 10)}.csv`, toCsv(rows));
+    setExportOpen(false);
+  };
+
+  const STATUS_LABEL_TO_MAPPED: Record<string, Exclude<MappedStatus, 'all'>> = {
+    支払い前: 'payment_pending',
+    発送前: 'before_shipping',
+    発送済み: 'shipped',
+    キャンセル: 'cancelled',
+  };
+
+  const parseCsvText = (csvText: string): string[][] => {
+    const rows: string[][] = [];
+    let currentRow: string[] = [];
+    let currentCell = '';
+    let inQuote = false;
+
+    for (let i = 0; i < csvText.length; i++) {
+      const char = csvText[i];
+      const nextChar = csvText[i + 1];
+      if (char === '"') {
+        if (inQuote && nextChar === '"') {
+          currentCell += '"';
+          i++;
+        } else {
+          inQuote = !inQuote;
+        }
+      } else if (char === ',' && !inQuote) {
+        currentRow.push(currentCell);
+        currentCell = '';
+      } else if ((char === '\n' || char === '\r') && !inQuote) {
+        if (char === '\r' && nextChar === '\n') i++;
+        if (currentCell || currentRow.length > 0) {
+          currentRow.push(currentCell);
+          rows.push(currentRow);
+          currentRow = [];
+          currentCell = '';
+        }
+      } else {
+        currentCell += char;
+      }
+    }
+    if (currentCell || currentRow.length > 0) {
+      currentRow.push(currentCell);
+      rows.push(currentRow);
+    }
+    return rows;
+  };
+
+  const handleImportTrackingCsv = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    const client = supabase;
+    if (!file || !client) return;
+
+    setImporting(true);
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const text = e.target?.result as string;
+        const rows = parseCsvText(text);
+        if (rows.length === 0) {
+          alert('CSVにデータがありません。');
+          return;
+        }
+        const header = rows[0].map((h) => h.trim());
+        const dataRows = rows.slice(1).filter((r) => r.length === header.length && r.some((v) => v.trim() !== ''));
+
+        const errors: string[] = [];
+        const toUpdate: Array<{
+          order: Order;
+          order_status: Order['order_status'];
+          shipping_carrier: string | null;
+          tracking_number: string | null;
+          isNewTracking: boolean;
+        }> = [];
+
+        for (const row of dataRows) {
+          const rowData: Record<string, string> = {};
+          header.forEach((key, index) => {
+            rowData[key] = (row[index] || '').trim();
+          });
+
+          const orderNumber = rowData['order_number'];
+          if (!orderNumber) {
+            errors.push('order_numberが空の行があります');
+            continue;
+          }
+          const order = orders.find((o) => getOrderNumber(o) === orderNumber);
+          if (!order) {
+            errors.push(`注文が見つかりません: ${orderNumber}`);
+            continue;
+          }
+
+          const statusLabel = rowData['ステータス'];
+          const mapped = STATUS_LABEL_TO_MAPPED[statusLabel];
+          if (statusLabel && !mapped) {
+            errors.push(`不明なステータスです: ${orderNumber} (${statusLabel})`);
+            continue;
+          }
+
+          const nextStatus = mapped ? mappedToOrderStatus(mapped) : order.order_status;
+          const nextCarrier = rowData['配送会社'] || null;
+          const nextTracking = rowData['伝票番号'] || null;
+          const isNewTracking = Boolean(nextTracking) && nextTracking !== (order.tracking_number || '');
+
+          toUpdate.push({
+            order,
+            order_status: nextStatus,
+            shipping_carrier: nextCarrier,
+            tracking_number: nextTracking,
+            isNewTracking,
+          });
+        }
+
+        if (errors.length > 0) {
+          alert(`インポートエラー:\n${errors.join('\n')}`);
+          if (toUpdate.length === 0 || !window.confirm('エラーのある行を除いてインポートを続けますか？')) {
+            return;
+          }
+        }
+
+        if (toUpdate.length === 0) {
+          alert('更新対象がありません。');
+          return;
+        }
+
+        let successCount = 0;
+        let failureCount = 0;
+        const now = new Date().toISOString();
+
+        for (const item of toUpdate) {
+          try {
+            const { error } = await client
+              .from('orders')
+              .update({
+                order_status: item.order_status,
+                shipping_carrier: item.shipping_carrier,
+                tracking_number: item.tracking_number,
+                updated_at: now,
+              })
+              .eq('id', item.order.id);
+            if (error) throw error;
+
+            setOrders((prev) =>
+              prev.map((o) =>
+                o.id === item.order.id
+                  ? {
+                      ...o,
+                      order_status: item.order_status,
+                      shipping_carrier: item.shipping_carrier,
+                      tracking_number: item.tracking_number,
+                      updated_at: now,
+                    }
+                  : o
+              )
+            );
+            successCount++;
+          } catch (err: any) {
+            failureCount++;
+            console.error('伝票番号インポート更新エラー:', err);
+          }
+        }
+
+        const newTrackingOrders = toUpdate.filter((item) => item.isNewTracking);
+        if (
+          newTrackingOrders.length > 0 &&
+          window.confirm(`伝票番号が新規入力された${newTrackingOrders.length}件について発送通知メールを送信しますか？`)
+        ) {
+          let mailSuccess = 0;
+          let mailFailure = 0;
+          for (const item of newTrackingOrders) {
+            const ok = await sendShippingEmail(item.order.id);
+            if (ok) mailSuccess++;
+            else mailFailure++;
+          }
+          alert(
+            `更新: 成功${successCount}件 / 失敗${failureCount}件\n発送メール: 成功${mailSuccess}件 / 失敗${mailFailure}件`
+          );
+        } else {
+          alert(`更新: 成功${successCount}件 / 失敗${failureCount}件`);
+        }
+      } catch (error) {
+        console.error('CSV Import Error:', error);
+        alert('CSVの読み込み中にエラーが発生しました');
+      } finally {
+        setImporting(false);
+        if (importFileInputRef.current) importFileInputRef.current.value = '';
+      }
+    };
+
+    reader.readAsText(file);
+  };
+
   const getPaymentBadge = (ps: Order['payment_status']) => {
     switch (ps) {
       case 'paid':
@@ -771,13 +1014,34 @@ const Orders = () => {
                     exportShippingCsv();
                     setExportOpen(false);
                   }}
-                  className="w-full text-left px-4 py-3 text-sm hover:bg-gray-50"
+                  className="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100"
                 >
                   発送CSV（指定形式）{selectedCount > 0 ? `（選択${selectedCount}件）` : '（フィルタ適用）'}
+                </button>
+                <button
+                  onClick={exportTrackingImportCsv}
+                  className="w-full text-left px-4 py-3 text-sm hover:bg-gray-50"
+                >
+                  伝票番号一括更新用CSV{selectedCount > 0 ? `（選択${selectedCount}件）` : '（フィルタ適用）'}
                 </button>
               </div>
             )}
           </div>
+          <button
+            onClick={() => importFileInputRef.current?.click()}
+            disabled={importing}
+            className="px-4 py-2 border border-gray-200 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors bg-white disabled:opacity-50"
+          >
+            <IconUpload className="w-4 h-4" />
+            {importing ? '読み込み中...' : '伝票番号インポート'}
+          </button>
+          <input
+            type="file"
+            ref={importFileInputRef}
+            onChange={handleImportTrackingCsv}
+            accept=".csv"
+            className="hidden"
+          />
         </div>
       </div>
 

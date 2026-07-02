@@ -89,7 +89,8 @@ const numJa = (n: number) => Number(n || 0).toLocaleString('ja-JP');
 // BrevoのテンプレートID（環境変数で上書き可能）
 const ORDER_TEMPLATE_ID = Number(process.env.BREVO_ORDER_TEMPLATE_ID || 1); // 通常注文（お客様向け）
 const SUBSCRIPTION_TEMPLATE_ID = Number(process.env.BREVO_SUBSCRIPTION_TEMPLATE_ID || 4); // 定期便（お客様向け）
-const ADMIN_NOTIFY_TEMPLATE_ID = Number(process.env.BREVO_ADMIN_TEMPLATE_ID || 3); // 受注通知（管理者向け）
+const ADMIN_NOTIFY_TEMPLATE_ID = Number(process.env.BREVO_ADMIN_TEMPLATE_ID || 3); // 受注通知（管理者向け・通常注文）
+const SUBSCRIPTION_ADMIN_TEMPLATE_ID = Number(process.env.BREVO_SUBSCRIPTION_ADMIN_TEMPLATE_ID || 7); // 受注通知_定期便（管理者向け・定期便のみ）
 // 受注通知の宛先（管理者）
 const ADMIN_NOTIFY_EMAIL = process.env.BREVO_ADMIN_EMAIL || 'info@ikevege.com';
 
@@ -223,14 +224,17 @@ async function sendOrderConfirmationEmail(
 
   // ===== 管理者向け受注通知メール（毎回） =====
   // テンプレ #3 は {{ params.name }} / {{ params.address }} を表示する
+  // 定期便注文の場合はテンプレ #7（受注通知_定期便）を代わりに使う
   try {
+    const adminTemplateId = isSubscription ? SUBSCRIPTION_ADMIN_TEMPLATE_ID : ADMIN_NOTIFY_TEMPLATE_ID;
     const result = await sendBrevoEmail({
       to: [{ email: ADMIN_NOTIFY_EMAIL, name: 'イケベジ' }],
-      templateId: ADMIN_NOTIFY_TEMPLATE_ID,
+      templateId: adminTemplateId,
       params: { name: customerName, address: shippingAddress, ...baseParams },
     });
     console.log('[OrderMail] admin notify sent', {
-      templateId: ADMIN_NOTIFY_TEMPLATE_ID,
+      templateId: adminTemplateId,
+      isSubscription,
       orderNumber,
       to: ADMIN_NOTIFY_EMAIL,
       messageId: result.messageId,

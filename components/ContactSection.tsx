@@ -64,6 +64,16 @@ const ContactSection = () => {
         throw error;
       }
 
+      try {
+        await fetch('/api/inquiry-notify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, phone, company, message }),
+        });
+      } catch (notifyError) {
+        console.error('お問い合わせ通知メールの送信に失敗しました:', notifyError);
+      }
+
       setSubmitStatus('success');
       setName('');
       setCompany('');
