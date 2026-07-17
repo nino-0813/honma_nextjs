@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase';
 import { IconArrowLeft, IconChevronDown, IconClose } from '@/components/Icons';
 import { LoadingButton } from '@/components/UI';
 
-type DiscountType = 'percentage' | 'fixed';
+type DiscountType = 'percentage' | 'fixed' | 'other';
 
 type Coupon = {
   id: string;
@@ -15,6 +15,7 @@ type Coupon = {
   code: string;
   discount_type: DiscountType;
   discount_value: number;
+  note: string | null;
   is_active: boolean;
   starts_at: string | null;
   ends_at: string | null;
@@ -63,6 +64,7 @@ const CouponEditor = () => {
 
   const [discountType, setDiscountType] = useState<DiscountType>('percentage');
   const [discountValue, setDiscountValue] = useState<string>('10');
+  const [note, setNote] = useState<string>('');
 
   const [hasPeriod, setHasPeriod] = useState(true);
   const [startsAt, setStartsAt] = useState('');
@@ -124,6 +126,7 @@ const CouponEditor = () => {
         setIsActive(Boolean(c.is_active));
         setDiscountType(c.discount_type || 'percentage');
         setDiscountValue(String(c.discount_value ?? 0));
+        setNote(c.note || '');
 
         const has = Boolean(c.starts_at || c.ends_at);
         setHasPeriod(has);
@@ -167,9 +170,13 @@ const CouponEditor = () => {
     if (!code.trim()) return 'クーポンコードを入力してください';
     if (!/^[A-Za-z0-9_-]+$/.test(code.trim())) return 'クーポンコードは英数字・_・- のみ利用できます';
 
-    const dv = Number(discountValue);
-    if (!Number.isFinite(dv) || dv <= 0) return '割引値を正しく入力してください';
-    if (discountType === 'percentage' && (dv <= 0 || dv > 100)) return '割引率は1〜100で入力してください';
+    if (discountType === 'other') {
+      if (!note.trim()) return '特典内容を入力してください';
+    } else {
+      const dv = Number(discountValue);
+      if (!Number.isFinite(dv) || dv <= 0) return '割引値を正しく入力してください';
+      if (discountType === 'percentage' && (dv <= 0 || dv > 100)) return '割引率は1〜100で入力してください';
+    }
 
     if (hasPeriod) {
       if (!startsAt || !endsAt) return '有効期間の開始/終了を入力してください';
@@ -208,7 +215,8 @@ const CouponEditor = () => {
         name: name.trim(),
         code: code.trim(),
         discount_type: discountType,
-        discount_value: Math.round(Number(discountValue)),
+        discount_value: discountType === 'other' ? 0 : Math.round(Number(discountValue)),
+        note: discountType === 'other' ? note.trim() : null,
         is_active: isActive,
         starts_at: hasPeriod ? fromLocalDateTimeInput(startsAt) : null,
         ends_at: hasPeriod ? fromLocalDateTimeInput(endsAt) : null,
@@ -377,6 +385,25 @@ const CouponEditor = () => {
                 onChange={(e) => setDiscountValue(e.target.value)}
                 className="w-full p-3 border border-gray-200 rounded-lg bg-white"
                 placeholder="500"
+              />
+            )}
+            <label className="flex items-center gap-3">
+              <input
+                type="radio"
+                name="discountType"
+                checked={discountType === 'other'}
+                onChange={() => setDiscountType('other')}
+                className="w-4 h-4"
+              />
+              <span className="text-sm text-gray-700">その他（金額を割り引かず、特典内容を記載）</span>
+            </label>
+            {discountType === 'other' && (
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                className="w-full p-3 border border-gray-200 rounded-lg bg-white"
+                rows={3}
+                placeholder="例: アンケート回答者限定で塩をプレゼント"
               />
             )}
           </div>

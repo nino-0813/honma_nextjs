@@ -19,8 +19,9 @@ type Coupon = {
   id: string;
   name: string | null;
   code: string | null;
-  discount_type: 'percentage' | 'fixed';
+  discount_type: 'percentage' | 'fixed' | 'other';
   discount_value: number;
+  note: string | null;
   is_active: boolean;
   starts_at: string | null;
   ends_at: string | null;
@@ -91,6 +92,7 @@ const Discounts = () => {
 
   const formatDiscountValue = (c: Coupon): string => {
     if (c.discount_type === 'percentage') return `${c.discount_value}% OFF`;
+    if (c.discount_type === 'other') return c.note ? `特典: ${c.note}` : '特典プレゼント';
     return `¥${c.discount_value.toLocaleString()} OFF`;
   };
 

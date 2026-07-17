@@ -32,6 +32,9 @@ interface OrderDetailData {
   subtotal: number;
   shipping_cost: number;
   discount_amount: number | null;
+  coupon_code?: string | null;
+  coupon_name?: string | null;
+  coupon_note?: string | null;
   total: number;
   payment_status: string;
   payment_method: string | null;
@@ -51,6 +54,9 @@ interface OrderDetailData {
     line_total: number;
     variant: string | null;
     selected_options: any;
+    shipping_status?: 'before_shipping' | 'shipped';
+    shipping_carrier?: string | null;
+    tracking_number?: string | null;
   }>;
 }
 
@@ -59,6 +65,8 @@ const OrderDetail = () => {
   const [loading, setLoading] = useState(true);
   const [order, setOrder] = useState<OrderDetailData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [receiptModalItem, setReceiptModalItem] = useState<OrderDetailData['order_items'][number] | null>(null);
+  const [receiptName, setReceiptName] = useState('');
 
   useEffect(() => {
     const fetchOrderDetail = async () => {
@@ -92,7 +100,10 @@ const OrderDetail = () => {
               quantity,
               line_total,
               variant,
-              selected_options
+              selected_options,
+              shipping_status,
+              shipping_carrier,
+              tracking_number
             )
           `
           )
@@ -307,6 +318,16 @@ const OrderDetail = () => {
                   <span className="text-red-600">-¥{order.discount_amount.toLocaleString()}</span>
                 </div>
               )}
+              {(order.coupon_code || order.coupon_name) && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">クーポン</span>
+                  <span className="text-gray-900 text-right">
+                    {order.coupon_code || ''}
+                    {order.coupon_name ? `（${order.coupon_name}）` : ''}
+                    {order.coupon_note && <div className="text-xs text-gray-600 mt-0.5">🎁 {order.coupon_note}</div>}
+                  </span>
+                </div>
+              )}
               <div className="flex justify-between text-lg font-semibold pt-2 border-t border-gray-200">
                 <span className="text-gray-900">合計</span>
                 <span className="text-gray-900">¥{order.total.toLocaleString()}</span>
@@ -341,7 +362,11 @@ const OrderDetail = () => {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        {order.order_status === 'shipped' || order.order_status === 'delivered' ? (
+                        {order.order_status === 'cancelled' ? (
+                          <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        ) : item.shipping_status === 'shipped' ? (
                           <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
                               strokeLinecap="round"
@@ -349,20 +374,6 @@ const OrderDetail = () => {
                               strokeWidth={2}
                               d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                             />
-                          </svg>
-                        ) : order.order_status === 'processing' ? (
-                          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3" />
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                          </svg>
-                        ) : order.order_status === 'cancelled' ? (
-                          <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                           </svg>
                         ) : (
                           <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -379,40 +390,52 @@ const OrderDetail = () => {
                           className={`text-sm font-medium ${
                             order.order_status === 'cancelled'
                               ? 'text-gray-700'
-                              : order.order_status === 'shipped' || order.order_status === 'delivered'
+                              : item.shipping_status === 'shipped'
                                 ? 'text-indigo-700'
-                                : order.order_status === 'processing'
-                                  ? 'text-blue-700'
-                                  : 'text-amber-800'
+                                : 'text-amber-800'
                           }`}
                         >
-                          {getOrderStatusText(order.order_status)}
+                          {order.order_status === 'cancelled'
+                            ? getOrderStatusText(order.order_status)
+                            : item.shipping_status === 'shipped'
+                              ? '発送済み'
+                              : '発送前'}
                         </span>
                       </div>
                       <p className="text-xs text-gray-500">
-                        {formatDate(
-                          order.order_status === 'cancelled'
-                            ? order.updated_at || order.created_at
-                            : order.order_status === 'shipped' || order.order_status === 'delivered'
-                              ? order.updated_at || order.created_at
-                              : order.created_at
-                        )}
+                        {formatDate(order.order_status === 'cancelled' ? order.updated_at || order.created_at : order.created_at)}
                       </p>
-                      {(order.order_status === 'shipped' || order.order_status === 'delivered') &&
-                        (order.shipping_carrier || order.tracking_number) && (
+                      {order.order_status !== 'cancelled' &&
+                        item.shipping_status === 'shipped' &&
+                        (item.shipping_carrier || item.tracking_number) && (
                           <div className="mt-2 text-xs text-gray-700 space-y-1">
-                            {order.shipping_carrier && (
+                            {item.shipping_carrier && (
                               <div>
-                                配送会社: <span className="font-medium text-gray-900">{order.shipping_carrier}</span>
+                                配送会社: <span className="font-medium text-gray-900">{item.shipping_carrier}</span>
                               </div>
                             )}
-                            {order.tracking_number && (
+                            {item.tracking_number && (
                               <div>
-                                発送番号: <span className="font-medium text-gray-900">{order.tracking_number}</span>
+                                発送番号: <span className="font-medium text-gray-900">{item.tracking_number}</span>
                               </div>
                             )}
                           </div>
                         )}
+                      <button
+                        type="button"
+                        disabled={order.order_status === 'cancelled' || item.shipping_status !== 'shipped'}
+                        onClick={() => {
+                          setReceiptName('');
+                          setReceiptModalItem(item);
+                        }}
+                        className={`mt-3 px-3 py-1.5 text-xs font-medium rounded-md border transition-colors ${
+                          order.order_status === 'cancelled' || item.shipping_status !== 'shipped'
+                            ? 'border-gray-200 text-gray-400 cursor-not-allowed bg-gray-50'
+                            : 'border-gray-300 text-gray-900 hover:bg-gray-50 bg-white'
+                        }`}
+                      >
+                        領収書を発行
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -491,6 +514,53 @@ const OrderDetail = () => {
           </div>
         </div>
       </div>
+
+      {receiptModalItem && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-8"
+          onClick={() => setReceiptModalItem(null)}
+        >
+          <div
+            className="relative bg-white rounded-lg shadow-xl max-w-lg w-full p-6 md:p-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setReceiptModalItem(null)}
+              aria-label="閉じる"
+              className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">領収書の宛名</h3>
+            <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+              宛名を変更する場合は下記に記載ください。
+              <br />
+              （空白の場合はご注文者様のお名前が宛名となります）
+            </p>
+            <input
+              type="text"
+              value={receiptName}
+              onChange={(e) => setReceiptName(e.target.value)}
+              placeholder={`${order.last_name} ${order.first_name}`}
+              className="w-full p-2.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 mb-6"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                const url = `/mypage/orders/${order.id}/receipt/${receiptModalItem.id}?name=${encodeURIComponent(receiptName.trim())}`;
+                window.open(url, '_blank');
+                setReceiptModalItem(null);
+              }}
+              className="w-full px-4 py-3 bg-gray-900 text-white rounded-md text-sm font-medium hover:bg-gray-800 transition-colors"
+            >
+              領収書を表示
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 };

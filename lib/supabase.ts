@@ -64,6 +64,7 @@ export interface DatabaseProduct {
   first_shipping_override_date?: string | null; // YYYY-MM-DD or null
   mile_earn_rate?: number | null;
   is_event_ticket?: boolean | null;
+  tax_rate?: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -110,6 +111,7 @@ export const convertDatabaseProductToProduct = (dbProduct: DatabaseProduct): Pro
         : null,
     mileEarnRate: Math.max(0, Math.min(100, Math.round(Number(dbProduct.mile_earn_rate ?? 0)))),
     isEventTicket: Boolean(dbProduct.is_event_ticket),
+    taxRate: dbProduct.tax_rate === 8 ? 8 : 10,
   };
 };
 
@@ -183,6 +185,7 @@ export const convertProductToDatabaseProduct = (product: Partial<Product> & { st
       return Math.max(0, Math.min(100, Math.round(n)));
     })(),
     is_event_ticket: Boolean((product as any).isEventTicket),
+    tax_rate: (product as any).taxRate === 8 ? 8 : 10,
   };
 };
 

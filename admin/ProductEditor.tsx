@@ -63,6 +63,7 @@ const ProductEditor = () => {
 
   const [title, setTitle] = useState('');
   const [price, setPrice] = useState('');
+  const [taxRate, setTaxRate] = useState('10');
   const [categories, setCategories] = useState<string[]>(['お米']);
   const [subcategories, setSubcategories] = useState<string[]>(['コシヒカリ']);
   const [description, setDescription] = useState('');
@@ -157,6 +158,7 @@ const ProductEditor = () => {
 
       setTitle(data.title ?? '');
       setPrice(String(data.price ?? ''));
+      setTaxRate(data.tax_rate === 8 ? '8' : '10');
       const loadedCategories =
         Array.isArray(data.categories) && data.categories.length > 0 ? data.categories : data.category ? [data.category] : ['お米'];
       const loadedSubcategories =
@@ -403,6 +405,7 @@ const ProductEditor = () => {
       const productData = {
         title: title.trim(),
         price: Number(price),
+        tax_rate: taxRate === '8' ? 8 : 10,
         category: categories[0] || 'お米',
         subcategory: subcategories[0] || null,
         categories,
@@ -744,6 +747,17 @@ const ProductEditor = () => {
                   />
                 </div>
                 {hasVariants && <p className="text-xs text-gray-500 mt-1">バリエーションごとの追加価格がここに加算されます。</p>}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">税率（領収書表示用）</label>
+                <select
+                  value={taxRate}
+                  onChange={(e) => setTaxRate(e.target.value)}
+                  className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all bg-white"
+                >
+                  <option value="10">10%（標準税率）</option>
+                  <option value="8">8%（軽減税率）</option>
+                </select>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

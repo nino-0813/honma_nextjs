@@ -24,6 +24,9 @@ interface OrderItem {
   line_total: number;
   variant?: string | null;
   selected_options?: any;
+  shipping_status?: 'before_shipping' | 'shipped';
+  shipping_carrier?: string | null;
+  tracking_number?: string | null;
 }
 
 interface Order {
@@ -53,6 +56,9 @@ interface Order {
   shipping_cost: number;
   discount_amount?: number | null;
   coupon_id?: string | null;
+  coupon_code?: string | null;
+  coupon_name?: string | null;
+  coupon_note?: string | null;
   total: number;
   payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
   payment_intent_id: string | null;
@@ -221,7 +227,7 @@ const Orders = () => {
   const [bulkStatus, setBulkStatus] = useState<Exclude<MappedStatus, 'all'>>('before_shipping');
   const [exportOpen, setExportOpen] = useState(false);
   const [detailOrder, setDetailOrder] = useState<Order | null>(null);
-  const [couponInfoById, setCouponInfoById] = useState<Record<string, { code: string | null; name: string | null }>>({});
+  const [couponInfoById, setCouponInfoById] = useState<Record<string, { code: string | null; name: string | null; note: string | null }>>({});
   const [shippingEdits, setShippingEdits] = useState<Record<string, { carrier: string; tracking: string }>>({});
   const [importing, setImporting] = useState(false);
   const exportRef = useRef<HTMLDivElement>(null);
@@ -245,22 +251,28 @@ const Orders = () => {
     const loadCoupon = async () => {
       const client = supabase;
       const couponId = detailOrder?.coupon_id || null;
+      // 新しい注文はcoupon_code/coupon_name/coupon_noteのスナップショットを持つのでライブ取得は不要
+      if (detailOrder?.coupon_code || detailOrder?.coupon_name || detailOrder?.coupon_note) return;
       if (!client || !couponId || couponInfoById[couponId]) return;
 
       try {
-        const { data, error } = await client.from('coupons').select('id, code, name').eq('id', couponId).single();
+        const { data, error } = await client.from('coupons').select('id, code, name, note').eq('id', couponId).single();
         if (error) throw error;
         setCouponInfoById((prev) => ({
           ...prev,
-          [couponId]: { code: (data as any)?.code ?? null, name: (data as any)?.name ?? null },
+          [couponId]: {
+            code: (data as any)?.code ?? null,
+            name: (data as any)?.name ?? null,
+            note: (data as any)?.note ?? null,
+          },
         }));
       } catch (e) {
         console.warn('[Orders] coupon fetch failed (ignored):', e);
-        setCouponInfoById((prev) => ({ ...prev, [couponId]: { code: null, name: null } }));
+        setCouponInfoById((prev) => ({ ...prev, [couponId]: { code: null, name: null, note: null } }));
       }
     };
     loadCoupon();
-  }, [detailOrder?.coupon_id, couponInfoById]);
+  }, [detailOrder?.coupon_id, detailOrder?.coupon_code, detailOrder?.coupon_name, detailOrder?.coupon_note, couponInfoById]);
 
   const fetchOrders = async () => {
     const client = supabase;
@@ -314,25 +326,25 @@ const Orders = () => {
     }
   };
 
-  const getShippingEdit = (order: Order) => {
-    const current = shippingEdits[order.id];
+  const getShippingEdit = (item: OrderItem) => {
+    const current = shippingEdits[item.id];
     return {
-      carrier: current?.carrier ?? (order.shipping_carrier || ''),
-      tracking: current?.tracking ?? (order.tracking_number || ''),
+      carrier: current?.carrier ?? (item.shipping_carrier || ''),
+      tracking: current?.tracking ?? (item.tracking_number || ''),
     };
   };
 
-  const setShippingEdit = (orderId: string, patch: Partial<{ carrier: string; tracking: string }>) => {
+  const setShippingEdit = (orderItemId: string, patch: Partial<{ carrier: string; tracking: string }>) => {
     setShippingEdits((prev) => ({
       ...prev,
-      [orderId]: {
-        carrier: patch.carrier ?? prev[orderId]?.carrier ?? '',
-        tracking: patch.tracking ?? prev[orderId]?.tracking ?? '',
+      [orderItemId]: {
+        carrier: patch.carrier ?? prev[orderItemId]?.carrier ?? '',
+        tracking: patch.tracking ?? prev[orderItemId]?.tracking ?? '',
       },
     }));
   };
 
-  const sendShippingEmail = async (orderId: string) => {
+  const sendShippingEmail = async (orderItemId: string) => {
     const client = supabase;
     if (!client) return;
     try {
@@ -348,7 +360,7 @@ const Orders = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ orderId }),
+        body: JSON.stringify({ orderItemId }),
       });
       const data = await res.json().catch(() => null);
       if (!res.ok) throw new Error(data?.error || '発送通知メールの送信に失敗しました');
@@ -360,62 +372,91 @@ const Orders = () => {
     }
   };
 
-  const saveShippingInfo = async (orderId: string) => {
+  const findOrderItem = (orderItemId: string): { order: Order; item: OrderItem } | null => {
+    for (const o of orders) {
+      const it = (o.order_items || []).find((x) => x.id === orderItemId);
+      if (it) return { order: o, item: it };
+    }
+    if (detailOrder) {
+      const it = (detailOrder.order_items || []).find((x) => x.id === orderItemId);
+      if (it) return { order: detailOrder, item: it };
+    }
+    return null;
+  };
+
+  const patchOrderItem = (orderItemId: string, patch: Partial<OrderItem>) => {
+    const applyPatch = (o: Order): Order => ({
+      ...o,
+      order_items: (o.order_items || []).map((it) => (it.id === orderItemId ? { ...it, ...patch } : it)),
+    });
+    setOrders((prev) => prev.map((o) => ((o.order_items || []).some((it) => it.id === orderItemId) ? applyPatch(o) : o)));
+    if (detailOrder && (detailOrder.order_items || []).some((it) => it.id === orderItemId)) {
+      setDetailOrder(applyPatch(detailOrder));
+    }
+  };
+
+  const updateOrderItemShippingStatus = async (orderItemId: string, status: 'before_shipping' | 'shipped') => {
+    const client = supabase;
+    if (!client) {
+      alert('Supabaseが利用できません。');
+      return;
+    }
+    try {
+      const { error } = await client.from('order_items').update({ shipping_status: status }).eq('id', orderItemId);
+      if (error) throw error;
+      patchOrderItem(orderItemId, { shipping_status: status });
+    } catch (err: any) {
+      console.error('発送ステータスの更新に失敗しました:', err);
+      alert(`発送ステータスの更新に失敗しました: ${err.message}`);
+    }
+  };
+
+  const saveShippingInfo = async (orderItemId: string) => {
     const client = supabase;
     if (!client) {
       alert('Supabaseが利用できません。');
       return;
     }
 
-    const order = orders.find((o) => o.id === orderId) || (detailOrder?.id === orderId ? detailOrder : null);
-    if (!order) return;
-    const { carrier, tracking } = getShippingEdit(order);
-    const isNewTracking = Boolean(tracking) && tracking !== (order.tracking_number || '');
+    const found = findOrderItem(orderItemId);
+    if (!found) return;
+    const { item } = found;
+    const { carrier, tracking } = getShippingEdit(item);
+    const isNewTracking = Boolean(tracking) && tracking !== (item.tracking_number || '');
+    const nextStatus: 'before_shipping' | 'shipped' = tracking ? 'shipped' : (item.shipping_status || 'before_shipping');
 
     try {
-      const now = new Date().toISOString();
       const { error } = await client
-        .from('orders')
+        .from('order_items')
         .update({
           shipping_carrier: carrier || null,
           tracking_number: tracking || null,
-          updated_at: now,
+          shipping_status: nextStatus,
         })
-        .eq('id', orderId);
+        .eq('id', orderItemId);
 
       if (error) throw error;
 
-      setOrders((prev) =>
-        prev.map((o) =>
-          o.id === orderId
-            ? { ...o, shipping_carrier: carrier || null, tracking_number: tracking || null, updated_at: now }
-            : o
-        )
-      );
-
-      if (detailOrder?.id === orderId) {
-        setDetailOrder({
-          ...detailOrder,
-          shipping_carrier: carrier || null,
-          tracking_number: tracking || null,
-          updated_at: now,
-        });
-      }
+      patchOrderItem(orderItemId, {
+        shipping_carrier: carrier || null,
+        tracking_number: tracking || null,
+        shipping_status: nextStatus,
+      });
 
       setShippingEdits((prev) => {
         const next = { ...prev };
-        delete next[orderId];
+        delete next[orderItemId];
         return next;
       });
 
       if (isNewTracking && window.confirm('こちらで発送通知を送信してもいいですか？')) {
-        await sendShippingEmail(orderId);
+        await sendShippingEmail(orderItemId);
       }
     } catch (err: any) {
       console.error('配送情報の更新に失敗しました:', err);
       const msg = err?.message || '配送情報の更新に失敗しました';
-      if (/column/i.test(msg) && /(shipping_carrier|tracking_number)/i.test(msg)) {
-        alert('配送会社/発送番号のカラムがDBにありません。先にマイグレーションSQLを実行してください。');
+      if (/column/i.test(msg) && /(shipping_carrier|tracking_number|shipping_status)/i.test(msg)) {
+        alert('配送会社/発送番号/発送ステータスのカラムがDBにありません。先にマイグレーションSQLを実行してください。');
         return;
       }
       alert(`配送情報の更新に失敗しました: ${msg}`);
@@ -718,28 +759,35 @@ const Orders = () => {
   };
 
   const exportTrackingImportCsv = () => {
-    const toExport = selectedCount > 0 ? filteredOrders.filter((o) => selectedIds.has(o.id)) : filteredOrders;
-    if (toExport.length === 0) {
+    const toExportOrders = selectedCount > 0 ? filteredOrders.filter((o) => selectedIds.has(o.id)) : filteredOrders;
+    if (toExportOrders.length === 0) {
       alert(selectedCount > 0 ? '出力する注文を選択してください。' : '対象注文がありません。');
       return;
     }
 
-    const rows = toExport.map((o) => ({
-      order_number: getOrderNumber(o),
-      ステータス: getStatusLabel(o.order_status),
-      配送会社: o.shipping_carrier || '',
-      伝票番号: o.tracking_number || '',
-    }));
+    const rows = toExportOrders.flatMap((o) =>
+      (o.order_items || []).map((it) => ({
+        order_item_id: it.id,
+        order_number: getOrderNumber(o),
+        商品名: it.product_title,
+        ステータス: it.shipping_status === 'shipped' ? '発送済み' : '発送前',
+        配送会社: it.shipping_carrier || '',
+        伝票番号: it.tracking_number || '',
+      }))
+    );
+
+    if (rows.length === 0) {
+      alert('対象の商品明細がありません。');
+      return;
+    }
 
     downloadText(`tracking-import-${new Date().toISOString().slice(0, 10)}.csv`, toCsv(rows));
     setExportOpen(false);
   };
 
-  const STATUS_LABEL_TO_MAPPED: Record<string, Exclude<MappedStatus, 'all'>> = {
-    支払い前: 'payment_pending',
+  const ITEM_STATUS_LABEL_TO_VALUE: Record<string, 'before_shipping' | 'shipped'> = {
     発送前: 'before_shipping',
     発送済み: 'shipped',
-    キャンセル: 'cancelled',
   };
 
   const parseCsvText = (csvText: string): string[][] => {
@@ -800,8 +848,8 @@ const Orders = () => {
 
         const errors: string[] = [];
         const toUpdate: Array<{
-          order: Order;
-          order_status: Order['order_status'];
+          item: OrderItem;
+          shipping_status: 'before_shipping' | 'shipped';
           shipping_carrier: string | null;
           tracking_number: string | null;
           isNewTracking: boolean;
@@ -813,32 +861,34 @@ const Orders = () => {
             rowData[key] = (row[index] || '').trim();
           });
 
-          const orderNumber = rowData['order_number'];
-          if (!orderNumber) {
-            errors.push('order_numberが空の行があります');
+          const orderItemId = rowData['order_item_id'];
+          if (!orderItemId) {
+            errors.push('order_item_idが空の行があります');
             continue;
           }
-          const order = orders.find((o) => getOrderNumber(o) === orderNumber);
-          if (!order) {
-            errors.push(`注文が見つかりません: ${orderNumber}`);
+          const found = findOrderItem(orderItemId);
+          if (!found) {
+            errors.push(`商品明細が見つかりません: ${orderItemId}`);
             continue;
           }
+          const { item } = found;
 
           const statusLabel = rowData['ステータス'];
-          const mapped = STATUS_LABEL_TO_MAPPED[statusLabel];
-          if (statusLabel && !mapped) {
-            errors.push(`不明なステータスです: ${orderNumber} (${statusLabel})`);
+          const mappedStatus = ITEM_STATUS_LABEL_TO_VALUE[statusLabel];
+          if (statusLabel && !mappedStatus) {
+            errors.push(`不明なステータスです: ${orderItemId} (${statusLabel})`);
             continue;
           }
 
-          const nextStatus = mapped ? mappedToOrderStatus(mapped) : order.order_status;
           const nextCarrier = rowData['配送会社'] || null;
           const nextTracking = rowData['伝票番号'] || null;
-          const isNewTracking = Boolean(nextTracking) && nextTracking !== (order.tracking_number || '');
+          const isNewTracking = Boolean(nextTracking) && nextTracking !== (item.tracking_number || '');
+          const nextStatus: 'before_shipping' | 'shipped' =
+            mappedStatus || (nextTracking ? 'shipped' : item.shipping_status || 'before_shipping');
 
           toUpdate.push({
-            order,
-            order_status: nextStatus,
+            item,
+            shipping_status: nextStatus,
             shipping_carrier: nextCarrier,
             tracking_number: nextTracking,
             isNewTracking,
@@ -859,34 +909,24 @@ const Orders = () => {
 
         let successCount = 0;
         let failureCount = 0;
-        const now = new Date().toISOString();
 
-        for (const item of toUpdate) {
+        for (const u of toUpdate) {
           try {
             const { error } = await client
-              .from('orders')
+              .from('order_items')
               .update({
-                order_status: item.order_status,
-                shipping_carrier: item.shipping_carrier,
-                tracking_number: item.tracking_number,
-                updated_at: now,
+                shipping_status: u.shipping_status,
+                shipping_carrier: u.shipping_carrier,
+                tracking_number: u.tracking_number,
               })
-              .eq('id', item.order.id);
+              .eq('id', u.item.id);
             if (error) throw error;
 
-            setOrders((prev) =>
-              prev.map((o) =>
-                o.id === item.order.id
-                  ? {
-                      ...o,
-                      order_status: item.order_status,
-                      shipping_carrier: item.shipping_carrier,
-                      tracking_number: item.tracking_number,
-                      updated_at: now,
-                    }
-                  : o
-              )
-            );
+            patchOrderItem(u.item.id, {
+              shipping_status: u.shipping_status,
+              shipping_carrier: u.shipping_carrier,
+              tracking_number: u.tracking_number,
+            });
             successCount++;
           } catch (err: any) {
             failureCount++;
@@ -894,15 +934,15 @@ const Orders = () => {
           }
         }
 
-        const newTrackingOrders = toUpdate.filter((item) => item.isNewTracking);
+        const newTrackingItems = toUpdate.filter((u) => u.isNewTracking);
         if (
-          newTrackingOrders.length > 0 &&
-          window.confirm(`伝票番号が新規入力された${newTrackingOrders.length}件について発送通知メールを送信しますか？`)
+          newTrackingItems.length > 0 &&
+          window.confirm(`伝票番号が新規入力された${newTrackingItems.length}件について発送通知メールを送信しますか？`)
         ) {
           let mailSuccess = 0;
           let mailFailure = 0;
-          for (const item of newTrackingOrders) {
-            const ok = await sendShippingEmail(item.order.id);
+          for (const u of newTrackingItems) {
+            const ok = await sendShippingEmail(u.item.id);
             if (ok) mailSuccess++;
             else mailFailure++;
           }
@@ -1259,29 +1299,16 @@ const Orders = () => {
                               <option value="cancelled">キャンセル</option>
                             </select>
 
-                            {getMappedStatus(order.order_status) === 'shipped' && (
-                              <div className="mt-2 flex items-center gap-2">
-                                <select
-                                  value={getShippingEdit(order).carrier}
-                                  onChange={(e) => setShippingEdit(order.id, { carrier: e.target.value })}
-                                  className="p-2 border border-gray-200 rounded-md bg-white text-xs"
-                                >
-                                  <option value="">配送会社</option>
-                                  <option value="ヤマト運輸">ヤマト運輸</option>
-                                  <option value="日本郵便">日本郵便</option>
-                                </select>
-                                <input
-                                  value={getShippingEdit(order).tracking}
-                                  onChange={(e) => setShippingEdit(order.id, { tracking: e.target.value })}
-                                  placeholder="発送番号"
-                                  className="p-2 border border-gray-200 rounded-md bg-white text-xs w-[140px]"
-                                />
+                            {(order.order_items || []).length > 0 && (
+                              <div className="mt-2 text-xs text-gray-500">
+                                発送: {(order.order_items || []).filter((it) => it.shipping_status === 'shipped').length}/
+                                {(order.order_items || []).length}
                                 <button
                                   type="button"
-                                  onClick={() => saveShippingInfo(order.id)}
-                                  className="px-3 py-2 bg-gray-900 text-white rounded-md text-xs hover:bg-gray-800 transition-colors"
+                                  onClick={() => setDetailOrder(order)}
+                                  className="ml-2 text-primary hover:underline"
                                 >
-                                  保存
+                                  商品ごとに編集
                                 </button>
                               </div>
                             )}
@@ -1402,10 +1429,17 @@ const Orders = () => {
                     <div className="text-gray-900 mt-1">
                       {detailOrder.coupon_id ? (
                         (() => {
-                          const info = couponInfoById[detailOrder.coupon_id as string];
-                          if (!info) return `取得中... (${detailOrder.coupon_id})`;
-                          if (info.code || info.name) return `${info.code || ''}${info.name ? ` (${info.name})` : ''}`.trim();
-                          return detailOrder.coupon_id;
+                          const fallback = couponInfoById[detailOrder.coupon_id as string];
+                          const code = detailOrder.coupon_code ?? fallback?.code;
+                          const name = detailOrder.coupon_name ?? fallback?.name;
+                          const note = detailOrder.coupon_note ?? fallback?.note;
+                          if (!code && !name && !fallback) return `取得中... (${detailOrder.coupon_id})`;
+                          return (
+                            <>
+                              {code || name ? `${code || ''}${name ? ` (${name})` : ''}`.trim() : detailOrder.coupon_id}
+                              {note && <div className="mt-1 text-gray-700">🎁 {note}</div>}
+                            </>
+                          );
                         })()
                       ) : (
                         'なし'
@@ -1493,32 +1527,7 @@ const Orders = () => {
                   <div className="mt-2 text-gray-700">{getShippingDisplayName(detailOrder)} 様</div>
                   {getShippingDisplayPhone(detailOrder) ? <div className="text-gray-700">{getShippingDisplayPhone(detailOrder)}</div> : null}
 
-                  {getMappedStatus(detailOrder.order_status) === 'shipped' && (
-                    <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2">
-                      <select
-                        value={getShippingEdit(detailOrder).carrier}
-                        onChange={(e) => setShippingEdit(detailOrder.id, { carrier: e.target.value })}
-                        className="p-2 border border-gray-200 rounded-md bg-white text-sm"
-                      >
-                        <option value="">配送会社</option>
-                        <option value="ヤマト運輸">ヤマト運輸</option>
-                        <option value="日本郵便">日本郵便</option>
-                      </select>
-                      <input
-                        value={getShippingEdit(detailOrder).tracking}
-                        onChange={(e) => setShippingEdit(detailOrder.id, { tracking: e.target.value })}
-                        placeholder="発送番号"
-                        className="p-2 border border-gray-200 rounded-md bg-white text-sm"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => saveShippingInfo(detailOrder.id)}
-                        className="px-4 py-2 bg-gray-900 text-white rounded-md text-sm hover:bg-gray-800 transition-colors"
-                      >
-                        配送情報を保存
-                      </button>
-                    </div>
-                  )}
+                  <p className="mt-3 text-xs text-gray-500">配送会社・伝票番号は下の「商品」欄で商品ごとに設定します。</p>
                   <div className="mt-3 flex items-center justify-between">
                     <div className="text-xs text-gray-600">送料合計</div>
                     <div className="text-sm font-semibold">{formatYen(detailOrder.shipping_cost)}</div>
@@ -1588,18 +1597,56 @@ const Orders = () => {
                   ) : (
                     <div className="divide-y divide-gray-200">
                       {(detailOrder.order_items || []).map((it) => (
-                        <div key={it.id} className="p-4 flex items-start justify-between gap-4">
-                          <div className="min-w-0">
-                            <div className="text-sm font-medium text-gray-900">{it.product_title}</div>
-                            <div className="text-xs text-gray-600 mt-1">
-                              {formatYen(it.product_price)} × {it.quantity} = {formatYen(it.line_total)}
-                            </div>
-                            {it.variant ? <div className="text-xs text-gray-500 mt-1">種類: {it.variant}</div> : null}
-                            {it.selected_options ? (
-                              <div className="text-xs text-gray-500 mt-1">
-                                オプション: {typeof it.selected_options === 'string' ? it.selected_options : JSON.stringify(it.selected_options)}
+                        <div key={it.id} className="p-4">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="min-w-0">
+                              <div className="text-sm font-medium text-gray-900">{it.product_title}</div>
+                              <div className="text-xs text-gray-600 mt-1">
+                                {formatYen(it.product_price)} × {it.quantity} = {formatYen(it.line_total)}
                               </div>
-                            ) : null}
+                              {it.variant ? <div className="text-xs text-gray-500 mt-1">種類: {it.variant}</div> : null}
+                              {it.selected_options ? (
+                                <div className="text-xs text-gray-500 mt-1">
+                                  オプション: {typeof it.selected_options === 'string' ? it.selected_options : JSON.stringify(it.selected_options)}
+                                </div>
+                              ) : null}
+                            </div>
+                            <select
+                              value={it.shipping_status || 'before_shipping'}
+                              onChange={(e) => updateOrderItemShippingStatus(it.id, e.target.value as 'before_shipping' | 'shipped')}
+                              className={`px-2.5 py-1 rounded-md text-xs font-medium border bg-white shrink-0 ${
+                                it.shipping_status === 'shipped'
+                                  ? 'bg-indigo-50 text-indigo-800 border-indigo-200'
+                                  : 'bg-blue-50 text-blue-800 border-blue-200'
+                              }`}
+                            >
+                              <option value="before_shipping">発送前</option>
+                              <option value="shipped">発送済み</option>
+                            </select>
+                          </div>
+                          <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                            <select
+                              value={getShippingEdit(it).carrier}
+                              onChange={(e) => setShippingEdit(it.id, { carrier: e.target.value })}
+                              className="p-2 border border-gray-200 rounded-md bg-white text-xs"
+                            >
+                              <option value="">配送会社</option>
+                              <option value="ヤマト運輸">ヤマト運輸</option>
+                              <option value="日本郵便">日本郵便</option>
+                            </select>
+                            <input
+                              value={getShippingEdit(it).tracking}
+                              onChange={(e) => setShippingEdit(it.id, { tracking: e.target.value })}
+                              placeholder="発送番号"
+                              className="p-2 border border-gray-200 rounded-md bg-white text-xs"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => saveShippingInfo(it.id)}
+                              className="px-3 py-2 bg-gray-900 text-white rounded-md text-xs hover:bg-gray-800 transition-colors"
+                            >
+                              この商品の配送情報を保存
+                            </button>
                           </div>
                         </div>
                       ))}

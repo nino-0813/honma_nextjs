@@ -60,7 +60,9 @@ import {
   Sparkles,
   DollarSign,
   Link,
-  Copy
+  Copy,
+  Archive,
+  ArchiveRestore
 } from 'lucide-react';
 
 export const IconBag = ({ className }: { className?: string }) => <ShoppingCart className={className} strokeWidth={1.5} />;
@@ -101,6 +103,8 @@ export const IconGlobe = ({ className }: { className?: string }) => <Globe class
 export const IconCalendar = ({ className }: { className?: string }) => <Calendar className={className} strokeWidth={1.5} />;
 export const IconEdit = ({ className }: { className?: string }) => <Edit className={className} strokeWidth={1.5} />;
 export const IconCopy = ({ className }: { className?: string }) => <Copy className={className} strokeWidth={1.5} />;
+export const IconArchive = ({ className }: { className?: string }) => <Archive className={className} strokeWidth={1.5} />;
+export const IconArchiveRestore = ({ className }: { className?: string }) => <ArchiveRestore className={className} strokeWidth={1.5} />;
 export const IconTrendingUp = ({ className }: { className?: string }) => <TrendingUp className={className} strokeWidth={1.5} />;
 export const IconEye = ({ className }: { className?: string }) => <Eye className={className} strokeWidth={1.5} />;
 export const IconEyeOff = ({ className }: { className?: string }) => <EyeOff className={className} strokeWidth={1.5} />;

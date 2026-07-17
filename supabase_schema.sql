@@ -132,10 +132,26 @@ CREATE TABLE IF NOT EXISTS public.order_items (
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS paid_at TIMESTAMP WITH TIME ZONE;
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS discount_amount INTEGER DEFAULT 0;
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS coupon_id UUID REFERENCES public.coupons(id) ON DELETE SET NULL;
+-- クーポンのスナップショット（マイページはcouponsテーブルをRLSで直接参照できないため注文側に保存）
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS coupon_code TEXT;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS coupon_name TEXT;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS coupon_note TEXT;
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS delivery_time_slot TEXT; -- 配送時間希望
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS notes TEXT; -- 備考
 ALTER TABLE public.order_items ADD COLUMN IF NOT EXISTS variant TEXT;
 ALTER TABLE public.order_items ADD COLUMN IF NOT EXISTS selected_options JSONB;
+
+-- 商品ごとの税率（8% または 10%、領収書表示専用・Stripeには送らない）
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS tax_rate INTEGER NOT NULL DEFAULT 10;
+-- order_items.tax_rate は注文時点の税率スナップショット
+ALTER TABLE public.order_items ADD COLUMN IF NOT EXISTS tax_rate INTEGER NOT NULL DEFAULT 10;
+
+-- 商品明細ごとの発送ステータス・配送会社・伝票番号（orders.order_statusとは別管理）
+ALTER TABLE public.order_items
+ADD COLUMN IF NOT EXISTS shipping_status TEXT NOT NULL DEFAULT 'before_shipping'
+  CHECK (shipping_status IN ('before_shipping', 'shipped'));
+ALTER TABLE public.order_items ADD COLUMN IF NOT EXISTS shipping_carrier TEXT;
+ALTER TABLE public.order_items ADD COLUMN IF NOT EXISTS tracking_number TEXT;
 
 -- payment_intent_id はWebhook/重複防止に使うためユニーク化（NULLは複数OK）
 -- NOTE: PostgREST の upsert(on_conflict=payment_intent_id) は「UNIQUE制約/インデックス」を要求するが、
@@ -224,8 +240,9 @@ CREATE TABLE IF NOT EXISTS public.coupons (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name TEXT NOT NULL,
   code TEXT NOT NULL UNIQUE,
-  discount_type TEXT NOT NULL DEFAULT 'percentage' CHECK (discount_type IN ('percentage', 'fixed')),
-  discount_value INTEGER NOT NULL DEFAULT 0, -- percentage: 1-100, fixed: 円
+  discount_type TEXT NOT NULL DEFAULT 'percentage' CHECK (discount_type IN ('percentage', 'fixed', 'other')),
+  discount_value INTEGER NOT NULL DEFAULT 0, -- percentage: 1-100, fixed: 円, other: 0固定
+  note TEXT, -- discount_type='other' の時の特典内容（自由記述）
   is_active BOOLEAN NOT NULL DEFAULT true,
   starts_at TIMESTAMP WITH TIME ZONE,
   ends_at TIMESTAMP WITH TIME ZONE,
@@ -243,6 +260,10 @@ ALTER TABLE public.coupons ADD COLUMN IF NOT EXISTS name TEXT;
 ALTER TABLE public.coupons ADD COLUMN IF NOT EXISTS code TEXT;
 ALTER TABLE public.coupons ADD COLUMN IF NOT EXISTS discount_type TEXT DEFAULT 'percentage';
 ALTER TABLE public.coupons ADD COLUMN IF NOT EXISTS discount_value INTEGER DEFAULT 0;
+ALTER TABLE public.coupons ADD COLUMN IF NOT EXISTS note TEXT;
+ALTER TABLE public.coupons DROP CONSTRAINT IF EXISTS coupons_discount_type_check;
+ALTER TABLE public.coupons ADD CONSTRAINT coupons_discount_type_check
+  CHECK (discount_type IN ('percentage', 'fixed', 'other'));
 ALTER TABLE public.coupons ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
 ALTER TABLE public.coupons ADD COLUMN IF NOT EXISTS starts_at TIMESTAMP WITH TIME ZONE;
 ALTER TABLE public.coupons ADD COLUMN IF NOT EXISTS ends_at TIMESTAMP WITH TIME ZONE;
@@ -671,6 +692,8 @@ END;
 $$;
 
 -- クーポンコードで大文字・小文字を区別しない検索を行う関数
+-- 戻り値の列構成を変更したことがあるため、既存環境向けに先に削除してから再作成する
+DROP FUNCTION IF EXISTS public.get_coupon_by_code(TEXT);
 CREATE OR REPLACE FUNCTION public.get_coupon_by_code(
   p_code TEXT
 ) RETURNS TABLE (
@@ -679,6 +702,7 @@ CREATE OR REPLACE FUNCTION public.get_coupon_by_code(
   code TEXT,
   discount_type TEXT,
   discount_value INTEGER,
+  note TEXT,
   is_active BOOLEAN,
   starts_at TIMESTAMP WITH TIME ZONE,
   ends_at TIMESTAMP WITH TIME ZONE,
@@ -689,18 +713,19 @@ CREATE OR REPLACE FUNCTION public.get_coupon_by_code(
   applies_to_all BOOLEAN,
   created_at TIMESTAMP WITH TIME ZONE,
   updated_at TIMESTAMP WITH TIME ZONE
-) 
+)
 LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 BEGIN
   RETURN QUERY
-  SELECT 
+  SELECT
     c.id,
     c.name,
     c.code,
     c.discount_type,
     c.discount_value,
+    c.note,
     c.is_active,
     c.starts_at,
     c.ends_at,

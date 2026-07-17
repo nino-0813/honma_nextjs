@@ -27,6 +27,7 @@ export interface Product {
   }[];
   sku?: string;
   stock?: number;
+  taxRate?: number; // 税率（8 または 10）。領収書表示専用でStripeには送らない
   display_order?: number; // 表示順序
   is_visible?: boolean; // 表示/非表示
   isFreeShipping?: boolean; // 送料無料フラグ

@@ -13,6 +13,8 @@ import {
   IconDownload,
   IconGripVertical,
   IconCopy,
+  IconArchive,
+  IconArchiveRestore,
 } from '@/components/Icons';
 
 interface ProductRow {
@@ -33,6 +35,7 @@ interface ProductRow {
   status?: string;
   display_order?: number;
   is_visible?: boolean;
+  tax_rate?: number;
 }
 
 const ProductList = () => {
@@ -47,6 +50,7 @@ const ProductList = () => {
   const [dragOverItem, setDragOverItem] = useState<string | null>(null);
   const [isReorderMode, setIsReorderMode] = useState(false);
   const [hasUnsavedReorder, setHasUnsavedReorder] = useState(false);
+  const [showArchived, setShowArchived] = useState(false);
   const originalOrderRef = useRef<ProductRow[]>([]);
 
   useEffect(() => {
@@ -110,6 +114,68 @@ const ProductList = () => {
       alert('商品データの取得に失敗しました');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleArchive = async (id: string) => {
+    if (!window.confirm('この商品をアーカイブしますか？\n一覧から非表示になり、ストアにも表示されなくなります。')) return;
+    try {
+      const { error } = await supabase!
+        .from('products')
+        .update({ status: 'archived', is_active: false, is_visible: false })
+        .eq('id', id);
+      if (error) throw error;
+      setProducts(
+        products.map((p) => (p.id === id ? { ...p, status: 'archived', is_active: false, is_visible: false } : p))
+      );
+      setSelectedProducts(selectedProducts.filter((pid) => pid !== id));
+      alert('アーカイブしました');
+    } catch (error) {
+      console.error('アーカイブエラー:', error);
+      alert('アーカイブに失敗しました');
+    }
+  };
+
+  const handleUnarchive = async (id: string) => {
+    try {
+      const { error } = await supabase!
+        .from('products')
+        .update({ status: 'draft', is_active: false, is_visible: false })
+        .eq('id', id);
+      if (error) throw error;
+      setProducts(
+        products.map((p) => (p.id === id ? { ...p, status: 'draft', is_active: false, is_visible: false } : p))
+      );
+      setSelectedProducts(selectedProducts.filter((pid) => pid !== id));
+      alert('非公開に戻しました');
+    } catch (error) {
+      console.error('復元エラー:', error);
+      alert('復元に失敗しました');
+    }
+  };
+
+  const handleBulkArchive = async () => {
+    if (selectedProducts.length === 0) {
+      alert('商品を選択してください');
+      return;
+    }
+    if (!window.confirm(`選択した${selectedProducts.length}件をアーカイブしますか？`)) return;
+    try {
+      const { error } = await supabase!
+        .from('products')
+        .update({ status: 'archived', is_active: false, is_visible: false })
+        .in('id', selectedProducts);
+      if (error) throw error;
+      setProducts(
+        products.map((p) =>
+          selectedProducts.includes(p.id) ? { ...p, status: 'archived', is_active: false, is_visible: false } : p
+        )
+      );
+      setSelectedProducts([]);
+      alert('アーカイブしました');
+    } catch (error) {
+      console.error('一括アーカイブエラー:', error);
+      alert('アーカイブに失敗しました');
     }
   };
 
@@ -239,6 +305,7 @@ const ProductList = () => {
   };
 
   const filteredProducts = products
+    .filter((product) => (showArchived ? product.status === 'archived' : product.status !== 'archived'))
     .filter(
       (product) =>
         product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -514,6 +581,7 @@ const ProductList = () => {
       'price（必須・数値）',
       'stock（数値）',
       "sku（必須・数字の先頭に'をつける）",
+      'tax_rate（8 または 10）',
     ];
 
     const csvRows = productsToExport.map((product) => [
@@ -527,6 +595,7 @@ const ProductList = () => {
       product.price || 0,
       product.stock || 0,
       product.sku || '',
+      product.tax_rate === 8 ? 8 : 10,
     ]);
 
     const csvContent = [csvHeader.join(','), ...csvRows.map((row) => row.join(','))].join('\n');
@@ -631,6 +700,7 @@ const ProductList = () => {
             price: parseInt(productData.price) || 0,
             stock: parseInt(productData.stock) || 0,
             sku: productData.sku.trim(),
+            tax_rate: parseInt(productData.tax_rate) === 8 ? 8 : 10,
           };
 
           if (!cleanData.handle) {
@@ -782,11 +852,31 @@ const ProductList = () => {
               一括非公開
             </button>
             <button
+              onClick={handleBulkArchive}
+              className="px-3 py-2 text-xs md:text-sm rounded-md border border-amber-200 text-amber-700 hover:bg-amber-50 transition-all disabled:opacity-50"
+              disabled={selectedProducts.length === 0 || showArchived}
+            >
+              一括アーカイブ
+            </button>
+            <button
               onClick={handleBulkDelete}
               className="px-3 py-2 text-xs md:text-sm rounded-md border border-red-200 text-red-600 hover:bg-red-50 transition-all disabled:opacity-50"
               disabled={selectedProducts.length === 0}
             >
               一括削除
+            </button>
+            <button
+              onClick={() => {
+                setShowArchived((v) => !v);
+                setSelectedProducts([]);
+              }}
+              className={`px-3 py-2 text-xs md:text-sm rounded-md border transition-all ${
+                showArchived
+                  ? 'border-amber-300 bg-amber-50 text-amber-700'
+                  : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              {showArchived ? 'アーカイブ済みを表示中' : 'アーカイブ済みを表示'}
             </button>
             {!isReorderMode ? (
               <button
@@ -886,10 +976,17 @@ const ProductList = () => {
                             e.stopPropagation();
                             toggleVisibility(product.id, product.is_visible ?? true);
                           }}
-                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${
+                          disabled={product.status === 'archived'}
+                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-40 disabled:cursor-not-allowed ${
                             product.is_visible !== false ? 'bg-purple-600' : 'bg-gray-200'
                           }`}
-                          title={product.is_visible !== false ? '非表示にする' : '表示する'}
+                          title={
+                            product.status === 'archived'
+                              ? 'アーカイブ済みの商品は復元してから変更してください'
+                              : product.is_visible !== false
+                                ? '非表示にする'
+                                : '表示する'
+                          }
                         >
                           <span
                             className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
@@ -918,21 +1015,27 @@ const ProductList = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleStatus(product.id, product.is_active);
-                        }}
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium cursor-pointer hover:opacity-80 transition-opacity ${
-                          !product.is_active
-                            ? 'bg-gray-100 text-gray-600'
-                            : 'bg-green-50 text-green-700 border border-green-100'
-                        }`}
-                        title={product.is_active ? '非公開にする' : '販売中にする'}
-                      >
-                        {product.is_active && <span className="w-1.5 h-1.5 rounded-full bg-green-500" />}
-                        {product.is_active ? '販売中' : '非公開'}
-                      </button>
+                      {product.status === 'archived' ? (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-100">
+                          アーカイブ済み
+                        </span>
+                      ) : (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleStatus(product.id, product.is_active);
+                          }}
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium cursor-pointer hover:opacity-80 transition-opacity ${
+                            !product.is_active
+                              ? 'bg-gray-100 text-gray-600'
+                              : 'bg-green-50 text-green-700 border border-green-100'
+                          }`}
+                          title={product.is_active ? '非公開にする' : '販売中にする'}
+                        >
+                          {product.is_active && <span className="w-1.5 h-1.5 rounded-full bg-green-500" />}
+                          {product.is_active ? '販売中' : '非公開'}
+                        </button>
+                      )}
                     </td>
                     <td className="px-6 py-4 text-gray-600">{calculateVariantStock(product)}</td>
                     <td className="px-6 py-4 text-gray-500">
@@ -964,6 +1067,29 @@ const ProductList = () => {
                         >
                           <IconCopy className="w-4 h-4" />
                         </button>
+                        {product.status === 'archived' ? (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleUnarchive(product.id);
+                            }}
+                            className="p-1 text-gray-400 hover:text-purple-600"
+                            title="非公開に戻す"
+                          >
+                            <IconArchiveRestore className="w-4 h-4" />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleArchive(product.id);
+                            }}
+                            className="p-1 text-gray-400 hover:text-amber-600"
+                            title="アーカイブ"
+                          >
+                            <IconArchive className="w-4 h-4" />
+                          </button>
+                        )}
                         <button
                           onClick={(e) => {
                             e.stopPropagation();

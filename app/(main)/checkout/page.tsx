@@ -1243,8 +1243,9 @@ const Checkout = () => {
     id: string;
     code: string;
     name: string;
-    discount_type: 'percentage' | 'fixed';
+    discount_type: 'percentage' | 'fixed' | 'other';
     discount_value: number;
+    note?: string | null;
   } | null>(null);
   
   // クーポン検証関数
@@ -1353,6 +1354,7 @@ const Checkout = () => {
         name: coupon.name,
         discount_type: coupon.discount_type,
         discount_value: coupon.discount_value,
+        note: coupon.note,
       });
       setCouponError(null);
     } catch (err: any) {
@@ -1363,17 +1365,20 @@ const Checkout = () => {
       setCouponValidating(false);
     }
   };
-  
+
   // 割引額を計算
   const discountAmount = useMemo(() => {
     if (!appliedCoupon) return 0;
-    
+
     if (appliedCoupon.discount_type === 'percentage') {
       // 割引率: 小計に対して適用（送料は対象外）
       return Math.floor(subtotal * appliedCoupon.discount_value / 100);
-    } else {
+    } else if (appliedCoupon.discount_type === 'fixed') {
       // 固定額: 小計から引く（ただし小計を超えない）
       return Math.min(appliedCoupon.discount_value, subtotal);
+    } else {
+      // その他（特典プレゼント）: 金額の割引は無し
+      return 0;
     }
   }, [appliedCoupon, subtotal]);
   
@@ -1579,6 +1584,7 @@ const Checkout = () => {
       selected_options: Record<string, string> | null | undefined;
       quantity: number;
       line_total: number;
+      tax_rate: number;
     }>
   ) => {
     const buildLegacyCompatibleRows = (
@@ -1592,6 +1598,7 @@ const Checkout = () => {
         selected_options: Record<string, string> | null | undefined;
         quantity: number;
         line_total: number;
+        tax_rate: number;
       }>
     ) => {
       const grouped = new Map<
@@ -1607,6 +1614,7 @@ const Checkout = () => {
             selected_options: Record<string, any> | null;
             quantity: number;
             line_total: number;
+            tax_rate: number;
           };
           byVariant: Map<string, number>;
         }
@@ -1724,6 +1732,7 @@ const Checkout = () => {
           subtotal,
           shippingCost,
           discountAmount,
+          couponId: appliedCoupon?.id || null,
           // 最低限の必須項目だけでキーを作る（細かい入力途中の変化で暴れないようにする）
           email: formData.email,
           firstName: formData.firstName,
@@ -1808,6 +1817,9 @@ const Checkout = () => {
         shipping_cost: shippingCost,
           discount_amount: discountAmount,
           coupon_id: appliedCoupon?.id || null,
+          coupon_code: appliedCoupon?.code || null,
+          coupon_name: appliedCoupon?.name || null,
+          coupon_note: appliedCoupon?.note || null,
         total: total,
           event_miles_used: eventMilesUsed,
           payment_status: 'pending',
@@ -1844,6 +1856,7 @@ const Checkout = () => {
             selected_options: item.selectedOptions ?? null,
             quantity: item.quantity,
             line_total: unitPrice * item.quantity,
+            tax_rate: item.product.taxRate === 8 ? 8 : 10,
             is_subscription: isSub,
             subscription_interval: isSub ? item.subscriptionInterval ?? null : null,
             subscription_discount_percent: isSub ? item.subscriptionDiscountPercent ?? null : null,
@@ -1921,6 +1934,9 @@ const Checkout = () => {
       shipping_cost: shippingCost,
       discount_amount: discountAmount,
       coupon_id: appliedCoupon?.id || null,
+      coupon_code: appliedCoupon?.code || null,
+      coupon_name: appliedCoupon?.name || null,
+      coupon_note: appliedCoupon?.note || null,
       total: total,
       event_miles_used: eventMilesUsed,
       payment_status: 'pending',
@@ -1942,6 +1958,10 @@ const Checkout = () => {
         .single();
       if (insErr) throw insErr;
       orderId = inserted?.id;
+    } else {
+      // 既存のドラフトがあっても、クーポン適用などその後の変更を確実に反映する
+      const { error: updErr } = await supabase!.from('orders').update(orderData).eq('id', orderId);
+      if (updErr) throw updErr;
     }
 
     // 注文明細を保存（種類ごとの行を保持するため全置換）
@@ -1959,6 +1979,7 @@ const Checkout = () => {
           selected_options: item.selectedOptions ?? null,
           quantity: item.quantity,
           line_total: unitPrice * item.quantity,
+          tax_rate: item.product.taxRate === 8 ? 8 : 10,
           is_subscription: isSub,
           subscription_interval: isSub ? item.subscriptionInterval ?? null : null,
           subscription_discount_percent: isSub ? item.subscriptionDiscountPercent ?? null : null,
@@ -2912,6 +2933,9 @@ const Checkout = () => {
                           <div>
                             <p className="text-sm font-medium text-green-900">{appliedCoupon.name}</p>
                             <p className="text-xs text-green-700">{appliedCoupon.code}</p>
+                            {appliedCoupon.discount_type === 'other' && appliedCoupon.note && (
+                              <p className="text-xs text-green-700 mt-1">🎁 {appliedCoupon.note}</p>
+                            )}
                           </div>
                           <button
                             type="button"

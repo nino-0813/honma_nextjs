@@ -1,5 +1,5 @@
 // 管理者用: 発送通知メール（Brevoテンプレート #2）を手動送信するAPI
-// 管理画面で伝票番号を保存した際、または伝票番号CSVインポート時に呼ばれる
+// 管理画面で商品明細ごとの伝票番号を保存した際、または伝票番号CSVインポート時に呼ばれる
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendBrevoEmail } from '@/lib/brevo';
@@ -53,18 +53,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: '管理者権限がありません' }, { status: 403 });
     }
 
-    const body = (await request.json()) as { orderId?: string };
-    const orderId = body?.orderId;
-    if (!orderId) {
-      return NextResponse.json({ error: 'orderIdが必要です' }, { status: 400 });
+    const body = (await request.json()) as { orderItemId?: string };
+    const orderItemId = body?.orderItemId;
+    if (!orderItemId) {
+      return NextResponse.json({ error: 'orderItemIdが必要です' }, { status: 400 });
     }
 
-    const { data: order, error: orderErr } = await supabaseAdmin
-      .from('orders')
-      .select('*, order_items (product_title, quantity, variant, selected_options)')
-      .eq('id', orderId)
+    const { data: orderItem, error: itemErr } = await supabaseAdmin
+      .from('order_items')
+      .select('product_title, quantity, variant, selected_options, shipping_carrier, tracking_number, orders(*)')
+      .eq('id', orderItemId)
       .maybeSingle();
-    if (orderErr) throw orderErr;
+    if (itemErr) throw itemErr;
+    if (!orderItem) {
+      return NextResponse.json({ error: '商品明細が見つかりません' }, { status: 404 });
+    }
+
+    const order = (orderItem as any).orders;
     if (!order) {
       return NextResponse.json({ error: '注文が見つかりません' }, { status: 404 });
     }
@@ -84,19 +89,21 @@ export async function POST(request: Request) {
       return '';
     };
 
-    const items = (order.order_items || []).map((it: any) => ({
-      product_name: `${it.product_title ?? '商品'}${optionsLabel(it)}`,
-      quantity: Number(it.quantity || 0),
-    }));
+    const items = [
+      {
+        product_name: `${orderItem.product_title ?? '商品'}${optionsLabel(orderItem)}`,
+        quantity: Number(orderItem.quantity || 0),
+      },
+    ];
 
     const result = await sendBrevoEmail({
       to: [{ email: order.email, name: customerName }],
       templateId: SHIPPING_TEMPLATE_ID,
       params: {
         name: customerName,
-        order_number: order.order_number || orderId,
-        shipping_company: order.shipping_carrier || '',
-        shipping_number: order.tracking_number || '',
+        order_number: order.order_number || order.id,
+        shipping_company: orderItem.shipping_carrier || '',
+        shipping_number: orderItem.tracking_number || '',
         items,
         subtotal: numJa(order.subtotal),
         shipping_cost: numJa(order.shipping_cost),
