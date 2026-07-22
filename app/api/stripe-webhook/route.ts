@@ -131,10 +131,11 @@ async function sendOrderConfirmationEmail(
     'お客様';
 
   // 配送先住所（受注通知メール #3 の {{ params.address }} 用）
+  // shipping_address には都道府県・市区町村・番地が既にすべて含まれているため、shipping_city は付け足さない
   const shippingAddress =
     [
       order.shipping_postal_code ? `〒${order.shipping_postal_code}` : '',
-      `${order.shipping_city ?? ''}${order.shipping_address ?? ''}`.trim(),
+      (order.shipping_address ?? '').trim(),
     ]
       .filter(Boolean)
       .join(' ') || '（住所未登録）';

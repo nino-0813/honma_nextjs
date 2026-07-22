@@ -747,7 +747,7 @@ const Orders = () => {
       発送先氏名: getShippingDisplayName(o),
       発送先電話: getShippingDisplayPhone(o) || '',
       発送先郵便番号: o.shipping_postal_code || '',
-      発送先住所: [o.shipping_city, o.shipping_address].filter(Boolean).join('') || o.shipping_address || '',
+      発送先住所: o.shipping_address || '',
       注文者氏名: getCustomerName(o),
       注文者電話: o.phone || '',
       注文者郵便番号: o.billing_postal_code || o.shipping_postal_code || '',
