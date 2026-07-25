@@ -342,7 +342,7 @@ const Dashboard = () => {
             </div>
           </Link>
 
-          <Link href="/admin/customers" className="bg-white border border-gray-100 rounded-lg p-6 shadow-sm hover:border-gray-300 transition-colors block">
+          <Link href="/admin/customer-list" className="bg-white border border-gray-100 rounded-lg p-6 shadow-sm hover:border-gray-300 transition-colors block">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
                 <IconUsers className="w-5 h-5 text-gray-600" />

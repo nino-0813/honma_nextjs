@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import {
   IconChevronDown,
@@ -213,10 +214,12 @@ const copyText = async (text: string) => {
 };
 
 const Orders = () => {
+  const searchParams = useSearchParams();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  // 顧客リストの「注文履歴」から ?email=... で来た場合、その顧客のメールアドレスで初期検索する
+  const [searchQuery, setSearchQuery] = useState(() => searchParams?.get('email') || '');
   const [showFilters, setShowFilters] = useState(false);
   const [statusFilter, setStatusFilter] = useState<MappedStatus>('all');
   const [paymentFilter, setPaymentFilter] = useState<PaymentStatusFilter>('all');
