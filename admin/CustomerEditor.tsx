@@ -23,6 +23,9 @@ const PLATFORM_OPTIONS = [
 
 const GENDER_OPTIONS = ['男性', '女性', 'その他', '未回答'];
 
+// 紹介URLは常に本番ドメインを指す（管理画面をローカルで開いていても localhost にならないよう固定文字列にする）
+const REFERRAL_BASE_URL = 'https://www.ikevege.com';
+
 type SnsRow = { sns_type: string; account_url: string };
 
 const CustomerEditor = () => {
@@ -53,6 +56,8 @@ const CustomerEditor = () => {
   const [snsAccounts, setSnsAccounts] = useState<SnsRow[]>([]);
   const [newsletterOptIn, setNewsletterOptIn] = useState(false);
   const [referrerName, setReferrerName] = useState('');
+  const [referralCode, setReferralCode] = useState('');
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const fetchFromProfile = async (client: NonNullable<typeof supabase>) => {
@@ -111,6 +116,7 @@ const CustomerEditor = () => {
         setLatestPurchaseShiitakeDate(c.latest_purchase_shiitake_date || '');
         setNewsletterOptIn(Boolean(c.newsletter_opt_in));
         setReferrerName(c.referrer_name || '');
+        setReferralCode(c.referral_code || '');
 
         const { data: sns, error: snsErr } = await client
           .from('customer_sns_accounts')
@@ -136,6 +142,28 @@ const CustomerEditor = () => {
       else next.add(cat);
       return next;
     });
+  };
+
+  const handleCopyReferralUrl = async () => {
+    const url = `${REFERRAL_BASE_URL}/?ref=${referralCode}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch {
+        alert('コピーに失敗しました');
+      }
+    }
   };
 
   const addSnsRow = () => setSnsAccounts((prev) => [...prev, { sns_type: '', account_url: '' }]);
@@ -465,6 +493,30 @@ const CustomerEditor = () => {
             />
           </div>
         </div>
+
+        {!isNew && referralCode && (
+          <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-3">
+            <h2 className="text-lg font-semibold text-gray-900">この方の紹介URL</h2>
+            <p className="text-xs text-gray-500">
+              このURLを経由して会員登録した方は、自動的にこの方の名前が「紹介者」として登録されます。
+            </p>
+            <div className="flex gap-2">
+              <input
+                readOnly
+                value={`${REFERRAL_BASE_URL}/?ref=${referralCode}`}
+                onFocus={(e) => e.target.select()}
+                className="flex-1 p-3 border border-gray-200 rounded-lg bg-gray-50 text-sm font-mono"
+              />
+              <button
+                type="button"
+                onClick={handleCopyReferralUrl}
+                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 whitespace-nowrap"
+              >
+                {copied ? 'コピーしました' : 'コピー'}
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="flex items-center justify-between">
           <div>

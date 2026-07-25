@@ -142,6 +142,23 @@ const AuthForm: React.FC<AuthFormProps> = ({ onAuthSuccess, initialEmail = '' })
 
         if (signUpError) throw signUpError;
 
+        // 紹介URL（?ref=）経由の登録なら、紹介者のcustomers行と紐付ける
+        if (data?.user) {
+          try {
+            const referralCode = localStorage.getItem('ikevege_referral_code');
+            if (referralCode) {
+              await fetch('/api/track-referral', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: data.user.id, email, referralCode }),
+              });
+              localStorage.removeItem('ikevege_referral_code');
+            }
+          } catch (referralError) {
+            console.error('紹介の記録に失敗しました:', referralError);
+          }
+        }
+
         // 新規登録成功時、sessionがあれば即座にログイン状態にする（ただし遷移はしない）
         if (data?.session && data?.user) {
           setSignUpCompleted(true);

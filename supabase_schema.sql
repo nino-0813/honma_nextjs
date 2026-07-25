@@ -342,6 +342,15 @@ CREATE POLICY "Admins can manage customer_sns_accounts"
 CREATE INDEX IF NOT EXISTS idx_customers_email ON public.customers(email);
 CREATE INDEX IF NOT EXISTS idx_customer_sns_accounts_customer_id ON public.customer_sns_accounts(customer_id);
 
+-- 紹介URL発行用のコード（既存環境向けに不足カラムを追加）
+ALTER TABLE public.customers ADD COLUMN IF NOT EXISTS referral_code TEXT;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_customers_referral_code ON public.customers(referral_code);
+
+-- 紹介者を確実に紐付けるための参照列（紹介実績の集計に使用）
+ALTER TABLE public.customers
+ADD COLUMN IF NOT EXISTS referred_by_customer_id UUID REFERENCES public.customers(id) ON DELETE SET NULL;
+CREATE INDEX IF NOT EXISTS idx_customers_referred_by ON public.customers(referred_by_customer_id);
+
 -- ==========================================
 -- 関数とトリガー
 -- ==========================================
@@ -406,6 +415,23 @@ CREATE TRIGGER set_order_number
   FOR EACH ROW
   WHEN (NEW.order_number IS NULL)
   EXECUTE FUNCTION generate_order_number();
+
+-- 顧客の紹介コードを自動生成する関数（紹介URL発行用）
+CREATE OR REPLACE FUNCTION generate_customer_referral_code()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.referral_code IS NULL THEN
+    NEW.referral_code := substr(replace(uuid_generate_v4()::text, '-', ''), 1, 8);
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS set_customer_referral_code ON public.customers;
+CREATE TRIGGER set_customer_referral_code
+  BEFORE INSERT ON public.customers
+  FOR EACH ROW
+  EXECUTE FUNCTION generate_customer_referral_code();
 
 -- 管理者権限チェック関数 (RLSで使用)
 CREATE OR REPLACE FUNCTION public.is_admin()

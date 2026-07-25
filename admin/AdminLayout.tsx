@@ -18,6 +18,7 @@ import {
   IconSettings,
   IconPercent,
   IconRefreshCw,
+  IconTrendingUp,
 } from '@/components/Icons';
 import { useAdmin } from '@/hooks/useAdmin';
 
@@ -66,6 +67,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, actions }) =
           <NavItem href="/admin/shipping-methods" icon={IconSettings} label="発送方法管理" />
           <NavItem href="/admin/discounts" icon={IconPercent} label="クーポン" />
           <NavItem href="/admin/customer-list" icon={IconUsers} label="顧客リスト" />
+          <NavItem href="/admin/referrals" icon={IconTrendingUp} label="紹介実績" />
           <NavItem href="/admin/reviews" icon={IconStar} label="レビュー管理" />
           <NavItem href="/admin/customer-support" icon={IconMessageCircle} label="顧客対応" />
           <NavItem href="/admin/analytics" icon={IconBarChart} label="ストア分析" />

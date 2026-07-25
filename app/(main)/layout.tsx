@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { CartProvider, CartContext } from '@/providers/CartProvider';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { CartDrawer, MenuDrawer } from '@/components/Drawers';
+
+const REFERRAL_STORAGE_KEY = 'ikevege_referral_code';
 
 function MainLayoutInner({
   children,
@@ -45,6 +47,19 @@ function MainLayoutInner({
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // 紹介URL（?ref=コード）を踏んだら会員登録まで覚えておく
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const ref = new URLSearchParams(window.location.search).get('ref');
+    if (ref) {
+      try {
+        localStorage.setItem(REFERRAL_STORAGE_KEY, ref);
+      } catch {
+        // localStorageが使えない場合は何もしない
+      }
+    }
+  }, []);
 
   return (
     <CartProvider onCartOpen={() => setIsCartOpen(true)} onMenuOpen={() => setIsMenuOpen(true)}>
