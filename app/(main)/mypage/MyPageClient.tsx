@@ -159,6 +159,7 @@ const MyPage = () => {
     const signUpSuccessFlag =
       typeof window !== 'undefined' ? localStorage.getItem('signUpSuccess') : null;
     if (signUpSuccessFlag === 'true') {
+      localStorage.removeItem('signUpSuccess');
       setIsSignUpSuccess(true);
       setLoading(false);
       return;
@@ -192,6 +193,7 @@ const MyPage = () => {
         return;
       }
 
+      setIsSignUpSuccess(false);
       setUser(session.user);
       await loadUserData(session.user.id);
     } catch (error) {
@@ -203,6 +205,7 @@ const MyPage = () => {
   };
 
   const handleAuthSuccess = async (_email: string, userData: any) => {
+    setIsSignUpSuccess(false);
     setUser(userData);
     if (userData?.id) {
       await loadUserData(userData.id);

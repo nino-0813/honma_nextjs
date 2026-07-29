@@ -57,6 +57,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ onAuthSuccess, initialEmail = '' })
     if (message.includes('user already registered') || message.includes('already registered')) {
       return 'このメールアドレスは既に登録されています。ログインしてください。';
     }
+    if (message.includes('invalid login credentials')) {
+      return 'メールアドレスまたはパスワードが正しくありません。';
+    }
     if (message.includes('invalid email')) {
       return 'メールアドレスの形式が正しくありません。';
     }
