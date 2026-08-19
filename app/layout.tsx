@@ -27,7 +27,9 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     images: ['/og-image.png'],
   },
-  alternates: { canonical: '/' },
+  // canonical はルートレイアウトで指定しない。
+  // ここで '/' を指定すると、個別に canonical を持たないページが
+  // すべてトップページに正規化され、検索結果から消えるため。
   // Search Console の HTMLメタタグ認証用（DNS TXT/GA連携の場合は未設定でOK）
   ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
     ? { verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION } }

@@ -1,10 +1,5 @@
-import type { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'COLLECTIONS',
-  description: 'IKEVEGE（イケベジ）の商品一覧です。',
-  alternates: { canonical: '/collections' },
-};
+// メタデータ（title / description / canonical）は
+// [[...slug]]/layout.tsx の generateMetadata でカテゴリごとに出し分けている。
 
 export default function CollectionsLayout({ children }: { children: React.ReactNode }) {
   return children;

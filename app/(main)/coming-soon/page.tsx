@@ -1,3 +1,11 @@
+import type { Metadata } from 'next';
+
+// 一時的な案内ページ。検索結果に出す必要がないため noindex。
+export const metadata: Metadata = {
+  title: 'COMING SOON',
+  robots: { index: false, follow: false },
+};
+
 const ComingSoon = () => {
   return (
     <div
