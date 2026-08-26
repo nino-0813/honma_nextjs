@@ -32,12 +32,33 @@ function FadeInSection({ children, className = '' }: { children: React.ReactNode
  * イケてるパートナーズ 協賛企業ロゴ一覧
  * - 必要に応じてここに追記するだけでグリッドが自動的に増えます（最大8社想定）
  */
-const PARTNER_LOGOS: { name: string; src: string }[] = [
+const PARTNER_LOGOS: { name: string; src: string; url?: string }[] = [
   { name: 'ClearHome', src: '/images/partners/clearhome.png' },
-  { name: 'BLUE ADVANCE', src: '/images/partners/blue-advance.png' },
-  { name: 'KOU PRIVATE MAISON', src: '/images/partners/kou-private-maison.webp' },
-  { name: 'NOAH ORDER SUIT TOKYO', src: '/images/partners/noah-order-suit.webp' },
-  { name: 'キムチの家 KIMUCHI HOUSE', src: '/images/partners/kimuchi-house.webp' },
+  {
+    name: 'BLUE ADVANCE',
+    src: '/images/partners/blue-advance.png',
+    url: 'https://www.blue-advance.co.jp',
+  },
+  {
+    name: 'KOU PRIVATE MAISON',
+    src: '/images/partners/kou-private-maison.webp',
+    url: 'https://kou-kyoto.com/',
+  },
+  {
+    name: 'NOAH ORDER SUIT TOKYO',
+    src: '/images/partners/noah-order-suit.webp',
+    url: 'https://www.ordersuit-noah.com/',
+  },
+  {
+    name: 'キムチの家 KIMUCHI HOUSE',
+    src: '/images/partners/kimuchi-house.webp',
+    url: 'https://www.instagram.com/kimuchi.house/',
+  },
+  {
+    name: 'SHINWA style',
+    src: '/images/partners/shinwa-style.webp',
+    url: 'https://shinwastyle.com/',
+  },
 ];
 
 export default function AmbassadorPage() {
@@ -142,19 +163,35 @@ export default function AmbassadorPage() {
 
                 {/* 協賛企業ロゴグリッド（最大8社） */}
                 <div className="grid grid-cols-2 gap-3 md:gap-4">
-                  {PARTNER_LOGOS.map((p) => (
-                    <div
-                      key={p.name}
-                      className="aspect-[16/9] bg-white border border-gray-200 rounded-lg flex items-center justify-center p-4 hover:border-amber-200 hover:shadow-sm transition-all"
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                  {PARTNER_LOGOS.map((p) => {
+                    const cellClass =
+                      'aspect-[16/9] bg-white border border-gray-200 rounded-lg flex items-center justify-center p-4 hover:border-amber-200 hover:shadow-sm transition-all';
+                    const logo = (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={p.src}
                         alt={p.name}
                         className="max-w-full max-h-full object-contain"
                       />
-                    </div>
-                  ))}
+                    );
+                    // URLが登録されている企業だけリンクにする
+                    return p.url ? (
+                      <a
+                        key={p.name}
+                        href={p.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`${p.name}のウェブサイトを開く`}
+                        className={cellClass}
+                      >
+                        {logo}
+                      </a>
+                    ) : (
+                      <div key={p.name} className={cellClass}>
+                        {logo}
+                      </div>
+                    );
+                  })}
                 </div>
 
                 <p className="mt-5 md:mt-6 text-[10px] md:text-[11px] text-gray-400 text-center">
