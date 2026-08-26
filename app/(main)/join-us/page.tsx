@@ -35,6 +35,9 @@ function FadeInSection({ children, className = '' }: { children: React.ReactNode
 const PARTNER_LOGOS: { name: string; src: string }[] = [
   { name: 'ClearHome', src: '/images/partners/clearhome.png' },
   { name: 'BLUE ADVANCE', src: '/images/partners/blue-advance.png' },
+  { name: 'KOU PRIVATE MAISON', src: '/images/partners/kou-private-maison.webp' },
+  { name: 'NOAH ORDER SUIT TOKYO', src: '/images/partners/noah-order-suit.webp' },
+  { name: 'キムチの家 KIMUCHI HOUSE', src: '/images/partners/kimuchi-house.webp' },
 ];
 
 export default function AmbassadorPage() {
