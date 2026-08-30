@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import SectionHeading from './SectionHeading';
 import CircleButton from './CircleButton';
+import FadeIn from '@/components/FadeIn';
 
 /**
  * 取り組み（ベースフードの「サービス」枠に相当）。
@@ -37,11 +38,14 @@ export default function Activities() {
   return (
     <section className="pb-20 md:pb-28 bg-white">
       <div className="max-w-[1500px] mx-auto px-5 md:px-10">
-        <SectionHeading ja="取り組み" />
+        <FadeIn>
+          <SectionHeading ja="取り組み" />
+        </FadeIn>
 
         <ul className="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
-          {ITEMS.map((s) => (
+          {ITEMS.map((s, i) => (
             <li key={s.title}>
+              <FadeIn delay={Math.min(i, 3) * 70}>
               <Link href={s.href} className="group block">
                 <div className="relative aspect-[4/3] overflow-hidden bg-dim">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -60,6 +64,7 @@ export default function Activities() {
                   <CircleButton icon="arrow" variant="dark" size="sm" />
                 </span>
               </Link>
+              </FadeIn>
             </li>
           ))}
         </ul>

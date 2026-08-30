@@ -1,5 +1,6 @@
 import SectionHeading from './SectionHeading';
 import CircleButton from './CircleButton';
+import FadeIn from '@/components/FadeIn';
 
 /**
  * ブランドについて。
@@ -34,7 +35,9 @@ export default function BrandAbout() {
   return (
     <section className="pt-20 md:pt-32 bg-white">
       <div className="max-w-[1500px] mx-auto px-5 md:px-10">
-        <SectionHeading en="About" ja="イケベジについて" />
+        <FadeIn>
+          <SectionHeading en="About" ja="イケベジについて" />
+        </FadeIn>
 
         <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20">
           <p className="text-3xl md:text-[44px] lg:text-[52px] font-serif leading-[1.6] tracking-wide text-primary">
@@ -59,8 +62,9 @@ export default function BrandAbout() {
 
       {/* 全面タイル */}
       <ul className="mt-14 md:mt-20 grid grid-cols-1 md:grid-cols-3">
-        {TILES.map((t) => (
+        {TILES.map((t, i) => (
           <li key={t.key}>
+            <FadeIn delay={Math.min(i, 2) * 80}>
             <a href={t.href} className="group block">
               {/* 写真には色を重ねない */}
               <span className="relative block aspect-[4/5] md:aspect-auto md:h-[64svh] overflow-hidden bg-dim">
@@ -82,6 +86,7 @@ export default function BrandAbout() {
                 </span>
               </span>
             </a>
+            </FadeIn>
           </li>
         ))}
       </ul>

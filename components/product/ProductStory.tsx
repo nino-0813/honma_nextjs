@@ -3,6 +3,7 @@
 import Carousel from '@/components/Carousel';
 import { useState } from 'react';
 import { SHOW_PLACEHOLDER_BADGE } from '@/components/home/placeholders';
+import FadeIn from '@/components/FadeIn';
 
 /**
  * 商品ページ下部のテーマ別セクション（ベースフードの
@@ -95,15 +96,16 @@ export default function ProductStory() {
       {THEMES.map((t) => (
         <section key={t.label} className="mt-20 md:mt-28">
           <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8 lg:gap-16">
-            <div>
+            <FadeIn>
               <p className="text-xs tracking-[0.15em] text-yuunagi-ink mb-2">{t.label}</p>
               <h2 className="text-xl md:text-2xl font-serif tracking-wider text-primary whitespace-pre-line leading-relaxed">
                 {t.heading}
               </h2>
-            </div>
+            </FadeIn>
 
+            <FadeIn delay={80}>
             <Carousel ariaLabel={t.label}>
-              {t.cards.map((c) => (
+              {t.cards.map((c, i) => (
                 <li key={c.title} className="snap-start shrink-0 w-[260px] md:w-[320px]">
                   <div className="relative aspect-[4/3] overflow-hidden bg-dim">
                     {SHOW_PLACEHOLDER_BADGE && (
@@ -119,6 +121,7 @@ export default function ProductStory() {
                 </li>
               ))}
             </Carousel>
+            </FadeIn>
           </div>
         </section>
       ))}

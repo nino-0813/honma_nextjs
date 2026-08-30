@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import SectionHeading from './SectionHeading';
 import { PLACEHOLDER_NEWS, SHOW_PLACEHOLDER_BADGE } from './placeholders';
+import FadeIn from '@/components/FadeIn';
 
 const ROW_COUNT = 5;
 
@@ -49,7 +50,9 @@ export default async function News() {
         <div className="bg-secondary/40 px-6 md:px-10 py-10 md:py-14">
           <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-8 lg:gap-12">
             <div className="flex flex-col gap-5">
-              <SectionHeading en="News" ja="お知らせ" />
+              <FadeIn>
+                <SectionHeading en="News" ja="お知らせ" />
+              </FadeIn>
               <Link
                 href="/blog"
                 className="self-start inline-flex items-center gap-2 rounded-full border border-gray-400 bg-white px-5 py-2.5 text-xs text-primary hover:border-primary transition-colors"

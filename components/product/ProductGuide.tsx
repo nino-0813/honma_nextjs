@@ -1,6 +1,7 @@
 import { getGuide } from './guides';
 import ProductFeatures from './ProductFeatures';
 import { SHOW_PLACEHOLDER_BADGE } from '@/components/home/placeholders';
+import FadeIn from '@/components/FadeIn';
 
 /**
  * 商品詳細ページの下部に置く「詳しく見る」セクション。
@@ -43,7 +44,8 @@ export default function ProductGuide({
                 key={step.heading}
                 className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-center"
               >
-                <div className={`relative aspect-[4/3] overflow-hidden ${i % 2 === 1 ? 'md:order-2' : ''} ${step.image ? 'bg-dim' : 'bg-secondary/30 border border-dashed border-gray-300'}`}>
+                <FadeIn className={i % 2 === 1 ? 'md:order-2' : ''}>
+                <div className={`relative aspect-[4/3] overflow-hidden ${step.image ? 'bg-dim' : 'bg-secondary/30 border border-dashed border-gray-300'}`}>
                   {step.imageIsPlaceholder && SHOW_PLACEHOLDER_BADGE && (
                     <span className="absolute top-2 left-2 z-10 rounded-sm bg-yuunagi-ink/90 px-1.5 py-0.5 text-[9px] tracking-wider text-white">
                       仮素材
@@ -71,8 +73,9 @@ export default function ProductGuide({
                     </span>
                   )}
                 </div>
+                </FadeIn>
 
-                <div className={i % 2 === 1 ? 'md:order-1' : ''}>
+                <FadeIn delay={80} className={i % 2 === 1 ? 'md:order-1' : ''}>
                   <p className="text-[11px] tabular-nums tracking-[0.2em] text-yuunagi-ink mb-2">
                     {String(i + 1).padStart(2, '0')}
                   </p>
@@ -80,7 +83,7 @@ export default function ProductGuide({
                     {step.heading}
                   </h3>
                   <p className="text-[13px] md:text-sm leading-loose text-gray-600">{step.body}</p>
-                </div>
+                </FadeIn>
               </li>
             ))}
           </ol>

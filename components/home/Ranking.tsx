@@ -5,6 +5,7 @@ import { useProducts } from '@/hooks/useProducts';
 import { isProductPreorder, isProductSoldOut } from '@/lib/productStatus';
 import SectionHeading from './SectionHeading';
 import Carousel from '@/components/Carousel';
+import FadeIn from '@/components/FadeIn';
 
 const MAX_ITEMS = 10;
 
@@ -28,7 +29,9 @@ export default function Ranking() {
     <section id="products" className="py-20 md:py-28 lg:min-h-screen lg:flex lg:items-center bg-white">
       <div className="w-full max-w-[1500px] mx-auto px-5 md:px-10">
         <div className="mb-9 md:mb-12">
-          <SectionHeading en="Ranking" ja="人気の商品" />
+          <FadeIn>
+            <SectionHeading en="Ranking" ja="人気の商品" />
+          </FadeIn>
         </div>
 
         {loading ? (
@@ -36,6 +39,7 @@ export default function Ranking() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
           </div>
         ) : (
+          <FadeIn delay={80}>
           <Carousel ariaLabel="人気の商品">
             {items.map((p, i) => {
               const soldOut = isProductSoldOut(p);
@@ -77,6 +81,7 @@ export default function Ranking() {
               );
             })}
           </Carousel>
+          </FadeIn>
         )}
       </div>
     </section>

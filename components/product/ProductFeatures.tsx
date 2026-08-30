@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import FadeIn from '@/components/FadeIn';
 
 /**
  * 商品詳細のアコーディオン（ベースフードの「Features / 商品詳細」に相当）。
@@ -17,7 +18,7 @@ export default function ProductFeatures({
   return (
     <section className="mt-24 md:mt-32 border-t border-gray-100 pt-16 md:pt-20">
       <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8 lg:gap-16">
-        <div>
+        <FadeIn>
           <p className="text-[32px] md:text-[46px] font-sans font-bold tracking-tight text-yuunagi leading-none">
             Features
           </p>
@@ -25,7 +26,7 @@ export default function ProductFeatures({
             <span className="inline-block w-3 h-3 rounded-full bg-hekishoku shrink-0" aria-hidden="true" />
             商品詳細
           </p>
-        </div>
+        </FadeIn>
 
         <ul className="border-t border-gray-200">
           {rows.map((r) => {

@@ -56,10 +56,10 @@ export default async function Topics() {
             </FadeIn>
           </div>
 
+          <FadeIn delay={80}>
           <Carousel ariaLabel="トピックス">
             {cards.map((c, i) => (
               <li key={`${c.title}-${i}`} className="snap-start shrink-0 w-[280px] md:w-[380px] lg:w-[420px]">
-                <FadeIn delay={Math.min(i, 3) * 80}>
                 <Link href={c.href} className="group block">
                   <div className="relative aspect-[4/3] overflow-hidden bg-dim">
                     {c.isPlaceholder && <PlaceholderBadge />}
@@ -78,10 +78,10 @@ export default async function Topics() {
                     <time className="mt-1.5 block text-xs text-gray-400 tabular-nums">{formatDate(c.date)}</time>
                   )}
                 </Link>
-                </FadeIn>
               </li>
             ))}
           </Carousel>
+          </FadeIn>
         </div>
       </div>
     </section>

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import SectionHeading from './SectionHeading';
 import CircleButton from './CircleButton';
 import PlaceholderBadge from './PlaceholderBadge';
+import FadeIn from '@/components/FadeIn';
 
 /**
  * ラインナップ。
@@ -65,7 +66,9 @@ export default function Lineup() {
     <section className="pt-8 pb-20 md:pb-28 bg-white">
       <div className="max-w-[1500px] mx-auto px-5 md:px-10">
         <div className="flex items-end justify-between gap-6 mb-9 md:mb-12">
-          <SectionHeading en="Lineup" ja="ラインナップ" />
+          <FadeIn>
+            <SectionHeading en="Lineup" ja="ラインナップ" />
+          </FadeIn>
           <Link
             href="/collections"
             className="shrink-0 inline-flex items-center gap-2 rounded-full border border-gray-300 px-5 py-2.5 text-xs md:text-[13px] text-primary hover:border-primary transition-colors"
@@ -80,8 +83,9 @@ export default function Lineup() {
 
       {/* 全面タイル（隙間なし） */}
       <ul className="grid grid-cols-2 lg:grid-cols-3">
-        {TILES.map((t) => (
+        {TILES.map((t, i) => (
           <li key={t.ja}>
+            <FadeIn delay={Math.min(i % 3, 2) * 80}>
             {/* 上段3枚だけで画面の約8割。次の段が少し覗く高さ */}
               <Link href={t.href} className="group block">
               {/* 写真には色を重ねない。文字は写真の下に置く */}
@@ -105,6 +109,7 @@ export default function Lineup() {
                 <CircleButton icon="arrow" variant="dark" />
               </span>
             </Link>
+            </FadeIn>
           </li>
         ))}
       </ul>

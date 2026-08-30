@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import SectionHeading from './SectionHeading';
+import FadeIn from '@/components/FadeIn';
 
 /**
  * 定期便（ベースフードの「継続コース」に相当）。
@@ -34,7 +35,9 @@ export default function SubscriptionCTA() {
   return (
     <section className="py-20 md:py-32 bg-hekishoku text-white">
       <div className="max-w-[1500px] mx-auto px-5 md:px-10">
-        <SectionHeading ja="イケベジ定期便" tone="light" />
+        <FadeIn>
+          <SectionHeading ja="イケベジ定期便" tone="light" />
+        </FadeIn>
 
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-16">
           <h2 className="text-2xl md:text-[38px] lg:text-[44px] font-serif leading-[1.6] tracking-wide text-white">
@@ -54,14 +57,16 @@ export default function SubscriptionCTA() {
         </div>
 
         <ul className="mt-12 grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-          {POINTS.map((p) => (
+          {POINTS.map((p, i) => (
             <li key={p.head} className="flex flex-col gap-3">
+              <FadeIn delay={Math.min(i, 3) * 70} className="flex flex-col gap-3">
               <div className="aspect-[4/3] overflow-hidden bg-dim">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={p.image} alt="" aria-hidden="true" loading="lazy" className="w-full h-full object-cover" />
               </div>
               <h3 className="text-sm md:text-[15px] font-medium text-white">{p.head}</h3>
               <p className="text-[12px] text-white/80 leading-relaxed">{p.body}</p>
+              </FadeIn>
             </li>
           ))}
         </ul>
