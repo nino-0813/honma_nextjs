@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useProducts } from '@/hooks/useProducts';
 import { isProductPreorder, isProductSoldOut } from '@/lib/productStatus';
 import SectionHeading from './SectionHeading';
-import Carousel from './Carousel';
+import Carousel from '@/components/Carousel';
 
 const MAX_ITEMS = 10;
 

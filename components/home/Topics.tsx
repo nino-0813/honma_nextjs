@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import SectionHeading from './SectionHeading';
-import Carousel from './Carousel';
+import Carousel from '@/components/Carousel';
 import PlaceholderBadge from './PlaceholderBadge';
 import { PLACEHOLDER_TOPICS, type TopicCard } from './placeholders';
 

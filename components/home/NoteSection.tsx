@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import Carousel from './Carousel';
+import Carousel from '@/components/Carousel';
 import { PLACEHOLDER_TOPICS } from './placeholders';
 
 /**

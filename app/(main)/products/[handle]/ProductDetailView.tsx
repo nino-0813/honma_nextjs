@@ -12,6 +12,9 @@ import { isProductPreorder } from '@/lib/productStatus';
 import { computeFirstShippingDate, formatJapaneseDate } from '@/lib/subscriptionShipping';
 import ProductGuide from '@/components/product/ProductGuide';
 import StickyPurchaseBar from '@/components/product/StickyPurchaseBar';
+import ProductGallery from '@/components/product/ProductGallery';
+import ProductStory from '@/components/product/ProductStory';
+import SubscriptionCTA from '@/components/home/SubscriptionCTA';
 import {
   trackViewItem,
   trackAddToCart,
@@ -321,35 +324,21 @@ export default function ProductDetailView({ product }: { product: Product }) {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           {/* 左の画像は固定。右の詳細を読み終えるまで残り、そのあと一緒に流れていく */}
-          <div className="lg:col-span-7 lg:sticky lg:top-24 lg:self-start flex flex-col-reverse lg:flex-row gap-4 lg:gap-6 items-start">
-            {product.images && product.images.length > 0 && (
-              <div className="w-full lg:w-24 flex lg:flex-col gap-3 overflow-x-auto lg:overflow-y-auto scrollbar-hide lg:max-h-[74vh]">
-                {product.images.map((img, idx) => (
-                  <button key={idx} onClick={() => setSelectedImage(idx)} className={`relative aspect-square w-20 lg:w-full flex-shrink-0 overflow-hidden border transition-all duration-300 ${selectedImage === idx ? 'border-black opacity-100' : 'border-transparent opacity-60 hover:opacity-100'}`}>
-                    <FadeInImage src={img} alt="" className="w-full h-full object-cover" width={160} height={160} />
-                  </button>
-                ))}
-              </div>
-            )}
-            <div className="flex-1 w-full relative">
-               <FadeInImage
-                 src={product.images && product.images.length > 0 ? product.images[selectedImage] : (product.image || '')}
-                 alt={product.title}
-                 priority
-                 width={1200}
-                 height={1200}
-                 className="w-full h-auto object-contain block"
-               />
-               {(() => {
-                 // バリエーションが無効な場合はSOLD OUTを表示しない
-                 if (!product?.hasVariants) {
-                   return null;
-                 }
-                 const currentStock = product ? getStockForVariant(product, selectedOptions) : null;
-                 const isOutOfStock = currentStock !== null && currentStock === 0;
-                 return isOutOfStock ? <span className="absolute top-4 left-4 bg-primary text-white px-3 py-1.5 text-[10px] font-bold tracking-widest uppercase z-10">Sold Out</span> : null;
-               })()}
-            </div>
+          <div className="lg:col-span-7 lg:sticky lg:top-24 lg:self-start">
+            {(() => {
+              const gallery = product.images && product.images.length > 0
+                ? product.images
+                : (product.image ? [product.image] : []);
+              // バリエーションが無効な商品では SOLD OUT を出さない
+              const stock = product.hasVariants ? getStockForVariant(product, selectedOptions) : null;
+              return (
+                <ProductGallery
+                  images={gallery}
+                  alt={product.title}
+                  soldOut={stock !== null && stock === 0}
+                />
+              );
+            })()}
           </div>
 
           <div className="lg:col-span-5">
@@ -397,26 +386,39 @@ export default function ProductDetailView({ product }: { product: Product }) {
                      // 新しいConfig形式
                      product.variants_config.map(type => (
                        <div key={type.id}>
-                         <label className="block text-sm text-gray-600 mb-2">{type.name}</label>
-                         <div className="flex flex-wrap gap-2">
-                           {type.options.map(option => (
-                             <button 
-                               key={option.id}
-                               onClick={() => handleOptionChange(type.id, option.id)}
-                               className={`px-4 py-2 border text-sm transition-colors ${
-                                 selectedOptions[type.id] === option.id
-                                   ? 'border-black bg-black text-white'
-                                   : 'border-gray-200 text-gray-500 hover:border-gray-400 bg-white hover:text-black'
-                               }`}
-                             >
-                               {option.value}
-                               {option.priceAdjustment !== 0 && (
-                                 <span className="ml-1 text-xs opacity-80">
-                                   ({option.priceAdjustment > 0 ? '+' : ''}{option.priceAdjustment}円)
+                         <label className="block text-sm text-primary mb-3">
+                           {type.name}：
+                           <span className="ml-1 text-gray-500">
+                             {type.options.find((o) => o.id === selectedOptions[type.id])?.value ?? '未選択'}
+                           </span>
+                         </label>
+                         {/* 写真と価格を出すカード形式。横に溢れる場合はスクロールする */}
+                         <div className="flex gap-2.5 overflow-x-auto scrollbar-hide -mx-1 px-1 pb-1">
+                           {type.options.map(option => {
+                             const selected = selectedOptions[type.id] === option.id;
+                             const optionPrice = product.price + (option.priceAdjustment || 0);
+                             return (
+                               <button
+                                 key={option.id}
+                                 onClick={() => handleOptionChange(type.id, option.id)}
+                                 aria-pressed={selected}
+                                 className={`shrink-0 w-[104px] border rounded-sm overflow-hidden text-left transition-colors ${
+                                   selected ? 'border-hekishoku' : 'border-gray-200 hover:border-gray-400'
+                                 }`}
+                               >
+                                 <span className="block aspect-square bg-dim overflow-hidden">
+                                   {/* eslint-disable-next-line @next/next/no-img-element */}
+                                   <img src={product.image} alt="" aria-hidden="true" loading="lazy" className="w-full h-full object-cover" />
                                  </span>
-                               )}
-                             </button>
-                           ))}
+                                 <span className={`block px-2 pt-2 text-[12px] leading-tight ${selected ? 'text-primary font-medium' : 'text-gray-600'}`}>
+                                   {option.value}
+                                 </span>
+                                 <span className="block px-2 pb-2 pt-0.5 text-[11px] text-gray-500 tabular-nums">
+                                   ¥{optionPrice.toLocaleString()}
+                                 </span>
+                               </button>
+                             );
+                           })}
                          </div>
                        </div>
                      ))
@@ -566,48 +568,71 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 </div>
               )}
 
-              {/* 購入タイプ選択（通常 / 定期）— 定期購入が有効な商品のみ表示 */}
+              {/* 購入方法（ベースフードと同じく、特典を並べたラジオカード） */}
               {subscriptionEnabled && subscriptionIntervals.length > 0 && (
               <div className="mb-6">
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setPurchaseType('one_time')}
-                    className={`relative flex flex-col items-center justify-center py-6 px-4 border-2 rounded transition-colors ${
-                      purchaseType === 'one_time'
-                        ? 'border-primary bg-white'
-                        : 'border-gray-200 bg-white hover:border-gray-300'
-                    }`}
-                  >
-                    {purchaseType === 'one_time' && (
-                      <span className="absolute top-2 right-2 w-5 h-5 rounded-full bg-primary text-white text-xs flex items-center justify-center">✓</span>
-                    )}
-                    <svg className="w-8 h-8 mb-2 text-primary" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
-                    </svg>
-                    <span className="text-sm font-medium text-primary">通常購入</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPurchaseType('subscription')}
-                    className={`relative flex flex-col items-center justify-center py-6 px-4 border-2 rounded transition-colors ${
-                      purchaseType === 'subscription'
-                        ? 'border-primary bg-white'
-                        : 'border-gray-200 bg-white hover:border-gray-300'
-                    }`}
-                  >
-                    {purchaseType === 'subscription' && (
-                      <span className="absolute top-2 right-2 w-5 h-5 rounded-full bg-primary text-white text-xs flex items-center justify-center">✓</span>
-                    )}
-                    <svg className="w-8 h-8 mb-2 text-primary" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-                    </svg>
-                    <span className="text-sm font-medium text-primary">定期購入</span>
-                    {subscriptionDiscountPercent > 0 && (
-                      <span className="text-[10px] text-red-600 mt-1">{subscriptionDiscountPercent}%OFF</span>
-                    )}
-                  </button>
-                </div>
+                <p className="text-sm font-medium text-primary">購入方法：</p>
+                <p className="mt-1 mb-3 text-[11px] text-gray-500">※カート内のすべての商品に適用されます</p>
+
+                {/* 定期購入 */}
+                <button
+                  type="button"
+                  onClick={() => setPurchaseType('subscription')}
+                  aria-pressed={purchaseType === 'subscription'}
+                  className={`w-full text-left border-2 rounded-sm p-4 md:p-5 transition-colors ${
+                    purchaseType === 'subscription' ? 'border-primary bg-white' : 'border-gray-200 bg-white hover:border-gray-300'
+                  }`}
+                >
+                  <span className="flex items-center justify-between gap-3">
+                    <span className="flex items-center gap-2.5">
+                      <span className={`w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center ${purchaseType === 'subscription' ? 'border-primary' : 'border-gray-300'}`}>
+                        {purchaseType === 'subscription' && <span className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                      </span>
+                      <span className="text-sm font-medium text-primary">定期購入</span>
+                    </span>
+                    <span className="text-sm text-primary tabular-nums">¥{subscriptionPrice.toLocaleString()}</span>
+                  </span>
+
+                  <span className="mt-4 block border-t border-gray-100 pt-4">
+                    <ul className="flex flex-col gap-2.5">
+                      {[
+                        subscriptionDiscountPercent > 0
+                          ? `いつでも${subscriptionDiscountPercent}%OFF でお届けします`
+                          : 'お届けのたびにお得な価格で',
+                        'お届けに合わせて出荷直前に精米します',
+                        'お米が余りそうな月はスキップできます',
+                        'お届けの間隔はマイページからいつでも変更できます',
+                      ].map((t) => (
+                        <li key={t} className="flex items-start gap-2 text-[12px] md:text-[13px] text-gray-600 leading-relaxed">
+                          <svg className="shrink-0 mt-0.5 w-3.5 h-3.5 text-yuunagi" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8">
+                            <path d="M3 8.5l3.2 3.2L13 5" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                          {t}
+                        </li>
+                      ))}
+                    </ul>
+                  </span>
+                </button>
+
+                {/* 通常購入 */}
+                <button
+                  type="button"
+                  onClick={() => setPurchaseType('one_time')}
+                  aria-pressed={purchaseType === 'one_time'}
+                  className={`mt-3 w-full text-left border-2 rounded-sm p-4 md:p-5 transition-colors ${
+                    purchaseType === 'one_time' ? 'border-primary bg-white' : 'border-gray-200 bg-white hover:border-gray-300'
+                  }`}
+                >
+                  <span className="flex items-center justify-between gap-3">
+                    <span className="flex items-center gap-2.5">
+                      <span className={`w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center ${purchaseType === 'one_time' ? 'border-primary' : 'border-gray-300'}`}>
+                        {purchaseType === 'one_time' && <span className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                      </span>
+                      <span className="text-sm font-medium text-primary">今回のみ購入</span>
+                    </span>
+                    <span className="text-sm text-primary tabular-nums">¥{calculatedPrice.toLocaleString()}</span>
+                  </span>
+                </button>
 
                 {/* 定期購入プラン選択 */}
                 {purchaseType === 'subscription' && subscriptionIntervals.length > 0 && (
@@ -992,6 +1017,14 @@ export default function ProductDetailView({ product }: { product: Product }) {
 
         {/* 下スクロールで読む詳細（説明全文・炊き方 / 戻し方・保管方法） */}
         <ProductGuide product={product} />
+
+        {/* テーマ別の紹介・お客様の声・よくある質問（文章と写真は仮） */}
+        <ProductStory />
+
+        {/* 定期便の案内（トップと同じパネルを流用） */}
+        <div className="mt-20 md:mt-28 -mx-4 sm:-mx-6 lg:-mx-8">
+          <SubscriptionCTA />
+        </div>
 
         {allProducts.length > 0 && (
           <div className="mt-32 border-t border-gray-100 pt-16">
