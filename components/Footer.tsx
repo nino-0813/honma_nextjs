@@ -6,7 +6,7 @@ import { IconInstagram, IconYoutube } from './Icons';
 
 const Footer = () => {
   return (
-    <footer className="bg-[#1a1a1a] text-white pt-16 pb-8 md:pt-20 md:pb-12">
+    <footer className="bg-hekishoku-deep text-white pt-16 pb-8 md:pt-20 md:pb-12">
       <div className="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
           <div className="text-left">

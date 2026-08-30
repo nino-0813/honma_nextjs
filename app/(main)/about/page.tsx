@@ -75,7 +75,7 @@ export default function AboutPage() {
       <div className="relative w-full">
         <div className="relative z-10 bg-white pt-4 md:pt-8 pb-12 md:pb-16 flex flex-col items-center justify-center text-black">
           <p className="flex items-center gap-2 text-[13px] font-medium text-primary mb-3">
-            <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-500" aria-hidden="true" />
+            <span className="inline-block w-2.5 h-2.5 rounded-full bg-yuunagi" aria-hidden="true" />
             ブランドについて
           </p>
           <h1 className="text-xl md:text-2xl font-serif tracking-[0.15em] font-normal mb-2">
@@ -144,7 +144,7 @@ export default function AboutPage() {
                 },
               ].map((k) => (
                 <li key={k.key} className="flex flex-col gap-3">
-                  <span className="w-8 h-px bg-amber-600" />
+                  <span className="w-8 h-px bg-yuunagi" />
                   <h3 className="text-lg md:text-xl font-serif tracking-[0.15em] text-primary">{k.key}</h3>
                   <p className="text-[13px] md:text-sm text-gray-600 leading-loose">{k.body}</p>
                 </li>
@@ -157,7 +157,7 @@ export default function AboutPage() {
       <section className="py-8 md:py-16 bg-secondary/30 relative">
         <div className="max-w-6xl mx-auto px-6">
           <FadeInSection className="text-center">
-            <p className="text-[11px] tracking-[0.22em] uppercase text-amber-700 font-medium mb-3">Our Stances</p>
+            <p className="text-[11px] tracking-[0.22em] uppercase text-yuunagi-ink font-medium mb-3">Our Stances</p>
             <h3 className="text-2xl md:text-4xl font-serif tracking-widest mb-4">3つの姿勢</h3>
             <div className="w-12 h-px bg-primary mx-auto" />
           </FadeInSection>

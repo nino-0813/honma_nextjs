@@ -117,13 +117,13 @@ export default function AnnouncementPopup() {
         </button>
 
         <div className="px-6 pt-10 pb-8 text-center">
-          <p className="text-[11px] md:text-xs text-amber-700 tracking-[0.3em] uppercase mb-3 font-medium">
+          <p className="text-[11px] md:text-xs text-yuunagi-ink tracking-[0.3em] uppercase mb-3 font-medium">
             Information
           </p>
           <h2 className="text-lg md:text-xl font-serif font-semibold text-primary leading-relaxed mb-3">
             予約販売＆定期便のご案内
           </h2>
-          <div className="w-10 h-px bg-amber-600 mx-auto mb-4" />
+          <div className="w-10 h-px bg-yuunagi mx-auto mb-4" />
           <p className="text-xs md:text-sm text-gray-600 leading-loose mb-7">
             佐渡ヶ島の自然栽培米を、いまだけの予約販売と、
             <br className="hidden md:block" />
@@ -141,7 +141,7 @@ export default function AnnouncementPopup() {
             <Link
               href="/collections/rice/yearly?view=lp"
               onClick={close}
-              className="block w-full py-3 rounded-full border border-amber-600 text-amber-700 text-sm font-medium tracking-wider hover:bg-amber-50 transition-colors"
+              className="block w-full py-3 rounded-full border border-yuunagi text-yuunagi-ink text-sm font-medium tracking-wider hover:bg-yuunagi-soft transition-colors"
             >
               定期便（10%OFF）を見る
             </Link>
@@ -153,7 +153,7 @@ export default function AnnouncementPopup() {
               type="checkbox"
               checked={dontShowAgain}
               onChange={(e) => setDontShowAgain(e.target.checked)}
-              className="w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 cursor-pointer"
+              className="w-4 h-4 rounded border-gray-300 text-yuunagi focus:ring-yuunagi cursor-pointer"
             />
             {SNOOZE_DAYS}日間表示しない
           </label>

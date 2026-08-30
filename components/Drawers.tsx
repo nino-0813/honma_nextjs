@@ -255,9 +255,9 @@ export const CartDrawer = ({ isOpen, onClose, cartItems, onRemove, onUpdateQuant
               const miles = calculateEarnableMiles(cartItems, 0);
               if (miles <= 0) return null;
               return (
-                <div className="rounded bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-900">
+                <div className="rounded bg-yuunagi-soft border border-yuunagi-soft px-3 py-2 text-xs text-yuunagi-ink">
                   この購入で <span className="font-bold">最大 {miles.toLocaleString()} マイル</span> 付与予定
-                  <span className="block text-amber-700 mt-0.5">
+                  <span className="block text-yuunagi-ink mt-0.5">
                     ※ ゲスト購入では付与されません。送料込みでチェックアウト時に確定します。
                   </span>
                 </div>

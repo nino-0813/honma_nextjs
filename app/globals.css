@@ -12,6 +12,17 @@
   --font-sans: "Helvetica Neue", Helvetica, "Hiragino Sans", "Hiragino Kaku Gothic ProN", Arial, sans-serif;
   --font-mincho: "Noto Serif JP", YuMincho, "Yu Mincho", "Hiragino Mincho ProN", serif;
   --color-primary: #1c1d1d;
+
+  /* ブランドカラー（イケベジ・コーポレートカラーより）
+     碧色は白文字が8.1:1で通るので広い面に使える。
+     夕凪は白との対比が3.4:1しかないため、文字とボタン地には濃い派生色を使う。 */
+  --color-hekishoku: #0E5956;        /* 日本海の碧色 */
+  --color-hekishoku-deep: #083E3C;
+  --color-hekishoku-soft: #EAF1F0;
+  --color-yuunagi: #F05817;          /* 豊田の夕凪。面・ドット・バッジ用 */
+  --color-yuunagi-ink: #C63F0B;      /* 文字・白文字を乗せるボタン地用 */
+  --color-yuunagi-soft: #FDECE3;
+  --color-toki: #EAA696;             /* 朱鷺色 */
   --color-secondary: #e8e8e1;
   --color-dim: #f2f2f2;
   --tracking-widest-xl: 0.2em;

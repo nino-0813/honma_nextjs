@@ -23,7 +23,7 @@ export default function ProductGuide({
       {description && (
         <div className="max-w-3xl mx-auto mb-16 md:mb-24">
           <h2 className="flex items-center gap-2 text-[13px] font-medium text-primary mb-5">
-            <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-500" aria-hidden="true" />
+            <span className="inline-block w-2.5 h-2.5 rounded-full bg-yuunagi" aria-hidden="true" />
             この商品について
           </h2>
           <div className="text-[13px] md:text-sm leading-loose text-gray-600 whitespace-pre-wrap">
@@ -36,7 +36,7 @@ export default function ProductGuide({
       {guide && (
         <div className="max-w-5xl mx-auto">
           <h2 className="flex items-center gap-2 text-[13px] font-medium text-primary mb-8 md:mb-10">
-            <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-500" aria-hidden="true" />
+            <span className="inline-block w-2.5 h-2.5 rounded-full bg-yuunagi" aria-hidden="true" />
             {guide.label}
           </h2>
 
@@ -48,7 +48,7 @@ export default function ProductGuide({
               >
                 <div className={`relative aspect-[4/3] overflow-hidden ${i % 2 === 1 ? 'md:order-2' : ''} ${step.image ? 'bg-dim' : 'bg-secondary/30 border border-dashed border-gray-300'}`}>
                   {step.imageIsPlaceholder && SHOW_PLACEHOLDER_BADGE && (
-                    <span className="absolute top-2 left-2 z-10 rounded-sm bg-amber-700/90 px-1.5 py-0.5 text-[9px] tracking-wider text-white">
+                    <span className="absolute top-2 left-2 z-10 rounded-sm bg-yuunagi-ink/90 px-1.5 py-0.5 text-[9px] tracking-wider text-white">
                       仮素材
                     </span>
                   )}
@@ -76,7 +76,7 @@ export default function ProductGuide({
                 </div>
 
                 <div className={i % 2 === 1 ? 'md:order-1' : ''}>
-                  <p className="text-[11px] tabular-nums tracking-[0.2em] text-amber-700 mb-2">
+                  <p className="text-[11px] tabular-nums tracking-[0.2em] text-yuunagi-ink mb-2">
                     {String(i + 1).padStart(2, '0')}
                   </p>
                   <h3 className="text-lg md:text-xl font-serif tracking-wider text-primary mb-3">

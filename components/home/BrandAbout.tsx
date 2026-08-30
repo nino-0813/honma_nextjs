@@ -70,8 +70,8 @@ export default function BrandAbout() {
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-[900ms] group-hover:scale-105"
               />
               {/* 同上。イラスト素材が明るいので強めにかける */}
-              <span className="absolute inset-0 bg-black/45 transition-colors group-hover:bg-black/55" />
-              <span className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/25" />
+              <span className="absolute inset-0 bg-hekishoku/60 transition-colors group-hover:bg-hekishoku/70" />
+              <span className="absolute inset-0 bg-gradient-to-t from-hekishoku-deep/50 via-transparent to-hekishoku-deep/30" />
               <span className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center px-6">
                 <span className="text-white text-2xl md:text-4xl font-serif tracking-[0.15em] drop-shadow">{t.key}</span>
                 <span className="text-white/95 text-sm md:text-base leading-relaxed whitespace-pre-line drop-shadow">

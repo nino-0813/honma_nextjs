@@ -4,7 +4,7 @@ import { SHOW_PLACEHOLDER_BADGE } from './placeholders';
 export default function PlaceholderBadge() {
   if (!SHOW_PLACEHOLDER_BADGE) return null;
   return (
-    <span className="absolute top-2 left-2 z-10 rounded-sm bg-amber-700/90 px-1.5 py-0.5 text-[9px] font-medium tracking-wider text-white">
+    <span className="absolute top-2 left-2 z-10 rounded-sm bg-yuunagi-ink/90 px-1.5 py-0.5 text-[9px] font-medium tracking-wider text-white">
       仮素材
     </span>
   );

@@ -70,7 +70,7 @@ export default async function News() {
                         <time className="tabular-nums">{formatDate(r.date)}</time>
                         {r.label && <span>{r.label}</span>}
                         {r.isPlaceholder && SHOW_PLACEHOLDER_BADGE && (
-                          <span className="rounded-sm bg-amber-700/90 px-1.5 py-0.5 text-[9px] text-white">仮素材</span>
+                          <span className="rounded-sm bg-yuunagi-ink/90 px-1.5 py-0.5 text-[9px] text-white">仮素材</span>
                         )}
                       </p>
                       <p className="mt-1 text-[13px] md:text-sm font-medium text-primary leading-relaxed group-hover:text-gray-600 transition-colors">

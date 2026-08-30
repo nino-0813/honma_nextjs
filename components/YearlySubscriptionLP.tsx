@@ -39,7 +39,7 @@ export default function YearlySubscriptionLP() {
     <section className="mt-12 md:mt-16 mb-10 md:mb-16">
       {/* 01 キャッチコピー */}
       <div className="max-w-3xl mx-auto text-center mb-16 md:mb-20">
-        <p className="text-[11px] md:text-xs text-amber-700 tracking-[0.3em] uppercase mb-3 font-medium">
+        <p className="text-[11px] md:text-xs text-yuunagi-ink tracking-[0.3em] uppercase mb-3 font-medium">
           Subscription
         </p>
         <h2 className="text-xl md:text-3xl font-serif font-semibold text-primary leading-[1.55] md:leading-[1.4] mb-4">
@@ -47,7 +47,7 @@ export default function YearlySubscriptionLP() {
           <br className="md:hidden" />
           佐渡の田んぼをひとつ。
         </h2>
-        <div className="w-10 h-px bg-amber-600 mx-auto mb-4" />
+        <div className="w-10 h-px bg-yuunagi mx-auto mb-4" />
         <p className="text-xs md:text-sm text-gray-600 leading-loose">
           イケベジのお米を、必要な量だけ、必要なタイミングでお届けします。
           <br className="hidden md:block" />
@@ -91,10 +91,10 @@ export default function YearlySubscriptionLP() {
       </div>
 
       {/* 03 新規お申し込み特典 */}
-      <div className="relative bg-amber-50/70 border border-amber-200 rounded-2xl overflow-hidden mb-10 md:mb-14 shadow-[0_15px_40px_-12px_rgba(0,0,0,0.22)]">
+      <div className="relative bg-yuunagi-soft/70 border border-yuunagi-soft rounded-2xl overflow-hidden mb-10 md:mb-14 shadow-[0_15px_40px_-12px_rgba(0,0,0,0.22)]">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
           {/* 画像 */}
-          <div className="relative aspect-[4/3] md:aspect-auto md:min-h-[420px] bg-amber-100/50 overflow-hidden">
+          <div className="relative aspect-[4/3] md:aspect-auto md:min-h-[420px] bg-yuunagi-soft/50 overflow-hidden">
             <Image
               src="/images/rice-keep-bag.jpg"
               alt="新規お申し込み特典のお米保存袋"
@@ -123,15 +123,15 @@ export default function YearlySubscriptionLP() {
           {/* テキスト */}
           <div className="p-6 md:py-10 md:px-10 flex flex-col justify-center">
             <div className="mb-6">
-              <p className="text-sm md:text-base text-amber-800 mb-2 font-semibold tracking-[0.05em]">
+              <p className="text-sm md:text-base text-yuunagi-ink mb-2 font-semibold tracking-[0.05em]">
                 新規お申し込み特典
               </p>
-              <h3 className="text-2xl md:text-[1.875rem] font-bold text-amber-900 leading-[1.4] tracking-[0.04em]">
+              <h3 className="text-2xl md:text-[1.875rem] font-bold text-yuunagi-ink leading-[1.4] tracking-[0.04em]">
                 究極のお米保存袋をプレゼント
               </h3>
             </div>
 
-            <p className="text-sm md:text-base text-amber-900/80 leading-loose mb-6 font-semibold">
+            <p className="text-sm md:text-base text-yuunagi-ink/80 leading-loose mb-6 font-semibold">
               新しく定期便をお申し込みいただいた方に、
               <br className="hidden md:block" />
               「冷蔵庫のいらないお米保存袋」をプレゼントします。
@@ -140,9 +140,9 @@ export default function YearlySubscriptionLP() {
             <ul className="space-y-2.5 font-semibold mb-6">
               {['防虫・防湿に強い専用素材', '冷蔵庫不要でシンク下にも収まる', '繰り返し使えるジッパー付き'].map(
                 (item) => (
-                  <li key={item} className="flex items-start gap-2.5 text-xs md:text-sm text-amber-900/80">
+                  <li key={item} className="flex items-start gap-2.5 text-xs md:text-sm text-yuunagi-ink/80">
                     <svg
-                      className="w-4 h-4 md:w-5 md:h-5 text-amber-600 flex-shrink-0 mt-0.5"
+                      className="w-4 h-4 md:w-5 md:h-5 text-yuunagi flex-shrink-0 mt-0.5"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth={2.5}
@@ -156,11 +156,11 @@ export default function YearlySubscriptionLP() {
               )}
             </ul>
 
-            <div className="pt-4 border-t border-amber-200/60 space-y-1.5">
-              <p className="text-[11px] md:text-xs text-amber-700/70 font-bold">
+            <div className="pt-4 border-t border-yuunagi-soft/60 space-y-1.5">
+              <p className="text-[11px] md:text-xs text-yuunagi-ink/70 font-bold">
                 ※数量限定・なくなり次第終了
               </p>
-              <p className="text-[11px] md:text-xs text-amber-700/70 leading-relaxed">
+              <p className="text-[11px] md:text-xs text-yuunagi-ink/70 leading-relaxed">
                 ※お米保存袋は1アカウントにつきおひとつまでとなります。複数種類のお米や期間の異なる定期便をご注文いただいてもプレゼントはおひとつとなります。
               </p>
             </div>
@@ -170,12 +170,12 @@ export default function YearlySubscriptionLP() {
 
       {/* 04 商品一覧見出し */}
       <div id="ikevege-subscription" className="text-center mb-6 mt-20 md:mt-28 pt-6 border-t border-gray-100 scroll-mt-28">
-        <p className="text-[11px] md:text-xs text-amber-700 tracking-[0.3em] uppercase mb-3 font-medium">Products</p>
+        <p className="text-[11px] md:text-xs text-yuunagi-ink tracking-[0.3em] uppercase mb-3 font-medium">Products</p>
         <h3 className="text-xl md:text-2xl font-serif font-medium text-primary tracking-wider mb-2">
           イケベジ定期便
         </h3>
         <p className="text-xs md:text-sm text-gray-600 leading-relaxed">
-          すべて<span className="text-amber-700 font-medium">10%OFF</span>でお届けします。
+          すべて<span className="text-yuunagi-ink font-medium">10%OFF</span>でお届けします。
         </p>
       </div>
     </section>
@@ -282,7 +282,7 @@ export function YearlySubscriptionFooter() {
 
           {/* テキスト（右） */}
           <div className="md:pl-2">
-            <p className="text-[11px] md:text-xs text-amber-700 tracking-[0.3em] uppercase mb-3 font-medium">
+            <p className="text-[11px] md:text-xs text-yuunagi-ink tracking-[0.3em] uppercase mb-3 font-medium">
               Our Thoughts
             </p>
             <h3 className="text-2xl md:text-3xl font-serif font-semibold text-primary tracking-wider mb-6 md:mb-8">
@@ -316,7 +316,7 @@ export function YearlySubscriptionFooter() {
       {/* 06 定期便のご利用について */}
       <div className="max-w-3xl mx-auto px-2 mb-16 md:mb-24">
         <div className="text-center mb-8">
-          <p className="text-[11px] md:text-xs text-amber-700 tracking-[0.3em] uppercase mb-3 font-medium">How It Works</p>
+          <p className="text-[11px] md:text-xs text-yuunagi-ink tracking-[0.3em] uppercase mb-3 font-medium">How It Works</p>
           <h3 className="text-xl md:text-2xl font-serif font-semibold text-primary tracking-wider">
             定期便のご利用について
           </h3>
@@ -359,11 +359,11 @@ export function YearlySubscriptionFooter() {
             },
           ].map((item) => (
             <div key={item.title} className="bg-white border border-gray-200 rounded-xl p-5 md:p-6">
-              <p className="text-[10px] md:text-xs font-serif tracking-[0.2em] text-amber-700 mb-1.5">
+              <p className="text-[10px] md:text-xs font-serif tracking-[0.2em] text-yuunagi-ink mb-1.5">
                 {item.number}
               </p>
               <h4 className="text-sm md:text-base font-semibold text-primary mb-2 flex items-center gap-2">
-                <span className="w-1 h-4 bg-amber-600 rounded-full" />
+                <span className="w-1 h-4 bg-yuunagi rounded-full" />
                 {item.title}
               </h4>
               <p className="text-xs md:text-sm text-gray-600 leading-relaxed">{item.body}</p>
@@ -384,7 +384,7 @@ export function YearlySubscriptionFooter() {
       {/* 07 よくある質問 */}
       <div className="max-w-3xl mx-auto px-2 mb-16 md:mb-24">
         <div className="text-center mb-8">
-          <p className="text-[11px] md:text-xs text-amber-700 tracking-[0.3em] uppercase mb-3 font-medium">FAQ</p>
+          <p className="text-[11px] md:text-xs text-yuunagi-ink tracking-[0.3em] uppercase mb-3 font-medium">FAQ</p>
           <h3 className="text-xl md:text-2xl font-serif font-medium text-primary tracking-wider">
             よくある質問
           </h3>
@@ -393,11 +393,11 @@ export function YearlySubscriptionFooter() {
           {FAQ_ITEMS.map((item, i) => (
             <details
               key={i}
-              className="group border border-gray-200 rounded-xl bg-white open:shadow-sm open:border-amber-200 transition-all"
+              className="group border border-gray-200 rounded-xl bg-white open:shadow-sm open:border-yuunagi-soft transition-all"
             >
               <summary className="flex items-start justify-between cursor-pointer p-4 md:p-5 list-none gap-3">
                 <span className="text-sm md:text-base font-medium text-primary flex gap-2 flex-1 min-w-0">
-                  <span className="text-amber-600 flex-shrink-0">Q.</span>
+                  <span className="text-yuunagi flex-shrink-0">Q.</span>
                   <span>{item.q}</span>
                 </span>
                 <svg
@@ -410,7 +410,7 @@ export function YearlySubscriptionFooter() {
                 </svg>
               </summary>
               <div className="px-4 md:px-5 pb-4 md:pb-5 text-xs md:text-sm text-gray-600 leading-relaxed flex gap-2">
-                <span className="text-amber-600 font-medium flex-shrink-0">A.</span>
+                <span className="text-yuunagi font-medium flex-shrink-0">A.</span>
                 <span className="whitespace-pre-line">{item.a}</span>
               </div>
             </details>
@@ -421,7 +421,7 @@ export function YearlySubscriptionFooter() {
       {/* 送料について */}
       <div className="max-w-3xl mx-auto px-2 mb-16 md:mb-24">
         <div className="text-center mb-6">
-          <p className="text-[11px] md:text-xs text-amber-700 tracking-[0.3em] uppercase mb-3 font-medium">Shipping</p>
+          <p className="text-[11px] md:text-xs text-yuunagi-ink tracking-[0.3em] uppercase mb-3 font-medium">Shipping</p>
           <h3 className="text-xl md:text-2xl font-serif font-medium text-primary tracking-wider">
             送料について
           </h3>
@@ -442,20 +442,20 @@ export function YearlySubscriptionFooter() {
 
       {/* 08 最後のCTA */}
       <div className="relative max-w-4xl mx-auto px-2">
-        <div className="bg-gradient-to-b from-stone-50 to-amber-50/40 rounded-3xl px-6 md:px-12 py-14 md:py-20 text-center">
+        <div className="bg-gradient-to-b from-stone-50 to-yuunagi-soft/40 rounded-3xl px-6 md:px-12 py-14 md:py-20 text-center">
           <h3 className="text-xl md:text-3xl font-serif font-semibold text-primary leading-[1.6] md:leading-[1.5] mb-6">
             毎日のごはんに、
             <br className="md:hidden" />
             佐渡の田んぼをひとつ。
           </h3>
-          <div className="w-10 h-px bg-amber-600 mx-auto mb-6" />
+          <div className="w-10 h-px bg-yuunagi mx-auto mb-6" />
           <p className="text-sm md:text-base text-primary font-medium mb-8">
             イケベジのお米の定期便、はじめてみませんか。
           </p>
           <a
             href="#ikevege-subscription"
             onClick={handleScrollToProducts}
-            className="inline-flex items-center gap-2 bg-primary text-white text-xs md:text-sm tracking-[0.2em] uppercase px-8 md:px-10 py-4 rounded-full hover:bg-amber-700 transition-colors"
+            className="inline-flex items-center gap-2 bg-primary text-white text-xs md:text-sm tracking-[0.2em] uppercase px-8 md:px-10 py-4 rounded-full hover:bg-yuunagi-ink transition-colors"
           >
             定期便の商品を見る
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">

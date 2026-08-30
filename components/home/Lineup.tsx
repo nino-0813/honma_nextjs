@@ -93,8 +93,8 @@ export default function Lineup() {
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-[900ms] group-hover:scale-105"
               />
               {/* 明るい写真でも白文字が読めるように、ベタ＋下方向のグラデーションを重ねる */}
-              <span className="absolute inset-0 bg-black/40 transition-colors group-hover:bg-black/50" />
-              <span className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/20" />
+              <span className="absolute inset-0 bg-hekishoku/55 transition-colors group-hover:bg-hekishoku/65" />
+              <span className="absolute inset-0 bg-gradient-to-t from-hekishoku-deep/50 via-transparent to-hekishoku-deep/25" />
               <span className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 text-center px-4">
                 <span className="text-white text-xl md:text-3xl lg:text-4xl font-sans font-bold tracking-wide drop-shadow">
                   {t.en}

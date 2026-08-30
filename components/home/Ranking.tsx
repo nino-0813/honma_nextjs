@@ -44,7 +44,7 @@ export default function Ranking() {
                 <li key={p.id} className="snap-start shrink-0 w-[200px] md:w-[280px] lg:w-[320px]">
                   <Link href={`/products/${p.handle || p.id}`} className="group block">
                     <div className="relative aspect-square overflow-hidden bg-dim">
-                      <span className="absolute top-3 left-3 z-10 w-8 h-8 md:w-9 md:h-9 rounded-full bg-amber-500 text-white text-sm font-bold flex items-center justify-center">
+                      <span className="absolute top-3 left-3 z-10 w-8 h-8 md:w-9 md:h-9 rounded-full bg-yuunagi text-white text-sm font-bold flex items-center justify-center">
                         {i + 1}
                       </span>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -68,7 +68,7 @@ export default function Ranking() {
                       <span className="text-xs text-gray-400">（税込）</span>
                     </p>
                     {preorder && (
-                      <span className="mt-1 inline-block text-[10px] text-amber-700 border border-amber-600 rounded-sm px-1.5 py-0.5">
+                      <span className="mt-1 inline-block text-[10px] text-yuunagi-ink border border-yuunagi rounded-sm px-1.5 py-0.5">
                         予約商品
                       </span>
                     )}

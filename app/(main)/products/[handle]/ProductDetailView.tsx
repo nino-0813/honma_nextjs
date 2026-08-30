@@ -367,7 +367,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                   <p className="text-[13px] leading-relaxed text-gray-600 mb-4">
                     {short}
                     {excerpt.length > 90 && (
-                      <a href="#product-detail" className="ml-1 text-amber-700 underline underline-offset-2 hover:text-amber-800">
+                      <a href="#product-detail" className="ml-1 text-yuunagi-ink underline underline-offset-2 hover:text-yuunagi-ink">
                         詳しく見る
                       </a>
                     )}
@@ -907,7 +907,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                     <span className="text-primary flex-shrink-0">・</span>
                     <span>
                       2回目以降の決済はお届け月の10日になされます。
-                      <span className="block mt-1 text-xs text-amber-700">
+                      <span className="block mt-1 text-xs text-yuunagi-ink">
                         ※初回のみご注文時に第1回目の決済がされます
                       </span>
                     </span>
@@ -927,7 +927,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                     <span className="text-primary flex-shrink-0">・</span>
                     <span>
                       マイページより次回配送の<span className="font-medium">1ヶ月スキップ</span>ができます。
-                      <span className="text-amber-700">（2回連続は不可）</span>
+                      <span className="text-yuunagi-ink">（2回連続は不可）</span>
                       配送先やお届けサイクルの変更も可能です。
                     </span>
                   </li>
@@ -941,7 +941,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                     <span className="text-primary flex-shrink-0">・</span>
                     <span>
                       2回目以降の発送分に関しては当該発送月の<span className="font-medium">9日</span>までの解約申込でストップできます。
-                      <span className="text-amber-700">お申し込み完了後、初回分のキャンセルはできかねますのでご了承ください。</span>
+                      <span className="text-yuunagi-ink">お申し込み完了後、初回分のキャンセルはできかねますのでご了承ください。</span>
                     </span>
                   </li>
                   {(subscriptionRiceSeason === '10' || subscriptionRiceSeason === '11') && (

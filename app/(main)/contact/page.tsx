@@ -13,7 +13,7 @@ export default function ContactPage() {
       <div className="pt-16 md:pt-24 pb-12">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <p className="flex items-center gap-2 text-[13px] font-medium text-primary mb-3">
-            <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-500" aria-hidden="true" />
+            <span className="inline-block w-2.5 h-2.5 rounded-full bg-yuunagi" aria-hidden="true" />
             お問い合わせ
           </p>
           <h1 className="text-xl md:text-2xl font-serif tracking-[0.15em] font-normal text-primary">お気軽にご相談ください</h1>

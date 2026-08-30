@@ -25,7 +25,7 @@ export default function StartSetPage() {
     <div className="pt-28 md:pt-32 pb-24 min-h-screen bg-white">
       <div className="max-w-3xl mx-auto px-5 md:px-8">
         <p className="flex items-center gap-2 text-[13px] font-medium text-primary">
-          <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-500" aria-hidden="true" />
+          <span className="inline-block w-2.5 h-2.5 rounded-full bg-yuunagi" aria-hidden="true" />
           スタートセット
         </p>
 
@@ -35,7 +35,7 @@ export default function StartSetPage() {
           食べ比べてみてください。
         </h1>
 
-        <div className="mt-8 inline-flex items-center gap-2 rounded-sm bg-amber-50 border border-amber-200 px-4 py-2.5 text-[13px] text-amber-800">
+        <div className="mt-8 inline-flex items-center gap-2 rounded-sm bg-yuunagi-soft border border-yuunagi-soft px-4 py-2.5 text-[13px] text-yuunagi-ink">
           このページは準備中です
         </div>
 
