@@ -74,7 +74,13 @@ export default function AboutPage() {
     <div className="pt-20 animate-fade-in bg-white overflow-x-hidden w-full">
       <div className="relative w-full">
         <div className="relative z-10 bg-white pt-4 md:pt-8 pb-12 md:pb-16 flex flex-col items-center justify-center text-black">
-          <h1 className="text-xl md:text-2xl font-serif tracking-[0.15em] font-normal mb-2">ABOUT US</h1>
+          <p className="flex items-center gap-2 text-[13px] font-medium text-primary mb-3">
+            <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-500" aria-hidden="true" />
+            ブランドについて
+          </p>
+          <h1 className="text-xl md:text-2xl font-serif tracking-[0.15em] font-normal mb-2">
+            自然から学び、豊かさを分かち合う
+          </h1>
         </div>
         <div className="relative w-full pb-4 flex justify-center">
           <div className="relative w-full max-w-4xl h-auto md:h-[60vh] overflow-hidden mx-auto">
@@ -115,10 +121,44 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* トップページの「ブランドについて」で掲げた3つの言葉を、ここで少し詳しく */}
+      <section className="pb-16 md:pb-24 bg-white">
+        <div className="max-w-5xl mx-auto px-6">
+          <FadeInSection>
+            <p className="text-center text-xl md:text-3xl font-serif tracking-wider leading-relaxed text-primary mb-12 md:mb-16">
+              あんしん、おいしい、いいかお。
+            </p>
+            <ul className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
+              {[
+                {
+                  key: 'あんしん',
+                  body: '農薬にも化学肥料にも頼らず、島の有機資源だけで土を磨き上げています。子どもに毎日食べさせられるかどうかが、私たちの基準です。',
+                },
+                {
+                  key: 'おいしい',
+                  body: '余計なものを足さず、品種が秘めた旨みと香りをまっすぐに引き出します。世界最高米®の国際総合部門で最高金賞をいただきました。',
+                },
+                {
+                  key: 'いいかお',
+                  body: '生きものが育ち、子どもが学び、集落が続く。おいしいお米は結果であって、そのプロセスのほうを私たちは大切にしています。',
+                },
+              ].map((k) => (
+                <li key={k.key} className="flex flex-col gap-3">
+                  <span className="w-8 h-px bg-amber-600" />
+                  <h3 className="text-lg md:text-xl font-serif tracking-[0.15em] text-primary">{k.key}</h3>
+                  <p className="text-[13px] md:text-sm text-gray-600 leading-loose">{k.body}</p>
+                </li>
+              ))}
+            </ul>
+          </FadeInSection>
+        </div>
+      </section>
+
       <section className="py-8 md:py-16 bg-secondary/30 relative">
         <div className="max-w-6xl mx-auto px-6">
           <FadeInSection className="text-center">
-            <h3 className="text-2xl md:text-4xl font-serif tracking-widest mb-4">OUR 3 STANCES</h3>
+            <p className="text-[11px] tracking-[0.22em] uppercase text-amber-700 font-medium mb-3">Our Stances</p>
+            <h3 className="text-2xl md:text-4xl font-serif tracking-widest mb-4">3つの姿勢</h3>
             <div className="w-12 h-px bg-primary mx-auto" />
           </FadeInSection>
         </div>
@@ -206,9 +246,9 @@ export default function AboutPage() {
           <FadeInSection>
             <Link href="/blog" className="inline-block text-gray-900 hover:text-gray-700 transition-all duration-300 group hover:scale-105">
               <div className="font-serif text-base md:text-lg leading-relaxed">
-                <p className="mb-2">read more</p>
+                <p className="mb-2 text-xs tracking-widest text-gray-500">もっと読む</p>
                 <p className="mb-2 relative inline-block">
-                  BLOG
+                  ブログ
                   <span className="absolute bottom-0 left-0 w-full h-px bg-primary" />
                 </p>
               </div>

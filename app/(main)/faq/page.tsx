@@ -52,7 +52,11 @@ export default function FAQPage() {
     <div className="pt-28 pb-24 min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-6 md:px-12">
         <div className="mb-12">
-          <h1 className="text-3xl md:text-4xl font-serif tracking-widest text-primary mb-4">FAQ</h1>
+          <p className="flex items-center gap-2 text-[13px] font-medium text-primary mb-3">
+            <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-500" aria-hidden="true" />
+            よくあるご質問
+          </p>
+          <h1 className="text-2xl md:text-3xl font-serif tracking-widest text-primary mb-4">お困りのことはありませんか</h1>
           <div className="w-12 h-px bg-primary" />
         </div>
         <div className="space-y-12">

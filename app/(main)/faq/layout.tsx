@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'FAQ',
+  title: 'よくあるご質問',
   description: 'よくあるご質問。配送・商品についての回答です。',
   alternates: { canonical: '/faq' },
 };

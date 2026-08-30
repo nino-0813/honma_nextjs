@@ -121,7 +121,7 @@ export default function CollectionsPage() {
       if (currentSubcategory === 'yearly') return 'イケベジ定期便';
       return 'お米';
     }
-    if (currentCategory === 'ALL') return 'ALL ITEM';
+    if (currentCategory === 'ALL') return 'すべての商品';
     return currentCategory;
   };
 
@@ -129,6 +129,10 @@ export default function CollectionsPage() {
     <div className="pt-28 pb-32 min-h-screen bg-white overflow-x-hidden w-full">
       <div className="max-w-[1400px] mx-auto px-6 md:px-12">
         <div className="text-center mb-8 md:mb-12 animate-fade-in">
+          <p className="flex items-center justify-center gap-2 text-[13px] font-medium text-primary mb-3">
+            <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-500" aria-hidden="true" />
+            商品一覧
+          </p>
           <h1 className="text-xl md:text-2xl font-serif tracking-[0.15em] font-normal mb-4">{getPageTitle()}</h1>
           {currentSubcategory === 'yearly' && !isLpView && (
             <p className="text-xs md:text-sm text-gray-600 leading-relaxed mb-6">
@@ -140,7 +144,7 @@ export default function CollectionsPage() {
             {currentCategory === 'お米' ? (
               <div className="flex gap-4 min-w-max justify-center md:justify-center">
                 <Link href="/collections/rice" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${!currentSubcategory ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
-                  ALL
+                  すべて
                 </Link>
                 <Link href="/collections/rice/yearly?view=lp" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentSubcategory === 'yearly' ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
                   イケベジ定期便
@@ -158,7 +162,7 @@ export default function CollectionsPage() {
             ) : (
               <div className="flex gap-4 min-w-max justify-center md:justify-center">
                 <Link href="/collections" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentCategory === 'ALL' ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200'}`}>
-                  ALL
+                  すべて
                 </Link>
                 <Link href="/collections/rice" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${(currentCategory as CategoryLabel) === 'お米' ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200'}`}>
                   お米

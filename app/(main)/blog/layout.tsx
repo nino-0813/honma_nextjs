@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'BLOG',
+  title: 'ブログ',
   description: 'IKEVEGE（イケベジ）のブログです。',
   alternates: { canonical: '/blog' },
 };
