@@ -1,4 +1,5 @@
 import { getGuide } from './guides';
+import ProductFeatures from './ProductFeatures';
 import { SHOW_PLACEHOLDER_BADGE } from '@/components/home/placeholders';
 
 /**
@@ -18,19 +19,15 @@ export default function ProductGuide({
   if (!guide && !description) return null;
 
   return (
-    <section id="product-detail" className="mt-24 md:mt-32 border-t border-gray-100 pt-16 md:pt-20">
-      {/* 商品説明の全文 */}
+    <>
+      {/* 商品詳細（アコーディオン） */}
       {description && (
-        <div className="max-w-3xl mx-auto mb-16 md:mb-24">
-          <h2 className="flex items-center gap-2 text-[13px] font-medium text-primary mb-5">
-            <span className="inline-block w-2.5 h-2.5 rounded-full bg-yuunagi" aria-hidden="true" />
-            この商品について
-          </h2>
-          <div className="text-[13px] md:text-sm leading-loose text-gray-600 whitespace-pre-wrap">
-            {description}
-          </div>
+        <div id="product-detail">
+          <ProductFeatures rows={[{ label: '商品の説明', body: description }]} />
         </div>
       )}
+
+      <section className="mt-20 md:mt-28">
 
       {/* 手順（写真つき） */}
       {guide && (
@@ -89,6 +86,7 @@ export default function ProductGuide({
           </ol>
         </div>
       )}
-    </section>
+      </section>
+    </>
   );
 }

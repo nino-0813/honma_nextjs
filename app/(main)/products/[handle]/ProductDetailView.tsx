@@ -8,8 +8,10 @@ import { IconChevronDown } from '@/components/Icons';
 import { FadeInImage, LoadingButton } from '@/components/UI';
 import { CartContext } from '@/providers/CartProvider';
 import { supabase, checkStockAvailability, getStockForVariant } from '@/lib/supabase';
+import { isProductPreorder } from '@/lib/productStatus';
 import { computeFirstShippingDate, formatJapaneseDate } from '@/lib/subscriptionShipping';
 import ProductGuide from '@/components/product/ProductGuide';
+import StickyPurchaseBar from '@/components/product/StickyPurchaseBar';
 import {
   trackViewItem,
   trackAddToCart,
@@ -307,7 +309,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
   };
 
   return (
-    <div className="pt-32 pb-24 bg-white min-h-screen animate-fade-in overflow-x-hidden w-full">
+    <div className="pt-32 pb-24 bg-white min-h-screen animate-fade-in overflow-x-clip w-full">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-[10px] text-gray-400 mb-8 md:mb-12 tracking-widest uppercase">
           <Link href="/" className="hover:text-black transition-colors">Home</Link>
@@ -317,10 +319,11 @@ export default function ProductDetailView({ product }: { product: Product }) {
           <span className="text-black">{product.title}</span>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
-          <div className="lg:col-span-7 flex flex-col-reverse lg:flex-row gap-4 lg:gap-6 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+          {/* 左の画像は固定。右の詳細を読み終えるまで残り、そのあと一緒に流れていく */}
+          <div className="lg:col-span-7 lg:sticky lg:top-24 lg:self-start flex flex-col-reverse lg:flex-row gap-4 lg:gap-6 items-start">
             {product.images && product.images.length > 0 && (
-              <div className="w-full lg:w-24 flex lg:flex-col gap-3 overflow-x-auto lg:overflow-y-auto scrollbar-hide lg:max-h-[80vh] lg:sticky lg:top-32">
+              <div className="w-full lg:w-24 flex lg:flex-col gap-3 overflow-x-auto lg:overflow-y-auto scrollbar-hide lg:max-h-[74vh]">
                 {product.images.map((img, idx) => (
                   <button key={idx} onClick={() => setSelectedImage(idx)} className={`relative aspect-square w-20 lg:w-full flex-shrink-0 overflow-hidden border transition-all duration-300 ${selectedImage === idx ? 'border-black opacity-100' : 'border-transparent opacity-60 hover:opacity-100'}`}>
                     <FadeInImage src={img} alt="" className="w-full h-full object-cover" width={160} height={160} />
@@ -350,7 +353,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
           </div>
 
           <div className="lg:col-span-5">
-            <div className="lg:sticky lg:top-32">
+            <div id="purchase-panel">
               <h1 className="text-xl md:text-2xl font-medium text-primary leading-relaxed tracking-wide mb-3">{product.title}</h1>
 
               {/* 簡潔な説明。全文はページ下部の「この商品について」に出す */}
@@ -978,6 +981,14 @@ export default function ProductDetailView({ product }: { product: Product }) {
             </div>
           </div>
         )}
+
+        {/* 画面下の固定購入バー（購入パネルが画面外に出たら出現） */}
+        <StickyPurchaseBar
+          title={product.title}
+          price={calculatedPrice}
+          image={product.image}
+          note={isProductPreorder(product) ? '予約商品' : undefined}
+        />
 
         {/* 下スクロールで読む詳細（説明全文・炊き方 / 戻し方・保管方法） */}
         <ProductGuide product={product} />
