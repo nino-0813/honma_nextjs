@@ -45,10 +45,10 @@ export default async function NoteSection() {
   };
 
   return (
-    <section className="pb-16 md:pb-24 bg-white">
-      <div className="max-w-[1400px] mx-auto px-5 md:px-10">
+    <section className="pb-20 md:pb-28 bg-white">
+      <div className="max-w-[1500px] mx-auto px-5 md:px-10">
         <div className="bg-secondary/40 px-6 md:px-10 py-10 md:py-14">
-          <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8 lg:gap-12">
+          <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-10 lg:gap-16">
             <div className="flex flex-col gap-4">
               <p className="text-xl md:text-2xl font-serif tracking-wider text-primary">
                 イケベジの
@@ -70,7 +70,7 @@ export default async function NoteSection() {
 
             <Carousel ariaLabel="noteの記事">
               {items.map((a, i) => (
-                <li key={`${a.title}-${i}`} className="snap-start shrink-0 w-[220px] md:w-[260px]">
+                <li key={`${a.title}-${i}`} className="snap-start shrink-0 w-[260px] md:w-[340px]">
                   <Link href={a.href} className="group block">
                     <div className="relative aspect-[16/10] overflow-hidden bg-white">
                       {/* eslint-disable-next-line @next/next/no-img-element */}

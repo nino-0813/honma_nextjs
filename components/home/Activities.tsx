@@ -35,11 +35,11 @@ const ITEMS = [
 
 export default function Activities() {
   return (
-    <section className="pb-16 md:pb-24 bg-white">
-      <div className="max-w-[1400px] mx-auto px-5 md:px-10">
+    <section className="pb-20 md:pb-28 bg-white">
+      <div className="max-w-[1500px] mx-auto px-5 md:px-10">
         <SectionHeading ja="取り組み" />
 
-        <ul className="mt-7 grid grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
+        <ul className="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
           {ITEMS.map((s) => (
             <li key={s.title}>
               <Link href={s.href} className="group block">

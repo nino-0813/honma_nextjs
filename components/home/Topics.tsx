@@ -42,9 +42,9 @@ export default async function Topics() {
   cards = [...cards, ...PLACEHOLDER_TOPICS].slice(0, CARD_COUNT);
 
   return (
-    <section className="py-16 md:py-24 bg-white">
-      <div className="max-w-[1400px] mx-auto px-5 md:px-10">
-        <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-8 lg:gap-12">
+    <section className="py-20 md:py-28 lg:min-h-screen lg:flex lg:items-center bg-white">
+      <div className="w-full max-w-[1500px] mx-auto px-5 md:px-10">
+        <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-10 lg:gap-16">
           <div className="lg:pt-2">
             <SectionHeading
               en="Topics"
@@ -55,7 +55,7 @@ export default async function Topics() {
 
           <Carousel ariaLabel="トピックス">
             {cards.map((c, i) => (
-              <li key={`${c.title}-${i}`} className="snap-start shrink-0 w-[240px] md:w-[300px]">
+              <li key={`${c.title}-${i}`} className="snap-start shrink-0 w-[280px] md:w-[380px] lg:w-[420px]">
                 <Link href={c.href} className="group block">
                   <div className="relative aspect-[4/3] overflow-hidden bg-dim">
                     {c.isPlaceholder && <PlaceholderBadge />}
@@ -67,11 +67,11 @@ export default async function Topics() {
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                   </div>
-                  <h3 className="mt-3 text-[13px] md:text-sm font-medium text-primary leading-relaxed line-clamp-2 group-hover:text-gray-600 transition-colors">
+                  <h3 className="mt-4 text-sm md:text-base font-medium text-primary leading-relaxed line-clamp-2 group-hover:text-gray-600 transition-colors">
                     {c.title}
                   </h3>
                   {c.date && (
-                    <time className="mt-1 block text-[11px] text-gray-400 tabular-nums">{formatDate(c.date)}</time>
+                    <time className="mt-1.5 block text-xs text-gray-400 tabular-nums">{formatDate(c.date)}</time>
                   )}
                 </Link>
               </li>

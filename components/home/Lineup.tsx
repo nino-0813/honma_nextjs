@@ -62,9 +62,9 @@ const TILES: {
 
 export default function Lineup() {
   return (
-    <section className="pt-4 pb-16 md:pb-24 bg-white">
-      <div className="max-w-[1400px] mx-auto px-5 md:px-10">
-        <div className="flex items-end justify-between gap-6 mb-7">
+    <section className="pt-8 pb-20 md:pb-28 bg-white">
+      <div className="max-w-[1500px] mx-auto px-5 md:px-10">
+        <div className="flex items-end justify-between gap-6 mb-9 md:mb-12">
           <SectionHeading en="Lineup" ja="ラインナップ" />
           <Link
             href="/collections"
@@ -82,7 +82,8 @@ export default function Lineup() {
       <ul className="grid grid-cols-2 lg:grid-cols-3">
         {TILES.map((t) => (
           <li key={t.ja}>
-            <Link href={t.href} className="group relative block aspect-[4/3] overflow-hidden">
+            {/* 上段3枚だけで画面の約8割。次の段が少し覗く高さ */}
+              <Link href={t.href} className="group relative block aspect-[4/3] lg:aspect-auto lg:h-[74svh] overflow-hidden">
               {t.imageIsPlaceholder && <PlaceholderBadge />}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -95,11 +96,11 @@ export default function Lineup() {
               <span className="absolute inset-0 bg-black/40 transition-colors group-hover:bg-black/50" />
               <span className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/20" />
               <span className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 text-center px-4">
-                <span className="text-white text-base md:text-xl font-sans font-bold tracking-wide drop-shadow">
+                <span className="text-white text-xl md:text-3xl lg:text-4xl font-sans font-bold tracking-wide drop-shadow">
                   {t.en}
                 </span>
-                <span className="text-white/90 text-[11px] md:text-xs tracking-[0.15em]">{t.ja}</span>
-                <span className="mt-2">
+                <span className="text-white/90 text-xs md:text-sm tracking-[0.2em]">{t.ja}</span>
+                <span className="mt-4 md:mt-6">
                   <CircleButton icon="arrow" variant="light" />
                 </span>
               </span>

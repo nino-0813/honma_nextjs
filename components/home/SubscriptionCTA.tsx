@@ -32,12 +32,12 @@ const POINTS = [
 
 export default function SubscriptionCTA() {
   return (
-    <section className="py-16 md:py-24 bg-white">
-      <div className="max-w-[1400px] mx-auto px-5 md:px-10">
+    <section className="py-20 md:py-32 bg-white">
+      <div className="max-w-[1500px] mx-auto px-5 md:px-10">
         <SectionHeading ja="イケベジ定期便" />
 
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-16">
-          <h2 className="text-2xl md:text-[34px] font-serif leading-[1.6] tracking-wide text-primary">
+          <h2 className="text-3xl md:text-[46px] lg:text-[54px] font-serif leading-[1.6] tracking-wide text-primary">
             買い続けることが、
             <br />
             集落を続けることになる。

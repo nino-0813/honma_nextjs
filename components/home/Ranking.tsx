@@ -25,9 +25,9 @@ export default function Ranking() {
     .slice(0, MAX_ITEMS);
 
   return (
-    <section id="products" className="py-16 md:py-24 bg-white">
-      <div className="max-w-[1400px] mx-auto px-5 md:px-10">
-        <div className="mb-7">
+    <section id="products" className="py-20 md:py-28 lg:min-h-screen lg:flex lg:items-center bg-white">
+      <div className="w-full max-w-[1500px] mx-auto px-5 md:px-10">
+        <div className="mb-9 md:mb-12">
           <SectionHeading en="Ranking" ja="人気の商品" />
         </div>
 
@@ -41,10 +41,10 @@ export default function Ranking() {
               const soldOut = isProductSoldOut(p);
               const preorder = isProductPreorder(p);
               return (
-                <li key={p.id} className="snap-start shrink-0 w-[150px] md:w-[190px]">
+                <li key={p.id} className="snap-start shrink-0 w-[200px] md:w-[280px] lg:w-[320px]">
                   <Link href={`/products/${p.handle || p.id}`} className="group block">
                     <div className="relative aspect-square overflow-hidden bg-dim">
-                      <span className="absolute top-2 left-2 z-10 w-6 h-6 rounded-full bg-amber-500 text-white text-[11px] font-bold flex items-center justify-center">
+                      <span className="absolute top-3 left-3 z-10 w-8 h-8 md:w-9 md:h-9 rounded-full bg-amber-500 text-white text-sm font-bold flex items-center justify-center">
                         {i + 1}
                       </span>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -60,12 +60,12 @@ export default function Ranking() {
                         </span>
                       )}
                     </div>
-                    <h3 className="mt-3 text-[12px] md:text-[13px] text-primary leading-relaxed line-clamp-2 group-hover:text-gray-600 transition-colors">
+                    <h3 className="mt-4 text-sm md:text-base text-primary leading-relaxed line-clamp-2 group-hover:text-gray-600 transition-colors">
                       {p.title}
                     </h3>
-                    <p className="mt-1 text-[12px] text-gray-600 tabular-nums">
+                    <p className="mt-1.5 text-sm text-gray-600 tabular-nums">
                       ¥{p.price.toLocaleString()}
-                      <span className="text-[10px] text-gray-400">（税込）</span>
+                      <span className="text-xs text-gray-400">（税込）</span>
                     </p>
                     {preorder && (
                       <span className="mt-1 inline-block text-[10px] text-amber-700 border border-amber-600 rounded-sm px-1.5 py-0.5">

@@ -44,8 +44,8 @@ export default async function News() {
     .slice(0, ROW_COUNT);
 
   return (
-    <section className="pb-16 md:pb-24 bg-white">
-      <div className="max-w-[1400px] mx-auto px-5 md:px-10">
+    <section className="pb-20 md:pb-28 bg-white">
+      <div className="max-w-[1500px] mx-auto px-5 md:px-10">
         <div className="bg-secondary/40 px-6 md:px-10 py-10 md:py-14">
           <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-8 lg:gap-12">
             <div className="flex flex-col gap-5">

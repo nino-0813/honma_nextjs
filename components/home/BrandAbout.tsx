@@ -32,19 +32,19 @@ const TILES = [
 
 export default function BrandAbout() {
   return (
-    <section className="pt-16 md:pt-24 bg-white">
-      <div className="max-w-[1400px] mx-auto px-5 md:px-10">
+    <section className="pt-20 md:pt-32 bg-white">
+      <div className="max-w-[1500px] mx-auto px-5 md:px-10">
         <SectionHeading en="About" ja="イケベジについて" />
 
-        <div className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
-          <p className="text-2xl md:text-[32px] font-serif leading-[1.7] tracking-wide text-primary">
+        <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20">
+          <p className="text-3xl md:text-[44px] lg:text-[52px] font-serif leading-[1.6] tracking-wide text-primary">
             あんしん、
             <br />
             おいしい、
             <br />
             いいかお。
           </p>
-          <div className="flex flex-col gap-5 text-[13px] md:text-sm text-gray-600 leading-loose">
+          <div className="flex flex-col gap-5 text-sm md:text-base text-gray-600 leading-loose">
             <p>
               自然から学び、豊かさを分かち合う。イケベジは佐渡島で、農薬にも化学肥料にも頼らずにお米を育てています。
             </p>
@@ -58,10 +58,10 @@ export default function BrandAbout() {
       </div>
 
       {/* 全面タイル */}
-      <ul className="mt-12 md:mt-16 grid grid-cols-1 md:grid-cols-3">
+      <ul className="mt-14 md:mt-20 grid grid-cols-1 md:grid-cols-3">
         {TILES.map((t) => (
           <li key={t.key}>
-            <a href={t.href} className="group relative block aspect-[4/5] md:aspect-[3/4] overflow-hidden">
+            <a href={t.href} className="group relative block aspect-[4/5] md:aspect-auto md:h-[78svh] overflow-hidden">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={t.image}
@@ -73,8 +73,8 @@ export default function BrandAbout() {
               <span className="absolute inset-0 bg-black/45 transition-colors group-hover:bg-black/55" />
               <span className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/25" />
               <span className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center px-6">
-                <span className="text-white text-xl md:text-2xl font-serif tracking-[0.15em] drop-shadow">{t.key}</span>
-                <span className="text-white/95 text-xs md:text-sm leading-relaxed whitespace-pre-line drop-shadow">
+                <span className="text-white text-2xl md:text-4xl font-serif tracking-[0.15em] drop-shadow">{t.key}</span>
+                <span className="text-white/95 text-sm md:text-base leading-relaxed whitespace-pre-line drop-shadow">
                   {t.lead}
                 </span>
                 <span className="mt-2">

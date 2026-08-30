@@ -27,6 +27,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
       location === '/collections/rice/yearly' && params.get('view') === 'lp'
     );
   }, [location]);
+  const isHomePage = location === '/';
   const [isScrolled, setIsScrolled] = useState(false);
   const { cartItems } = useContext(CartContext);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -53,11 +54,21 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
     }
   }, []);
 
+  // トップページはヒーロー動画が画面いっぱいのため、動画を抜けるまで透明のままにする。
+  // 他のページは従来どおり少しスクロールしたら背景を出す。
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    const handleScroll = () => {
+      const threshold = isHomePage ? Math.max(window.innerHeight - 90, 100) : 50;
+      setIsScrolled(window.scrollY > threshold);
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, [isHomePage]);
 
   const isActive = (item: { href: string; matchPrefix?: string; matchQuery?: { key: string; value: string } }) => {
     // 定期便リンクは ?view=lp が付いている時だけアクティブ
@@ -68,7 +79,6 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
     }
     return location === item.href;
   };
-  const isHomePage = location === '/';
 
   return (
     <header

@@ -45,7 +45,7 @@ const HeroVideo = () => {
   return (
     <div className="relative w-full bg-gray-50">
       {/* Mobile */}
-      <div className="md:hidden w-full h-[55vh] relative overflow-hidden">
+      <div className="md:hidden w-full h-[70svh] relative overflow-hidden">
         {useMp4 && isLoading && !mp4Failed && (
           <div className="absolute inset-0 bg-gray-200 flex items-center justify-center z-10">
             <div className="w-6 h-6 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
@@ -78,7 +78,8 @@ const HeroVideo = () => {
       </div>
 
       {/* Desktop */}
-      <div className="hidden md:block relative w-full h-[80vh] overflow-hidden">
+      {/* デスクトップは画面いっぱい。ヘッダーはこの間だけ透明 */}
+      <div className="hidden md:block relative w-full h-[100svh] overflow-hidden">
         {useMp4 && isLoading && !mp4Failed && (
           <div className="absolute inset-0 bg-gray-900 flex items-center justify-center z-10">
             <div className="text-white text-sm animate-pulse">読み込み中...</div>
