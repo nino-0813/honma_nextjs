@@ -9,6 +9,7 @@ import { FadeInImage, LoadingButton } from '@/components/UI';
 import { CartContext } from '@/providers/CartProvider';
 import { supabase, checkStockAvailability, getStockForVariant } from '@/lib/supabase';
 import { computeFirstShippingDate, formatJapaneseDate } from '@/lib/subscriptionShipping';
+import ProductGuide from '@/components/product/ProductGuide';
 import {
   trackViewItem,
   trackAddToCart,
@@ -350,7 +351,29 @@ export default function ProductDetailView({ product }: { product: Product }) {
 
           <div className="lg:col-span-5">
             <div className="lg:sticky lg:top-32">
-              <h1 className="text-xl md:text-2xl font-medium text-primary leading-relaxed tracking-wide mb-4">{product.title}</h1>
+              <h1 className="text-xl md:text-2xl font-medium text-primary leading-relaxed tracking-wide mb-3">{product.title}</h1>
+
+              {/* 簡潔な説明。全文はページ下部の「この商品について」に出す */}
+              {(() => {
+                const excerpt = (product.description ?? '')
+                  .replace(/https?:\/\/\S+/g, '')
+                  .split(/\n+/)
+                  .map((line) => line.trim())
+                  .filter((line) => line && !line.startsWith('※'))
+                  .join(' ');
+                if (!excerpt) return null;
+                const short = excerpt.length > 90 ? `${excerpt.slice(0, 90)}…` : excerpt;
+                return (
+                  <p className="text-[13px] leading-relaxed text-gray-600 mb-4">
+                    {short}
+                    {excerpt.length > 90 && (
+                      <a href="#product-detail" className="ml-1 text-amber-700 underline underline-offset-2 hover:text-amber-800">
+                        詳しく見る
+                      </a>
+                    )}
+                  </p>
+                );
+              })()}
               <div className="mb-8 border-b border-gray-100 pb-8">
                 {subscriptionEnabled && purchaseType === 'subscription' && subscriptionDiscountPercent > 0 ? (
                   <div className="flex items-baseline gap-3 mb-1">
@@ -801,16 +824,15 @@ export default function ProductDetailView({ product }: { product: Product }) {
               </div>
 
               <div className="border-t border-gray-200 mt-8">
+                {/* 商品説明はページ下部にまとめたので、ここからは誘導だけ置く */}
                 <div className="py-4 border-b border-gray-200">
-                  <div className="flex justify-end items-center cursor-pointer py-2" onClick={() => toggleAccordion('desc')}>
-                    <IconChevronDown className={`w-4 h-4 transition-transform duration-300 ${activeAccordion === 'desc' ? 'rotate-180' : ''}`} />
-                  </div>
-                  <div className={`overflow-hidden transition-all duration-500 ease-in-out ${activeAccordion === 'desc' ? 'max-h-[5000px] opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
-                    <div className="text-sm leading-loose text-gray-600 font-light space-y-4 pb-4">
-                      <h3 className="font-medium text-gray-900">【{product.title}】</h3>
-                      {product.description && product.description.trim() ? <div className="whitespace-pre-wrap">{product.description}</div> : <p className="text-gray-400">商品説明がありません。</p>}
-                    </div>
-                  </div>
+                  <a
+                    href="#product-detail"
+                    className="flex justify-between items-center py-2 text-sm font-medium tracking-wider text-primary hover:text-gray-500 transition-colors"
+                  >
+                    この商品について詳しく見る
+                    <IconChevronDown className="w-4 h-4" />
+                  </a>
                 </div>
                 <div className="py-4 border-b border-gray-200">
                   <div className="flex justify-between items-center cursor-pointer py-2" onClick={() => toggleAccordion('shipping')}>
@@ -956,6 +978,9 @@ export default function ProductDetailView({ product }: { product: Product }) {
             </div>
           </div>
         )}
+
+        {/* 下スクロールで読む詳細（説明全文・炊き方 / 戻し方・保管方法） */}
+        <ProductGuide product={product} />
 
         {allProducts.length > 0 && (
           <div className="mt-32 border-t border-gray-100 pt-16">
