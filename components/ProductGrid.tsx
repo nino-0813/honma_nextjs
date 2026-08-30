@@ -22,7 +22,8 @@ const ProductGrid = () => {
   const displayProducts = sortedProducts.slice(0, 8);
 
   return (
-    <section className="py-8 md:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    // id は告知ポップアップの表示トリガー（AnnouncementPopup）にも使われている
+    <section id="products" className="py-8 md:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="text-center mb-12">
         <p className="text-xs font-serif text-gray-500 mb-2 tracking-[0.2em] uppercase">IKEVEGE online</p>
         <h3 className="text-xl font-serif uppercase tracking-[0.1em] border-b border-gray-800 inline-block pb-0.5 text-black">ALL ITEM</h3>
