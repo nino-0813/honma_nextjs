@@ -67,7 +67,7 @@ export default function BrandAbout() {
             <FadeIn delay={Math.min(i, 2) * 80}>
             <a href={t.href} className="group block">
               {/* 写真には色を重ねない */}
-              <span className="relative block aspect-[4/5] md:aspect-auto md:h-[64svh] overflow-hidden bg-dim">
+              <span className="relative block aspect-[4/5] md:aspect-[3/4] lg:aspect-auto lg:h-[70svh] overflow-hidden bg-dim">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={t.image}

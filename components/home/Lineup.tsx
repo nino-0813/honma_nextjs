@@ -89,7 +89,7 @@ export default function Lineup() {
             {/* 上段3枚だけで画面の約8割。次の段が少し覗く高さ */}
               <Link href={t.href} className="group block">
               {/* 写真には色を重ねない。文字は写真の下に置く */}
-              <span className="relative block aspect-[4/3] lg:aspect-auto lg:h-[74svh] overflow-hidden bg-dim">
+              <span className="relative block aspect-[3/4] md:aspect-[4/3] lg:aspect-auto lg:h-[74svh] overflow-hidden bg-dim">
                 {t.imageIsPlaceholder && <PlaceholderBadge />}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
