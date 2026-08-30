@@ -1,25 +1,33 @@
 /**
- * トップページ各セクションの見出し。
- * ベースフードと同じく「英語ラベル → 日本語見出し → 補足文」の3段構成。
+ * セクション見出し。ベースフードの型に合わせている。
+ *   Topics          … 大きめの英語（太字ゴシック）
+ *   ● トピックス     … ドット + 日本語ラベル
+ *   説明文           … 任意
  */
 export default function SectionHeading({
-  label,
-  title,
+  en,
+  ja,
   description,
-  align = 'left',
+  size = 'lg',
 }: {
-  label: string;
-  title: string;
+  en?: string;
+  ja: string;
   description?: string;
-  align?: 'left' | 'center';
+  size?: 'lg' | 'sm';
 }) {
-  const alignClass = align === 'center' ? 'items-center text-center' : 'items-start text-left';
   return (
-    <div className={`flex flex-col gap-2 ${alignClass}`}>
-      <p className="text-[11px] tracking-[0.22em] uppercase text-amber-700 font-medium">{label}</p>
-      <h2 className="text-xl md:text-2xl font-serif tracking-[0.1em] text-primary">{title}</h2>
+    <div className="flex flex-col gap-1.5">
+      {en && size === 'lg' && (
+        <p className="text-[28px] md:text-[34px] font-sans font-bold tracking-tight text-primary leading-none">
+          {en}
+        </p>
+      )}
+      <p className="flex items-center gap-2 text-[13px] md:text-sm font-medium text-primary">
+        <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" aria-hidden="true" />
+        {ja}
+      </p>
       {description && (
-        <p className="text-xs md:text-sm text-gray-500 leading-relaxed max-w-2xl">{description}</p>
+        <p className="mt-2 text-xs md:text-[13px] text-gray-500 leading-relaxed max-w-xs">{description}</p>
       )}
     </div>
   );

@@ -1,11 +1,13 @@
 import type { Metadata } from 'next';
 import HeroVideo from '@/components/HeroVideo';
-import ProductGrid from '@/components/ProductGrid';
 import AnnouncementPopup from '@/components/AnnouncementPopup';
 import Topics from '@/components/home/Topics';
 import Lineup from '@/components/home/Lineup';
+import Ranking from '@/components/home/Ranking';
 import BrandAbout from '@/components/home/BrandAbout';
 import LearnMore from '@/components/home/LearnMore';
+import NoteSection from '@/components/home/NoteSection';
+import Activities from '@/components/home/Activities';
 import SubscriptionCTA from '@/components/home/SubscriptionCTA';
 import News from '@/components/home/News';
 
@@ -51,11 +53,11 @@ export default function HomePage() {
       {/* 2. トピックス */}
       <Topics />
 
-      {/* 3. 商品ラインナップ */}
+      {/* 3. ラインナップ */}
       <Lineup />
 
-      {/* 4. 商品一覧（告知ポップアップの表示トリガーもこのセクション） */}
-      <ProductGrid />
+      {/* 4. 人気の商品（告知ポップアップの表示トリガーもこのセクション） */}
+      <Ranking />
 
       {/* 5. ブランドについて */}
       <BrandAbout />
@@ -63,11 +65,18 @@ export default function HomePage() {
       {/* 6. もっと知る */}
       <LearnMore />
 
-      {/* 7. 定期便 */}
+      {/* 7. note の記事 */}
+      <NoteSection />
+
+      {/* 8. 取り組み */}
+      <Activities />
+
+      {/* 9. 定期便 */}
       <SubscriptionCTA />
 
-      {/* 8. お知らせ */}
+      {/* 10. お知らせ */}
       <News />
+
     </div>
   );
 }

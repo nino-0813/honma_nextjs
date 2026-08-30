@@ -16,6 +16,7 @@ export type TopicCard = {
   label: string;
   image: string;
   href: string;
+  date?: string;
   isPlaceholder?: boolean;
 };
 
@@ -26,6 +27,7 @@ export const PLACEHOLDER_TOPICS: TopicCard[] = [
     label: 'お知らせ',
     image: '/images/home/parallax/sunset_riceplanting_7_800.webp',
     href: '/collections/rice',
+    date: '2026-08-20',
     isPlaceholder: true,
   },
   {
@@ -33,6 +35,7 @@ export const PLACEHOLDER_TOPICS: TopicCard[] = [
     label: 'キャンペーン',
     image: '/images/home/collections/collection_koshihikari_800.webp',
     href: '/collections/rice',
+    date: '2026-08-01',
     isPlaceholder: true,
   },
   {
@@ -40,6 +43,7 @@ export const PLACEHOLDER_TOPICS: TopicCard[] = [
     label: '取り組み',
     image: '/images/joinus/sadokids-fieldwork.jpg',
     href: '/join-us',
+    date: '2026-07-30',
     isPlaceholder: true,
   },
   {
@@ -47,35 +51,43 @@ export const PLACEHOLDER_TOPICS: TopicCard[] = [
     label: '田んぼだより',
     image: '/images/about/stories/about_story_taue_123.webp',
     href: '/blog',
+    date: '2026-05-18',
     isPlaceholder: true,
   },
 ];
 
 /** もっと知る：ブランドブック等。PDF・note の URL が決まったら差し替える */
-export const LEARN_MORE_CARDS = [
+export const LEARN_MORE_CARDS: {
+  title: string;
+  body: string;
+  href: string;
+  image: string;
+  isPlaceholder?: boolean;
+}[] = [
   {
     title: 'ブランドブック',
     body: '佐渡でなぜこの育て方を選んだのか。イケベジの考えと、これから目指すことをまとめています。',
     href: '#',
+    image: '/images/about/stories/P3A0011.jpg',
     isPlaceholder: true,
   },
   {
     title: '島の循環のはなし',
     body: '島の有機資源だけで土をつくる。農薬に頼らない米づくりの裏側を紹介します。',
     href: '/about',
-    isPlaceholder: false,
+    image: '/images/about/stories/about_story_taue_123.webp',
   },
   {
     title: '佐渡Kids生きもの調査隊',
     body: '19年目を迎える環境学習プログラム。子どもたちと一緒に田んぼの生きものを数えています。',
     href: '/join-us',
-    isPlaceholder: false,
+    image: '/images/joinus/sadokids-fieldwork.jpg',
   },
   {
-    title: 'note の記事',
-    body: '日々の農作業や、佐渡での暮らしについて書いています。',
-    href: '/blog',
-    isPlaceholder: true,
+    title: 'イケてるパートナーズ',
+    body: '1年を通して佐渡の田んぼとつながる、企業向けのオーナー制度です。',
+    href: '/join-us',
+    image: '/images/joinus/crowdfunding-1052.webp',
   },
 ];
 

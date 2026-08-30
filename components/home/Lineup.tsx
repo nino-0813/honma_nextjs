@@ -1,87 +1,112 @@
 import Link from 'next/link';
 import SectionHeading from './SectionHeading';
+import CircleButton from './CircleButton';
 import PlaceholderBadge from './PlaceholderBadge';
 
 /**
- * 商品ラインナップ（ベースフード構成の3番目）。
- * 要件どおり「米 / 原木椎茸 / その他」の3分類で入口を出す。
+ * ラインナップ。
+ * ベースフードと同じく、隙間なく並べた大判の写真タイルに
+ * 白抜きの見出しと丸ボタンを重ねる。
  *
- * 注意: 原木椎茸は現在DB上 category='その他' に入っているため、
- * ここでは検索キーワード付きのURLで暫定的に飛ばしている。
- * 管理画面でカテゴリを分けたら href を /collections/shiitake などに変更する。
+ * 注意: 原木椎茸は現在DB上 category='その他' のため、リンク先は暫定。
+ * 管理画面でカテゴリを分けたら href を差し替える。
  */
-const CATEGORIES: { title: string; en: string; body: string; href: string; image: string; imageIsPlaceholder?: boolean }[] = [
+const TILES: {
+  en: string;
+  ja: string;
+  href: string;
+  image: string;
+  imageIsPlaceholder?: boolean;
+}[] = [
   {
-    title: 'お米',
     en: 'Rice',
-    body: 'コシヒカリ・亀の尾・にこまる。農薬と化学肥料に頼らずに育てた自然栽培米。',
+    ja: 'お米',
     href: '/collections/rice',
-    image: '/images/home/collections/collection_koshihikari_800.webp',
+    image: '/images/home/parallax/sunset_riceplanting_7_1200.webp',
   },
   {
-    title: '原木椎茸',
+    en: 'Koshihikari',
+    ja: 'コシヒカリ',
+    href: '/collections/rice/koshihikari',
+    image: '/images/home/collections/collection_koshihikari_1200.webp',
+  },
+  {
+    en: 'Kamenoo',
+    ja: '亀の尾',
+    href: '/collections/rice/kamenoo',
+    image: '/images/home/collections/collection_kamenoo_1200.webp',
+  },
+  {
     en: 'Shiitake',
-    body: '佐渡の原木で育てた乾しいたけ。だしにも、そのままの一品にも。',
+    ja: '原木椎茸',
     href: '/collections/other',
-    // 椎茸の写真が無いため米のバナーを流用中
-    image: '/images/home/collections/4_800.webp',
+    // 椎茸の写真が無いため流用中
+    image: '/images/about/stories/P3A9707.webp',
     imageIsPlaceholder: true,
   },
   {
-    title: 'その他',
+    en: 'Subscription',
+    ja: 'イケベジ定期便',
+    href: '/collections/rice/yearly?view=lp',
+    image: '/images/about/stories/about_story_taue_123.webp',
+  },
+  {
     en: 'Others',
-    body: '焼き菓子や季節のもの。佐渡の恵みからつくられた品々です。',
+    ja: 'その他',
     href: '/collections/other',
     // その他カテゴリの代表写真が無いため流用中
-    image: '/images/home/collections/2_800.webp',
+    image: '/images/about/stories/IMG_8832.webp',
     imageIsPlaceholder: true,
   },
 ];
 
 export default function Lineup() {
   return (
-    <section className="py-14 md:py-20 bg-secondary/30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <SectionHeading
-          label="Lineup"
-          title="ラインナップ"
-          description="佐渡島で育てたものを、種類ごとにご覧いただけます。"
-          align="center"
-        />
-
-        <ul className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
-          {CATEGORIES.map((c) => (
-            <li key={c.title}>
-              <Link href={c.href} className="group block bg-white rounded-lg overflow-hidden h-full">
-                <div className="relative aspect-[16/10] overflow-hidden bg-dim">
-                  {c.imageIsPlaceholder && <PlaceholderBadge />}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={c.image}
-                    alt={c.title}
-                    loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                </div>
-                <div className="p-5 md:p-6">
-                  <p className="text-[10px] tracking-[0.2em] uppercase text-amber-700">{c.en}</p>
-                  <h3 className="mt-1 text-base md:text-lg font-serif tracking-wider text-primary">{c.title}</h3>
-                  <p className="mt-2 text-xs md:text-sm text-gray-600 leading-relaxed">{c.body}</p>
-                </div>
-              </Link>
-            </li>
-          ))}
-        </ul>
-
-        <div className="mt-8 text-center">
+    <section className="pt-4 pb-16 md:pb-24 bg-white">
+      <div className="max-w-[1400px] mx-auto px-5 md:px-10">
+        <div className="flex items-end justify-between gap-6 mb-7">
+          <SectionHeading en="Lineup" ja="ラインナップ" />
           <Link
             href="/collections"
-            className="inline-block px-8 py-3 rounded-full border border-primary text-sm tracking-wider text-primary hover:bg-primary hover:text-white transition-colors"
+            className="shrink-0 inline-flex items-center gap-2 rounded-full border border-gray-300 px-5 py-2.5 text-xs md:text-[13px] text-primary hover:border-primary transition-colors"
           >
             すべての商品を見る
+            <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3">
+              <path d="M3 8h10M9 4l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </Link>
         </div>
       </div>
+
+      {/* 全面タイル（隙間なし） */}
+      <ul className="grid grid-cols-2 lg:grid-cols-3">
+        {TILES.map((t) => (
+          <li key={t.ja}>
+            <Link href={t.href} className="group relative block aspect-[4/3] overflow-hidden">
+              {t.imageIsPlaceholder && <PlaceholderBadge />}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={t.image}
+                alt={t.ja}
+                loading="lazy"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-[900ms] group-hover:scale-105"
+              />
+              {/* 明るい写真でも白文字が読めるように、ベタ＋下方向のグラデーションを重ねる */}
+              <span className="absolute inset-0 bg-black/40 transition-colors group-hover:bg-black/50" />
+              <span className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/20" />
+              <span className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 text-center px-4">
+                <span className="text-white text-base md:text-xl font-sans font-bold tracking-wide drop-shadow">
+                  {t.en}
+                </span>
+                <span className="text-white/90 text-[11px] md:text-xs tracking-[0.15em]">{t.ja}</span>
+                <span className="mt-2">
+                  <CircleButton icon="arrow" variant="light" />
+                </span>
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
