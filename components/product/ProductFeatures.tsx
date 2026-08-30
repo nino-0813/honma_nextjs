@@ -50,9 +50,11 @@ export default function ProductFeatures({
                     <path d="M3 6l5 5 5-5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </button>
-                <div className={`overflow-hidden transition-all duration-500 ${isOpen ? 'max-h-[4000px] opacity-100' : 'max-h-0 opacity-0'}`}>
-                  <div className="pb-6 text-[13px] md:text-sm leading-loose text-gray-600 whitespace-pre-wrap">
-                    {r.body}
+                <div className={`accordion-body ${isOpen ? 'is-open' : ''}`}>
+                  <div>
+                    <div className="pb-6 text-[13px] md:text-sm leading-loose text-gray-600 whitespace-pre-wrap">
+                      {r.body}
+                    </div>
                   </div>
                 </div>
               </li>

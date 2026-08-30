@@ -80,7 +80,7 @@ export default async function NoteSection() {
                         src={a.image}
                         alt={a.title}
                         loading="lazy"
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     </div>
                     <h3 className="mt-3 text-[13px] font-medium text-primary leading-relaxed line-clamp-2">

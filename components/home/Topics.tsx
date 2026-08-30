@@ -68,7 +68,7 @@ export default async function Topics() {
                       src={c.image}
                       alt={c.title}
                       loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   </div>
                   <h3 className="mt-4 text-sm md:text-base font-medium text-primary leading-relaxed line-clamp-2 group-hover:text-gray-600 transition-colors">

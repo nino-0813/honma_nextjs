@@ -73,7 +73,7 @@ export default function BrandAbout() {
                   src={t.image}
                   alt={t.key}
                   loading="lazy"
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-[900ms] group-hover:scale-105"
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               </span>
               <span className="flex flex-col gap-2 px-5 md:px-6 py-6">

@@ -173,8 +173,10 @@ export default function ProductStory() {
                       <path d="M3 6l5 5 5-5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </button>
-                  <div className={`overflow-hidden transition-all duration-500 ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
-                    <p className="pb-5 text-[13px] text-gray-600 leading-loose">{f.a}</p>
+                  <div className={`accordion-body ${isOpen ? 'is-open' : ''}`}>
+                    <div>
+                      <p className="pb-5 text-[13px] text-gray-600 leading-loose">{f.a}</p>
+                    </div>
                   </div>
                 </li>
               );

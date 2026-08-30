@@ -31,7 +31,7 @@ export default function LearnMore() {
                     alt=""
                     aria-hidden="true"
                     loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>
                 <div className="flex-1 min-w-0 flex flex-col gap-1.5">

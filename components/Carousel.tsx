@@ -84,7 +84,7 @@ export default function Carousel({
         {/* 進捗バー */}
         <div className="relative flex-1 max-w-[220px] h-px bg-gray-200" aria-hidden="true">
           <div
-            className="absolute inset-y-0 left-0 bg-primary transition-[width] duration-200"
+            className="absolute inset-y-0 left-0 bg-primary transition-[width] duration-200 ease-out-expo"
             style={{ width: `${Math.max(12, progress * 100)}%` }}
           />
         </div>

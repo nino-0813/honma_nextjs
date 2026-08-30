@@ -114,3 +114,42 @@
     transition: none;
   }
 }
+
+
+/* ------------------------------------------------------------------
+   キーボード操作時のフォーカス表示。
+   マウス操作では出さず、Tab移動のときだけ枠を出す。
+   ------------------------------------------------------------------ */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-hekishoku);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ------------------------------------------------------------------
+   アコーディオンの開閉。
+   max-height だと閉じるときに間が空いて見えるため、
+   grid の行を 0fr → 1fr で伸ばして実際の高さを動かす。
+   ------------------------------------------------------------------ */
+.accordion-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s var(--ease-out-expo), opacity 0.3s var(--ease-out-expo);
+  opacity: 0;
+}
+
+.accordion-body.is-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.accordion-body > * {
+  overflow: hidden;
+  min-height: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .accordion-body {
+    transition: none;
+  }
+}

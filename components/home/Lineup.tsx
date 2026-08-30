@@ -96,7 +96,7 @@ export default function Lineup() {
                   src={t.image}
                   alt={t.ja}
                   loading="lazy"
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-[900ms] group-hover:scale-105"
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               </span>
               <span className="flex items-center justify-between gap-4 px-5 md:px-6 py-5">

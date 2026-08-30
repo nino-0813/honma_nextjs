@@ -56,7 +56,7 @@ export default function Ranking() {
                         src={p.image}
                         alt={p.title}
                         loading="lazy"
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                       {soldOut && (
                         <span className="absolute inset-0 bg-white/70 flex items-center justify-center text-xs tracking-widest text-primary">

@@ -29,13 +29,13 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, children, title, posit
     <>
       {/* Overlay */}
       <div 
-        className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] transition-opacity duration-500 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         onClick={onClose}
       />
       
       {/* Content */}
       <div 
-        className={`fixed top-0 bottom-0 z-[70] w-full max-w-[350px] bg-white shadow-2xl transition-transform duration-500 cubic-bezier(0.4, 0, 0.2, 1) ${
+        className={`fixed top-0 bottom-0 z-[70] w-full max-w-[350px] bg-white shadow-2xl transition-transform duration-[400ms] ease-in-out ${
           position === 'right' 
             ? (isOpen ? 'translate-x-0 right-0' : 'translate-x-full right-0')
             : (isOpen ? 'translate-x-0 left-0' : '-translate-x-full left-0')

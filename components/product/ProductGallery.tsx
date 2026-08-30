@@ -126,7 +126,7 @@ export default function ProductGallery({
               </button>
             </div>
             <div className="relative flex-1 max-w-[240px] h-px bg-gray-200" aria-hidden="true">
-              <div className="absolute inset-y-0 left-0 bg-primary transition-[width] duration-200" style={{ width: `${Math.max(12, progress * 100)}%` }} />
+              <div className="absolute inset-y-0 left-0 bg-primary transition-[width] duration-200 ease-out-expo" style={{ width: `${Math.max(12, progress * 100)}%` }} />
             </div>
           </div>
         )}

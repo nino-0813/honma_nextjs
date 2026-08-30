@@ -53,7 +53,7 @@ export default function Activities() {
                     src={s.image}
                     alt={s.title}
                     loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>
                 <h3 className="mt-3 text-[13px] md:text-sm font-medium text-primary group-hover:text-gray-600 transition-colors">
