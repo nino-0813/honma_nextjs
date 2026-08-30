@@ -59,6 +59,7 @@ const PARTNER_LOGOS: { name: string; src: string; url?: string }[] = [
     src: '/images/partners/shinwa-style.webp',
     url: 'https://shinwastyle.com/',
   },
+  { name: 'HPP（Human Perfect Position）', src: '/images/partners/hpp.webp' },
 ];
 
 export default function AmbassadorPage() {
