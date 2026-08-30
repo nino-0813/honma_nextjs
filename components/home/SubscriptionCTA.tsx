@@ -69,7 +69,7 @@ export default function SubscriptionCTA() {
         <div className="mt-12 text-center">
           <Link
             href="/collections/rice/yearly?view=lp"
-            className="inline-flex items-center gap-2 rounded-full bg-yuunagi px-10 py-4 text-sm font-medium text-white hover:bg-yuunagi transition-colors"
+            className="inline-flex items-center gap-2 rounded-full bg-yuunagi px-10 py-4 text-sm font-medium text-white hover:bg-yuunagi-ink transition-colors"
           >
             定期便をはじめる
             <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4">

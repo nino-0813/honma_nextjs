@@ -53,7 +53,7 @@ export default function FAQPage() {
       <div className="max-w-4xl mx-auto px-6 md:px-12">
         <div className="mb-12">
           <p className="flex items-center gap-2 text-[13px] font-medium text-primary mb-3">
-            <span className="inline-block w-2.5 h-2.5 rounded-full bg-yuunagi" aria-hidden="true" />
+            <span className="inline-block w-2.5 h-2.5 rounded-full bg-hekishoku" aria-hidden="true" />
             よくあるご質問
           </p>
           <h1 className="text-2xl md:text-3xl font-serif tracking-widest text-primary mb-4">お困りのことはありませんか</h1>

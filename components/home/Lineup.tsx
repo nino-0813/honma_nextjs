@@ -83,26 +83,26 @@ export default function Lineup() {
         {TILES.map((t) => (
           <li key={t.ja}>
             {/* 上段3枚だけで画面の約8割。次の段が少し覗く高さ */}
-              <Link href={t.href} className="group relative block aspect-[4/3] lg:aspect-auto lg:h-[74svh] overflow-hidden">
-              {t.imageIsPlaceholder && <PlaceholderBadge />}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={t.image}
-                alt={t.ja}
-                loading="lazy"
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-[900ms] group-hover:scale-105"
-              />
-              {/* 明るい写真でも白文字が読めるように、ベタ＋下方向のグラデーションを重ねる */}
-              <span className="absolute inset-0 bg-hekishoku/55 transition-colors group-hover:bg-hekishoku/65" />
-              <span className="absolute inset-0 bg-gradient-to-t from-hekishoku-deep/50 via-transparent to-hekishoku-deep/25" />
-              <span className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 text-center px-4">
-                <span className="text-white text-xl md:text-3xl lg:text-4xl font-sans font-bold tracking-wide drop-shadow">
-                  {t.en}
+              <Link href={t.href} className="group block">
+              {/* 写真には色を重ねない。文字は写真の下に置く */}
+              <span className="relative block aspect-[4/3] lg:aspect-auto lg:h-[74svh] overflow-hidden bg-dim">
+                {t.imageIsPlaceholder && <PlaceholderBadge />}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={t.image}
+                  alt={t.ja}
+                  loading="lazy"
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-[900ms] group-hover:scale-105"
+                />
+              </span>
+              <span className="flex items-center justify-between gap-4 px-5 md:px-6 py-5">
+                <span>
+                  <span className="block text-lg md:text-2xl font-sans font-bold tracking-wide text-primary">
+                    {t.en}
+                  </span>
+                  <span className="mt-0.5 block text-xs md:text-sm tracking-[0.2em] text-gray-500">{t.ja}</span>
                 </span>
-                <span className="text-white/90 text-xs md:text-sm tracking-[0.2em]">{t.ja}</span>
-                <span className="mt-4 md:mt-6">
-                  <CircleButton icon="arrow" variant="light" />
-                </span>
+                <CircleButton icon="arrow" variant="dark" />
               </span>
             </Link>
           </li>

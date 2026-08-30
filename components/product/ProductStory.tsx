@@ -127,9 +127,9 @@ export default function ProductStory() {
       <section className="mt-20 md:mt-28">
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8 lg:gap-16">
           <div>
-            <p className="text-[32px] md:text-[46px] font-sans font-bold tracking-tight text-hekishoku leading-none">Reviews</p>
+            <p className="text-[32px] md:text-[46px] font-sans font-bold tracking-tight text-yuunagi leading-none">Reviews</p>
             <p className="mt-1.5 flex items-center gap-2.5 text-sm md:text-base font-medium text-primary">
-              <span className="inline-block w-3 h-3 rounded-full bg-yuunagi shrink-0" aria-hidden="true" />
+              <span className="inline-block w-3 h-3 rounded-full bg-hekishoku shrink-0" aria-hidden="true" />
               お客様の声
             </p>
           </div>
@@ -147,9 +147,9 @@ export default function ProductStory() {
       <section className="mt-20 md:mt-28">
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8 lg:gap-16">
           <div>
-            <p className="text-[32px] md:text-[46px] font-sans font-bold tracking-tight text-hekishoku leading-none">FAQ</p>
+            <p className="text-[32px] md:text-[46px] font-sans font-bold tracking-tight text-yuunagi leading-none">FAQ</p>
             <p className="mt-1.5 flex items-center gap-2.5 text-sm md:text-base font-medium text-primary">
-              <span className="inline-block w-3 h-3 rounded-full bg-yuunagi shrink-0" aria-hidden="true" />
+              <span className="inline-block w-3 h-3 rounded-full bg-hekishoku shrink-0" aria-hidden="true" />
               よくある質問
             </p>
           </div>

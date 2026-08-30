@@ -18,7 +18,7 @@ export default function SectionHeading({
   /** 碧色など濃い面の上に置くときは light */
   tone?: 'dark' | 'light';
 }) {
-  const enColor = tone === 'light' ? 'text-white' : 'text-hekishoku';
+  const enColor = tone === 'light' ? 'text-white' : 'text-yuunagi';
   const jaColor = tone === 'light' ? 'text-white' : 'text-primary';
   const descColor = tone === 'light' ? 'text-white/70' : 'text-gray-500';
   return (
@@ -29,7 +29,7 @@ export default function SectionHeading({
         </p>
       )}
       <p className={`flex items-center gap-2.5 text-sm md:text-base font-medium ${jaColor}`}>
-        <span className="inline-block w-3 h-3 rounded-full bg-yuunagi shrink-0" aria-hidden="true" />
+        <span className="inline-block w-3 h-3 rounded-full bg-hekishoku shrink-0" aria-hidden="true" />
         {ja}
       </p>
       {description && (

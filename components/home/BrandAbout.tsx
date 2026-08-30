@@ -61,24 +61,24 @@ export default function BrandAbout() {
       <ul className="mt-14 md:mt-20 grid grid-cols-1 md:grid-cols-3">
         {TILES.map((t) => (
           <li key={t.key}>
-            <a href={t.href} className="group relative block aspect-[4/5] md:aspect-auto md:h-[78svh] overflow-hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={t.image}
-                alt={t.key}
-                loading="lazy"
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-[900ms] group-hover:scale-105"
-              />
-              {/* 同上。イラスト素材が明るいので強めにかける */}
-              <span className="absolute inset-0 bg-hekishoku/60 transition-colors group-hover:bg-hekishoku/70" />
-              <span className="absolute inset-0 bg-gradient-to-t from-hekishoku-deep/50 via-transparent to-hekishoku-deep/30" />
-              <span className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center px-6">
-                <span className="text-white text-2xl md:text-4xl font-serif tracking-[0.15em] drop-shadow">{t.key}</span>
-                <span className="text-white/95 text-sm md:text-base leading-relaxed whitespace-pre-line drop-shadow">
+            <a href={t.href} className="group block">
+              {/* 写真には色を重ねない */}
+              <span className="relative block aspect-[4/5] md:aspect-auto md:h-[64svh] overflow-hidden bg-dim">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={t.image}
+                  alt={t.key}
+                  loading="lazy"
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-[900ms] group-hover:scale-105"
+                />
+              </span>
+              <span className="flex flex-col gap-2 px-5 md:px-6 py-6">
+                <span className="text-xl md:text-2xl font-serif tracking-[0.15em] text-primary">{t.key}</span>
+                <span className="text-[13px] md:text-sm text-gray-600 leading-relaxed whitespace-pre-line">
                   {t.lead}
                 </span>
-                <span className="mt-2">
-                  <CircleButton icon="plus" variant="light" />
+                <span className="mt-1">
+                  <CircleButton icon="plus" variant="dark" />
                 </span>
               </span>
             </a>

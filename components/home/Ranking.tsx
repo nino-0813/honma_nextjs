@@ -44,7 +44,7 @@ export default function Ranking() {
                 <li key={p.id} className="snap-start shrink-0 w-[200px] md:w-[280px] lg:w-[320px]">
                   <Link href={`/products/${p.handle || p.id}`} className="group block">
                     <div className="relative aspect-square overflow-hidden bg-dim">
-                      <span className="absolute top-3 left-3 z-10 w-8 h-8 md:w-9 md:h-9 rounded-full bg-yuunagi text-white text-sm font-bold flex items-center justify-center">
+                      <span className="absolute top-3 left-3 z-10 w-8 h-8 md:w-9 md:h-9 rounded-full bg-hekishoku text-white text-sm font-bold flex items-center justify-center">
                         {i + 1}
                       </span>
                       {/* eslint-disable-next-line @next/next/no-img-element */}

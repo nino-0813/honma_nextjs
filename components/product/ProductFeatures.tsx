@@ -18,11 +18,11 @@ export default function ProductFeatures({
     <section className="mt-24 md:mt-32 border-t border-gray-100 pt-16 md:pt-20">
       <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8 lg:gap-16">
         <div>
-          <p className="text-[32px] md:text-[46px] font-sans font-bold tracking-tight text-hekishoku leading-none">
+          <p className="text-[32px] md:text-[46px] font-sans font-bold tracking-tight text-yuunagi leading-none">
             Features
           </p>
           <p className="mt-1.5 flex items-center gap-2.5 text-sm md:text-base font-medium text-primary">
-            <span className="inline-block w-3 h-3 rounded-full bg-yuunagi shrink-0" aria-hidden="true" />
+            <span className="inline-block w-3 h-3 rounded-full bg-hekishoku shrink-0" aria-hidden="true" />
             商品詳細
           </p>
         </div>
