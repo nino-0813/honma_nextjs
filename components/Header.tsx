@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { IconBag, IconMenu, IconUser } from './Icons';
 import { CartContext } from '@/providers/CartProvider';
+import { PRIMARY_NAV } from './navigation';
 import { supabase } from '@/lib/supabase';
 
 interface HeaderProps {
@@ -15,7 +16,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
   const pathname = usePathname();
   const location = pathname ?? '/';
-  // SUBSCRIPTIONリンク（/collections/rice/yearly?view=lp）かどうかの判定用
+  // 定期便リンク（/collections/rice/yearly?view=lp）かどうかの判定用
   // ※ useSearchParams は静的プリレンダリングのバウンダリ要件があるため、
   //   useEffect+window.location.searchで代替してビルドエラーを回避
   const [isSubscriptionLp, setIsSubscriptionLp] = useState(false);
@@ -58,15 +59,14 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const isActive = (path: string) => {
-    // SUBSCRIPTIONリンクは ?view=lp が付いている時だけアクティブ
-    if (path === '/collections/rice/yearly') return isSubscriptionLp;
-    // CATEGORYは /collections* すべて。ただし SUBSCRIPTION LP表示時は除外
-    if (path === '/collections') {
-      return (location === '/collections' || location.startsWith('/collections/'))
-        && !isSubscriptionLp;
+  const isActive = (item: { href: string; matchPrefix?: string; matchQuery?: { key: string; value: string } }) => {
+    // 定期便リンクは ?view=lp が付いている時だけアクティブ
+    if (item.matchQuery) return isSubscriptionLp;
+    // 商品一覧は /collections 配下すべて。ただし定期便LP表示中は除外
+    if (item.matchPrefix) {
+      return location.startsWith(item.matchPrefix) && !isSubscriptionLp;
     }
-    return location === path;
+    return location === item.href;
   };
   const isHomePage = location === '/';
 
@@ -87,64 +87,38 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
                 alt="IKEVEGE"
                 width={128}
                 height={128}
+                // スクロール時に拡大するとヘッダーの高さを超えて見切れるため、
+                // 上部で少し大きく・スクロール後に少し小さくする
                 className={`w-auto object-contain transition-all duration-500 ${
-                  isScrolled ? 'h-16 md:h-24' : 'h-8 md:h-12'
+                  isScrolled ? 'h-9 md:h-11' : 'h-10 md:h-14'
                 }`}
               />
             </Link>
           </div>
 
-          <nav className="hidden md:flex space-x-10 items-center">
-            <Link href="/" className={`text-sm font-medium tracking-[0.15em] transition-colors relative group ${
-              isActive('/') ? (isHomePage && !isScrolled ? 'text-white' : 'text-black') : (isHomePage && !isScrolled ? 'text-white hover:text-white/80' : 'text-gray-500 hover:text-black')
-            }`}>
-              HOME
-              <span className={`absolute -bottom-2 left-0 w-full h-px ${isHomePage && !isScrolled ? 'bg-white' : 'bg-black'} transition-transform duration-300 origin-left ${isActive('/') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`} />
-            </Link>
-            <Link href="/about" className={`text-sm font-medium tracking-[0.15em] transition-colors relative group ${
-              isActive('/about') ? (isHomePage && !isScrolled ? 'text-white' : 'text-black') : (isHomePage && !isScrolled ? 'text-white hover:text-white/80' : 'text-gray-500 hover:text-black')
-            }`}>
-              ABOUT US
-              <span className={`absolute -bottom-2 left-0 w-full h-px ${isHomePage && !isScrolled ? 'bg-white' : 'bg-black'} transition-transform duration-300 origin-left ${isActive('/about') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`} />
-            </Link>
-            <Link
-              href="/collections/rice/yearly?view=lp"
-              className={`relative inline-flex items-center gap-1.5 text-xs md:text-[13px] font-semibold tracking-[0.2em] px-3.5 md:px-4 py-1.5 rounded-full border transition-all duration-300 ${
-                isActive('/collections/rice/yearly')
-                  ? isHomePage && !isScrolled
-                    ? 'text-black bg-white border-white shadow-[0_0_0_3px_rgba(255,255,255,0.18)]'
-                    : 'text-white bg-black border-black'
-                  : isHomePage && !isScrolled
-                    ? 'text-white border-white/85 bg-white/5 backdrop-blur-[2px] hover:bg-white hover:text-black shadow-[0_0_0_3px_rgba(255,255,255,0.12)]'
-                    : 'text-primary border-primary/60 hover:bg-primary hover:text-white'
-              }`}
-            >
-              SUBSCRIPTION
-            </Link>
-            <Link href="/collections" className={`text-sm font-medium tracking-[0.15em] transition-colors relative group ${
-              isActive('/collections') ? (isHomePage && !isScrolled ? 'text-white' : 'text-black') : (isHomePage && !isScrolled ? 'text-white hover:text-white/80' : 'text-gray-500 hover:text-black')
-            }`}>
-              CATEGORY
-              <span className={`absolute -bottom-2 left-0 w-full h-px ${isHomePage && !isScrolled ? 'bg-white' : 'bg-black'} transition-transform duration-300 origin-left ${isActive('/collections') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`} />
-            </Link>
-            <Link href="/blog" className={`text-sm font-medium tracking-[0.15em] transition-colors relative group ${
-              isActive('/blog') ? (isHomePage && !isScrolled ? 'text-white' : 'text-black') : (isHomePage && !isScrolled ? 'text-white hover:text-white/80' : 'text-gray-500 hover:text-black')
-            }`}>
-              BLOG
-              <span className={`absolute -bottom-2 left-0 w-full h-px ${isHomePage && !isScrolled ? 'bg-white' : 'bg-black'} transition-transform duration-300 origin-left ${isActive('/blog') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`} />
-            </Link>
-            <Link href="/join-us" className={`text-sm font-medium tracking-[0.15em] transition-colors relative group ${
-              isActive('/join-us') ? (isHomePage && !isScrolled ? 'text-white' : 'text-black') : (isHomePage && !isScrolled ? 'text-white hover:text-white/80' : 'text-gray-500 hover:text-black')
-            }`}>
-              JOIN US
-              <span className={`absolute -bottom-2 left-0 w-full h-px ${isHomePage && !isScrolled ? 'bg-white' : 'bg-black'} transition-transform duration-300 origin-left ${isActive('/join-us') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`} />
-            </Link>
-            <Link href="/contact" className={`text-sm font-medium tracking-[0.15em] transition-colors relative group ${
-              isActive('/contact') ? (isHomePage && !isScrolled ? 'text-white' : 'text-black') : (isHomePage && !isScrolled ? 'text-white hover:text-white/80' : 'text-gray-500 hover:text-black')
-            }`}>
-              CONTACT
-              <span className={`absolute -bottom-2 left-0 w-full h-px ${isHomePage && !isScrolled ? 'bg-white' : 'bg-black'} transition-transform duration-300 origin-left ${isActive('/contact') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`} />
-            </Link>
+          <nav className="hidden md:flex space-x-8 lg:space-x-10 items-center">
+            {PRIMARY_NAV.map((item) => {
+              const active = isActive(item);
+              const onHero = isHomePage && !isScrolled;
+              return (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className={`text-[13px] lg:text-sm font-medium tracking-[0.08em] transition-colors relative group whitespace-nowrap ${
+                    active
+                      ? onHero ? 'text-white' : 'text-black'
+                      : onHero ? 'text-white hover:text-white/80' : 'text-gray-500 hover:text-black'
+                  }`}
+                >
+                  {item.label}
+                  <span
+                    className={`absolute -bottom-2 left-0 w-full h-px ${onHero ? 'bg-white' : 'bg-black'} transition-transform duration-300 origin-left ${
+                      active ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                    }`}
+                  />
+                </Link>
+              );
+            })}
           </nav>
 
           <div className="flex items-center gap-5 sm:gap-6">
@@ -163,7 +137,8 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
                 </span>
               )}
             </button>
-            <button type="button" onClick={onOpenMenu} className={`md:hidden transition-colors ${
+            {/* ハンバーガーはPCでも出す（副次メニューをここに集約） */}
+            <button type="button" onClick={onOpenMenu} aria-label="メニューを開く" className={`transition-colors ${
               isHomePage && !isScrolled ? 'text-white hover:text-white/80' : 'text-primary hover:text-gray-500'
             }`}>
               <IconMenu className="w-5 h-5" />

@@ -7,6 +7,7 @@ import { IconClose, IconInstagram, IconYoutube, IconChevronDown, IconPlus, IconT
 import { CartItem, SubscriptionInterval, SUBSCRIPTION_INTERVAL_LABELS } from '@/types';
 import { FadeInImage } from './UI';
 import { supabase, checkStockAvailability } from '@/lib/supabase';
+import { PRIMARY_NAV, SECONDARY_NAV, CATEGORY_NAV } from './navigation';
 import { calculateEarnableMiles } from '@/lib/eventMiles';
 import {
   trackViewCart,
@@ -284,7 +285,6 @@ export const CartDrawer = ({ isOpen, onClose, cartItems, onRemove, onUpdateQuant
 export const MenuDrawer = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const router = useRouter();
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
-  const [isRiceOpen, setIsRiceOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
@@ -319,124 +319,89 @@ export const MenuDrawer = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
   return (
     <Drawer isOpen={isOpen} onClose={onClose} title="" position="right">
       <div className="flex flex-col px-6 py-8 gap-0">
-        <nav className="flex flex-col text-sm font-medium tracking-widest text-gray-800">
+        <nav className="flex flex-col text-sm font-medium tracking-wide text-gray-800">
           <button onClick={() => navigate('/')} className="text-left border-b border-gray-100 py-4 hover:text-gray-500 transition-colors block w-full">
-            HOME
-          </button>
-          <button onClick={() => navigate('/about')} className="text-left border-b border-gray-100 py-4 hover:text-gray-500 transition-colors block w-full">
-            ABOUT US
-          </button>
-          <button onClick={() => navigate('/collections/rice/yearly?view=lp')} className="text-left border-b border-gray-100 py-4 hover:text-gray-500 transition-colors block w-full">
-            SUBSCRIPTION
+            ホーム
           </button>
 
-          {/* CATEGORY with Accordion */}
+          {/* 商品一覧（カテゴリのアコーディオン付き） */}
           <div className="border-b border-gray-100">
             <div className="w-full flex items-center justify-between py-4">
-              <button 
-                onClick={() => navigate('/collections')}
+              <button
+                onClick={() => navigate(CATEGORY_NAV.href)}
                 className="flex-1 text-left hover:text-gray-500 transition-colors"
               >
-                CATEGORY
+                {CATEGORY_NAV.label}
               </button>
-              <button 
+              <button
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsCategoryOpen(!isCategoryOpen);
                 }}
+                aria-label="カテゴリを開閉"
+                aria-expanded={isCategoryOpen}
                 className="p-1 hover:bg-gray-100 rounded transition-colors"
               >
                 <IconChevronDown className={`w-4 h-4 transition-transform duration-300 ${isCategoryOpen ? 'rotate-180' : ''}`} />
               </button>
             </div>
-            
+
             {isCategoryOpen && (
-              <div className="pl-4 pb-4 flex flex-col gap-0">
-                <button 
-                  onClick={() => navigate('/collections')} 
-                  className="text-left py-3 text-gray-600 hover:text-black transition-colors block w-full"
-                >
-                  ALL
-                </button>
-                
-                {/* お米 with Sub-Accordion */}
-                <div>
-                  <button 
-                    onClick={() => setIsRiceOpen(!isRiceOpen)}
-                    className="w-full flex items-center justify-between py-3 text-gray-600 hover:text-black transition-colors text-left"
+              <div className="pl-4 pb-4 flex flex-col">
+                {CATEGORY_NAV.children.map((c) => (
+                  <button
+                    key={`${c.label}-${c.href}`}
+                    onClick={() => navigate(c.href)}
+                    className={`text-left py-2.5 transition-colors block w-full ${
+                      'indent' in c && c.indent
+                        ? 'pl-4 text-xs text-gray-500 hover:text-black'
+                        : 'text-gray-600 hover:text-black'
+                    }`}
                   >
-                    <span>お米</span>
-                    <IconPlus className={`w-4 h-4 transition-transform duration-300 ${isRiceOpen ? 'rotate-45' : ''}`} />
+                    {c.label}
                   </button>
-                  
-                  {isRiceOpen && (
-                    <div className="pl-4 flex flex-col gap-0">
-                      <button 
-                        onClick={() => navigate('/collections/rice')} 
-                        className="text-left py-2 text-gray-500 hover:text-black transition-colors block w-full text-xs"
-                      >
-                        ALL
-                      </button>
-                      <button 
-                        onClick={() => navigate('/collections/rice/koshihikari')} 
-                        className="text-left py-2 text-gray-500 hover:text-black transition-colors block w-full text-xs"
-                      >
-                        コシヒカリ
-                      </button>
-                      <button 
-                        onClick={() => navigate('/collections/rice/kamenoo')} 
-                        className="text-left py-2 text-gray-500 hover:text-black transition-colors block w-full text-xs"
-                      >
-                        亀の尾
-                      </button>
-                      <button 
-                        onClick={() => navigate('/collections/rice/nikomaru')} 
-                        className="text-left py-2 text-gray-500 hover:text-black transition-colors block w-full text-xs"
-                      >
-                        にこまる
-                      </button>
-                      <button
-                        onClick={() => navigate('/collections/rice/yearly?view=lp')}
-                        className="text-left py-2 text-gray-500 hover:text-black transition-colors block w-full text-xs"
-                      >
-                        イケベジ定期便
-                      </button>
-                    </div>
-                  )}
-                </div>
-                
-                <button 
-                  onClick={() => navigate('/collections/crescent')} 
-                  className="text-left py-3 text-gray-600 hover:text-black transition-colors block w-full"
-                >
-                  Crescentmoon
-                </button>
-                <button 
-                  onClick={() => navigate('/collections/other')} 
-                  className="text-left py-3 text-gray-600 hover:text-black transition-colors block w-full"
-                >
-                  その他
-                </button>
+                ))}
               </div>
             )}
           </div>
 
-          <button onClick={() => navigate('/blog')} className="text-left border-b border-gray-100 py-4 hover:text-gray-500 transition-colors block w-full">
-            BLOG
-          </button>
-          <button onClick={() => navigate('/join-us')} className="text-left border-b border-gray-100 py-4 hover:text-gray-500 transition-colors block w-full">
-            JOIN US
-          </button>
-          <button onClick={() => navigate('/contact')} className="text-left border-b border-gray-100 py-4 hover:text-gray-500 transition-colors block w-full">
-            CONTACT
-          </button>
+          {/* 主要項目のうち商品一覧以外 */}
+          {PRIMARY_NAV.filter((item) => item.href !== CATEGORY_NAV.href).map((item) => (
+            <button
+              key={item.label}
+              onClick={() => navigate(item.href)}
+              className="text-left border-b border-gray-100 py-4 hover:text-gray-500 transition-colors block w-full"
+            >
+              {item.label}
+            </button>
+          ))}
+
+          {/* 副次項目 */}
+          {SECONDARY_NAV.map((item) => (
+            <button
+              key={item.label}
+              onClick={() => navigate(item.href)}
+              className="text-left border-b border-gray-100 py-4 hover:text-gray-500 transition-colors block w-full"
+            >
+              {item.label}
+            </button>
+          ))}
+
           <button onClick={handleLoginClick} className="text-left border-b border-gray-100 py-4 hover:text-gray-500 transition-colors block w-full">
-            MY PAGE
+            {isLoggedIn ? 'マイページ' : 'ログイン'}
           </button>
         </nav>
 
         <div className="flex gap-8 justify-center mt-8 pt-8 border-t border-gray-100">
-          <a href="#" className="text-primary hover:text-gray-500 transition-colors"><IconInstagram className="w-5 h-5" /></a>
+          <a
+            href="https://www.instagram.com/ikevege_official"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Instagram"
+            className="text-primary hover:text-gray-500 transition-colors"
+          >
+            <IconInstagram className="w-5 h-5" />
+          </a>
           <a 
             href="https://www.youtube.com/@ikevege" 
             target="_blank" 

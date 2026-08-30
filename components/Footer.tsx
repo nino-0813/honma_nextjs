@@ -11,12 +11,14 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
           <div className="text-left">
             <ul className="space-y-4 text-xs tracking-[0.2em] text-gray-300 font-medium">
-              <li><Link href="/" className="hover:text-white transition-colors">HOME</Link></li>
-              <li><Link href="/about" className="hover:text-white transition-colors">ABOUT US</Link></li>
-              <li><Link href="/collections" className="hover:text-white transition-colors">CATEGORY</Link></li>
-              <li><Link href="/blog" className="hover:text-white transition-colors">BLOG</Link></li>
-              <li><Link href="/join-us" className="hover:text-white transition-colors">JOIN US</Link></li>
-              <li><Link href="/contact" className="hover:text-white transition-colors">CONTACT</Link></li>
+              <li><Link href="/" className="hover:text-white transition-colors">ホーム</Link></li>
+              <li><Link href="/about" className="hover:text-white transition-colors">ブランドについて</Link></li>
+              <li><Link href="/collections" className="hover:text-white transition-colors">商品一覧</Link></li>
+              <li><Link href="/start-set" className="hover:text-white transition-colors">スタートセット</Link></li>
+              <li><Link href="/collections/rice/yearly?view=lp" className="hover:text-white transition-colors">定期便について</Link></li>
+              <li><Link href="/blog" className="hover:text-white transition-colors">ブログ</Link></li>
+              <li><Link href="/join-us" className="hover:text-white transition-colors">取り組み</Link></li>
+              <li><Link href="/contact" className="hover:text-white transition-colors">お問い合わせ</Link></li>
             </ul>
           </div>
           <div className="text-left">
