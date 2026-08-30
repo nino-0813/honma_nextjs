@@ -50,6 +50,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: `body{background-color:#fff;color:#1c1d1d;font-family:"Times New Roman",YuMincho,"Yu Mincho",serif;}`,
           }}
         />
+        {/* JSが無効なら、スクロール表示待ちの要素を最初から見せる */}
+        <noscript>
+          <style dangerouslySetInnerHTML={{ __html: '.reveal{opacity:1;transform:none}' }} />
+        </noscript>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}

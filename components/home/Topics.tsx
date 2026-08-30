@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase';
 import SectionHeading from './SectionHeading';
 import Carousel from '@/components/Carousel';
 import PlaceholderBadge from './PlaceholderBadge';
+import FadeIn from '@/components/FadeIn';
 import { PLACEHOLDER_TOPICS, type TopicCard } from './placeholders';
 
 const CARD_COUNT = 6;
@@ -46,16 +47,19 @@ export default async function Topics() {
       <div className="w-full max-w-[1500px] mx-auto px-5 md:px-10">
         <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-10 lg:gap-16">
           <div className="lg:pt-2">
+            <FadeIn>
             <SectionHeading
               en="Topics"
               ja="トピックス"
               description="新商品やキャンペーンのお知らせ、佐渡の田んぼの様子をお届けします。"
             />
+            </FadeIn>
           </div>
 
           <Carousel ariaLabel="トピックス">
             {cards.map((c, i) => (
               <li key={`${c.title}-${i}`} className="snap-start shrink-0 w-[280px] md:w-[380px] lg:w-[420px]">
+                <FadeIn delay={Math.min(i, 3) * 80}>
                 <Link href={c.href} className="group block">
                   <div className="relative aspect-[4/3] overflow-hidden bg-dim">
                     {c.isPlaceholder && <PlaceholderBadge />}
@@ -74,6 +78,7 @@ export default async function Topics() {
                     <time className="mt-1.5 block text-xs text-gray-400 tabular-nums">{formatDate(c.date)}</time>
                   )}
                 </Link>
+                </FadeIn>
               </li>
             ))}
           </Carousel>
