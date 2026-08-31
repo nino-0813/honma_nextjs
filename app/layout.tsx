@@ -44,10 +44,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ja">
       <head>
+        {/* 見出し用の明朝体。CSPは fonts.googleapis.com / fonts.gstatic.com を許可済み */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
         {/* リロード時も一瞬でベーススタイルを当てる（FOUC軽減） */}
         <style
           dangerouslySetInnerHTML={{
-            __html: `body{background-color:#fff;color:#1c1d1d;font-family:"Times New Roman",YuMincho,"Yu Mincho",serif;}`,
+            __html: `body{background-color:#fff;color:#1c1d1d;font-family:"Noto Serif JP","Times New Roman",YuMincho,"Yu Mincho",serif;}`,
           }}
         />
         {/* JSが無効なら、スクロール表示待ちの要素を最初から見せる */}

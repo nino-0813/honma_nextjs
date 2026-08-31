@@ -98,7 +98,7 @@ export default function ProductStory() {
           <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8 lg:gap-16">
             <FadeIn>
               <p className="text-xs tracking-[0.15em] text-yuunagi-ink mb-2">{t.label}</p>
-              <h2 className="text-xl md:text-2xl font-serif tracking-wider text-primary whitespace-pre-line leading-relaxed">
+              <h2 className="text-xl md:text-2xl font-serif font-semibold tracking-wider text-primary whitespace-pre-line leading-relaxed">
                 {t.heading}
               </h2>
             </FadeIn>

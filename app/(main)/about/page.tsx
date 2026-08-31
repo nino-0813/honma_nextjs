@@ -145,7 +145,7 @@ export default function AboutPage() {
               ].map((k) => (
                 <li key={k.key} className="flex flex-col gap-3">
                   <span className="w-8 h-px bg-yuunagi" />
-                  <h3 className="text-lg md:text-xl font-serif tracking-[0.15em] text-primary">{k.key}</h3>
+                  <h3 className="text-lg md:text-xl font-serif font-semibold tracking-[0.15em] text-primary">{k.key}</h3>
                   <p className="text-[13px] md:text-sm text-gray-600 leading-loose">{k.body}</p>
                 </li>
               ))}

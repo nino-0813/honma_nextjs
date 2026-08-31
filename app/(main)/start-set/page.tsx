@@ -88,7 +88,7 @@ export default function StartSetPage() {
                   <span className="rounded-sm bg-hekishoku px-2 py-1 text-[10px] font-medium text-white">初回限定</span>
                   <span className="text-xs text-gray-500 line-through tabular-nums">¥{LIST_PRICE.toLocaleString()}</span>
                 </div>
-                <p className="text-3xl font-serif text-primary tabular-nums">
+                <p className="text-3xl font-serif font-semibold text-primary tabular-nums">
                   ¥{PRICE.toLocaleString()}
                   <span className="ml-1 text-xs text-gray-500">（税込）</span>
                 </p>

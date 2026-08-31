@@ -79,7 +79,7 @@ export default function ProductGuide({
                   <p className="text-[11px] tabular-nums tracking-[0.2em] text-yuunagi-ink mb-2">
                     {String(i + 1).padStart(2, '0')}
                   </p>
-                  <h3 className="text-lg md:text-xl font-serif tracking-wider text-primary mb-3">
+                  <h3 className="text-lg md:text-xl font-serif font-semibold tracking-wider text-primary mb-3">
                     {step.heading}
                   </h3>
                   <p className="text-[13px] md:text-sm leading-loose text-gray-600">{step.body}</p>

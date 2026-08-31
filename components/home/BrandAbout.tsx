@@ -40,7 +40,7 @@ export default function BrandAbout() {
         </FadeIn>
 
         <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20">
-          <p className="text-3xl md:text-[44px] lg:text-[52px] font-serif leading-[1.6] tracking-wide text-primary">
+          <p className="text-3xl md:text-[44px] lg:text-[52px] font-serif font-semibold leading-[1.6] tracking-wide text-primary">
             あんしん、
             <br />
             おいしい、
@@ -77,7 +77,7 @@ export default function BrandAbout() {
                 />
               </span>
               <span className="flex flex-col gap-2 px-5 md:px-6 py-6">
-                <span className="text-xl md:text-2xl font-serif tracking-[0.15em] text-primary">{t.key}</span>
+                <span className="text-xl md:text-2xl font-serif font-semibold tracking-[0.15em] text-primary">{t.key}</span>
                 <span className="text-[13px] md:text-sm text-gray-600 leading-relaxed whitespace-pre-line">
                   {t.lead}
                 </span>

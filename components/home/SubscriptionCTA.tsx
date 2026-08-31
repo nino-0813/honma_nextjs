@@ -40,7 +40,7 @@ export default function SubscriptionCTA() {
         </FadeIn>
 
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-16">
-          <h2 className="text-2xl md:text-[38px] lg:text-[44px] font-serif leading-[1.6] tracking-wide text-white">
+          <h2 className="text-2xl md:text-[38px] lg:text-[44px] font-serif font-semibold leading-[1.6] tracking-wide text-white">
             買い続けることが、
             <br />
             集落を続けることになる。
