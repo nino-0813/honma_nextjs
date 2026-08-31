@@ -74,8 +74,7 @@ export default function AboutPage() {
     <div className="pt-20 animate-fade-in bg-white overflow-x-hidden w-full">
       <div className="relative w-full">
         <div className="relative z-10 bg-white pt-4 md:pt-8 pb-12 md:pb-16 flex flex-col items-center justify-center text-black">
-          <p className="flex items-center gap-2 text-[13px] font-medium text-primary mb-3">
-            <span className="inline-block w-2.5 h-2.5 rounded-full bg-hekishoku" aria-hidden="true" />
+          <p className="text-[13px] font-medium text-primary mb-3">
             ブランドについて
           </p>
           <h1 className="text-xl md:text-2xl font-serif tracking-[0.15em] font-normal mb-2">

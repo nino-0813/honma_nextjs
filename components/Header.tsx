@@ -89,18 +89,20 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
           <div className="flex-shrink-0 flex items-center z-50">
-            <Link href="/" className="hover:opacity-70 transition-opacity block">
+            <Link href="/" className="hover:opacity-70 transition-opacity block" aria-label="イケベジ ホーム">
+              {/* ヒーロー動画の上では白、背景が白くなったら濃色に切り替える */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/ikevege_logo_128.webp"
-                srcSet="/images/ikevege_logo_128.webp 128w, /images/ikevege_logo.webp 4500w"
-                sizes="(max-width: 768px) 32px, 48px"
-                alt="IKEVEGE"
-                width={128}
-                height={128}
-                // スクロール時に拡大するとヘッダーの高さを超えて見切れるため、
-                // 上部で少し大きく・スクロール後に少し小さくする
+                src={
+                  isHomePage && !isScrolled
+                    ? '/images/ikevege_wordmark_white.png'
+                    : '/images/ikevege_wordmark_dark.png'
+                }
+                alt="イケベジ"
+                width={196}
+                height={34}
                 className={`w-auto object-contain transition-all duration-300 ease-out-expo ${
-                  isScrolled ? 'h-9 md:h-11' : 'h-10 md:h-14'
+                  isScrolled ? 'h-6 md:h-8' : 'h-7 md:h-10'
                 }`}
               />
             </Link>
@@ -116,13 +118,13 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
                   href={item.href}
                   className={`text-[13px] lg:text-sm font-medium tracking-[0.08em] transition-colors relative group whitespace-nowrap ${
                     active
-                      ? onHero ? 'text-white' : 'text-black'
-                      : onHero ? 'text-white hover:text-white/80' : 'text-gray-500 hover:text-black'
+                      ? onHero ? 'text-white' : 'text-primary'
+                      : onHero ? 'text-white hover:text-white/80' : 'text-gray-500 hover:text-primary'
                   }`}
                 >
                   {item.label}
                   <span
-                    className={`absolute -bottom-2 left-0 w-full h-px ${onHero ? 'bg-white' : 'bg-black'} transition-transform duration-300 origin-left ${
+                    className={`absolute -bottom-2 left-0 w-full h-px ${onHero ? 'bg-white' : 'bg-primary'} transition-transform duration-300 origin-left ${
                       active ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
                     }`}
                   />

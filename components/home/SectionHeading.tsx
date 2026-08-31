@@ -28,10 +28,7 @@ export default function SectionHeading({
           {en}
         </p>
       )}
-      <p className={`flex items-center gap-2.5 text-sm md:text-base font-medium ${jaColor}`}>
-        <span className="inline-block w-3 h-3 rounded-full bg-hekishoku shrink-0" aria-hidden="true" />
-        {ja}
-      </p>
+      <p className={`text-sm md:text-base font-medium ${jaColor}`}>{ja}</p>
       {description && (
         <p className={`mt-3 text-[13px] md:text-sm leading-relaxed max-w-xs ${descColor}`}>{description}</p>
       )}

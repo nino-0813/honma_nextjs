@@ -98,8 +98,7 @@ export default function AmbassadorPage() {
   return (
     <div className="pt-20 animate-fade-in bg-white overflow-x-hidden w-full">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 md:pt-8 pb-12 md:pb-16 text-center">
-        <p className="flex items-center gap-2 text-[13px] font-medium text-primary mb-3">
-          <span className="inline-block w-2.5 h-2.5 rounded-full bg-hekishoku" aria-hidden="true" />
+        <p className="text-[13px] font-medium text-primary mb-3">
           取り組み
         </p>
         <h1 className="text-xl md:text-2xl font-serif tracking-[0.15em] font-normal mb-4">一緒に佐渡をつくる</h1>

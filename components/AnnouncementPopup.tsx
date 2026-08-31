@@ -121,27 +121,27 @@ export default function AnnouncementPopup() {
             Information
           </p>
           <h2 className="text-lg md:text-xl font-serif font-semibold text-primary leading-relaxed mb-3">
-            予約販売＆定期便のご案内
+            まずは食べ比べてみませんか
           </h2>
           <div className="w-10 h-px bg-yuunagi mx-auto mb-4" />
           <p className="text-xs md:text-sm text-gray-600 leading-loose mb-7">
-            佐渡ヶ島の自然栽培米を、いまだけの予約販売と、
+            コシヒカリ・亀の尾・にこまるの3品種を、
             <br className="hidden md:block" />
-            いつでも10%OFFの定期便でお届けします。
+            少量ずつお試しいただけるスタートセットをご用意しました。
           </p>
 
           <div className="flex flex-col gap-3">
             <Link
-              href="/collections/rice"
+              href="/start-set"
               onClick={close}
-              className="block w-full py-3 rounded-full bg-primary text-white text-sm font-medium tracking-wider hover:opacity-90 transition-opacity"
+              className="block w-full py-3 rounded-full bg-yuunagi text-white text-sm font-medium tracking-wider hover:bg-yuunagi-ink transition-colors"
             >
-              予約販売を見る
+              スタートセットを見る
             </Link>
             <Link
               href="/collections/rice/yearly?view=lp"
               onClick={close}
-              className="block w-full py-3 rounded-full border border-yuunagi text-yuunagi-ink text-sm font-medium tracking-wider hover:bg-yuunagi-soft transition-colors"
+              className="block w-full py-3 rounded-full border border-primary text-primary text-sm font-medium tracking-wider hover:bg-primary hover:text-white transition-colors"
             >
               定期便（10%OFF）を見る
             </Link>

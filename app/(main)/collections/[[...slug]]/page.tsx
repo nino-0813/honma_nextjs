@@ -129,8 +129,7 @@ export default function CollectionsPage() {
     <div className="pt-28 pb-32 min-h-screen bg-white overflow-x-hidden w-full">
       <div className="max-w-[1400px] mx-auto px-6 md:px-12">
         <div className="text-center mb-8 md:mb-12 animate-fade-in">
-          <p className="flex items-center justify-center gap-2 text-[13px] font-medium text-primary mb-3">
-            <span className="inline-block w-2.5 h-2.5 rounded-full bg-hekishoku" aria-hidden="true" />
+          <p className="text-center text-[13px] font-medium text-primary mb-3">
             商品一覧
           </p>
           <h1 className="text-xl md:text-2xl font-serif tracking-[0.15em] font-normal mb-4">{getPageTitle()}</h1>

@@ -22,8 +22,7 @@ export default function ProductFeatures({
           <p className="text-[32px] md:text-[46px] font-sans font-bold tracking-tight text-yuunagi leading-none">
             Features
           </p>
-          <p className="mt-1.5 flex items-center gap-2.5 text-sm md:text-base font-medium text-primary">
-            <span className="inline-block w-3 h-3 rounded-full bg-hekishoku shrink-0" aria-hidden="true" />
+          <p className="mt-1.5 text-sm md:text-base font-medium text-primary">
             商品詳細
           </p>
         </FadeIn>
