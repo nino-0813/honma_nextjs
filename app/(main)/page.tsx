@@ -3,7 +3,6 @@ import HeroVideo from '@/components/HeroVideo';
 import AnnouncementPopup from '@/components/AnnouncementPopup';
 import Topics from '@/components/home/Topics';
 import Lineup from '@/components/home/Lineup';
-import Ranking from '@/components/home/Ranking';
 import BrandAbout from '@/components/home/BrandAbout';
 import LearnMore from '@/components/home/LearnMore';
 import NoteSection from '@/components/home/NoteSection';
@@ -53,11 +52,8 @@ export default function HomePage() {
       {/* 2. トピックス */}
       <Topics />
 
-      {/* 3. ラインナップ */}
+      {/* 3. ラインナップ（告知ポップアップの表示トリガーもこのセクション） */}
       <Lineup />
-
-      {/* 4. 人気の商品（告知ポップアップの表示トリガーもこのセクション） */}
-      <Ranking />
 
       {/* 5. ブランドについて */}
       <BrandAbout />

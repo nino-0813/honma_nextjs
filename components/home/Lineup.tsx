@@ -26,30 +26,12 @@ const TILES: {
     image: '/images/home/parallax/sunset_riceplanting_7_1200.webp',
   },
   {
-    en: 'Koshihikari',
-    ja: 'コシヒカリ',
-    href: '/collections/rice/koshihikari',
-    image: '/images/home/collections/collection_koshihikari_1200.webp',
-  },
-  {
-    en: 'Kamenoo',
-    ja: '亀の尾',
-    href: '/collections/rice/kamenoo',
-    image: '/images/home/collections/collection_kamenoo_1200.webp',
-  },
-  {
     en: 'Shiitake',
     ja: '原木椎茸',
     href: '/collections/other',
     // 椎茸の写真が無いため流用中
     image: '/images/about/stories/P3A9707.webp',
     imageIsPlaceholder: true,
-  },
-  {
-    en: 'Subscription',
-    ja: 'イケベジ定期便',
-    href: '/collections/rice/yearly?view=lp',
-    image: '/images/about/stories/about_story_taue_123.webp',
   },
   {
     en: 'Others',
@@ -62,8 +44,9 @@ const TILES: {
 ];
 
 export default function Lineup() {
+  // id="products" は告知ポップアップの表示トリガー（旧 Ranking から引き継ぎ）
   return (
-    <section className="pt-8 pb-20 md:pb-28 bg-white">
+    <section id="products" className="pt-8 pb-20 md:pb-28 bg-white">
       <div className="max-w-[1500px] mx-auto px-5 md:px-10">
         <div className="flex items-end justify-between gap-6 mb-9 md:mb-12">
           <FadeIn>
@@ -82,14 +65,14 @@ export default function Lineup() {
       </div>
 
       {/* 全面タイル（隙間なし） */}
-      <ul className="grid grid-cols-2 lg:grid-cols-3">
+      <ul className="grid grid-cols-1 md:grid-cols-3">
         {TILES.map((t, i) => (
           <li key={t.ja}>
             <FadeIn delay={Math.min(i % 3, 2) * 80}>
             {/* 上段3枚だけで画面の約8割。次の段が少し覗く高さ */}
               <Link href={t.href} className="group block">
               {/* 写真には色を重ねない。文字は写真の下に置く */}
-              <span className="relative block aspect-[3/4] md:aspect-[4/3] lg:aspect-auto lg:h-[74svh] overflow-hidden bg-dim">
+              <span className="relative block aspect-[16/10] md:aspect-auto md:h-[62svh] lg:h-[74svh] overflow-hidden bg-dim">
                 {t.imageIsPlaceholder && <PlaceholderBadge />}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
