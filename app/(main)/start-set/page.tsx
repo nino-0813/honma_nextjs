@@ -151,7 +151,18 @@ export default function StartSetPage() {
           </div>
         </div>
 
-        <StickyPurchaseBar title="自然栽培米 3品種 食べ比べセット" price={PRICE} image={GALLERY[0]} note="準備中" />
+        {/* 商品が未登録のため、数量とカート追加は無効にしてある */}
+        <StickyPurchaseBar
+          title="自然栽培米 3品種 食べ比べセット"
+          price={PRICE}
+          image={GALLERY[0]}
+          note="準備中"
+          quantity={1}
+          onQuantityChange={() => undefined}
+          onAddToCart={() => false}
+          disabled
+          disabledLabel="準備中"
+        />
 
         <ProductFeatures
           rows={[

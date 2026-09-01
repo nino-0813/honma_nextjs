@@ -27,6 +27,62 @@ export default function ProductDetailView({ product }: { product: Product }) {
   const { products: allProducts } = useProducts();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+
+  /**
+   * 現在の選択内容をカートに追加する。
+   *
+   * 従来はカート追加の処理が JSX 内に2箇所インラインで書かれていたため、
+   * 画面下の固定バーからも同じ挙動で呼べるよう1つにまとめた。
+   * 在庫チェック・定期購入のゲート・GA4送信はいずれも従来どおり。
+   *
+   * @returns 追加できたら true。ゲートや在庫不足で追加しなかったら false
+   */
+  const addSelectionToCart = (): boolean => {
+    if (!product) return false;
+    // 定期購入モード時は注意事項ポップアップを表示してゲートする
+    if (purchaseType === 'subscription') {
+      setShowSubscriptionNotice(true);
+      return false;
+    }
+    setStockError('');
+    const variantString = getSelectedVariantString();
+
+    if (product.hasVariants) {
+      const existingCartItem = cartItems.find(
+        (item) => item.product.id === product.id && item.variant === variantString
+      );
+      const stockCheck = checkStockAvailability(
+        product,
+        selectedOptions,
+        quantity,
+        existingCartItem?.quantity || 0
+      );
+      if (!stockCheck.available) {
+        setStockError(stockCheck.message);
+        return false;
+      }
+      addToCart(product, quantity, {
+        variant: variantString,
+        finalPrice: calculatedPrice,
+        selectedOptions,
+      });
+    } else {
+      addToCart(product, quantity, { variant: variantString });
+    }
+
+    trackAddToCart([
+      toAnalyticsItem({
+        id: product.id,
+        title: product.title,
+        price: calculatedPrice,
+        quantity,
+        category: product.category ?? null,
+        variant: variantString || undefined,
+        brand: 'one_time',
+      }),
+    ]);
+    return true;
+  };
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [calculatedPrice, setCalculatedPrice] = useState(product.price);
   const [activeAccordion, setActiveAccordion] = useState<string | null>('desc');
@@ -710,28 +766,8 @@ export default function ProductDetailView({ product }: { product: Product }) {
                          </div>
                          <LoadingButton
                            onClick={() => {
-                             if (!product) return;
-                             // 定期購入モード時は注意事項ポップアップを表示してゲートする
-                             if (purchaseType === 'subscription') {
-                               setShowSubscriptionNotice(true);
-                               return;
-                             }
-                             setStockError('');
-                             const variantString = getSelectedVariantString();
-                             addToCart(product, quantity, { variant: variantString });
-                             // GA4: 通常購入のカート追加イベント
-                             trackAddToCart([
-                               toAnalyticsItem({
-                                 id: product.id,
-                                 title: product.title,
-                                 price: calculatedPrice,
-                                 quantity,
-                                 category: product.category ?? null,
-                                 variant: variantString || undefined,
-                                 brand: 'one_time',
-                               }),
-                             ]);
-                             openCart();
+                             // 追加処理は addSelectionToCart に集約している
+                             if (addSelectionToCart()) openCart();
                            }}
                            className="w-full py-4 text-sm tracking-widest uppercase bg-black text-white hover:bg-gray-800 transition-colors"
                          >
@@ -787,48 +823,8 @@ export default function ProductDetailView({ product }: { product: Product }) {
                          <>
                            <LoadingButton
                              onClick={() => {
-                               if (!product) return;
-                               // 定期購入モード時は注意事項ポップアップを表示してゲートする
-                               if (purchaseType === 'subscription') {
-                                 setShowSubscriptionNotice(true);
-                                 return;
-                               }
-                               setStockError('');
-                               const variantString = getSelectedVariantString();
-                               // カート内の既存数量を取得
-                               const existingCartItem = cartItems.find(
-                                 item => item.product.id === product.id && item.variant === variantString
-                               );
-                               const currentCartQuantity = existingCartItem?.quantity || 0;
-                               // 在庫チェック
-                               const stockCheck = checkStockAvailability(
-                                 product,
-                                 selectedOptions,
-                                 quantity,
-                                 currentCartQuantity
-                               );
-                               if (!stockCheck.available) {
-                                 setStockError(stockCheck.message);
-                                 return;
-                               }
-                               addToCart(product, quantity, {
-                                 variant: variantString,
-                                 finalPrice: calculatedPrice,
-                                 selectedOptions,
-                               });
-                               // GA4: バリアント有り商品のカート追加イベント
-                               trackAddToCart([
-                                 toAnalyticsItem({
-                                   id: product.id,
-                                   title: product.title,
-                                   price: calculatedPrice,
-                                   quantity,
-                                   category: product.category ?? null,
-                                   variant: variantString || undefined,
-                                   brand: 'one_time',
-                                 }),
-                               ]);
-                               openCart();
+                               // 追加処理は addSelectionToCart に集約している
+                               if (addSelectionToCart()) openCart();
                              }}
                              className="w-full py-4 text-sm tracking-widest bg-white text-black border border-black hover:bg-gray-50 transition-colors group relative"
                            >
@@ -1013,6 +1009,12 @@ export default function ProductDetailView({ product }: { product: Product }) {
           price={calculatedPrice}
           image={product.image}
           note={isProductPreorder(product) ? '予約商品' : undefined}
+          quantity={quantity}
+          onQuantityChange={(next) => {
+            setStockError('');
+            setQuantity(next);
+          }}
+          onAddToCart={addSelectionToCart}
         />
 
         {/* 下スクロールで読む詳細（説明全文・炊き方 / 戻し方・保管方法） */}
