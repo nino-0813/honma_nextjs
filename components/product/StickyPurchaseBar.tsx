@@ -25,13 +25,21 @@ export default function StickyPurchaseBar({
   price: number;
   image?: string;
   note?: string;
-  quantity: number;
-  onQuantityChange: (next: number) => void;
+  /**
+   * 数量とカート追加は任意。サーバーコンポーネントからは関数を渡せないため、
+   * 省略した場合は数量の操作を出さず、ボタンも押せない状態で表示する。
+   */
+  quantity?: number;
+  onQuantityChange?: (next: number) => void;
   /** 追加できたら true を返すこと。true のときだけチェックアウトへ進む */
-  onAddToCart: () => boolean;
+  onAddToCart?: () => boolean;
   disabled?: boolean;
   disabledLabel?: string;
 }) {
+  // カート追加の手段が渡されていなければ操作できない状態にする
+  const interactive = typeof onAddToCart === 'function' && typeof onQuantityChange === 'function';
+  const qty = quantity ?? 1;
+  const isDisabled = disabled || !interactive;
   const [visible, setVisible] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -47,7 +55,7 @@ export default function StickyPurchaseBar({
   }, []);
 
   const handleAdd = () => {
-    if (busy || disabled) return;
+    if (busy || isDisabled || !onAddToCart) return;
     setBusy(true);
     try {
       // 在庫不足や定期購入のゲートで追加されなかった場合は遷移しない
@@ -88,14 +96,15 @@ export default function StickyPurchaseBar({
             </p>
           </div>
 
-          {/* 数量 */}
+          {/* 数量。操作手段が渡されているときだけ出す */}
+          {interactive && (
           <div className="flex items-center gap-1 shrink-0 rounded-full border border-gray-200 px-1 py-0.5">
             <button
               type="button"
-              onClick={() => onQuantityChange(Math.max(1, quantity - 1))}
+              onClick={() => onQuantityChange?.(Math.max(1, qty - 1))}
               aria-label="数量を1つ減らす"
               className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary transition-colors disabled:opacity-30"
-              disabled={quantity <= 1}
+              disabled={qty <= 1}
             >
               −
             </button>
@@ -103,31 +112,32 @@ export default function StickyPurchaseBar({
               type="number"
               min={1}
               inputMode="numeric"
-              value={quantity}
+              value={qty}
               onChange={(e) => {
                 const v = parseInt(e.target.value, 10);
-                onQuantityChange(Number.isNaN(v) ? 1 : Math.max(1, v));
+                onQuantityChange?.(Number.isNaN(v) ? 1 : Math.max(1, v));
               }}
               aria-label="数量"
               className="w-10 text-center text-sm tabular-nums bg-transparent outline-none focus-visible:outline-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
             <button
               type="button"
-              onClick={() => onQuantityChange(quantity + 1)}
+              onClick={() => onQuantityChange?.(qty + 1)}
               aria-label="数量を1つ増やす"
               className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary transition-colors"
             >
               ＋
             </button>
           </div>
+          )}
 
           <button
             type="button"
             onClick={handleAdd}
-            disabled={disabled || busy}
+            disabled={isDisabled || busy}
             className="shrink-0 rounded-full bg-yuunagi px-5 md:px-9 py-3 text-xs md:text-sm font-medium text-white hover:bg-yuunagi-ink transition-colors disabled:opacity-40 disabled:hover:bg-yuunagi"
           >
-            {disabled ? (disabledLabel ?? 'カートに入れる') : busy ? '処理中…' : 'カートに入れる'}
+            {isDisabled ? (disabledLabel ?? 'カートに入れる') : busy ? '処理中…' : 'カートに入れる'}
           </button>
         </div>
       </div>

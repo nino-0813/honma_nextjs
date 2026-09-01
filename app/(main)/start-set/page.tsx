@@ -157,9 +157,6 @@ export default function StartSetPage() {
           price={PRICE}
           image={GALLERY[0]}
           note="準備中"
-          quantity={1}
-          onQuantityChange={() => undefined}
-          onAddToCart={() => false}
           disabled
           disabledLabel="準備中"
         />
