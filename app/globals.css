@@ -8,7 +8,7 @@
 @source "../admin/**/*.{js,ts,jsx,tsx}";
 
 @theme {
-  --font-serif: "Times New Roman", YuMincho, "Yu Mincho", "Hiragino Mincho ProN", serif;
+  --font-serif: "Noto Serif JP", "Times New Roman", YuMincho, "Yu Mincho", "Hiragino Mincho ProN", serif;
   --font-sans: "Helvetica Neue", Helvetica, "Hiragino Sans", "Hiragino Kaku Gothic ProN", Arial, sans-serif;
   --font-mincho: "Noto Serif JP", YuMincho, "Yu Mincho", "Hiragino Mincho ProN", serif;
   --color-primary: #1c1d1d;

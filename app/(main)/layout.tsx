@@ -30,7 +30,8 @@ function MainLayoutInner({
   return (
     <>
       <Header onOpenCart={onOpenCart} onOpenMenu={onOpenMenu} />
-      <main className="flex-1 w-full overflow-x-hidden">{children}</main>
+      {/* overflow-x-hidden は縦方向にもスクロール領域を作り position:sticky を無効化するため clip を使う */}
+      <main className="flex-1 w-full overflow-x-clip">{children}</main>
       <Footer />
       <CartDrawer
         isOpen={isCartOpen}
@@ -63,7 +64,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <CartProvider onCartOpen={() => setIsCartOpen(true)} onMenuOpen={() => setIsMenuOpen(true)}>
-      <div className="min-h-screen bg-white flex flex-col font-serif font-medium tracking-widest text-primary selection:bg-black selection:text-white overflow-x-hidden w-full">
+      <div className="min-h-screen bg-white flex flex-col font-serif font-medium tracking-widest text-primary selection:bg-black selection:text-white overflow-x-clip w-full">
         <MainLayoutInner
           isCartOpen={isCartOpen}
           onCloseCart={() => setIsCartOpen(false)}

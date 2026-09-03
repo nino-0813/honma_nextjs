@@ -306,7 +306,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
   };
 
   return (
-    <div className="pt-32 pb-24 bg-white min-h-screen animate-fade-in overflow-x-hidden w-full">
+    <div className="pt-32 pb-24 bg-white min-h-screen animate-fade-in overflow-x-clip w-full">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-[10px] text-gray-400 mb-8 md:mb-12 tracking-widest uppercase">
           <Link href="/" className="hover:text-black transition-colors">Home</Link>
