@@ -52,7 +52,10 @@ export default function HomePage() {
       {/* 2. トピックス */}
       <Topics />
 
-      {/* 3. ラインナップ（告知ポップアップの表示トリガーもこのセクション） */}
+      {/* 告知ポップアップを出す位置。ここを動かせば表示タイミングを調整できる */}
+      <div id="popup-trigger" aria-hidden="true" />
+
+      {/* 3. ラインナップ */}
       <Lineup />
 
       {/* 5. ブランドについて */}

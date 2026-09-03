@@ -44,7 +44,6 @@ const TILES: {
 ];
 
 export default function Lineup() {
-  // id="products" は告知ポップアップの表示トリガー（旧 Ranking から引き継ぎ）
   return (
     <section id="products" className="pt-8 pb-20 md:pb-28 bg-white">
       <div className="max-w-[1500px] mx-auto px-5 md:px-10">

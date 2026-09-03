@@ -9,8 +9,9 @@ const SESSION_KEY = 'ikevege_announcement_popup_dismissed';
 const SNOOZE_UNTIL_KEY = 'ikevege_announcement_popup_snooze_until';
 // 非表示にする日数（ここを変えれば期間を調整できる）
 const SNOOZE_DAYS = 30;
-// 表示のきっかけにする要素（トップページの商品一覧セクション = ProductGrid）
-const TRIGGER_SELECTOR = '#products';
+// 表示のきっかけにする要素。トップページのトピックス直後に置いた目印。
+// 表示タイミングを変えたいときは page.tsx の #popup-trigger を動かす
+const TRIGGER_SELECTOR = '#popup-trigger';
 // 商品セクションに入ってから実際に開くまでの間（スクロール中に唐突に出ないように）
 const OPEN_DELAY_MS = 300;
 
@@ -19,8 +20,8 @@ const OPEN_DELAY_MS = 300;
  * 「予約販売」と「定期便」を案内し、それぞれの一覧へ誘導する。
  *
  * 表示タイミング:
- *   ページを開いた直後ではなく、閲覧者が商品一覧セクション（TRIGGER_SELECTOR）まで
- *   スクロールしてきた時点で開く。買う気配が出てから案内するため。
+ *   ページを開いた直後ではなく、トピックスを読み終えた位置（TRIGGER_SELECTOR）まで
+ *   スクロールしてきた時点で開く。サイトの雰囲気が伝わってから案内するため。
  *   トリガー要素が無いページでは、従来どおり少し遅らせて表示する。
  *
  * - 「30日間表示しない」にチェックして閉じた人 → SNOOZE_DAYS 日間は表示しない（localStorage）
