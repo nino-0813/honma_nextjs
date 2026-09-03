@@ -138,6 +138,21 @@ export async function getProductByHandle(handle: string): Promise<Product | null
   } as Product;
 }
 
+/** 公開ページ用: 公開中かつ表示対象の商品だけを取得する。 */
+export async function getPublishedProductByHandle(handle: string): Promise<Product | null> {
+  if (!supabase) return null;
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('handle', handle)
+    .eq('status', 'active')
+    .eq('is_active', true)
+    .eq('is_visible', true)
+    .maybeSingle();
+  if (error || !data) return null;
+  return convertDatabaseProductToProduct(data as DatabaseProduct);
+}
+
 // Product型をDatabase型に変換
 export const convertProductToDatabaseProduct = (product: Partial<Product> & { status?: 'active' | 'draft' | 'archived', is_active?: boolean }) => {
   const hasVariantsFromConfig =

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import {
@@ -30,7 +30,7 @@ const SUBSCRIPTION_INTERVAL_OPTIONS: SubscriptionInterval[] = [
 ];
 
 const CATEGORIES = [
-  { id: 'お米', name: 'お米', subcategories: ['コシヒカリ', '亀の尾', 'にこまる', '年間契約'] },
+  { id: 'お米', name: 'お米', subcategories: ['コシヒカリ', '亀の尾', 'にこまる', '年間契約', 'スタートセット'] },
   { id: 'Crescentmoon', name: 'Crescentmoon', subcategories: [] },
   { id: 'その他', name: 'その他', subcategories: [] },
 ];
@@ -53,8 +53,10 @@ type VariationType = {
 const ProductEditor = () => {
   const params = useParams<{ handle?: string }>();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const routeParam = (params?.handle as string) ?? '';
   const isNew = !routeParam || routeParam === 'new';
+  const isStartSet = routeParam === 'start-set' || searchParams?.get('template') === 'start-set';
   const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(routeParam);
 
   const [loading, setLoading] = useState(false);
@@ -118,6 +120,21 @@ const ProductEditor = () => {
     if (!isNew && routeParam) {
       fetchProduct(routeParam, isUuid);
     } else if (isNew) {
+      if (isStartSet) {
+        setTitle('自然栽培米 3品種 食べ比べセット');
+        setPrice('1872');
+        setTaxRate('8');
+        setCategories(['お米']);
+        setSubcategories(['スタートセット']);
+        setDescription(
+          'コシヒカリ・亀の尾・にこまる。同じ田んぼの、同じ育て方でも、品種が違えば味も香りも変わります。\n\n3品種を少量ずつ、食べ比べていただける初回限定セットです。'
+        );
+        setHandle('start-set');
+        setSku('START-SET');
+        setImages(['/images/renewal/products/rice-lineup.webp']);
+        setIsActive(false);
+        setIsVisible(false);
+      }
       setVariationTypes([
         {
           id: Math.random().toString(36).substr(2, 9),
@@ -129,7 +146,7 @@ const ProductEditor = () => {
       ]);
       setInitialLoading(false);
     }
-  }, [routeParam, isNew, isUuid]);
+  }, [routeParam, isNew, isUuid, isStartSet]);
 
   useEffect(() => {
     if (!categories?.length) {
@@ -898,10 +915,14 @@ const ProductEditor = () => {
                   type="text"
                   value={handle}
                   onChange={(e) => setHandle(e.target.value)}
-                  className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm bg-white"
+                  disabled={isStartSet}
+                  className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-sm bg-white disabled:bg-gray-100 disabled:text-gray-500"
                   placeholder="例: koshihikari-5kg"
                   required
                 />
+                {isStartSet && (
+                  <p className="mt-1 text-[11px] text-gray-500">スタートセットの公開URLと連携するため変更できません。</p>
+                )}
               </div>
             </div>
           </div>

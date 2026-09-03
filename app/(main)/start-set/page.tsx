@@ -6,6 +6,8 @@ import ProductStory from '@/components/product/ProductStory';
 import StickyPurchaseBar from '@/components/product/StickyPurchaseBar';
 import SubscriptionCTA from '@/components/home/SubscriptionCTA';
 import { SHOW_PLACEHOLDER_BADGE } from '@/components/home/placeholders';
+import ProductDetailView from '@/app/(main)/products/[handle]/ProductDetailView';
+import { getPublishedProductByHandle } from '@/lib/supabase';
 
 export const metadata: Metadata = {
   title: 'スタートセット',
@@ -48,7 +50,14 @@ const BENEFITS = [
   'お届けに合わせて出荷直前に精米します',
 ];
 
-export default function StartSetPage() {
+export const revalidate = 60;
+
+export default async function StartSetPage() {
+  const product = await getPublishedProductByHandle('start-set');
+
+  // 管理画面で公開された商品があれば、通常の商品と同じ購入・在庫・配送処理を使う。
+  if (product) return <ProductDetailView product={product} />;
+
   return (
     <div className="pt-32 pb-24 bg-white min-h-screen animate-fade-in overflow-x-clip w-full">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
