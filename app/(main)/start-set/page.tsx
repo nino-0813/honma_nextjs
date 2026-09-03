@@ -6,7 +6,7 @@ import ProductStory from '@/components/product/ProductStory';
 import StickyPurchaseBar from '@/components/product/StickyPurchaseBar';
 import SubscriptionCTA from '@/components/home/SubscriptionCTA';
 import { SHOW_PLACEHOLDER_BADGE } from '@/components/home/placeholders';
-import { getPublishedProductByHandle } from '@/lib/supabase';
+import { getProductByHandle, getPublishedProductByHandle } from '@/lib/supabase';
 import StartSetPurchasePanel from '@/components/start-set/StartSetPurchasePanel';
 
 export const metadata: Metadata = {
@@ -31,10 +31,8 @@ const LIST_PRICE = 2340;
 const PRICE = 1872;
 
 const GALLERY = [
-  '/images/home/collections/collection_koshihikari_800.webp',
-  '/images/home/collections/collection_kamenoo_800.webp',
-  '/images/usage-scene.jpg',
-  '/images/rice-keep-bag.jpg',
+  '/images/renewal/products/rice-lineup.webp',
+  '/images/renewal/lineup/rice.webp',
 ];
 
 const VARIETIES = [
@@ -50,10 +48,14 @@ const BENEFITS = [
   'お届けに合わせて出荷直前に精米します',
 ];
 
-export const revalidate = 60;
+// 管理画面で保存した内容を、確認用デプロイですぐ確認できるようにする。
+export const dynamic = 'force-dynamic';
 
 export default async function StartSetPage() {
-  const product = await getPublishedProductByHandle('start-set');
+  // 本番は公開中の商品のみ。Vercel Preview とローカルでは下書きも確認できる。
+  const product = process.env.VERCEL_ENV === 'production'
+    ? await getPublishedProductByHandle('start-set')
+    : await getProductByHandle('start-set');
 
   const gallery = product
     ? (product.images?.length ? product.images : product.image ? [product.image] : GALLERY)
