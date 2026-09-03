@@ -59,29 +59,32 @@ export default function BrandAbout() {
         </div>
       </div>
 
-      {/* 全面タイル */}
-      <ul className="mt-14 md:mt-20 grid grid-cols-1 md:grid-cols-3">
+      {/* 写真全体を押せるブランドタイル */}
+      <ul className="mt-14 grid grid-cols-1 gap-px bg-white md:mt-20 md:grid-cols-3">
         {TILES.map((t, i) => (
           <li key={t.key}>
             <FadeIn delay={Math.min(i, 2) * 80}>
-            <a href={t.href} className="group block">
-              {/* 写真には色を重ねない */}
+            <a
+              href={t.href}
+              aria-label={`${t.key}について詳しく見る`}
+              className="group block focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-white"
+            >
               <span className="relative block aspect-[4/5] md:aspect-[3/4] lg:aspect-auto lg:h-[70svh] overflow-hidden bg-dim">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={t.image}
-                  alt={t.key}
+                  alt=""
+                  aria-hidden="true"
                   loading="lazy"
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105 group-focus-visible:scale-105 motion-reduce:transition-none"
                 />
-              </span>
-              <span className="flex flex-col gap-2 px-5 md:px-6 py-6">
-                <span className="text-xl md:text-2xl font-serif font-semibold tracking-[0.15em] text-primary">{t.key}</span>
-                <span className="text-[13px] md:text-sm text-gray-600 leading-relaxed whitespace-pre-line">
-                  {t.lead}
-                </span>
-                <span className="mt-1">
-                  <CircleButton icon="plus" variant="dark" />
+                <span className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-black/10 transition-colors duration-300 group-hover:from-black/75 group-hover:via-black/30" />
+                <span className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center text-white">
+                  <span className="text-2xl font-serif font-semibold tracking-[0.15em] drop-shadow-sm md:text-[26px] lg:text-[30px]">{t.key}</span>
+                  <span className="mt-3 whitespace-pre-line text-xs font-medium leading-relaxed tracking-[0.08em] drop-shadow-sm md:text-sm">{t.lead}</span>
+                  <span className="mt-6 transition-transform duration-300 group-hover:translate-x-1 group-focus-visible:translate-x-1 motion-reduce:transition-none">
+                    <CircleButton icon="arrow" variant="light" />
+                  </span>
                 </span>
               </span>
             </a>
