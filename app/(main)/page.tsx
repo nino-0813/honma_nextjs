@@ -52,9 +52,6 @@ export default function HomePage() {
       {/* 2. トピックス */}
       <Topics />
 
-      {/* 告知ポップアップを出す位置。ここを動かせば表示タイミングを調整できる */}
-      <div id="popup-trigger" aria-hidden="true" />
-
       {/* 3. ラインナップ */}
       <Lineup />
 
