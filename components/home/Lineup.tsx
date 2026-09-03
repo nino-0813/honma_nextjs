@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import SectionHeading from './SectionHeading';
 import CircleButton from './CircleButton';
-import PlaceholderBadge from './PlaceholderBadge';
 import FadeIn from '@/components/FadeIn';
 
 /**
@@ -17,29 +16,24 @@ const TILES: {
   ja: string;
   href: string;
   image: string;
-  imageIsPlaceholder?: boolean;
 }[] = [
   {
     en: 'Rice',
     ja: 'お米',
     href: '/collections/rice',
-    image: '/images/home/parallax/sunset_riceplanting_7_1200.webp',
+    image: '/images/renewal/lineup/rice.webp',
   },
   {
     en: 'Shiitake',
     ja: '原木椎茸',
     href: '/collections/other',
-    // 椎茸の写真が無いため流用中
-    image: '/images/about/stories/P3A9707.webp',
-    imageIsPlaceholder: true,
+    image: '/images/renewal/lineup/shiitake.webp',
   },
   {
     en: 'Others',
     ja: 'その他',
     href: '/collections/other',
-    // その他カテゴリの代表写真が無いため流用中
-    image: '/images/about/stories/IMG_8832.webp',
-    imageIsPlaceholder: true,
+    image: '/images/renewal/lineup/others.webp',
   },
 ];
 
@@ -72,7 +66,6 @@ export default function Lineup() {
               <Link href={t.href} className="group block">
               {/* 写真には色を重ねない。文字は写真の下に置く */}
               <span className="relative block aspect-[16/10] md:aspect-auto md:h-[62svh] lg:h-[74svh] overflow-hidden bg-dim">
-                {t.imageIsPlaceholder && <PlaceholderBadge />}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={t.image}

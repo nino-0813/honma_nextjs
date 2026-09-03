@@ -13,21 +13,20 @@ const TILES = [
   {
     key: 'あんしん',
     lead: '農薬にも化学肥料にも\n頼らない',
-    image: '/images/about/stories/about_story_taue_123.webp',
+    image: '/images/renewal/about/safety.webp',
     href: '/about',
   },
   {
     key: 'おいしい',
     lead: '品種が持つ味を、\nそのまま',
-    // イラストバナーは文字が競るため炊飯シーンの写真を使用
-    image: '/images/usage-scene.jpg',
+    image: '/images/renewal/about/delicious.webp',
     href: '/about',
   },
   {
     key: 'いいかお',
     lead: '田んぼが、\n島の循環をつくる',
-    image: '/images/joinus/sadokids-fieldwork.jpg',
-    href: '/join-us',
+    image: '/images/renewal/about/smiles.webp',
+    href: '/about',
   },
 ];
 

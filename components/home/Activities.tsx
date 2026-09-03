@@ -29,7 +29,7 @@ const ITEMS = [
   {
     title: '稲刈りリトリート',
     body: '実際に佐渡へ来て、田んぼに入る。貯まったイベントマイルでご参加いただけます。',
-    image: '/images/about/stories/P3A9707.webp',
+    image: '/images/renewal/activities/harvest-retreat.webp',
     href: '/collections',
   },
 ];

@@ -33,7 +33,7 @@ export const PLACEHOLDER_TOPICS: TopicCard[] = [
   {
     title: '3品種を食べ比べできるスタートセット',
     label: 'キャンペーン',
-    image: '/images/home/collections/collection_koshihikari_800.webp',
+    image: '/images/renewal/products/rice-lineup.webp',
     href: '/collections/rice',
     date: '2026-08-01',
     isPlaceholder: true,
@@ -49,7 +49,7 @@ export const PLACEHOLDER_TOPICS: TopicCard[] = [
   {
     title: '田植えのシーズンがはじまりました',
     label: '田んぼだより',
-    image: '/images/about/stories/about_story_taue_123.webp',
+    image: '/images/renewal/learn-more/island-cycle.webp',
     href: '/blog',
     date: '2026-05-18',
     isPlaceholder: true,

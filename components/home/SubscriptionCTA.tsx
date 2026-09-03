@@ -12,7 +12,7 @@ const POINTS = [
   {
     head: 'いつでも10%OFF',
     body: '続けやすい価格でお届けします。買い忘れもありません。',
-    image: '/images/home/collections/collection_koshihikari_800.webp',
+    image: '/images/renewal/products/rice-lineup.webp',
   },
   {
     head: '出荷直前に精米',
