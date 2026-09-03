@@ -79,7 +79,7 @@ export default function BrandAbout() {
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105 group-focus-visible:scale-105 motion-reduce:transition-none"
                 />
                 <span className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-black/10 transition-colors duration-300 group-hover:from-black/75 group-hover:via-black/30" />
-                <span className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center text-white">
+                <span className="absolute inset-0 flex flex-col items-center justify-end px-6 pb-9 text-center text-white md:pb-11 lg:pb-14">
                   <span className="text-2xl font-serif font-semibold tracking-[0.15em] drop-shadow-sm md:text-[26px] lg:text-[30px]">{t.key}</span>
                   <span className="mt-3 whitespace-pre-line text-xs font-medium leading-relaxed tracking-[0.08em] drop-shadow-sm md:text-sm">{t.lead}</span>
                   <span className="mt-6 transition-transform duration-300 group-hover:translate-x-1 group-focus-visible:translate-x-1 motion-reduce:transition-none">
