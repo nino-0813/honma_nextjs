@@ -57,33 +57,37 @@ export default function Lineup() {
         </div>
       </div>
 
-      {/* 全面タイル（隙間なし） */}
-      <ul className="grid grid-cols-1 md:grid-cols-3">
+      {/* 写真全体を押せるラインナップタイル */}
+      <ul className="grid grid-cols-1 gap-px bg-white md:grid-cols-3">
         {TILES.map((t, i) => (
           <li key={t.ja}>
             <FadeIn delay={Math.min(i % 3, 2) * 80}>
-            {/* 上段3枚だけで画面の約8割。次の段が少し覗く高さ */}
-              <Link href={t.href} className="group block">
-              {/* 写真には色を重ねない。文字は写真の下に置く */}
+              <Link
+                href={t.href}
+                aria-label={`${t.ja}の商品を見る`}
+                className="group block focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-white"
+              >
               <span className="relative block aspect-[16/10] md:aspect-auto md:h-[62svh] lg:h-[74svh] overflow-hidden bg-dim">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={t.image}
-                  alt={t.ja}
+                  alt=""
+                  aria-hidden="true"
                   loading="lazy"
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105 group-focus-visible:scale-105 motion-reduce:transition-none"
                 />
-              </span>
-              <span className="flex items-center justify-between gap-4 px-5 md:px-6 py-5">
-                <span>
-                  <span className="block text-lg md:text-2xl font-sans font-bold tracking-wide text-primary">
+                <span className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/25 to-black/10 transition-colors duration-300 group-hover:from-black/70 group-hover:via-black/30" />
+                <span className="absolute inset-0 flex flex-col items-center justify-center px-5 text-center text-white">
+                  <span className="text-2xl font-bold tracking-wide drop-shadow-sm md:text-[26px] lg:text-[30px]">
                     {t.en}
                   </span>
-                  <span className="mt-0.5 block text-xs md:text-sm tracking-[0.2em] text-gray-500">{t.ja}</span>
+                  <span className="mt-2 text-xs font-medium tracking-[0.2em] drop-shadow-sm md:text-sm">{t.ja}</span>
+                  <span className="mt-6 transition-transform duration-300 group-hover:translate-x-1 group-focus-visible:translate-x-1 motion-reduce:transition-none">
+                    <CircleButton icon="arrow" variant="light" />
+                  </span>
                 </span>
-                <CircleButton icon="arrow" variant="dark" />
               </span>
-            </Link>
+              </Link>
             </FadeIn>
           </li>
         ))}
