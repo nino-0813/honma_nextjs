@@ -6,8 +6,8 @@ import ProductStory from '@/components/product/ProductStory';
 import StickyPurchaseBar from '@/components/product/StickyPurchaseBar';
 import SubscriptionCTA from '@/components/home/SubscriptionCTA';
 import { SHOW_PLACEHOLDER_BADGE } from '@/components/home/placeholders';
-import ProductDetailView from '@/app/(main)/products/[handle]/ProductDetailView';
 import { getPublishedProductByHandle } from '@/lib/supabase';
+import StartSetPurchasePanel from '@/components/start-set/StartSetPurchasePanel';
 
 export const metadata: Metadata = {
   title: 'スタートセット',
@@ -55,8 +55,9 @@ export const revalidate = 60;
 export default async function StartSetPage() {
   const product = await getPublishedProductByHandle('start-set');
 
-  // 管理画面で公開された商品があれば、通常の商品と同じ購入・在庫・配送処理を使う。
-  if (product) return <ProductDetailView product={product} />;
+  const gallery = product
+    ? (product.images?.length ? product.images : product.image ? [product.image] : GALLERY)
+    : GALLERY;
 
   return (
     <div className="pt-32 pb-24 bg-white min-h-screen animate-fade-in overflow-x-clip w-full">
@@ -76,12 +77,15 @@ export default async function StartSetPage() {
                   仮素材
                 </span>
               )}
-              <ProductGallery images={GALLERY} alt="イケベジ スタートセット" />
+              <ProductGallery images={gallery} alt={product?.title || 'イケベジ スタートセット'} />
             </div>
           </div>
 
           {/* 右: 流れる購入パネル */}
           <div className="lg:col-span-5">
+            {product ? (
+              <StartSetPurchasePanel product={product} />
+            ) : (
             <div id="purchase-panel">
               <p className="text-xs tracking-[0.15em] text-yuunagi-ink mb-2">スタートセット</p>
               <h1 className="text-xl md:text-2xl font-medium text-primary leading-relaxed tracking-wide mb-3">
@@ -157,18 +161,20 @@ export default async function StartSetPage() {
                 </div>
               </div>
             </div>
+            )}
           </div>
         </div>
 
-        {/* 商品が未登録のため、数量とカート追加は無効にしてある */}
-        <StickyPurchaseBar
-          title="自然栽培米 3品種 食べ比べセット"
-          price={PRICE}
-          image={GALLERY[0]}
-          note="準備中"
-          disabled
-          disabledLabel="準備中"
-        />
+        {!product && (
+          <StickyPurchaseBar
+            title="自然栽培米 3品種 食べ比べセット"
+            price={PRICE}
+            image={GALLERY[0]}
+            note="準備中"
+            disabled
+            disabledLabel="準備中"
+          />
+        )}
 
         <ProductFeatures
           rows={[
