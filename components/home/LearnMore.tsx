@@ -1,8 +1,8 @@
-import Link from 'next/link';
 import SectionHeading from './SectionHeading';
 import { supabase } from '@/lib/supabase';
 import { LEARN_MORE_CARDS, PLACEHOLDER_TOPICS } from './placeholders';
 import FadeIn from '@/components/FadeIn';
+import LearnMoreGallery, { type GalleryItem } from './LearnMoreGallery';
 
 const ACTIVITIES = [
   {
@@ -34,14 +34,6 @@ const ACTIVITIES = [
     label: '取り組み',
   },
 ];
-
-type GalleryItem = {
-  title: string;
-  body: string;
-  image: string;
-  href: string;
-  label: string;
-};
 
 /** ブランドの背景、note、取り組みを一つにまとめた画像ギャラリー。 */
 export default async function LearnMore() {
@@ -86,44 +78,11 @@ export default async function LearnMore() {
 
   return (
     <section className="py-20 md:py-28 bg-white">
-      <div className="max-w-[1500px] mx-auto px-5 md:px-10">
+      <div className="max-w-[1120px] mx-auto px-10 md:px-16">
         <FadeIn>
           <SectionHeading ja="もっと知る" />
         </FadeIn>
-
-        <ul className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-          {items.map((item, i) => (
-            <li key={`${item.label}-${item.title}`}>
-              <FadeIn delay={Math.min(i, 3) * 70}>
-              <Link
-                href={item.href}
-                className="group relative block aspect-[4/3] overflow-hidden bg-dim focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hekishoku focus-visible:ring-offset-2"
-                aria-label={`${item.title}：${item.body}`}
-              >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-500 ease-out motion-reduce:transition-none group-hover:scale-[1.04] group-focus-visible:scale-[1.04]"
-                  />
-                <span className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent md:opacity-0 transition-opacity duration-300 motion-reduce:transition-none group-hover:opacity-100 group-focus-visible:opacity-100" />
-                <span className="absolute inset-x-0 bottom-0 flex flex-col justify-end p-5 md:p-6 text-white md:translate-y-3 md:opacity-0 transition-all duration-300 ease-out motion-reduce:transition-none group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100">
-                  <span className="text-[11px] font-medium tracking-[0.14em] text-white/80">{item.label}</span>
-                  <span className="mt-1.5 text-lg md:text-xl font-medium leading-snug">{item.title}</span>
-                  <span className="mt-2 text-sm leading-relaxed text-white/90 line-clamp-2">{item.body}</span>
-                  <span className="mt-4 inline-flex items-center gap-2 text-xs font-medium">
-                    詳しく見る
-                    <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden="true">
-                      <path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </span>
-                </span>
-              </Link>
-              </FadeIn>
-            </li>
-          ))}
-        </ul>
+        <LearnMoreGallery items={items} />
       </div>
     </section>
   );
