@@ -16,7 +16,7 @@ import {
 } from '@/components/Icons';
 
 type VarietyKey = 'koshihikari' | 'nikomaru' | 'kamenoo';
-type ChannelKey = 'tabechoku' | 'satofull' | 'furupo' | 'direct' | 'other';
+type ChannelKey = 'direct' | 'wholesale' | 'gift' | 'home_use';
 
 type Season = {
   id: string;
@@ -40,6 +40,7 @@ type ExternalSale = {
   season_id: string;
   variety_key: VarietyKey;
   channel: ChannelKey;
+  sales_destination: string | null;
   quantity_kg: number;
   sold_on: string;
   note: string | null;
@@ -67,11 +68,10 @@ const VARIETIES: Array<{ key: VarietyKey; label: string; short: string }> = [
 ];
 
 const CHANNELS: Array<{ key: ChannelKey; label: string }> = [
-  { key: 'tabechoku', label: '食べチョク' },
-  { key: 'satofull', label: 'さとふる' },
-  { key: 'furupo', label: 'ふるぽ' },
-  { key: 'direct', label: '直販' },
-  { key: 'other', label: 'その他' },
+  { key: 'direct', label: '直販（個人）' },
+  { key: 'wholesale', label: '卸し' },
+  { key: 'gift', label: 'プレゼント' },
+  { key: 'home_use', label: '自家用' },
 ];
 
 const number = (value: unknown) => Number(value || 0);
@@ -113,7 +113,8 @@ const InventorySystem: React.FC = () => {
   const [newYear, setNewYear] = useState(currentYear);
   const [saleDraft, setSaleDraft] = useState({
     variety_key: 'koshihikari' as VarietyKey,
-    channel: 'tabechoku' as ChannelKey,
+    channel: 'direct' as ChannelKey,
+    sales_destination: '',
     quantity_kg: '',
     sold_on: today(),
     note: '',
@@ -268,14 +269,15 @@ const InventorySystem: React.FC = () => {
       season_id: activeSeason.id,
       variety_key: saleDraft.variety_key,
       channel: saleDraft.channel,
+      sales_destination: saleDraft.sales_destination.trim() || null,
       quantity_kg: number(saleDraft.quantity_kg),
       sold_on: saleDraft.sold_on,
       note: saleDraft.note || null,
     });
     if (insertError) setError(insertError.message);
     else {
-      setSaleDraft((draft) => ({ ...draft, quantity_kg: '', note: '' }));
-      setNotice('外部販売実績を追加しました');
+      setSaleDraft((draft) => ({ ...draft, quantity_kg: '', sales_destination: '', note: '' }));
+      setNotice('販売・使用実績を追加しました');
       const { data } = await supabase.from('inventory_external_sales').select('*').eq('season_id', activeSeason.id).order('sold_on', { ascending: false });
       setSales((data || []) as ExternalSale[]);
     }
@@ -303,7 +305,7 @@ const InventorySystem: React.FC = () => {
         <div>
           <div className="flex items-center gap-2 text-xs font-medium text-emerald-700 mb-2"><IconArchive className="w-4 h-4" /> INVENTORY</div>
           <h1 className="text-2xl md:text-3xl font-bold text-gray-950">在庫システム</h1>
-          <p className="text-sm text-gray-600 mt-2">年間収穫量から、自社ECと外部販売の出荷重量を差し引いて管理します。</p>
+          <p className="text-sm text-gray-600 mt-2">年間収穫量から、自社ECの自動集計とWeb以外の販売・使用分を差し引いて管理します。</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {seasons.length > 0 && <label className="sr-only" htmlFor="inventory-season">収穫年度</label>}
@@ -333,7 +335,7 @@ const InventorySystem: React.FC = () => {
         <section aria-label="在庫サマリー" className="grid grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4">
           {[
             { label: '年間収穫量', value: kg(totals.harvested), note: '3品種の合計', icon: IconPackage },
-            { label: '販売・出荷済み', value: kg(totals.sold), note: '自社EC + 外部', icon: IconShoppingCart },
+            { label: '販売・使用済み', value: kg(totals.sold), note: '自社EC + 手入力', icon: IconShoppingCart },
             { label: '販売可能在庫', value: kg(totals.available), note: totals.harvested ? `残り ${Math.round((totals.available / totals.harvested) * 100)}%` : '収穫量を入力してください', icon: IconArchive },
             { label: '定期追加可能人数', value: `${totals.capacity.toLocaleString()}人`, note: `1人 ${activeSeason.capacity_unit_kg}kg/月 × 12か月`, icon: IconBarChart },
           ].map(({ label, value, note, icon: Icon }) => <article key={label} className="rounded-xl border border-gray-200 bg-white p-4 md:p-5 shadow-sm">
@@ -356,7 +358,7 @@ const InventorySystem: React.FC = () => {
                 <div className="flex justify-between"><dt className="text-gray-500">年間収穫量</dt><dd className="font-medium tabular-nums">{kg(row.harvested)}</dd></div>
                 <div className="flex justify-between"><dt className="text-gray-500">自社EC・単品</dt><dd className="tabular-nums">-{kg(row.oneTime)}</dd></div>
                 <div className="flex justify-between"><dt className="text-gray-500">自社EC・定期</dt><dd className="tabular-nums">-{kg(row.subscription)}</dd></div>
-                <div className="flex justify-between"><dt className="text-gray-500">外部販売</dt><dd className="tabular-nums">-{kg(row.external)}</dd></div>
+                <div className="flex justify-between"><dt className="text-gray-500">Web以外・使用分</dt><dd className="tabular-nums">-{kg(row.external)}</dd></div>
                 <div className="flex justify-between"><dt className="text-gray-500">確保分</dt><dd className="tabular-nums">-{kg(row.reserved)}</dd></div>
               </dl>
               <p className="mt-5 rounded-lg bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-900">定期をあと約 {row.capacity.toLocaleString()}人 受付可能</p>
@@ -376,21 +378,22 @@ const InventorySystem: React.FC = () => {
           </div>
 
           <div className="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 shadow-sm">
-            <h2 className="text-lg font-semibold">外部プラットフォームの販売を追加</h2><p className="text-sm text-gray-500 mt-1">Supabase自動連携までは、ここからkg実績を登録します。</p>
+            <h2 className="text-lg font-semibold">Web以外の販売・使用を追加</h2><p className="text-sm text-gray-500 mt-1">Web注文は自動連動されます。直販・卸し・プレゼント・自家用だけをここから登録します。</p>
             <form onSubmit={addSale} className="mt-5 grid sm:grid-cols-2 gap-3">
               <label className="text-xs text-gray-600">品種<select value={saleDraft.variety_key} onChange={(e) => setSaleDraft({ ...saleDraft, variety_key: e.target.value as VarietyKey })} className="mt-1 h-11 w-full rounded-lg border border-gray-300 bg-white px-3">{VARIETIES.map((v) => <option key={v.key} value={v.key}>{v.label}</option>)}</select></label>
-              <label className="text-xs text-gray-600">販売先<select value={saleDraft.channel} onChange={(e) => setSaleDraft({ ...saleDraft, channel: e.target.value as ChannelKey })} className="mt-1 h-11 w-full rounded-lg border border-gray-300 bg-white px-3">{CHANNELS.map((c) => <option key={c.key} value={c.key}>{c.label}</option>)}</select></label>
+              <label className="text-xs text-gray-600">カテゴリー<select value={saleDraft.channel} onChange={(e) => setSaleDraft({ ...saleDraft, channel: e.target.value as ChannelKey })} className="mt-1 h-11 w-full rounded-lg border border-gray-300 bg-white px-3 focus:outline-none focus:ring-2 focus:ring-emerald-600">{CHANNELS.map((c) => <option key={c.key} value={c.key}>{c.label}</option>)}</select></label>
               <label className="text-xs text-gray-600">販売重量（kg）<input required type="number" min="0.1" step="0.1" value={saleDraft.quantity_kg} onChange={(e) => setSaleDraft({ ...saleDraft, quantity_kg: e.target.value })} className="mt-1 h-11 w-full rounded-lg border border-gray-300 px-3" /></label>
               <label className="text-xs text-gray-600">販売日<input required type="date" value={saleDraft.sold_on} onChange={(e) => setSaleDraft({ ...saleDraft, sold_on: e.target.value })} className="mt-1 h-11 w-full rounded-lg border border-gray-300 px-3" /></label>
-              <label className="sm:col-span-2 text-xs text-gray-600">メモ（任意）<input type="text" value={saleDraft.note} onChange={(e) => setSaleDraft({ ...saleDraft, note: e.target.value })} className="mt-1 h-11 w-full rounded-lg border border-gray-300 px-3" placeholder="注文番号、キャンペーン名など" /></label>
+              <label className="sm:col-span-2 text-xs text-gray-600">販売先・使用先（任意）<input type="text" value={saleDraft.sales_destination} onChange={(e) => setSaleDraft({ ...saleDraft, sales_destination: e.target.value })} className="mt-1 h-11 w-full rounded-lg border border-gray-300 px-3 focus:outline-none focus:ring-2 focus:ring-emerald-600" placeholder="例：○○商店、田中様、収穫祭など" /></label>
+              <label className="sm:col-span-2 text-xs text-gray-600">メモ（任意）<input type="text" value={saleDraft.note} onChange={(e) => setSaleDraft({ ...saleDraft, note: e.target.value })} className="mt-1 h-11 w-full rounded-lg border border-gray-300 px-3 focus:outline-none focus:ring-2 focus:ring-emerald-600" placeholder="注文番号、用途、補足など" /></label>
               <button type="submit" disabled={saving || !saleDraft.quantity_kg} className="sm:col-span-2 h-11 rounded-lg bg-emerald-700 px-5 text-sm font-medium text-white hover:bg-emerald-800 disabled:opacity-40 flex items-center justify-center gap-2"><IconPlus className="w-4 h-4" />販売実績を追加</button>
             </form>
           </div>
         </section>
 
         <section className="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-sm">
-          <div className="p-5 md:p-6 border-b border-gray-100"><h2 className="text-lg font-semibold">外部販売の履歴</h2><p className="text-sm text-gray-500 mt-1">後からSupabase連携へ置き換えられる販売台帳です。</p></div>
-          {sales.length === 0 ? <p className="p-8 text-center text-sm text-gray-500">外部販売の登録はまだありません。</p> : <div className="overflow-x-auto"><table className="w-full min-w-[680px] text-sm"><thead className="bg-gray-50 text-left text-xs text-gray-500"><tr><th className="px-5 py-3">販売日</th><th className="px-5 py-3">品種</th><th className="px-5 py-3">販売先</th><th className="px-5 py-3 text-right">重量</th><th className="px-5 py-3">メモ</th><th className="px-5 py-3"><span className="sr-only">操作</span></th></tr></thead><tbody className="divide-y divide-gray-100">{sales.map((sale) => <tr key={sale.id} className="hover:bg-gray-50"><td className="px-5 py-3 tabular-nums">{sale.sold_on}</td><td className="px-5 py-3 font-medium">{VARIETIES.find((v) => v.key === sale.variety_key)?.label}</td><td className="px-5 py-3">{CHANNELS.find((c) => c.key === sale.channel)?.label}</td><td className="px-5 py-3 text-right font-medium tabular-nums">{kg(number(sale.quantity_kg))}</td><td className="px-5 py-3 text-gray-500">{sale.note || '-'}</td><td className="px-5 py-3 text-right"><button type="button" onClick={() => removeSale(sale.id)} aria-label="販売実績を削除" className="w-11 h-11 inline-flex items-center justify-center rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-700 focus:ring-2 focus:ring-red-600"><IconTrash className="w-4 h-4" /></button></td></tr>)}</tbody></table></div>}
+          <div className="p-5 md:p-6 border-b border-gray-100"><h2 className="text-lg font-semibold">Web以外の販売・使用履歴</h2><p className="text-sm text-gray-500 mt-1">直販、卸し、贈答、自家消費をまとめて確認できます。</p></div>
+          {sales.length === 0 ? <p className="p-8 text-center text-sm text-gray-500">手入力の販売・使用履歴はまだありません。</p> : <div className="overflow-x-auto"><table className="w-full min-w-[800px] text-sm"><thead className="bg-gray-50 text-left text-xs text-gray-500"><tr><th className="px-5 py-3">日付</th><th className="px-5 py-3">品種</th><th className="px-5 py-3">カテゴリー</th><th className="px-5 py-3">販売先・使用先</th><th className="px-5 py-3 text-right">重量</th><th className="px-5 py-3">メモ</th><th className="px-5 py-3"><span className="sr-only">操作</span></th></tr></thead><tbody className="divide-y divide-gray-100">{sales.map((sale) => <tr key={sale.id} className="hover:bg-gray-50"><td className="px-5 py-3 tabular-nums">{sale.sold_on}</td><td className="px-5 py-3 font-medium">{VARIETIES.find((v) => v.key === sale.variety_key)?.label}</td><td className="px-5 py-3 whitespace-nowrap">{CHANNELS.find((c) => c.key === sale.channel)?.label || sale.channel}</td><td className="px-5 py-3 text-gray-700">{sale.sales_destination || '-'}</td><td className="px-5 py-3 text-right font-medium tabular-nums">{kg(number(sale.quantity_kg))}</td><td className="px-5 py-3 text-gray-500">{sale.note || '-'}</td><td className="px-5 py-3 text-right"><button type="button" onClick={() => removeSale(sale.id)} aria-label="販売・使用実績を削除" className="w-11 h-11 inline-flex items-center justify-center rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-700 focus:ring-2 focus:ring-red-600"><IconTrash className="w-4 h-4" /></button></td></tr>)}</tbody></table></div>}
         </section>
       </>}
     </div>

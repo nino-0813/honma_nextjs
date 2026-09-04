@@ -27,7 +27,8 @@ CREATE TABLE IF NOT EXISTS public.inventory_external_sales (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   season_id uuid NOT NULL REFERENCES public.inventory_seasons(id) ON DELETE CASCADE,
   variety_key text NOT NULL CHECK (variety_key IN ('koshihikari', 'nikomaru', 'kamenoo')),
-  channel text NOT NULL CHECK (channel IN ('tabechoku', 'satofull', 'furupo', 'direct', 'other')),
+  channel text NOT NULL CHECK (channel IN ('direct', 'wholesale', 'gift', 'home_use')),
+  sales_destination text,
   quantity_kg numeric(12,2) NOT NULL CHECK (quantity_kg > 0),
   sold_on date NOT NULL DEFAULT current_date,
   note text,
@@ -58,4 +59,4 @@ WITH CHECK (EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = auth.uid() AND 
 
 COMMENT ON TABLE public.inventory_seasons IS '収穫年度ごとの在庫管理期間';
 COMMENT ON TABLE public.inventory_varieties IS '品種別の年間収穫量と確保分';
-COMMENT ON TABLE public.inventory_external_sales IS '食べチョク・さとふる・ふるぽ等の外部販売実績';
+COMMENT ON TABLE public.inventory_external_sales IS 'Web以外の直販・卸し・プレゼント・自家用の販売使用実績';
