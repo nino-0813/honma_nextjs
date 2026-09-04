@@ -59,7 +59,7 @@ const THEMES: Theme[] = [
     ],
   },
   {
-    label: 'いいかお',
+    label: 'いいとき',
     heading: '田んぼが、\n島の循環をつくる。',
     cards: [
       {

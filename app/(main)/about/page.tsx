@@ -125,7 +125,7 @@ export default function AboutPage() {
         <div className="max-w-5xl mx-auto px-6">
           <FadeInSection>
             <p className="text-center text-xl md:text-3xl font-serif tracking-wider leading-relaxed text-primary mb-12 md:mb-16">
-              あんしん、おいしい、いいかお。
+              あんしん、おいしい、いいとき。
             </p>
             <ul className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
               {[
@@ -138,7 +138,7 @@ export default function AboutPage() {
                   body: '余計なものを足さず、品種が秘めた旨みと香りをまっすぐに引き出します。世界最高米®の国際総合部門で最高金賞をいただきました。',
                 },
                 {
-                  key: 'いいかお',
+                  key: 'いいとき',
                   body: '生きものが育ち、子どもが学び、集落が続く。おいしいお米は結果であって、そのプロセスのほうを私たちは大切にしています。',
                 },
               ].map((k) => (

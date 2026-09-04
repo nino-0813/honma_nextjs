@@ -7,7 +7,7 @@ import FadeIn from '@/components/FadeIn';
  * ベースフードの About と同じく、左に大きな宣言 / 右に本文を置き、
  * その下に全面写真タイルで3つのキーワードを見せる。
  *
- * キーワードは要件定義の「あんしん / おいしい / いいかお」。
+ * キーワードは要件定義の「あんしん / おいしい / いいとき」。
  */
 const TILES = [
   {
@@ -23,7 +23,7 @@ const TILES = [
     href: '/about',
   },
   {
-    key: 'いいかお',
+    key: 'いいとき',
     lead: '田んぼが、\n島の循環をつくる',
     image: '/images/renewal/about/smiles.webp',
     href: '/about',
@@ -44,14 +44,14 @@ export default function BrandAbout() {
             <br />
             おいしい、
             <br />
-            いいかお。
+            いいとき。
           </p>
           <div className="flex flex-col gap-5 text-sm md:text-base text-gray-600 leading-loose">
             <p>
               自然から学び、豊かさを分かち合う。イケベジは佐渡島で、農薬にも化学肥料にも頼らずにお米を育てています。
             </p>
             <p>
-              おいしさや安全は、私たちにとって大前提です。そのうえで大切にしているのは、田んぼが生む「いいかお」のほう。
+              おいしさや安全は、私たちにとって大前提です。そのうえで大切にしているのは、田んぼが生む「いいとき」のほう。
               生きものが育ち、子どもが学び、集落が続く。おいしいお米は、そのプロセスの結果として生まれます。
             </p>
             <p>佐渡と共に歩み、共に挑戦しつづけます。</p>
