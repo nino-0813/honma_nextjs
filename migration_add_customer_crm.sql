@@ -10,6 +10,9 @@ CREATE TABLE IF NOT EXISTS public.customers (
   email TEXT,
   platform TEXT DEFAULT 'website', -- 'website' | 'base' | 'other'
   birth_year INTEGER,
+  age_decade INTEGER,
+  birth_year_from INTEGER,
+  birth_year_to INTEGER,
   gender TEXT, -- '男性' | '女性' | 'その他' | '未回答'
   target_categories TEXT[] DEFAULT '{}',
   first_purchase_rice_date DATE,
@@ -22,6 +25,10 @@ CREATE TABLE IF NOT EXISTS public.customers (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+ALTER TABLE public.customers ADD COLUMN IF NOT EXISTS age_decade INTEGER;
+ALTER TABLE public.customers ADD COLUMN IF NOT EXISTS birth_year_from INTEGER;
+ALTER TABLE public.customers ADD COLUMN IF NOT EXISTS birth_year_to INTEGER;
 
 CREATE TABLE IF NOT EXISTS public.customer_sns_accounts (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

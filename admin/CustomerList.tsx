@@ -21,6 +21,9 @@ interface CustomerRow {
   email: string | null;
   platform: string | null;
   birth_year: number | null;
+  age_decade: number | null;
+  birth_year_from: number | null;
+  birth_year_to: number | null;
   gender: string | null;
   target_categories: string[] | null;
   first_purchase_rice_date: string | null;
@@ -53,6 +56,14 @@ type NewsletterFilter = 'all' | 'yes' | 'no';
 type RecencyFilter = 'all' | 'recent' | 'dormant';
 
 const formatDate = (d: string | null) => (d ? new Date(d).toLocaleDateString('ja-JP') : '-');
+
+const formatCustomerAge = (c: CustomerRow) => {
+  if (c.birth_year) return `${c.birth_year}年`;
+  if (c.age_decade && c.birth_year_from && c.birth_year_to) {
+    return `${c.age_decade}代（${c.birth_year_from}〜${c.birth_year_to}年）`;
+  }
+  return '-';
+};
 
 const getLatestPurchaseDate = (c: CustomerRow): Date | null => {
   const dates = [c.latest_purchase_rice_date, c.latest_purchase_shiitake_date].filter(Boolean) as string[];
@@ -131,6 +142,9 @@ const CustomerList = () => {
           email: p.email || null,
           platform: 'website',
           birth_year: null,
+          age_decade: null,
+          birth_year_from: null,
+          birth_year_to: null,
           gender: null,
           target_categories: [],
           first_purchase_rice_date: null,
@@ -253,6 +267,8 @@ const CustomerList = () => {
       メール: c.email || '',
       プラットフォーム: c.platform ? PLATFORM_LABEL[c.platform] || c.platform : '',
       生年: c.birth_year || '',
+      推定年代: c.age_decade ? `${c.age_decade}代` : '',
+      推定生年範囲: !c.birth_year && c.birth_year_from && c.birth_year_to ? `${c.birth_year_from}〜${c.birth_year_to}` : '',
       性別: c.gender || '',
       ターゲットカテゴリー: (c.target_categories || []).join(' / '),
       初回購入日_お米: c.first_purchase_rice_date || '',
@@ -427,7 +443,7 @@ const CustomerList = () => {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
+              <table className="w-full min-w-[980px] table-fixed text-left text-sm">
                 <thead className="bg-gray-50/50 text-gray-500 font-medium border-b border-gray-100">
                   <tr>
                     <th className="px-4 py-3 w-10">
@@ -438,13 +454,14 @@ const CustomerList = () => {
                         className="w-4 h-4 rounded border-gray-300"
                       />
                     </th>
-                    <th className="px-4 py-3 whitespace-nowrap">氏名</th>
-                    <th className="px-4 py-3 whitespace-nowrap">メール</th>
-                    <th className="px-4 py-3 whitespace-nowrap">媒体</th>
-                    <th className="px-4 py-3 whitespace-nowrap">カテゴリー</th>
-                    <th className="px-4 py-3 whitespace-nowrap">最新購入</th>
-                    <th className="px-4 py-3 whitespace-nowrap">メルマガ</th>
-                    <th className="px-4 py-3 w-40" />
+                    <th className="px-3 py-3 w-32 whitespace-nowrap">氏名</th>
+                    <th className="px-3 py-3 w-44 whitespace-nowrap">メール</th>
+                    <th className="px-3 py-3 w-24 whitespace-nowrap">年代・生年</th>
+                    <th className="px-3 py-3 w-24 whitespace-nowrap">媒体</th>
+                    <th className="px-3 py-3 w-20 whitespace-nowrap">カテゴリー</th>
+                    <th className="px-3 py-3 w-28 whitespace-nowrap">最新購入</th>
+                    <th className="px-3 py-3 w-20 whitespace-nowrap">メルマガ</th>
+                    <th className="px-3 py-3 w-44" />
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -458,10 +475,11 @@ const CustomerList = () => {
                           className="w-4 h-4 rounded border-gray-300"
                         />
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
+                      <td className="px-3 py-3 min-w-0">
                         <Link
                           href={`/admin/customer-list/${c.id}`}
-                          className="font-medium text-gray-900 hover:text-primary transition-colors"
+                          className="block truncate font-medium text-gray-900 hover:text-primary transition-colors"
+                          title={`${c.last_name}${c.first_name ? ` ${c.first_name}` : ''}`}
                         >
                           {c.last_name}
                           {c.first_name ? ` ${c.first_name}` : ''}
@@ -470,13 +488,16 @@ const CustomerList = () => {
                           <div className="text-[10px] text-amber-600 mt-0.5">会員登録済み・未編集</div>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-gray-600 max-w-[180px] truncate" title={c.email || ''}>
+                      <td className="px-3 py-3 text-gray-600 truncate" title={c.email || ''}>
                         {c.email || '-'}
                       </td>
-                      <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
+                      <td className="px-3 py-3 text-xs text-gray-600 leading-relaxed" title={formatCustomerAge(c)}>
+                        {c.birth_year ? `${c.birth_year}年` : c.age_decade ? <><span className="font-medium text-gray-800">{c.age_decade}代</span><br /><span className="text-[10px]">{c.birth_year_from}〜{c.birth_year_to}</span></> : '-'}
+                      </td>
+                      <td className="px-3 py-3 text-gray-600 whitespace-nowrap">
                         {c.platform ? PLATFORM_LABEL[c.platform] || c.platform : '-'}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-3">
                         {(c.target_categories || []).length === 0 ? (
                           <span className="text-gray-400">-</span>
                         ) : (
@@ -488,12 +509,12 @@ const CustomerList = () => {
                           </span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-gray-500 text-xs whitespace-nowrap">
+                      <td className="px-3 py-3 text-gray-500 text-xs whitespace-nowrap">
                         米 {formatDate(c.latest_purchase_rice_date)}
                         <br />
                         椎茸 {formatDate(c.latest_purchase_shiitake_date)}
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
+                      <td className="px-3 py-3 whitespace-nowrap">
                         {c.newsletter_opt_in ? (
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-800 border border-emerald-200">
                             許可
@@ -502,7 +523,7 @@ const CustomerList = () => {
                           <span className="text-gray-400 text-xs">-</span>
                         )}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-3">
                         <div className="flex items-center gap-2 justify-end">
                           {c.email && (
                             <Link

@@ -23,6 +23,16 @@ const PLATFORM_OPTIONS = [
 
 const GENDER_OPTIONS = ['男性', '女性', 'その他', '未回答'];
 
+const AGE_DECADE_OPTIONS = [20, 30, 40, 50, 60, 70, 80] as const;
+
+const getEstimatedBirthYearRange = (ageDecade: number) => {
+  const year = new Date().getFullYear();
+  return {
+    from: year - ageDecade - 10,
+    to: year - ageDecade,
+  };
+};
+
 // 紹介URLは常に本番ドメインを指す（管理画面をローカルで開いていても localhost にならないよう固定文字列にする）
 const REFERRAL_BASE_URL = 'https://www.ikevege.com';
 
@@ -47,6 +57,7 @@ const CustomerEditor = () => {
   const [email, setEmail] = useState('');
   const [platform, setPlatform] = useState('website');
   const [birthYear, setBirthYear] = useState('');
+  const [ageDecade, setAgeDecade] = useState('');
   const [gender, setGender] = useState('');
   const [targetCategories, setTargetCategories] = useState<Set<string>>(new Set());
   const [firstPurchaseRiceDate, setFirstPurchaseRiceDate] = useState('');
@@ -108,6 +119,7 @@ const CustomerEditor = () => {
         setEmail(c.email || '');
         setPlatform(c.platform || 'website');
         setBirthYear(c.birth_year ? String(c.birth_year) : '');
+        setAgeDecade(c.age_decade ? String(c.age_decade) : '');
         setGender(c.gender || '');
         setTargetCategories(new Set<string>(c.target_categories || []));
         setFirstPurchaseRiceDate(c.first_purchase_rice_date || '');
@@ -196,12 +208,16 @@ const CustomerEditor = () => {
       setError(null);
 
       const now = new Date().toISOString();
+      const estimatedRange = ageDecade ? getEstimatedBirthYearRange(Number(ageDecade)) : null;
       const payload = {
         last_name: lastName.trim(),
         first_name: firstName.trim() || null,
         email: email.trim() || null,
         platform,
         birth_year: birthYear ? Number(birthYear) : null,
+        age_decade: ageDecade ? Number(ageDecade) : null,
+        birth_year_from: estimatedRange?.from ?? null,
+        birth_year_to: estimatedRange?.to ?? null,
         gender: gender || null,
         target_categories: Array.from(targetCategories),
         first_purchase_rice_date: firstPurchaseRiceDate || null,
@@ -341,21 +357,45 @@ const CustomerEditor = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">生年（4桁）</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">正確な生年（4桁）</label>
               <input
                 value={birthYear}
-                onChange={(e) => setBirthYear(e.target.value.replace(/[^0-9]/g, '').slice(0, 4))}
-                className="w-full p-3 border border-gray-200 rounded-lg bg-white"
+                onChange={(e) => {
+                  setBirthYear(e.target.value.replace(/[^0-9]/g, '').slice(0, 4));
+                  if (e.target.value) setAgeDecade('');
+                }}
+                className="w-full min-h-11 p-3 border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600"
                 placeholder="例）1990"
                 inputMode="numeric"
               />
+              <p className="mt-1.5 text-xs text-gray-500">正確に分かる場合だけ入力してください。</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">推定年代</label>
+              <select
+                value={ageDecade}
+                onChange={(e) => {
+                  setAgeDecade(e.target.value);
+                  if (e.target.value) setBirthYear('');
+                }}
+                className="w-full min-h-11 p-3 border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600"
+              >
+                <option value="">未設定</option>
+                {AGE_DECADE_OPTIONS.map((decade) => (
+                  <option key={decade} value={decade}>{decade}代</option>
+                ))}
+              </select>
+              {ageDecade ? (() => {
+                const range = getEstimatedBirthYearRange(Number(ageDecade));
+                return <p className="mt-1.5 text-xs font-medium text-emerald-800" aria-live="polite">{range.from}〜{range.to}年生まれ（推定）</p>;
+              })() : <p className="mt-1.5 text-xs text-gray-500">生年が不明で、年代だけ分かる場合に選択します。</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">性別</label>
               <select
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
-                className="w-full p-3 border border-gray-200 rounded-lg bg-white"
+                className="w-full min-h-11 p-3 border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600"
               >
                 <option value="">未設定</option>
                 {GENDER_OPTIONS.map((opt) => (

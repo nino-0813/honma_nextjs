@@ -303,6 +303,9 @@ CREATE TABLE IF NOT EXISTS public.customers (
   email TEXT,
   platform TEXT DEFAULT 'website', -- 'website' | 'base' | 'other'
   birth_year INTEGER,
+  age_decade INTEGER,
+  birth_year_from INTEGER,
+  birth_year_to INTEGER,
   gender TEXT, -- '男性' | '女性' | 'その他' | '未回答'
   target_categories TEXT[] DEFAULT '{}',
   first_purchase_rice_date DATE,
@@ -893,5 +896,4 @@ CREATE POLICY "Admins can manage email logs"
   ON public.email_logs
   FOR ALL
   USING (public.is_admin());
-
 
