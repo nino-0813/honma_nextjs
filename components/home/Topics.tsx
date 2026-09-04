@@ -51,7 +51,6 @@ export default async function Topics() {
             <SectionHeading
               en="Topics"
               ja="トピックス"
-              description="新商品やキャンペーンのお知らせ、佐渡の田んぼの様子をお届けします。"
             />
             </FadeIn>
           </div>
