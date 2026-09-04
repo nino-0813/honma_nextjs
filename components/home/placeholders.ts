@@ -87,7 +87,7 @@ export const LEARN_MORE_CARDS: {
     title: 'イケてるパートナーズ',
     body: '1年を通して佐渡の田んぼとつながる、企業向けのオーナー制度です。',
     href: '/join-us',
-    image: '/images/joinus/crowdfunding-1052.webp',
+    image: '/images/joinus/artboard_1_copy.webp',
   },
 ];
 

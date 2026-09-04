@@ -5,8 +5,6 @@ import Topics from '@/components/home/Topics';
 import Lineup from '@/components/home/Lineup';
 import BrandAbout from '@/components/home/BrandAbout';
 import LearnMore from '@/components/home/LearnMore';
-import NoteSection from '@/components/home/NoteSection';
-import Activities from '@/components/home/Activities';
 import SubscriptionCTA from '@/components/home/SubscriptionCTA';
 import News from '@/components/home/News';
 
@@ -58,19 +56,13 @@ export default function HomePage() {
       {/* 5. ブランドについて */}
       <BrandAbout />
 
-      {/* 6. もっと知る */}
+      {/* 6. もっと知る（ブランド・note・取り組みをまとめた画像ギャラリー） */}
       <LearnMore />
 
-      {/* 7. note の記事 */}
-      <NoteSection />
-
-      {/* 8. 取り組み */}
-      <Activities />
-
-      {/* 9. 定期便 */}
+      {/* 7. 定期便 */}
       <SubscriptionCTA />
 
-      {/* 10. お知らせ */}
+      {/* 8. お知らせ */}
       <News />
 
     </div>
