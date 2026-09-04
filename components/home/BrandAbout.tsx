@@ -47,14 +47,9 @@ export default function BrandAbout() {
             いいとき。
           </p>
           <div className="flex flex-col gap-5 text-sm md:text-base text-gray-600 leading-loose">
-            <p>
-              自然から学び、豊かさを分かち合う。イケベジは佐渡島で、農薬にも化学肥料にも頼らずにお米を育てています。
-            </p>
-            <p>
-              おいしさや安全は、私たちにとって大前提です。そのうえで大切にしているのは、田んぼが生む「いいとき」のほう。
-              生きものが育ち、子どもが学び、集落が続く。おいしいお米は、そのプロセスの結果として生まれます。
-            </p>
-            <p>佐渡と共に歩み、共に挑戦しつづけます。</p>
+            <p className="whitespace-pre-line">{'イケベジは\n日々の暮らしのなかに “ ありのまま ” でいられる姿を想像し'}</p>
+            <p className="whitespace-pre-line">{'「自然から学び、豊かさを分かち合うこと」を通じて\nあんしん と おいしさ から得られる\n" 時別な時間 ( とき )" を提供しつづけ'}</p>
+            <p className="whitespace-pre-line">{'「イケてる社会」を創造し\n「佐渡」という唯一無二の価値を守り続けていきます'}</p>
           </div>
         </div>
       </div>
