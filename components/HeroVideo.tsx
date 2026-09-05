@@ -6,16 +6,12 @@ const HERO_IMG_400 = '/images/home/parallax/sunset_riceplanting_7_400.webp';
 const HERO_IMG_800 = '/images/home/parallax/sunset_riceplanting_7_800.webp';
 const HERO_IMG_1200 = '/images/home/parallax/sunset_riceplanting_7_1200.webp';
 
-/** 動画URL: 環境変数（Next / Vite 両方） > ローカル public/videos/hero.mp4 */
+/** リブランディング用のトップ動画 */
 const DEFAULT_HERO_VIDEO = '/videos/hero.mp4';
 
 const HeroVideo = () => {
-  const mp4Url =
-    process.env.NEXT_PUBLIC_HERO_VIDEO_URL ||
-    (process.env as Record<string, string>).VITE_HERO_VIDEO_URL ||
-    DEFAULT_HERO_VIDEO;
+  const mp4Url = DEFAULT_HERO_VIDEO;
   const useMp4 = true; // 常に動画を試す。失敗時は画像にフォールバック
-  const isExternalUrl = mp4Url.startsWith('http');
 
   const [isLoaded, setIsLoaded] = useState(!useMp4);
   const [isLoading, setIsLoading] = useState(useMp4);
@@ -29,8 +25,7 @@ const HeroVideo = () => {
     setIsLoaded(true);
   };
 
-  // 外部URL（Supabase等）は初回読み込みが遅いことがあるのでタイムアウトを長めに
-  const loadTimeoutMs = isExternalUrl ? 15000 : 8000;
+  const loadTimeoutMs = 8000;
   useEffect(() => {
     if (!useMp4 || mp4Failed) return;
     const timer = setTimeout(() => {
