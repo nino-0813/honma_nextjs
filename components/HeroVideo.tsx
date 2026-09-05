@@ -104,7 +104,6 @@ const HeroVideo = () => {
             onError={handleMp4Error}
           />
         )}
-        <div className="absolute inset-0 bg-black/20 flex items-center justify-center pointer-events-none"></div>
       </div>
     </div>
   );
