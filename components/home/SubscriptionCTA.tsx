@@ -41,9 +41,7 @@ export default function SubscriptionCTA() {
 
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-16">
           <h2 className="text-2xl md:text-[38px] lg:text-[44px] font-serif font-semibold leading-[1.6] tracking-wide text-white">
-            買い続けることが、
-            <br />
-            集落を続けることになる。
+            4700人でつくる里山の風景
           </h2>
           <div className="flex flex-col gap-4 text-[13px] md:text-sm text-white/90 leading-loose">
             <p>
