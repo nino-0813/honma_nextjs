@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import SectionHeading from './SectionHeading';
 import FadeIn from '@/components/FadeIn';
 
@@ -13,15 +14,12 @@ export default function BrandAbout() {
           <SectionHeading ja="イケベジとは" />
         </FadeIn>
 
-        <div className="mt-14 grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-28">
-          <p className="text-3xl md:text-[44px] lg:text-[52px] font-serif font-semibold leading-[1.6] tracking-wide text-primary">
-            あんしん、
-            <br />
-            おいしい、
-            <br />
-            いいとき。
-          </p>
-          <div className="flex flex-col gap-5 text-sm md:text-base text-gray-600 leading-loose">
+        <div className="mt-14 grid grid-cols-1 items-center gap-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-24">
+          <div>
+            <p className="text-3xl font-serif font-semibold leading-[1.6] tracking-wide text-primary md:text-[44px]">
+              あんしん、おいしい、いいとき。
+            </p>
+            <div className="mt-9 flex flex-col gap-5 text-sm leading-loose text-gray-600 md:text-base">
             <p className="whitespace-pre-line">{'イケベジは\n日々の暮らしのなかに “ ありのまま ” でいられる姿を想像し'}</p>
             <p className="whitespace-pre-line">{'「自然から学び、豊かさを分かち合うこと」を通じて\nあんしん と おいしさ から得られる\n" 時別な時間 ( とき )" を提供しつづけ'}</p>
             <p className="whitespace-pre-line">{'「イケてる社会」を創造し\n「佐渡」という唯一無二の価値を守り続けていきます'}</p>
@@ -32,7 +30,19 @@ export default function BrandAbout() {
               イケベジについて詳しく知る
               <span aria-hidden="true">→</span>
             </Link>
+            </div>
           </div>
+          <FadeIn delay={150}>
+            <div className="relative aspect-[4/3] overflow-hidden bg-dim">
+              <Image
+                src="/images/about/hero/retreat_2025_56.webp"
+                alt="佐渡の田んぼで笑顔を見せる大人と子どもたち"
+                fill
+                sizes="(min-width: 1024px) 52vw, 100vw"
+                className="object-cover"
+              />
+            </div>
+          </FadeIn>
         </div>
       </div>
     </section>

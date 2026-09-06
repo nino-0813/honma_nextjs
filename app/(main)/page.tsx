@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import HeroVideo from '@/components/HeroVideo';
 import AnnouncementPopup from '@/components/AnnouncementPopup';
-import Topics from '@/components/home/Topics';
 import Lineup from '@/components/home/Lineup';
 import BrandAbout from '@/components/home/BrandAbout';
 import LearnMore from '@/components/home/LearnMore';
@@ -21,7 +20,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/' },
 };
 
-/** トピックス・ニュースはSupabaseから取得するため5分ごとに再生成 */
+/** お知らせはSupabaseから取得するため5分ごとに再生成 */
 export const revalidate = 300;
 
 /**
@@ -29,7 +28,7 @@ export const revalidate = 300;
  *
  * 構成はベースフードのトップページに準拠:
  *   トップ動画 → イケベジとは → ラインナップ → 定期便
- *   → もっと知る → トピックス → お知らせ
+ *   → もっと知る → お知らせ
  *
  * 要件定義（2026-08-26）の心理導線
  * 「信頼 → 試す → 知る → 承認される → 一員になる」に対応している。
@@ -56,13 +55,10 @@ export default function HomePage() {
       {/* 4. 定期便 */}
       <SubscriptionCTA />
 
-      {/* 5. もっと知る（ブランド・note・取り組みをまとめた画像ギャラリー） */}
+      {/* 5. もっと知る（詳細情報への入口を3つに整理） */}
       <LearnMore />
 
-      {/* 6. トピックス（より深く知りたい方向け） */}
-      <Topics />
-
-      {/* 7. お知らせ */}
+      {/* 6. お知らせ */}
       <News />
 
     </div>

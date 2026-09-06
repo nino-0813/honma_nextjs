@@ -439,6 +439,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 {subscriptionEnabled && purchaseType === 'subscription' && subscriptionDiscountPercent > 0 ? (
                   <div className="flex items-baseline gap-3 mb-1">
                     <span className="text-xl md:text-2xl font-serif text-primary">¥{subscriptionPrice.toLocaleString()}</span>
+                    <span className="text-xs text-gray-500">／1回のお届け</span>
                     <span className="text-sm text-gray-400 line-through">¥{calculatedPrice.toLocaleString()}</span>
                     <span className="text-xs bg-red-50 text-red-600 px-2 py-0.5 rounded">定期 {subscriptionDiscountPercent}%OFF</span>
                   </div>
@@ -640,7 +641,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
               {/* 購入方法（ベースフードと同じく、特典を並べたラジオカード） */}
               {subscriptionEnabled && subscriptionIntervals.length > 0 && (
               <div className="mb-6">
-                <p className="text-sm font-medium text-primary">購入方法：</p>
+                <p className="text-sm font-medium text-primary">1. 購入方法を選ぶ</p>
                 <p className="mt-1 mb-3 text-[11px] text-gray-500">※カート内のすべての商品に適用されます</p>
 
                 {/* 定期購入 */}
@@ -659,7 +660,10 @@ export default function ProductDetailView({ product }: { product: Product }) {
                       </span>
                       <span className="text-sm font-medium text-primary">定期購入</span>
                     </span>
-                    <span className="text-sm text-primary tabular-nums">¥{subscriptionPrice.toLocaleString()}</span>
+                    <span className="text-right text-sm text-primary tabular-nums">
+                      ¥{subscriptionPrice.toLocaleString()}
+                      <span className="block text-[10px] text-gray-500">1回のお届け分</span>
+                    </span>
                   </span>
 
                   <span className="mt-4 block border-t border-gray-100 pt-4">
@@ -706,7 +710,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 {/* 定期購入プラン選択 */}
                 {purchaseType === 'subscription' && subscriptionIntervals.length > 0 && (
                   <div className="mt-6 bg-gray-50 rounded p-4">
-                    <p className="text-xs font-medium text-gray-700 mb-3">お届け頻度</p>
+                    <p className="text-xs font-medium text-gray-700 mb-3">2. お届け頻度を選ぶ</p>
                     <div className="space-y-2">
                       {subscriptionIntervals.map((interval) => (
                         <label
@@ -729,7 +733,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                             {subscriptionDiscountPercent > 0 && (
                               <span className="text-xs text-gray-400 line-through">¥{calculatedPrice.toLocaleString()}</span>
                             )}
-                            <span className="text-sm font-serif text-primary">¥{subscriptionPrice.toLocaleString()}</span>
+                            <span className="text-sm font-serif text-primary">¥{subscriptionPrice.toLocaleString()}／回</span>
                             {subscriptionDiscountPercent > 0 && (
                               <span className="text-[10px] text-red-600 font-medium">{subscriptionDiscountPercent}%OFF</span>
                             )}
@@ -861,15 +865,13 @@ export default function ProductDetailView({ product }: { product: Product }) {
               </div>
 
               <div className="border-t border-gray-200 mt-8">
-                <div className="py-4 border-b border-gray-200">
-                  <div className="flex justify-between items-center cursor-pointer py-2" onClick={() => toggleAccordion('shipping')}>
+                <Link
+                  href="/legal#shipping"
+                  className="flex min-h-14 items-center justify-between border-b border-gray-200 py-4 transition-colors hover:text-hekishoku focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hekishoku focus-visible:ring-inset"
+                >
                     <span className="text-sm font-medium tracking-wider">送料について</span>
-                    <IconChevronDown className={`w-4 h-4 transition-transform duration-300 ${activeAccordion === 'shipping' ? 'rotate-180' : ''}`} />
-                  </div>
-                  <div className={`overflow-hidden transition-all duration-500 ease-in-out ${activeAccordion === 'shipping' ? 'max-h-[200px] opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
-                    <div className="pb-4"><Link href="/legal" className="text-sm text-gray-600 hover:text-black underline transition-colors">特定商取引法に基づく表記</Link></div>
-                  </div>
-                </div>
+                    <span aria-hidden="true">→</span>
+                </Link>
                 <div className="py-4 border-b border-gray-200">
                   <div className="flex justify-between items-center cursor-pointer py-2" onClick={() => toggleAccordion('inquiry')}>
                     <span className="text-sm font-medium tracking-wider">この商品について問い合わせる</span>

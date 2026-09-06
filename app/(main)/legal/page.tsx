@@ -48,7 +48,7 @@ export default function LegalPage() {
             </p>
           </section>
           <section className="space-y-4">
-            <h2 className="text-xl md:text-2xl font-serif tracking-widest text-primary mt-12 mb-6">送料に関して</h2>
+            <h2 id="shipping" className="scroll-mt-32 text-xl md:text-2xl font-serif tracking-widest text-primary mt-12 mb-6">送料に関して</h2>
             <p className="text-sm md:text-base leading-relaxed mb-4">下記の金額をご確認ください。</p>
             <div className="space-y-6">
               <div>
