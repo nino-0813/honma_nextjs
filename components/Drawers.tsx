@@ -7,7 +7,7 @@ import { IconClose, IconInstagram, IconYoutube, IconChevronDown, IconPlus, IconT
 import { CartItem, SubscriptionInterval, SUBSCRIPTION_INTERVAL_LABELS } from '@/types';
 import { FadeInImage } from './UI';
 import { supabase, checkStockAvailability } from '@/lib/supabase';
-import { PRIMARY_NAV, SECONDARY_NAV, CATEGORY_NAV } from './navigation';
+import { PRIMARY_NAV, SECONDARY_NAV } from './navigation';
 import { calculateEarnableMiles } from '@/lib/eventMiles';
 import {
   trackViewCart,
@@ -284,7 +284,6 @@ export const CartDrawer = ({ isOpen, onClose, cartItems, onRemove, onUpdateQuant
 
 export const MenuDrawer = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const router = useRouter();
-  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
@@ -320,63 +319,23 @@ export const MenuDrawer = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
     <Drawer isOpen={isOpen} onClose={onClose} title="" position="right">
       <div className="flex flex-col px-6 py-8 gap-0">
         <nav className="flex flex-col text-sm font-medium tracking-wide text-gray-800">
-          <button onClick={() => navigate('/')} className="text-left border-b border-gray-100 py-4 hover:text-gray-500 transition-colors block w-full">
-            ホーム
-          </button>
-
-          {/* 商品一覧（カテゴリのアコーディオン付き） */}
-          <div className="border-b border-gray-100">
-            <div className="w-full flex items-center justify-between py-4">
+          {/* スマホでは横並びナビが非表示になるため、主要項目もここに残す */}
+          <div className="md:hidden">
+            <button onClick={() => navigate('/')} className="text-left border-b border-gray-100 py-4 hover:text-gray-500 transition-colors block w-full">
+              ホーム
+            </button>
+            {PRIMARY_NAV.map((item) => (
               <button
-                onClick={() => navigate(CATEGORY_NAV.href)}
-                className="flex-1 text-left hover:text-gray-500 transition-colors"
+                key={item.label}
+                onClick={() => navigate(item.href)}
+                className="text-left border-b border-gray-100 py-4 hover:text-gray-500 transition-colors block w-full"
               >
-                {CATEGORY_NAV.label}
+                {item.label}
               </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsCategoryOpen(!isCategoryOpen);
-                }}
-                aria-label="カテゴリを開閉"
-                aria-expanded={isCategoryOpen}
-                className="p-1 hover:bg-gray-100 rounded transition-colors"
-              >
-                <IconChevronDown className={`w-4 h-4 transition-transform duration-300 ${isCategoryOpen ? 'rotate-180' : ''}`} />
-              </button>
-            </div>
-
-            {isCategoryOpen && (
-              <div className="pl-4 pb-4 flex flex-col">
-                {CATEGORY_NAV.children.map((c) => (
-                  <button
-                    key={`${c.label}-${c.href}`}
-                    onClick={() => navigate(c.href)}
-                    className={`text-left py-2.5 transition-colors block w-full ${
-                      'indent' in c && c.indent
-                        ? 'pl-4 text-xs text-gray-500 hover:text-black'
-                        : 'text-gray-600 hover:text-black'
-                    }`}
-                  >
-                    {c.label}
-                  </button>
-                ))}
-              </div>
-            )}
+            ))}
           </div>
 
-          {/* 主要項目のうち商品一覧以外 */}
-          {PRIMARY_NAV.filter((item) => item.href !== CATEGORY_NAV.href).map((item) => (
-            <button
-              key={item.label}
-              onClick={() => navigate(item.href)}
-              className="text-left border-b border-gray-100 py-4 hover:text-gray-500 transition-colors block w-full"
-            >
-              {item.label}
-            </button>
-          ))}
-
-          {/* 副次項目 */}
+          {/* ヘッダーと重複しない補助項目だけを表示 */}
           {SECONDARY_NAV.map((item) => (
             <button
               key={item.label}

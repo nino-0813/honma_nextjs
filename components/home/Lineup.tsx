@@ -5,7 +5,7 @@ import FadeIn from '@/components/FadeIn';
 
 /**
  * ラインナップ。
- * ベースフードと同じく、隙間なく並べた大判の写真タイルに
+ * 商品カテゴリーが増えても折り返せる写真タイルに
  * 白抜きの見出しと丸ボタンを重ねる。
  *
  * 注意: 原木椎茸は現在DB上 category='その他' のため、リンク先は暫定。
@@ -58,7 +58,7 @@ export default function Lineup() {
       </div>
 
       {/* 写真全体を押せるラインナップタイル */}
-      <ul className="grid grid-cols-1 gap-px bg-white md:grid-cols-3">
+      <ul className="grid grid-cols-1 gap-px bg-white sm:grid-cols-2 lg:grid-cols-3">
         {TILES.map((t, i) => (
           <li key={t.ja}>
             <FadeIn delay={Math.min(i % 3, 2) * 80}>
@@ -74,7 +74,7 @@ export default function Lineup() {
                   alt=""
                   aria-hidden="true"
                   loading="lazy"
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105 group-focus-visible:scale-105 motion-reduce:transition-none"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02] group-focus-visible:scale-[1.02] motion-reduce:transition-none"
                 />
                 <span className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/25 to-black/10 transition-colors duration-300 group-hover:from-black/70 group-hover:via-black/30" />
                 <span className="absolute inset-0 flex flex-col items-center justify-center px-5 text-center text-white">

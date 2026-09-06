@@ -224,18 +224,9 @@ export default function CollectionsPage() {
                 style={{ animationDelay: `${index * 60}ms` }}
               >
                 <div className="relative aspect-square bg-white border border-gray-100 overflow-hidden mb-5 flex items-center justify-center">
-                  <div className="absolute inset-0 z-10 bg-white transition-opacity duration-700 ease-in-out group-hover:opacity-0 flex items-center justify-center p-2">
+                  <div className="absolute inset-0 flex items-center justify-center bg-white p-2 transition-transform duration-500 ease-out group-hover:scale-[1.015] motion-reduce:transition-none">
                     <FadeInImage
                       src={product.images?.length ? product.images[0] : product.image || ''}
-                      alt={product.title}
-                      className="w-full h-full object-contain"
-                      width={320}
-                      height={320}
-                    />
-                  </div>
-                  <div className="absolute inset-0 z-0 bg-white transform scale-100 group-hover:scale-105 transition-transform duration-1000 ease-out flex items-center justify-center p-2">
-                    <FadeInImage
-                      src={product.images?.length > 1 ? product.images[1] : product.images?.[0] || product.image || ''}
                       alt={product.title}
                       className="w-full h-full object-contain"
                       width={320}

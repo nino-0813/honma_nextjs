@@ -6,41 +6,32 @@ import { IconInstagram, IconYoutube } from './Icons';
 
 const Footer = () => {
   return (
-    <footer className="bg-hekishoku-deep text-white pt-16 pb-8 md:pt-20 md:pb-12">
+    <footer className="bg-hekishoku-deep py-10 text-white md:py-12">
       <div className="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
-          <div className="text-left">
-            <ul className="space-y-4 text-xs tracking-[0.2em] text-gray-300 font-medium">
-              <li><Link href="/" className="hover:text-white transition-colors">ホーム</Link></li>
-              <li><Link href="/about" className="hover:text-white transition-colors">ブランドについて</Link></li>
-              <li><Link href="/collections" className="hover:text-white transition-colors">商品一覧</Link></li>
-              <li><Link href="/start-set" className="hover:text-white transition-colors">スタートセット</Link></li>
-              <li><Link href="/collections/rice/yearly?view=lp" className="hover:text-white transition-colors">定期便について</Link></li>
-              <li><Link href="/blog" className="hover:text-white transition-colors">ブログ</Link></li>
-              <li><Link href="/join-us" className="hover:text-white transition-colors">取り組み</Link></li>
-              <li><Link href="/contact" className="hover:text-white transition-colors">お問い合わせ</Link></li>
-            </ul>
+        <div className="flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
+          <div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/ikevege_wordmark_white.png" alt="イケベジ" width={196} height={34} className="h-7 w-auto" />
+            <p className="mt-5 text-xs leading-loose tracking-[0.12em] text-white/70">
+              佐渡の自然から学び、豊かさを分かち合う。
+            </p>
           </div>
-          <div className="text-left">
-            <ul className="space-y-4 text-xs tracking-[0.15em] text-gray-400">
-              <li><Link href="/legal" className="hover:text-white transition-colors">特定商取引法に基づく表記</Link></li>
-              <li><Link href="/terms" className="hover:text-white transition-colors">利用規約</Link></li>
-              <li><Link href="/privacy" className="hover:text-white transition-colors">プライバシーポリシー</Link></li>
+          <div className="flex flex-col gap-6 md:items-end">
+            <ul className="flex flex-wrap gap-x-6 gap-y-3 text-[11px] tracking-[0.08em] text-white/65 md:justify-end">
               <li><Link href="/faq" className="hover:text-white transition-colors">よくあるご質問</Link></li>
               <li><Link href="/contact" className="hover:text-white transition-colors">お問い合わせ</Link></li>
+              <li><Link href="/legal" className="hover:text-white transition-colors">特定商取引法</Link></li>
+              <li><Link href="/terms" className="hover:text-white transition-colors">利用規約</Link></li>
+              <li><Link href="/privacy" className="hover:text-white transition-colors">プライバシーポリシー</Link></li>
             </ul>
-          </div>
-          <div className="flex flex-col items-center md:items-end gap-8">
-            <div className="flex gap-6">
-              <a href="https://www.instagram.com/ikevege_official?igsh=MXg1amN3bWZjMHZuaQ%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" className="text-white hover:text-gray-400 transition-colors">
+            <div className="flex items-center gap-6">
+              <a href="https://www.instagram.com/ikevege_official" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-white hover:text-white/60 transition-colors">
                 <IconInstagram className="w-5 h-5" />
               </a>
-              <a href="https://www.youtube.com/@ikevege" target="_blank" rel="noopener noreferrer" className="text-white hover:text-gray-400 transition-colors">
+              <a href="https://www.youtube.com/@ikevege" target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="text-white hover:text-white/60 transition-colors">
                 <IconYoutube className="w-5 h-5" />
               </a>
-            </div>
-            <div className="text-center md:text-right">
-              <p className="text-[10px] tracking-widest text-gray-600 leading-relaxed">
+              <p className="text-[10px] tracking-widest text-white/40">
                 &copy; {new Date().getFullYear()} IKEVEGE
               </p>
             </div>

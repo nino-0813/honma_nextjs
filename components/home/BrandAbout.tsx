@@ -1,44 +1,19 @@
+import Link from 'next/link';
 import SectionHeading from './SectionHeading';
-import CircleButton from './CircleButton';
 import FadeIn from '@/components/FadeIn';
 
 /**
- * ブランドについて。
- * ベースフードの About と同じく、左に大きな宣言 / 右に本文を置き、
- * その下に全面写真タイルで3つのキーワードを見せる。
- *
- * キーワードは要件定義の「あんしん / おいしい / いいとき」。
+ * ホームではブランドメッセージだけを簡潔に伝え、詳細は /about に集約する。
  */
-const TILES = [
-  {
-    key: 'あんしん',
-    lead: '農薬にも化学肥料にも\n頼らない',
-    image: '/images/renewal/about/safety.webp',
-    href: '/about',
-  },
-  {
-    key: 'おいしい',
-    lead: '品種が持つ味を、\nそのまま',
-    image: '/images/renewal/about/delicious.webp',
-    href: '/about',
-  },
-  {
-    key: 'いいとき',
-    lead: '田んぼが、\n島の循環をつくる',
-    image: '/images/renewal/about/smiles.webp',
-    href: '/about',
-  },
-];
-
 export default function BrandAbout() {
   return (
-    <section className="pt-20 md:pt-32 bg-white">
-      <div className="max-w-[1500px] mx-auto px-5 md:px-10">
+    <section className="bg-white py-24 md:py-40">
+      <div className="mx-auto max-w-[1280px] px-8 md:px-14">
         <FadeIn>
-          <SectionHeading en="About" ja="イケベジについて" />
+          <SectionHeading ja="イケベジとは" />
         </FadeIn>
 
-        <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20">
+        <div className="mt-14 grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-28">
           <p className="text-3xl md:text-[44px] lg:text-[52px] font-serif font-semibold leading-[1.6] tracking-wide text-primary">
             あんしん、
             <br />
@@ -50,43 +25,16 @@ export default function BrandAbout() {
             <p className="whitespace-pre-line">{'イケベジは\n日々の暮らしのなかに “ ありのまま ” でいられる姿を想像し'}</p>
             <p className="whitespace-pre-line">{'「自然から学び、豊かさを分かち合うこと」を通じて\nあんしん と おいしさ から得られる\n" 時別な時間 ( とき )" を提供しつづけ'}</p>
             <p className="whitespace-pre-line">{'「イケてる社会」を創造し\n「佐渡」という唯一無二の価値を守り続けていきます'}</p>
+            <Link
+              href="/about"
+              className="mt-3 inline-flex min-h-11 w-fit items-center gap-3 rounded-full border border-gray-300 px-6 py-3 text-xs text-primary transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hekishoku focus-visible:ring-offset-2"
+            >
+              イケベジについて詳しく知る
+              <span aria-hidden="true">→</span>
+            </Link>
           </div>
         </div>
       </div>
-
-      {/* 写真全体を押せるブランドタイル */}
-      <ul className="mt-14 grid grid-cols-1 gap-px bg-white md:mt-20 md:grid-cols-3">
-        {TILES.map((t, i) => (
-          <li key={t.key}>
-            <FadeIn delay={Math.min(i, 2) * 80}>
-            <a
-              href={t.href}
-              aria-label={`${t.key}について詳しく見る`}
-              className="group block focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-white"
-            >
-              <span className="relative block aspect-[4/5] md:aspect-[3/4] lg:aspect-auto lg:h-[70svh] overflow-hidden bg-dim">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={t.image}
-                  alt=""
-                  aria-hidden="true"
-                  loading="lazy"
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105 group-focus-visible:scale-105 motion-reduce:transition-none"
-                />
-                <span className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-black/10 transition-colors duration-300 group-hover:from-black/75 group-hover:via-black/30" />
-                <span className="absolute inset-0 flex flex-col items-center justify-end px-6 pb-9 text-center text-white md:pb-11 lg:pb-14">
-                  <span className="text-2xl font-serif font-semibold tracking-[0.15em] drop-shadow-sm md:text-[26px] lg:text-[30px]">{t.key}</span>
-                  <span className="mt-3 whitespace-pre-line text-xs font-medium leading-relaxed tracking-[0.08em] drop-shadow-sm md:text-sm">{t.lead}</span>
-                  <span className="mt-6 transition-transform duration-300 group-hover:translate-x-1 group-focus-visible:translate-x-1 motion-reduce:transition-none">
-                    <CircleButton icon="arrow" variant="light" />
-                  </span>
-                </span>
-              </span>
-            </a>
-            </FadeIn>
-          </li>
-        ))}
-      </ul>
     </section>
   );
 }

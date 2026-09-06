@@ -23,6 +23,14 @@ import {
 
 type PurchaseType = 'one_time' | 'subscription';
 
+const PRODUCT_NAV = [
+  { label: 'すべての商品', href: '/collections' },
+  { label: 'お米', href: '/collections/rice' },
+  { label: '定期便', href: '/collections/rice/yearly?view=lp' },
+  { label: '原木椎茸', href: '/collections/other' },
+  { label: 'その他', href: '/collections/other' },
+];
+
 export default function ProductDetailView({ product }: { product: Product }) {
   const { products: allProducts } = useProducts();
   const [selectedImage, setSelectedImage] = useState(0);
@@ -378,6 +386,16 @@ export default function ProductDetailView({ product }: { product: Product }) {
           <span className="text-black">{product.title}</span>
         </div>
 
+        <nav aria-label="商品カテゴリー" className="-mx-4 mb-10 overflow-x-auto px-4 pb-2 scrollbar-hide sm:-mx-6 sm:px-6 md:mb-14">
+          <div className="flex min-w-max gap-3">
+            {PRODUCT_NAV.map((item) => (
+              <Link key={`${item.label}-${item.href}`} href={item.href} className="rounded-full border border-gray-200 px-4 py-2.5 text-xs text-gray-600 transition-colors hover:border-primary hover:text-primary">
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        </nav>
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           {/* 左の画像は固定。右の詳細を読み終えるまで残り、そのあと一緒に流れていく */}
           <div className="lg:col-span-7 lg:sticky lg:top-24 lg:self-start">
@@ -414,11 +432,6 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 return (
                   <p className="text-[13px] leading-relaxed text-gray-600 mb-4">
                     {short}
-                    {excerpt.length > 90 && (
-                      <a href="#product-detail" className="ml-1 text-yuunagi-ink underline underline-offset-2 hover:text-yuunagi-ink">
-                        詳しく見る
-                      </a>
-                    )}
                   </p>
                 );
               })()}
@@ -848,19 +861,9 @@ export default function ProductDetailView({ product }: { product: Product }) {
               </div>
 
               <div className="border-t border-gray-200 mt-8">
-                {/* 商品説明はページ下部にまとめたので、ここからは誘導だけ置く */}
-                <div className="py-4 border-b border-gray-200">
-                  <a
-                    href="#product-detail"
-                    className="flex justify-between items-center py-2 text-sm font-medium tracking-wider text-primary hover:text-gray-500 transition-colors"
-                  >
-                    この商品について詳しく見る
-                    <IconChevronDown className="w-4 h-4" />
-                  </a>
-                </div>
                 <div className="py-4 border-b border-gray-200">
                   <div className="flex justify-between items-center cursor-pointer py-2" onClick={() => toggleAccordion('shipping')}>
-                    <span className="text-sm font-medium tracking-wider">送料についてはこちらから</span>
+                    <span className="text-sm font-medium tracking-wider">送料について</span>
                     <IconChevronDown className={`w-4 h-4 transition-transform duration-300 ${activeAccordion === 'shipping' ? 'rotate-180' : ''}`} />
                   </div>
                   <div className={`overflow-hidden transition-all duration-500 ease-in-out ${activeAccordion === 'shipping' ? 'max-h-[200px] opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
@@ -869,7 +872,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 </div>
                 <div className="py-4 border-b border-gray-200">
                   <div className="flex justify-between items-center cursor-pointer py-2" onClick={() => toggleAccordion('inquiry')}>
-                    <span className="text-sm font-medium tracking-wider">お問い合わせはこちらから</span>
+                    <span className="text-sm font-medium tracking-wider">この商品について問い合わせる</span>
                     <IconChevronDown className={`w-4 h-4 transition-transform duration-300 ${activeAccordion === 'inquiry' ? 'rotate-180' : ''}`} />
                   </div>
                   <div className={`overflow-hidden transition-all duration-500 ease-in-out ${activeAccordion === 'inquiry' ? 'max-h-[1000px] opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>

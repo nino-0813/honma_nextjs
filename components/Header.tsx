@@ -83,10 +83,10 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
   return (
     <header
       className={`fixed top-0 w-full z-50 transition-all duration-300 ease-out-expo border-b overflow-x-hidden ${
-        isScrolled ? 'bg-white/95 backdrop-blur-md pt-3 pb-6 md:pt-4 md:pb-8 border-secondary shadow-sm' : 'bg-transparent py-4 md:py-6 border-transparent'
+        isScrolled ? 'bg-white/95 backdrop-blur-md py-[18px] md:py-6 border-secondary shadow-sm' : 'bg-transparent py-4 md:py-6 border-transparent'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-5 md:px-8 lg:px-10">
         <div className="flex justify-between items-center">
           <div className="flex-shrink-0 flex items-center z-50">
             <Link href="/" className="hover:opacity-70 transition-opacity block" aria-label="イケベジ ホーム">
@@ -102,13 +102,13 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
                 width={196}
                 height={34}
                 className={`w-auto object-contain transition-all duration-300 ease-out-expo ${
-                  isScrolled ? 'h-6 md:h-8' : 'h-7 md:h-10'
+                  isScrolled ? 'h-5 md:h-7' : 'h-6 md:h-8'
                 }`}
               />
             </Link>
           </div>
 
-          <nav className="hidden md:flex space-x-8 lg:space-x-10 items-center">
+          <nav className="ml-auto mr-8 hidden items-center space-x-7 md:flex lg:mr-10 lg:space-x-9">
             {PRIMARY_NAV.map((item) => {
               const active = isActive(item);
               const onHero = isHomePage && !isScrolled;

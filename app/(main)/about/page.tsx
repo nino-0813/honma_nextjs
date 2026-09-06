@@ -75,7 +75,7 @@ export default function AboutPage() {
       <div className="relative w-full">
         <div className="relative z-10 bg-white pt-4 md:pt-8 pb-12 md:pb-16 flex flex-col items-center justify-center text-black">
           <p className="text-[13px] font-medium text-primary mb-3">
-            ブランドについて
+            イケベジとは
           </p>
           <h1 className="text-xl md:text-2xl font-serif tracking-[0.15em] font-normal mb-2">
             自然から学び、豊かさを分かち合う
@@ -120,7 +120,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* トップページの「ブランドについて」で掲げた3つの言葉を、ここで少し詳しく */}
+      {/* トップページで掲げた3つの言葉を、ここで詳しく伝える */}
       <section className="pb-16 md:pb-24 bg-white">
         <div className="max-w-5xl mx-auto px-6">
           <FadeInSection>

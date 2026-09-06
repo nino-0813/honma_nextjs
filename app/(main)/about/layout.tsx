@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'ブランドについて',
+  title: 'イケベジとは',
   description: '農から社会へ。自然と共に、イケベジの考え方とストーリー。',
   openGraph: {
-    title: 'ブランドについて | イケベジ',
+    title: 'イケベジとは | イケベジ',
     url: '/about',
     images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'イケベジ | 佐渡ヶ島のオーガニックファーム' }],
   },

@@ -2,7 +2,7 @@
  * ヘッダー・ドロワー共通のナビゲーション定義。
  *
  * 要件定義（2026-08-26 §6）に従い、アルファベット表記をやめて日本語に統一。
- * 表示順もそのまま「商品一覧 / スタートセット / ブランドについて / 定期便について」。
+ * 表示順は「商品一覧 / スタートセット / イケベジとは / 定期便」。
  */
 
 export type NavItem = {
@@ -20,9 +20,9 @@ export type NavItem = {
 export const PRIMARY_NAV: NavItem[] = [
   { label: '商品一覧', href: '/collections', matchPrefix: '/collections' },
   { label: 'スタートセット', href: '/start-set', isDraft: true },
-  { label: 'ブランドについて', href: '/about' },
+  { label: 'イケベジとは', href: '/about' },
   {
-    label: '定期便について',
+    label: '定期便',
     href: '/collections/rice/yearly?view=lp',
     matchQuery: { key: 'view', value: 'lp' },
   },
