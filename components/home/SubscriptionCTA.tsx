@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import SectionHeading from './SectionHeading';
 import FadeIn from '@/components/FadeIn';
 import TokiCharacter from './TokiCharacter';
@@ -9,29 +10,6 @@ import TokiCharacter from './TokiCharacter';
  *
  * 要件どおり、社会的意義と経済メリットの両方でクロージングする。
  */
-const POINTS = [
-  {
-    head: 'いつでも10%OFF',
-    body: '続けやすい価格でお届けします。買い忘れもありません。',
-    image: '/images/renewal/products/rice-lineup.webp',
-  },
-  {
-    head: '出荷直前に精米',
-    body: 'お届けに合わせて精米するので、いつも新鮮な状態で届きます。',
-    image: '/images/rice-keep-bag.jpg',
-  },
-  {
-    head: 'スキップ・変更自由',
-    body: 'お米が余りそうな月は、マイページからスキップできます。',
-    image: '/images/usage-scene.jpg',
-  },
-  {
-    head: '佐渡の田んぼが続く',
-    body: '毎月受け取っていただくことで、私たちは翌年の田んぼを計画できます。',
-    image: '/images/about/stories/about_story_taue_123.webp',
-  },
-];
-
 export default function SubscriptionCTA() {
   return (
     <section className="relative overflow-hidden bg-white py-24 text-primary md:py-36">
@@ -57,21 +35,18 @@ export default function SubscriptionCTA() {
           </div>
         </div>
 
-        <ul className="mt-14 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {POINTS.map((p, i) => (
-            <li key={p.head} className="flex flex-col gap-3">
-              <FadeIn delay={Math.min(i, 3) * 70} className="flex h-full flex-col rounded-[24px] bg-white p-4 shadow-[0_14px_45px_rgba(48,62,45,0.07)]">
-              <div className="aspect-[4/3] overflow-hidden rounded-[17px] bg-dim">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.image} alt="" aria-hidden="true" loading="lazy" className="w-full h-full object-cover" />
-              </div>
-              <span className="mt-4 w-fit rounded-full bg-yuunagi px-3 py-1 text-[10px] font-semibold tracking-wider text-white">POINT {i + 1}</span>
-              <h3 className="mt-3 text-base font-semibold text-primary">{p.head}</h3>
-              <p className="mt-2 text-[13px] leading-relaxed text-gray-600">{p.body}</p>
-              </FadeIn>
-            </li>
-          ))}
-        </ul>
+        <div className="scrollbar-hide mt-14 overflow-x-auto">
+          <div className="min-w-[880px] md:min-w-0">
+            <Image
+              src="/images/renewal/subscription-points.webp"
+              alt="定期便の4つの特徴：10%OFF、出荷直前精米、スキップ・変更自由、佐渡の田んぼを支える"
+              width={2172}
+              height={724}
+              sizes="(min-width: 1340px) 1280px, (min-width: 768px) 94vw, 880px"
+              className="h-auto w-full"
+            />
+          </div>
+        </div>
 
         <div className="mt-14 text-center">
           <Link

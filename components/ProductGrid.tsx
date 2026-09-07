@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Product } from '@/types';
 import { useProducts } from '@/hooks/useProducts';
 import { FadeInImage } from '@/components/UI';
@@ -24,9 +25,16 @@ const ProductGrid = () => {
   return (
     <section className="bg-white px-6 py-24 md:px-12 md:py-36">
       <div className="mx-auto max-w-[1180px]">
-      <div className="mb-14 text-center">
-        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.26em] text-hekishoku">IKEVEGE ONLINE STORE</p>
-        <h2 className="font-serif text-2xl font-semibold tracking-[0.14em] text-primary md:text-4xl">佐渡から、お届けします。</h2>
+      <div className="mb-12 text-center md:mb-16">
+        <h2 className="sr-only">IKEVEGE ONLINE STORE — 佐渡から、お届けします。</h2>
+        <Image
+          src="/images/renewal/store-heading.webp"
+          alt="IKEVEGE ONLINE STORE　佐渡から、お届けします。"
+          width={2171}
+          height={430}
+          sizes="(min-width: 1024px) 920px, 92vw"
+          className="mx-auto h-auto w-full max-w-[920px]"
+        />
       </div>
       
       {loading && (

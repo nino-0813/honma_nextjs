@@ -58,17 +58,17 @@ export default function Lineup() {
           </Link>
         </div>
 
-        {/* 主役の商品を大きくした非対称モザイク */}
-        <ul className="grid grid-cols-1 gap-5 md:grid-cols-2 md:grid-rows-2 md:gap-7">
+        {/* 3カテゴリーを同じ大きさで比較できる横並び */}
+        <ul className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-7">
         {TILES.map((t, i) => (
-          <li key={t.ja} className={i === 0 ? 'md:row-span-2' : ''}>
+          <li key={t.ja}>
             <FadeIn delay={Math.min(i % 3, 2) * 80}>
               <Link
                 href={t.href}
                 aria-label={`${t.ja}の商品を見る`}
                 className="group block focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-white"
               >
-              <span className={`relative block overflow-hidden rounded-[24px] bg-dim md:rounded-[36px] ${i === 0 ? 'aspect-[4/5] md:h-full' : 'aspect-[16/9] md:h-full'}`}>
+              <span className="relative block aspect-[4/5] overflow-hidden rounded-[24px] bg-dim md:rounded-[36px]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={t.image}

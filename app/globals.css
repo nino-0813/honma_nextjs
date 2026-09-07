@@ -140,6 +140,27 @@ html {
   .toki-motion-fly { animation: none; }
 }
 
+.join-marquee {
+  animation: joinMarquee 38s linear infinite;
+  will-change: transform;
+}
+
+.join-marquee:hover {
+  animation-play-state: paused;
+}
+
+@keyframes joinMarquee {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(calc(-50% - 0.5rem), 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .join-marquee {
+    animation: none;
+    overflow-x: auto;
+  }
+}
+
 
 /* ------------------------------------------------------------------
    キーボード操作時のフォーカス表示。
