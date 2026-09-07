@@ -1,108 +1,27 @@
-'use client';
+import Image from 'next/image';
 
-import React, { useState, useEffect } from 'react';
-
-const HERO_IMG_400 = '/images/home/parallax/sunset_riceplanting_7_400.webp';
-const HERO_IMG_800 = '/images/home/parallax/sunset_riceplanting_7_800.webp';
-const HERO_IMG_1200 = '/images/home/parallax/sunset_riceplanting_7_1200.webp';
-
-/** リブランディング用のトップ動画 */
-const DEFAULT_HERO_VIDEO = '/videos/hero.mp4';
-
+/** 新デザイン用の静止画ヒーロー。 */
 const HeroVideo = () => {
-  const mp4Url = DEFAULT_HERO_VIDEO;
-  const useMp4 = true; // 常に動画を試す。失敗時は画像にフォールバック
-
-  const [isLoaded, setIsLoaded] = useState(!useMp4);
-  const [isLoading, setIsLoading] = useState(useMp4);
-  const [mp4Failed, setMp4Failed] = useState(false);
-
-  const handleMp4Error = () => {
-    if (!isLoaded) setMp4Failed(true);
-  };
-  const handleMp4Loaded = () => {
-    setIsLoading(false);
-    setIsLoaded(true);
-  };
-
-  const loadTimeoutMs = 8000;
-  useEffect(() => {
-    if (!useMp4 || mp4Failed) return;
-    const timer = setTimeout(() => {
-      if (isLoading) setMp4Failed(true);
-    }, loadTimeoutMs);
-    return () => clearTimeout(timer);
-  }, [useMp4, mp4Failed, isLoading, loadTimeoutMs]);
-
-  // MP4 が設定されていない、または読み込み失敗時: プレースホルダー画像を表示
-  const showPlaceholder = !useMp4 || mp4Failed;
-
   return (
     <section id="home-hero" className="relative w-full overflow-hidden bg-[#f7f2df] pb-12 md:pb-20 md:pr-[9vw]">
-      {/* Mobile */}
-      <div className="relative h-[78svh] w-[94%] overflow-hidden rounded-br-[72px] md:hidden">
-        {useMp4 && isLoading && !mp4Failed && (
-          <div className="absolute inset-0 bg-gray-200 flex items-center justify-center z-10">
-            <div className="w-6 h-6 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        )}
-        {showPlaceholder ? (
-          <img
-            src={HERO_IMG_400}
-            srcSet={`${HERO_IMG_400} 400w, ${HERO_IMG_800} 800w, ${HERO_IMG_1200} 1200w`}
-            sizes="(max-width: 768px) 100vw, 100vw"
-            alt="IKEVEGE"
-            width={400}
-            height={225}
-            className="absolute inset-0 w-full h-full object-cover"
-            fetchPriority="high"
-          />
-        ) : (
-          <video
-            src={mp4Url}
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            onLoadedData={handleMp4Loaded}
-            onError={handleMp4Error}
-          />
-        )}
-      </div>
-
-      {/* Desktop */}
-      <div className="relative hidden h-[calc(100svh-64px)] min-h-[700px] max-h-[980px] w-full overflow-hidden rounded-br-[clamp(96px,10vw,180px)] md:block">
-        {useMp4 && isLoading && !mp4Failed && (
-          <div className="absolute inset-0 bg-gray-900 flex items-center justify-center z-10">
-            <div className="text-white text-sm animate-pulse">読み込み中...</div>
-          </div>
-        )}
-        {showPlaceholder ? (
-          <img
-            src={HERO_IMG_800}
-            srcSet={`${HERO_IMG_400} 400w, ${HERO_IMG_800} 800w, ${HERO_IMG_1200} 1200w`}
-            sizes="(max-width: 768px) 100vw, 100vw"
-            alt="IKEVEGE"
-            width={800}
-            height={450}
-            className="absolute inset-0 w-full h-full object-cover"
-            fetchPriority="high"
-          />
-        ) : (
-          <video
-            src={mp4Url}
-            className={`absolute inset-0 h-full w-full scale-[1.18] object-cover transition-opacity duration-700 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            onLoadedData={handleMp4Loaded}
-            onError={handleMp4Error}
-          />
-        )}
+      <div className="relative h-[78svh] w-[94%] overflow-hidden rounded-br-[72px] md:h-[calc(100svh-64px)] md:min-h-[700px] md:max-h-[980px] md:w-full md:rounded-br-[clamp(96px,10vw,180px)]">
+        <Image
+          src="/images/renewal/hero-sado-sunset.webp"
+          alt="佐渡の海に沈む夕日"
+          fill
+          priority
+          sizes="(min-width: 768px) 91vw, 94vw"
+          className="object-cover object-center"
+        />
+        <Image
+          src="/images/renewal/hero-ikevege-landscape.webp"
+          alt="佐渡の田園風景とイケベジのロゴ"
+          fill
+          priority
+          sizes="(min-width: 768px) 91vw, 94vw"
+          className="hero-opening-image object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/5 to-black/10" />
       </div>
 
       <div className="pointer-events-none absolute inset-x-0 bottom-20 z-20 px-6 text-white md:bottom-32 md:px-12">

@@ -11,6 +11,7 @@
   --font-serif: "Noto Serif JP", "Times New Roman", YuMincho, "Yu Mincho", "Hiragino Mincho ProN", serif;
   --font-sans: "Helvetica Neue", Helvetica, "Hiragino Sans", "Hiragino Kaku Gothic ProN", Arial, sans-serif;
   --font-mincho: "Noto Serif JP", YuMincho, "Yu Mincho", "Hiragino Mincho ProN", serif;
+  --font-display: "Dela Gothic One", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
   --color-primary: #1c1d1d;
 
   /* ブランドカラー（イケベジ・コーポレートカラーより）
@@ -82,6 +83,22 @@
   scrollbar-width: none;
   &::-webkit-scrollbar {
     display: none;
+  }
+}
+
+/* トップの田園風景から夕日へ、ゆっくり溶けるように切り替える。 */
+.hero-opening-image {
+  animation: heroCrossfade 12s cubic-bezier(0.45, 0, 0.55, 1) 2s forwards;
+}
+
+@keyframes heroCrossfade {
+  0%, 18% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.025); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-opening-image {
+    animation: none;
   }
 }
 
