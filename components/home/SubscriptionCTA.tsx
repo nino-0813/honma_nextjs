@@ -21,9 +21,17 @@ export default function SubscriptionCTA() {
         </FadeIn>
 
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-16">
-          <h2 className="text-3xl font-serif font-semibold leading-[1.6] tracking-wide text-primary md:text-[38px] lg:text-[48px]">
-            4700人でつくる里山の風景
-          </h2>
+          <div className="flex items-center">
+            <h2 className="sr-only">4700人でつくる里山の風景</h2>
+            <Image
+              src="/images/renewal/subscription-heading.webp"
+              alt="IKEVEGE FROM SADO　4700人でつくる里山の風景"
+              width={2172}
+              height={410}
+              sizes="(min-width: 1024px) 560px, 92vw"
+              className="h-auto w-full max-w-[620px]"
+            />
+          </div>
           <div className="flex flex-col gap-4 text-sm leading-loose text-gray-600 md:text-base">
             <p>
               定期便は、割引の仕組みである前に、お客様とイケベジが一緒に歩んでいくための形です。
