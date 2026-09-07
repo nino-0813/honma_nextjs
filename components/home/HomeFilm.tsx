@@ -10,7 +10,7 @@ export default function HomeFilm() {
         <div className="relative aspect-video overflow-hidden rounded-[24px] bg-primary md:rounded-[36px]">
           <video
             src="/videos/hero.mp4"
-            poster="/images/home/parallax/sunset_riceplanting_7_1200.webp"
+            poster="/images/renewal/film-poster-sunset.webp"
             controls
             playsInline
             preload="metadata"

@@ -88,11 +88,11 @@
 
 /* トップの田園風景から夕日へ、ゆっくり溶けるように切り替える。 */
 .hero-opening-image {
-  animation: heroCrossfade 12s cubic-bezier(0.45, 0, 0.55, 1) 2s forwards;
+  animation: heroCrossfade 12s cubic-bezier(0.45, 0, 0.55, 1) 0.5s forwards;
 }
 
 @keyframes heroCrossfade {
-  0%, 18% { opacity: 1; transform: scale(1); }
+  0%, 5% { opacity: 1; transform: scale(1); }
   100% { opacity: 0; transform: scale(1.025); }
 }
 
