@@ -83,8 +83,10 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
 
   return (
     <header
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ease-out-expo border-b overflow-x-hidden ${
-        isScrolled ? 'bg-white/95 backdrop-blur-md py-[18px] md:py-6 border-secondary shadow-sm' : 'bg-transparent py-4 md:py-6 border-transparent'
+      className={`w-full z-50 transition-all duration-300 ease-out-expo border-b overflow-x-hidden ${
+        isHomePage && !isScrolled
+          ? 'absolute top-[calc(78svh+3rem)] bg-[#f7f2df] py-7 md:top-[calc(100svh+1rem)] md:py-9 border-transparent'
+          : 'fixed top-0 bg-white/95 backdrop-blur-md py-[18px] md:py-6 border-secondary shadow-sm'
       }`}
     >
       <div className="w-full px-5 md:px-8 lg:px-10">
@@ -95,9 +97,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={
-                  isHomePage && !isScrolled
-                    ? '/images/ikevege_wordmark_white.png'
-                    : '/images/ikevege_wordmark_dark.png'
+                  '/images/ikevege_wordmark_dark.png'
                 }
                 alt="イケベジ"
                 width={196}
@@ -112,7 +112,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
           <nav className="ml-auto mr-8 hidden items-center space-x-7 md:flex lg:mr-10 lg:space-x-9">
             {PRIMARY_NAV.map((item) => {
               const active = isActive(item);
-              const onHero = isHomePage && !isScrolled;
+              const onHero = false;
               return (
                 <Link
                   key={item.label}
@@ -136,12 +136,12 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
 
           <div className="flex items-center gap-5 sm:gap-6">
             <Link href="/account" className={`hidden sm:block transition-colors ${
-              isHomePage && !isScrolled ? 'text-white hover:text-white/80' : 'text-primary hover:text-gray-500'
+              'text-primary hover:text-gray-500'
             }`} title={isLoggedIn ? 'mypage' : 'ログイン'}>
               <IconUser className="w-5 h-5" />
             </Link>
             <button type="button" onClick={onOpenCart} className={`transition-colors relative ${
-              isHomePage && !isScrolled ? 'text-white hover:text-white/80' : 'text-primary hover:text-gray-500'
+              'text-primary hover:text-gray-500'
             }`}>
               <IconBag className="w-5 h-5" />
               {mounted && cartItemCount > 0 && (
@@ -152,7 +152,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
             </button>
             {/* ハンバーガーはPCでも出す（副次メニューをここに集約） */}
             <button type="button" onClick={onOpenMenu} aria-label="メニューを開く" className={`transition-colors ${
-              isHomePage && !isScrolled ? 'text-white hover:text-white/80' : 'text-primary hover:text-gray-500'
+              'text-primary hover:text-gray-500'
             }`}>
               <IconMenu className="w-5 h-5" />
             </button>

@@ -26,11 +26,11 @@ const ENTRIES = [
 /** 深く知りたい人のための情報を、迷わない3つの入口に整理する。 */
 export default function LearnMore() {
   return (
-    <section className="relative overflow-hidden bg-hekishoku py-24 text-white md:py-36">
+    <section className="relative overflow-hidden bg-white py-20 text-primary md:py-28">
       <div className="mx-auto max-w-[1240px] px-6 md:px-14">
         <FadeIn>
           <div className="text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-white/70">Feature</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-hekishoku">Feature</p>
             <h2 className="mt-3 font-serif text-3xl font-semibold tracking-[0.14em] md:text-5xl">もっと知る</h2>
           </div>
         </FadeIn>
@@ -39,9 +39,9 @@ export default function LearnMore() {
             <FadeIn key={entry.href} delay={index * 100}>
               <Link
                 href={entry.href}
-                className="group block rounded-[28px] bg-white p-3 text-primary shadow-[0_20px_60px_rgba(0,0,0,0.14)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-4 focus-visible:ring-offset-hekishoku"
+                className="group block text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hekishoku focus-visible:ring-offset-4"
               >
-                <div className="relative aspect-[4/3] overflow-hidden rounded-[20px] bg-dim">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-[8px] bg-dim">
                   <Image
                     src={entry.image}
                     alt=""
@@ -53,7 +53,7 @@ export default function LearnMore() {
                     <p className="text-sm leading-relaxed text-white">{entry.body}</p>
                   </div>
                 </div>
-                <div className="flex min-h-20 items-center justify-between px-4 py-4">
+                <div className="flex min-h-20 items-center justify-between py-4">
                   <h3 className="font-serif text-lg font-semibold tracking-wider text-primary">{entry.title}</h3>
                   <span aria-hidden="true" className="flex h-11 w-11 items-center justify-center rounded-full border border-gray-300 transition group-hover:translate-x-1 group-hover:border-primary">→</span>
                 </div>
@@ -62,7 +62,6 @@ export default function LearnMore() {
           ))}
         </div>
       </div>
-      <div aria-hidden="true" className="absolute -left-20 top-12 h-56 w-56 rounded-full border-[34px] border-white/10" />
     </section>
   );
 }

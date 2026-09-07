@@ -8,7 +8,7 @@ import FadeIn from '@/components/FadeIn';
  */
 export default function BrandAbout() {
   return (
-    <section id="ikevege-message" className="bg-[#f7f2df] py-20 md:py-32">
+    <section id="ikevege-message" className="bg-[#f7f2df] pb-20 pt-40 md:pb-32 md:pt-56">
       <div className="mx-auto max-w-[1280px] px-6 md:px-14">
         <FadeIn>
           <div className="flex items-end justify-between gap-6">

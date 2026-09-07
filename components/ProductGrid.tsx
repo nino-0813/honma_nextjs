@@ -19,14 +19,14 @@ const ProductGrid = () => {
     }
     return 0;
   });
-  const displayProducts = sortedProducts.slice(0, 8);
+  const displayProducts = sortedProducts.slice(0, 9);
 
   return (
-    // id は告知ポップアップの表示トリガー（AnnouncementPopup）にも使われている
-    <section id="products" className="py-8 md:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="text-center mb-12">
-        <p className="text-xs font-serif text-gray-500 mb-2 tracking-[0.2em] uppercase">IKEVEGE online</p>
-        <h3 className="text-xl font-serif uppercase tracking-[0.1em] border-b border-gray-800 inline-block pb-0.5 text-black">ALL ITEM</h3>
+    <section className="bg-[#f7f2df] px-6 py-24 md:px-12 md:py-36">
+      <div className="mx-auto max-w-[1180px]">
+      <div className="mb-14 text-center">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.26em] text-hekishoku">IKEVEGE ONLINE STORE</p>
+        <h2 className="font-serif text-2xl font-semibold tracking-[0.14em] text-primary md:text-4xl">佐渡から、お届けします。</h2>
       </div>
       
       {loading && (
@@ -55,17 +55,17 @@ const ProductGrid = () => {
       )}
 
       {!loading && !error && displayProducts.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-10 md:gap-x-6 md:gap-y-12">
+        <div className="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-12 lg:gap-y-20">
           {displayProducts.map((product, index) => {
             const productPath = `/products/${product.handle || product.id}`;
             const soldOut = isProductSoldOut(product);
             const preorder = !soldOut && isProductPreorder(product); // 在庫切れ優先
             return (
-          <Link key={product.id} href={productPath} className="group flex flex-col opacity-0 animate-fade-in-up" style={{ animationDelay: `${index * 100}ms` }}>
-              <div className="relative aspect-square overflow-hidden bg-[#f9f9f9] mb-4">
+          <Link key={product.id} href={productPath} className="group flex flex-col opacity-0 animate-fade-in-up" style={{ animationDelay: `${index * 70}ms` }}>
+              <div className="relative mb-5 aspect-square overflow-hidden rounded-[18px] bg-white shadow-[0_12px_35px_rgba(48,62,45,0.06)]">
                 <div className="absolute top-2 left-2 z-20 flex flex-col gap-2">
                   {soldOut && (
-                    <span className="bg-primary text-white px-3 py-1 text-[10px] font-bold tracking-wider uppercase shadow-sm">
+                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-500 text-center text-[9px] font-bold uppercase tracking-wider text-white shadow-sm">
                       Sold Out
                     </span>
                   )}
@@ -94,11 +94,11 @@ const ProductGrid = () => {
                    />
                 </div>
               </div>
-              <div className="flex-1 flex flex-col gap-2 text-center">
-                <h3 className="text-sm font-medium text-primary leading-relaxed group-hover:text-gray-600 transition-colors line-clamp-2 min-h-[2.8em]">
+              <div className="flex flex-1 flex-col gap-2 text-left">
+                <h3 className="min-h-[2.8em] line-clamp-2 text-base font-semibold leading-relaxed text-primary transition-colors group-hover:text-hekishoku">
                   {product.title}
                 </h3>
-                <p className="text-sm text-gray-900 font-serif tracking-wide flex items-center justify-center gap-2">
+                <p className="flex items-center gap-2 font-serif text-base font-semibold tracking-wide text-gray-900">
                   <span>
                     ¥{product.price.toLocaleString()} {product.title.includes('〜') ? '〜' : ''}
                   </span>
@@ -116,12 +116,13 @@ const ProductGrid = () => {
       )}
 
       {!loading && !error && displayProducts.length > 0 && (
-        <div className="text-center mt-12">
-           <Link href="/collections" className="inline-block bg-black text-white px-10 py-3 text-xs tracking-[0.2em] hover:opacity-80 transition-opacity uppercase">
-             View all
+        <div className="mt-16 text-center">
+           <Link href="/collections" className="inline-flex min-h-14 items-center rounded-full bg-hekishoku px-10 py-4 text-xs font-medium tracking-[0.16em] text-white transition-colors hover:bg-primary">
+             すべての商品を見る
            </Link>
         </div>
       )}
+      </div>
     </section>
   );
 };

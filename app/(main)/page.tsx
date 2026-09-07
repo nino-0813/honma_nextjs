@@ -1,11 +1,13 @@
 import type { Metadata } from 'next';
 import HeroVideo from '@/components/HeroVideo';
-import AnnouncementPopup from '@/components/AnnouncementPopup';
 import Lineup from '@/components/home/Lineup';
 import BrandAbout from '@/components/home/BrandAbout';
 import LearnMore from '@/components/home/LearnMore';
 import SubscriptionCTA from '@/components/home/SubscriptionCTA';
 import News from '@/components/home/News';
+import HomeFilm from '@/components/home/HomeFilm';
+import HomeJoin from '@/components/home/HomeJoin';
+import ProductGrid from '@/components/ProductGrid';
 
 export const metadata: Metadata = {
   description:
@@ -36,8 +38,6 @@ export const revalidate = 300;
 export default function HomePage() {
   return (
     <div className="animate-fade-in overflow-x-hidden w-full">
-      <AnnouncementPopup />
-
       {/* ページの主題を検索エンジンに伝えるH1（デザイン上は非表示） */}
       <h1 className="sr-only">
         佐渡島の自然栽培米・無農薬玄米｜イケベジ（IKEVEGE）公式オンラインショップ
@@ -49,17 +49,26 @@ export default function HomePage() {
       {/* 2. イケベジのメッセージ */}
       <BrandAbout />
 
-      {/* 3. ラインナップ */}
-      <Lineup />
-
-      {/* 4. 定期便 */}
-      <SubscriptionCTA />
-
-      {/* 5. もっと知る（詳細情報への入口を3つに整理） */}
+      {/* 3. 3つの小特集 */}
       <LearnMore />
 
-      {/* 6. お知らせ */}
+      {/* 4. 横長ムービー */}
+      <HomeFilm />
+
+      {/* 5. 商品モザイク */}
+      <Lineup />
+
+      {/* 6. 2列のお知らせ */}
       <News />
+
+      {/* 7. 実商品一覧 */}
+      <ProductGrid />
+
+      {/* 8. 定期便 */}
+      <SubscriptionCTA />
+
+      {/* 9. 仲間・活動への入口 */}
+      <HomeJoin />
 
     </div>
   );
