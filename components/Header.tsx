@@ -54,8 +54,8 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
     }
   }, []);
 
-  // トップページはヒーロー動画が画面いっぱいのため、動画を抜けるまで透明のままにする。
-  // 他のページは従来どおり少しスクロールしたら背景を出す。
+  // トップページではヘッダーを先頭に置き、ピックアップまで追従させない。
+  // 他のページでは従来どおりスクロール後も固定する。
   useEffect(() => {
     const handleScroll = () => {
       const heroHeight = document.getElementById('home-hero')?.offsetHeight ?? window.innerHeight;
@@ -84,8 +84,8 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
   return (
     <header
       className={`w-full z-50 transition-all duration-300 ease-out-expo border-b overflow-x-hidden ${
-        isHomePage && !isScrolled
-          ? 'absolute top-[calc(78svh+3rem)] bg-[#f7f2df] py-7 md:top-[calc(100svh+1rem)] md:py-9 border-transparent'
+        isHomePage
+          ? 'absolute top-0 bg-white/95 backdrop-blur-md py-[18px] md:py-6 border-secondary shadow-sm'
           : 'fixed top-0 bg-white/95 backdrop-blur-md py-[18px] md:py-6 border-secondary shadow-sm'
       }`}
     >
