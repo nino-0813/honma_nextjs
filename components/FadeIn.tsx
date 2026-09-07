@@ -1,14 +1,15 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 /**
  * スクロールで画面に入ったら現れるラッパー。
  *
- * - フェード + 16px の上方向への移動（スタイルは globals.css の .reveal）
- * - 一度出したら監視を解除する（行き来のたびに再生しない）
+ * - GSAP ScrollTriggerでフェード + 上方向への移動
+ * - 一度だけ再生し、スクロール操作を妨げない
  * - prefers-reduced-motion では即時表示
- * - IntersectionObserver が使えない環境でも消えたままにならないようにする
  */
 export default function FadeIn({
   children,
@@ -22,35 +23,45 @@ export default function FadeIn({
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
 
-    const show = () => el.classList.add('is-visible');
-
-    // 動きを減らす設定、または監視APIが無い環境ではそのまま表示する
+    // 動きを減らす設定では、初期位置を変えずそのまま表示する。
     const reduced =
       typeof window.matchMedia === 'function' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduced || typeof IntersectionObserver === 'undefined') {
-      show();
+    if (reduced) {
+      gsap.set(el, { autoAlpha: 1, y: 0 });
       return;
     }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((e) => e.isIntersecting)) return;
-        show();
-        observer.disconnect();
-      },
-      { threshold: 0.12, rootMargin: '0px 0px -8% 0px' }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
+    gsap.registerPlugin(ScrollTrigger);
+    const context = gsap.context(() => {
+      gsap.fromTo(
+        el,
+        { autoAlpha: 0, y: 24 },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.48,
+          delay: delay / 1000,
+          ease: 'power3.out',
+          overwrite: 'auto',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 88%',
+            once: true,
+          },
+        }
+      );
+    }, el);
+
+    return () => context.revert();
+  }, [delay]);
 
   return (
-    <div ref={ref} className={`reveal ${className}`} style={delay ? { transitionDelay: `${delay}ms` } : undefined}>
+    <div ref={ref} className={className}>
       {children}
     </div>
   );

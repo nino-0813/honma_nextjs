@@ -87,36 +87,6 @@
 
 
 /* ------------------------------------------------------------------
-   スクロールに入ったら現れる要素。
-   参照サイトは opacity のみだが、余白を広く取った構成では動きが伝わり
-   にくいため 16px の微量な移動を足している。
-   JS が動かない環境では noscript で最初から表示する（app/layout.tsx）。
-   ------------------------------------------------------------------ */
-.reveal {
-  opacity: 0;
-  transform: translateY(16px);
-  transition:
-    opacity 0.5s var(--ease-out-expo),
-    transform 0.5s var(--ease-out-expo);
-}
-
-.reveal.is-visible {
-  opacity: 1;
-  transform: none;
-}
-
-/* 動きを減らす設定の人には移動もフェードもさせない */
-@media (prefers-reduced-motion: reduce) {
-  .reveal,
-  .reveal.is-visible {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-}
-
-
-/* ------------------------------------------------------------------
    キーボード操作時のフォーカス表示。
    マウス操作では出さず、Tab移動のときだけ枠を出す。
    ------------------------------------------------------------------ */
