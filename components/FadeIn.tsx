@@ -1,13 +1,11 @@
 'use client';
 
-import { useLayoutEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useEffect, useRef, useState } from 'react';
 
 /**
  * スクロールで画面に入ったら現れるラッパー。
  *
- * - GSAP ScrollTriggerでフェード + 上方向への移動
+ * - 軽量なIntersectionObserverでフェード + 上方向への移動
  * - 一度だけ再生し、スクロール操作を妨げない
  * - prefers-reduced-motion では即時表示
  */
@@ -22,8 +20,9 @@ export default function FadeIn({
   className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const el = ref.current;
     if (!el) return;
 
@@ -32,36 +31,31 @@ export default function FadeIn({
       typeof window.matchMedia === 'function' &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduced) {
-      gsap.set(el, { autoAlpha: 1, y: 0 });
+      setVisible(true);
       return;
     }
 
-    gsap.registerPlugin(ScrollTrigger);
-    const context = gsap.context(() => {
-      gsap.fromTo(
-        el,
-        { autoAlpha: 0, y: 24 },
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.48,
-          delay: delay / 1000,
-          ease: 'power3.out',
-          overwrite: 'auto',
-          scrollTrigger: {
-            trigger: el,
-            start: 'top 88%',
-            once: true,
-          },
-        }
-      );
-    }, el);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setVisible(true);
+        observer.disconnect();
+      },
+      { rootMargin: '0px 0px -12% 0px' }
+    );
+    observer.observe(el);
 
-    return () => context.revert();
-  }, [delay]);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <div ref={ref} className={className}>
+    <div
+      ref={ref}
+      className={`reveal transform-gpu transition-[opacity,transform] duration-500 ease-out ${
+        visible ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-0'
+      } ${className}`}
+      style={{ transitionDelay: visible ? `${delay}ms` : '0ms' }}
+    >
       {children}
     </div>
   );

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import SectionHeading from './SectionHeading';
 import CircleButton from './CircleButton';
 import FadeIn from '@/components/FadeIn';
+import TokiCharacter from './TokiCharacter';
 
 /**
  * ラインナップ。
@@ -40,6 +41,7 @@ const TILES: {
 export default function Lineup() {
   return (
     <section id="products" className="relative overflow-hidden bg-white py-24 md:py-36">
+      <TokiCharacter character="thanks" className="right-[-28px] top-8 h-24 w-24 md:right-8 md:top-14 md:h-32 md:w-32" />
       <div className="mx-auto max-w-[1320px] px-6 md:px-12">
         <div className="mb-12 flex items-end justify-between gap-6 md:mb-16">
           <FadeIn>
@@ -93,6 +95,7 @@ export default function Lineup() {
         </ul>
       </div>
       <div aria-hidden="true" className="absolute -bottom-16 -right-14 h-44 w-44 rounded-full border-[28px] border-yuunagi/20 md:h-64 md:w-64" />
+      <TokiCharacter character="back" motion="peek" className="bottom-6 left-[-26px] h-24 w-24 md:bottom-12 md:left-8 md:h-28 md:w-28" />
     </section>
   );
 }

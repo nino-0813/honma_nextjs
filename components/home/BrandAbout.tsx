@@ -1,9 +1,11 @@
 import Image from 'next/image';
+import TokiCharacter from './TokiCharacter';
 
 /** トップページのピックアップビジュアル。 */
 export default function BrandAbout() {
   return (
-    <section id="ikevege-message" className="bg-[#faf6ea] px-3 py-10 md:px-8 md:py-16">
+    <section id="ikevege-message" className="relative overflow-hidden bg-white px-3 py-10 md:px-8 md:py-16">
+      <TokiCharacter character="side" motion="peek" className="right-[-30px] top-4 h-24 w-24 md:right-6 md:top-8 md:h-32 md:w-32" />
       <h2 className="sr-only">ピックアップ：イケベジのお米ギフトセット</h2>
       <div className="mx-auto max-w-[1180px] overflow-hidden">
         <Image

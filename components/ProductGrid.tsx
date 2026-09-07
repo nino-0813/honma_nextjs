@@ -22,7 +22,7 @@ const ProductGrid = () => {
   const displayProducts = sortedProducts.slice(0, 9);
 
   return (
-    <section className="bg-[#f7f2df] px-6 py-24 md:px-12 md:py-36">
+    <section className="bg-white px-6 py-24 md:px-12 md:py-36">
       <div className="mx-auto max-w-[1180px]">
       <div className="mb-14 text-center">
         <p className="mb-3 text-xs font-semibold uppercase tracking-[0.26em] text-hekishoku">IKEVEGE ONLINE STORE</p>

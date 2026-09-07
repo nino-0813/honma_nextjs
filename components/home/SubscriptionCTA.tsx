@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import SectionHeading from './SectionHeading';
 import FadeIn from '@/components/FadeIn';
+import TokiCharacter from './TokiCharacter';
 
 /**
  * 定期便（ベースフードの「継続コース」に相当）。
@@ -33,7 +34,9 @@ const POINTS = [
 
 export default function SubscriptionCTA() {
   return (
-    <section className="bg-[#f7f2df] py-24 text-primary md:py-36">
+    <section className="relative overflow-hidden bg-white py-24 text-primary md:py-36">
+      <TokiCharacter character="hello" motion="peek" className="left-[-30px] top-8 h-24 w-24 md:left-8 md:top-14 md:h-32 md:w-32" />
+      <TokiCharacter character="logo" className="bottom-8 right-[-22px] h-24 w-24 md:bottom-12 md:right-8 md:h-28 md:w-28" />
       <div className="mx-auto max-w-[1280px] px-6 md:px-12">
         <FadeIn>
           <SectionHeading en="Subscription" ja="イケベジ定期便" />
