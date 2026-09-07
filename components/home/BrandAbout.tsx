@@ -8,42 +8,55 @@ import FadeIn from '@/components/FadeIn';
  */
 export default function BrandAbout() {
   return (
-    <section className="bg-white py-24 md:py-40">
-      <div className="mx-auto max-w-[1280px] px-8 md:px-14">
+    <section id="ikevege-message" className="bg-[#f7f2df] py-20 md:py-32">
+      <div className="mx-auto max-w-[1280px] px-6 md:px-14">
         <FadeIn>
-          <SectionHeading ja="イケベジとは" />
+          <div className="flex items-end justify-between gap-6">
+            <SectionHeading en="Pick up" ja="イケベジとは" />
+            <span className="hidden rotate-3 rounded-full bg-hekishoku px-5 py-2 text-xs font-medium tracking-[0.2em] text-white md:block">
+              FROM SADO
+            </span>
+          </div>
         </FadeIn>
 
-        <div className="mt-14 grid grid-cols-1 items-center gap-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-24">
-          <div>
-            <p className="text-3xl font-serif font-semibold leading-[1.6] tracking-wide text-primary md:text-[44px]">
-              あんしん、おいしい、いいとき。
-            </p>
-            <div className="mt-9 flex flex-col gap-5 text-sm leading-loose text-gray-600 md:text-base">
-            <p className="whitespace-pre-line">{'イケベジは\n日々の暮らしのなかに “ ありのまま ” でいられる姿を想像し'}</p>
-            <p className="whitespace-pre-line">{'「自然から学び、豊かさを分かち合うこと」を通じて\nあんしん と おいしさ から得られる\n" 時別な時間 ( とき )" を提供しつづけ'}</p>
-            <p className="whitespace-pre-line">{'「イケてる社会」を創造し\n「佐渡」という唯一無二の価値を守り続けていきます'}</p>
-            <Link
-              href="/about"
-              className="mt-3 inline-flex min-h-11 w-fit items-center gap-3 rounded-full border border-gray-300 px-6 py-3 text-xs text-primary transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hekishoku focus-visible:ring-offset-2"
-            >
-              イケベジについて詳しく知る
-              <span aria-hidden="true">→</span>
-            </Link>
+        <FadeIn delay={80}>
+          <div className="mt-12 overflow-hidden rounded-[32px] rounded-tr-[96px] bg-white shadow-[0_20px_70px_rgba(48,62,45,0.08)] md:rounded-[48px] md:rounded-tr-[160px]">
+            <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_0.85fr]">
+              <div className="relative min-h-[360px] overflow-hidden md:min-h-[560px]">
+                <Image
+                  src="/images/about/hero/retreat_2025_56.webp"
+                  alt="佐渡の田んぼで笑顔を見せる大人と子どもたち"
+                  fill
+                  sizes="(min-width: 1024px) 58vw, 100vw"
+                  className="object-cover transition-transform duration-700 hover:scale-[1.02] motion-reduce:transition-none"
+                />
+                <div className="absolute left-6 top-6 rounded-full bg-yuunagi px-4 py-2 text-[11px] font-semibold tracking-[0.16em] text-white md:left-10 md:top-10">
+                  佐渡ヶ島から
+                </div>
+              </div>
+              <div className="flex flex-col justify-center px-7 py-12 md:px-12 md:py-16 lg:px-14">
+                <p className="font-serif text-3xl font-semibold leading-[1.55] tracking-wide text-primary md:text-[42px]">
+                  あんしん、
+                  <br />
+                  おいしい、
+                  <br />
+                  いいとき。
+                </p>
+                <div className="mt-8 flex flex-col gap-5 text-sm leading-loose text-gray-600 md:text-base">
+              <p className="whitespace-pre-line">{'イケベジは\n日々の暮らしのなかに “ ありのまま ” でいられる姿を想像し'}</p>
+                  <p>自然から学び、豊かさを分かち合うことを通じて、佐渡という唯一無二の価値を守り続けます。</p>
+                  <Link
+                    href="/about"
+                    className="mt-2 inline-flex min-h-12 w-fit items-center gap-4 rounded-full bg-hekishoku px-7 py-3 text-xs font-medium text-white transition hover:bg-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hekishoku focus-visible:ring-offset-2"
+                  >
+                    イケベジについて
+                    <span aria-hidden="true">→</span>
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
-          <FadeIn delay={150}>
-            <div className="relative aspect-[4/3] overflow-hidden bg-dim">
-              <Image
-                src="/images/about/hero/retreat_2025_56.webp"
-                alt="佐渡の田んぼで笑顔を見せる大人と子どもたち"
-                fill
-                sizes="(min-width: 1024px) 52vw, 100vw"
-                className="object-cover"
-              />
-            </div>
-          </FadeIn>
-        </div>
+        </FadeIn>
       </div>
     </section>
   );

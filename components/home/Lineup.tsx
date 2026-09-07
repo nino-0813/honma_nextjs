@@ -39,11 +39,11 @@ const TILES: {
 
 export default function Lineup() {
   return (
-    <section id="products" className="pt-8 pb-20 md:pb-28 bg-white">
-      <div className="max-w-[1500px] mx-auto px-5 md:px-10">
-        <div className="flex items-end justify-between gap-6 mb-9 md:mb-12">
+    <section id="products" className="relative overflow-hidden bg-white py-24 md:py-36">
+      <div className="mx-auto max-w-[1320px] px-6 md:px-12">
+        <div className="mb-12 flex items-end justify-between gap-6 md:mb-16">
           <FadeIn>
-            <SectionHeading en="Lineup" ja="ラインナップ" />
+            <SectionHeading en="Products" ja="イケベジの商品" />
           </FadeIn>
           <Link
             href="/collections"
@@ -55,34 +55,33 @@ export default function Lineup() {
             </svg>
           </Link>
         </div>
-      </div>
 
-      {/* 写真全体を押せるラインナップタイル */}
-      <ul className="grid grid-cols-1 gap-px bg-white sm:grid-cols-2 lg:grid-cols-3">
+        {/* 主役の商品を大きくした非対称モザイク */}
+        <ul className="grid grid-cols-1 gap-5 md:grid-cols-2 md:grid-rows-2 md:gap-7">
         {TILES.map((t, i) => (
-          <li key={t.ja}>
+          <li key={t.ja} className={i === 0 ? 'md:row-span-2' : ''}>
             <FadeIn delay={Math.min(i % 3, 2) * 80}>
               <Link
                 href={t.href}
                 aria-label={`${t.ja}の商品を見る`}
                 className="group block focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-white"
               >
-              <span className="relative block aspect-[16/10] md:aspect-auto md:h-[62svh] lg:h-[74svh] overflow-hidden bg-dim">
+              <span className={`relative block overflow-hidden rounded-[24px] bg-dim md:rounded-[36px] ${i === 0 ? 'aspect-[4/5] md:h-full' : 'aspect-[16/9] md:h-full'}`}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={t.image}
                   alt=""
                   aria-hidden="true"
                   loading="lazy"
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.02] group-focus-visible:scale-[1.02] motion-reduce:transition-none"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.035] group-focus-visible:scale-[1.035] motion-reduce:transition-none"
                 />
                 <span className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/25 to-black/10 transition-colors duration-300 group-hover:from-black/70 group-hover:via-black/30" />
-                <span className="absolute inset-0 flex flex-col items-center justify-center px-5 text-center text-white">
-                  <span className="text-2xl font-bold tracking-wide drop-shadow-sm md:text-[26px] lg:text-[30px]">
+                <span className="absolute inset-0 flex flex-col items-start justify-end px-7 py-8 text-left text-white md:px-10 md:py-10">
+                  <span className="text-3xl font-bold tracking-wide drop-shadow-sm md:text-[34px] lg:text-[42px]">
                     {t.en}
                   </span>
                   <span className="mt-2 text-xs font-medium tracking-[0.2em] drop-shadow-sm md:text-sm">{t.ja}</span>
-                  <span className="mt-6 transition-transform duration-300 group-hover:translate-x-1 group-focus-visible:translate-x-1 motion-reduce:transition-none">
+                  <span className="mt-5 transition-transform duration-300 group-hover:translate-x-1 group-focus-visible:translate-x-1 motion-reduce:transition-none">
                     <CircleButton icon="arrow" variant="light" />
                   </span>
                 </span>
@@ -91,7 +90,9 @@ export default function Lineup() {
             </FadeIn>
           </li>
         ))}
-      </ul>
+        </ul>
+      </div>
+      <div aria-hidden="true" className="absolute -bottom-16 -right-14 h-44 w-44 rounded-full border-[28px] border-yuunagi/20 md:h-64 md:w-64" />
     </section>
   );
 }

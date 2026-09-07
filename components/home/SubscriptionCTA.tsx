@@ -33,17 +33,17 @@ const POINTS = [
 
 export default function SubscriptionCTA() {
   return (
-    <section className="py-20 md:py-32 bg-hekishoku text-white">
-      <div className="max-w-[1500px] mx-auto px-5 md:px-10">
+    <section className="bg-[#f7f2df] py-24 text-primary md:py-36">
+      <div className="mx-auto max-w-[1280px] px-6 md:px-12">
         <FadeIn>
-          <SectionHeading ja="イケベジ定期便" tone="light" />
+          <SectionHeading en="Subscription" ja="イケベジ定期便" />
         </FadeIn>
 
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-16">
-          <h2 className="text-2xl md:text-[38px] lg:text-[44px] font-serif font-semibold leading-[1.6] tracking-wide text-white">
+          <h2 className="text-3xl font-serif font-semibold leading-[1.6] tracking-wide text-primary md:text-[38px] lg:text-[48px]">
             4700人でつくる里山の風景
           </h2>
-          <div className="flex flex-col gap-4 text-[13px] md:text-sm text-white/90 leading-loose">
+          <div className="flex flex-col gap-4 text-sm leading-loose text-gray-600 md:text-base">
             <p>
               定期便は、割引の仕組みである前に、お客様とイケベジが一緒に歩んでいくための形です。
             </p>
@@ -54,25 +54,26 @@ export default function SubscriptionCTA() {
           </div>
         </div>
 
-        <ul className="mt-12 grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+        <ul className="mt-14 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {POINTS.map((p, i) => (
             <li key={p.head} className="flex flex-col gap-3">
-              <FadeIn delay={Math.min(i, 3) * 70} className="flex flex-col gap-3">
-              <div className="aspect-[4/3] overflow-hidden bg-dim">
+              <FadeIn delay={Math.min(i, 3) * 70} className="flex h-full flex-col rounded-[24px] bg-white p-4 shadow-[0_14px_45px_rgba(48,62,45,0.07)]">
+              <div className="aspect-[4/3] overflow-hidden rounded-[17px] bg-dim">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={p.image} alt="" aria-hidden="true" loading="lazy" className="w-full h-full object-cover" />
               </div>
-              <h3 className="text-sm md:text-[15px] font-medium text-white">{p.head}</h3>
-              <p className="text-[12px] text-white/80 leading-relaxed">{p.body}</p>
+              <span className="mt-4 w-fit rounded-full bg-yuunagi px-3 py-1 text-[10px] font-semibold tracking-wider text-white">POINT {i + 1}</span>
+              <h3 className="mt-3 text-base font-semibold text-primary">{p.head}</h3>
+              <p className="mt-2 text-[13px] leading-relaxed text-gray-600">{p.body}</p>
               </FadeIn>
             </li>
           ))}
         </ul>
 
-        <div className="mt-12 text-center">
+        <div className="mt-14 text-center">
           <Link
             href="/collections/rice/yearly?view=lp"
-            className="inline-flex items-center gap-2 rounded-full bg-yuunagi px-10 py-4 text-sm font-medium text-white hover:bg-yuunagi-ink transition-colors"
+            className="inline-flex min-h-14 items-center gap-3 rounded-full bg-hekishoku px-10 py-4 text-sm font-medium text-white transition-colors hover:bg-primary"
           >
             定期便をはじめる
             <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4">

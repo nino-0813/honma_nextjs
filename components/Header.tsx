@@ -58,7 +58,8 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
   // 他のページは従来どおり少しスクロールしたら背景を出す。
   useEffect(() => {
     const handleScroll = () => {
-      const threshold = isHomePage ? Math.max(window.innerHeight - 90, 100) : 50;
+      const heroHeight = document.getElementById('home-hero')?.offsetHeight ?? window.innerHeight;
+      const threshold = isHomePage ? Math.max(heroHeight - 90, 100) : 50;
       setIsScrolled(window.scrollY > threshold);
     };
     handleScroll();
