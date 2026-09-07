@@ -17,7 +17,7 @@ export default function SubscriptionCTA() {
       <TokiCharacter character="logo" className="bottom-8 right-[-22px] h-24 w-24 md:bottom-12 md:right-8 md:h-28 md:w-28" />
       <div className="mx-auto max-w-[1280px] px-6 md:px-12">
         <FadeIn>
-          <SectionHeading en="Subscription" ja="イケベジ定期便" />
+          <SectionHeading ja="イケベジ定期便" />
         </FadeIn>
 
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-16">

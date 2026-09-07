@@ -57,7 +57,7 @@ export default async function News() {
           <div className="relative grid grid-cols-1 gap-12 lg:grid-cols-[260px_1fr] lg:gap-16">
             <div className="flex flex-col gap-6">
               <FadeIn>
-                <SectionHeading en="Journal" ja="イケベジ便り" />
+                <SectionHeading ja="イケベジ便り" />
               </FadeIn>
               <Link
                 href="/blog"

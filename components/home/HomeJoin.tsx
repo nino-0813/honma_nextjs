@@ -34,8 +34,9 @@ export default function HomeJoin() {
           </div>
         </div>
 
-        <div className="join-marquee flex w-max gap-4 md:gap-6">
-          {[...JOIN_PHOTOS, ...JOIN_PHOTOS].map((photo, index) => (
+        <div className="scrollbar-hide overflow-x-auto md:overflow-visible">
+          <div className="join-marquee flex w-max gap-4 px-6 pb-2 md:gap-6 md:px-0 md:pb-0">
+            {[...JOIN_PHOTOS, ...JOIN_PHOTOS].map((photo, index) => (
             <Link
               href="/join-us"
               key={`${photo.src}-${index}`}
@@ -51,7 +52,8 @@ export default function HomeJoin() {
                 className="object-cover transition-transform duration-700 group-hover:scale-[1.025]"
               />
             </Link>
-          ))}
+            ))}
+          </div>
         </div>
 
         <div className="px-6 pt-8 text-center md:hidden">

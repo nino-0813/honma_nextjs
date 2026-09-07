@@ -141,12 +141,18 @@ html {
 }
 
 .join-marquee {
-  animation: joinMarquee 38s linear infinite;
-  will-change: transform;
+  transform: translate3d(0, 0, 0);
 }
 
-.join-marquee:hover {
-  animation-play-state: paused;
+@media (min-width: 768px) {
+  .join-marquee {
+    animation: joinMarquee 38s linear infinite;
+    will-change: transform;
+  }
+
+  .join-marquee:hover {
+    animation-play-state: paused;
+  }
 }
 
 @keyframes joinMarquee {
@@ -158,6 +164,19 @@ html {
   .join-marquee {
     animation: none;
     overflow-x: auto;
+  }
+}
+
+/* スマホでは常時動く装飾を止め、縦スクロールの描画負荷を抑える。 */
+@media (max-width: 767px) {
+  .toki-motion-float,
+  .toki-motion-peek,
+  .toki-motion-fly {
+    animation: none;
+  }
+
+  .reveal {
+    transition-duration: 280ms !important;
   }
 }
 

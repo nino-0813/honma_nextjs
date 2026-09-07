@@ -45,7 +45,7 @@ export default function Lineup() {
       <div className="mx-auto max-w-[1320px] px-6 md:px-12">
         <div className="mb-12 flex items-end justify-between gap-6 md:mb-16">
           <FadeIn>
-            <SectionHeading en="Products" ja="イケベジの商品" />
+            <SectionHeading ja="イケベジの商品" />
           </FadeIn>
           <Link
             href="/collections"
@@ -94,7 +94,6 @@ export default function Lineup() {
         ))}
         </ul>
       </div>
-      <div aria-hidden="true" className="absolute -bottom-16 -right-14 h-44 w-44 rounded-full border-[28px] border-yuunagi/20 md:h-64 md:w-64" />
       <TokiCharacter character="back" motion="peek" className="bottom-6 left-[-26px] h-24 w-24 md:bottom-12 md:left-8 md:h-28 md:w-28" />
     </section>
   );
