@@ -4,6 +4,7 @@ import { useState, useContext, useEffect } from 'react';
 import { CartProvider, CartContext } from '@/providers/CartProvider';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import BackToTop from '@/components/BackToTop';
 import { CartDrawer, MenuDrawer } from '@/components/Drawers';
 
 const REFERRAL_STORAGE_KEY = 'ikevege_referral_code';
@@ -33,6 +34,7 @@ function MainLayoutInner({
       {/* overflow-x-hidden だと sticky が効かなくなるため clip を使う */}
       <main className="flex-1 w-full overflow-x-clip">{children}</main>
       <Footer />
+      <BackToTop />
       <CartDrawer
         isOpen={isCartOpen}
         onClose={onCloseCart}
