@@ -86,18 +86,28 @@
   }
 }
 
-/* トップの田園風景から夕日へ、ゆっくり溶けるように切り替える。 */
+/* トップを田園風景 → 親子の夕景 → 海の夕日へ、順に溶かして切り替える。 */
 .hero-opening-image {
-  animation: heroCrossfade 12s cubic-bezier(0.45, 0, 0.55, 1) 0.5s forwards;
+  animation: heroOpeningCrossfade 14s cubic-bezier(0.45, 0, 0.55, 1) 0.5s forwards;
 }
 
-@keyframes heroCrossfade {
-  0%, 5% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(1.025); }
+.hero-middle-image {
+  animation: heroMiddleCrossfade 14s cubic-bezier(0.45, 0, 0.55, 1) 0.5s forwards;
+}
+
+@keyframes heroOpeningCrossfade {
+  0%, 8% { opacity: 1; transform: scale(1); }
+  40%, 100% { opacity: 0; transform: scale(1.018); }
+}
+
+@keyframes heroMiddleCrossfade {
+  0%, 48% { opacity: 1; transform: scale(1); }
+  90%, 100% { opacity: 0; transform: scale(1.018); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-opening-image {
+  .hero-opening-image,
+  .hero-middle-image {
     animation: none;
   }
 }

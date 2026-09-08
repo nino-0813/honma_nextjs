@@ -14,6 +14,14 @@ const HeroVideo = () => {
           className="object-cover object-center"
         />
         <Image
+          src="/images/renewal/hero-family-sunset.webp"
+          alt="夕空の下で子どもを抱き上げる親子"
+          fill
+          priority
+          sizes="100vw"
+          className="hero-middle-image object-cover object-center"
+        />
+        <Image
           src="/images/renewal/hero-ikevege-landscape.webp"
           alt="佐渡の田園風景とイケベジのロゴ"
           fill
