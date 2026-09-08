@@ -94,7 +94,7 @@ const HeroVideo = () => {
         ) : (
           <video
             src={mp4Url}
-            className={`absolute inset-0 w-full h-full object-cover scale-150 transition-opacity duration-700 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
             autoPlay
             muted
             loop

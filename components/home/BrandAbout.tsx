@@ -9,35 +9,68 @@ export default function BrandAbout() {
   return (
     <section className="bg-white py-24 md:py-40">
       <div className="mx-auto max-w-[1280px] px-6 md:px-14">
-        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-24">
+        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:gap-16">
           <FadeIn>
-            <div className="relative aspect-[4/3] overflow-hidden bg-dim">
+            <p className="font-serif text-[48px] font-semibold leading-[1.42] tracking-[0.08em] text-primary sm:text-[58px] md:text-[72px] lg:text-[82px] xl:text-[88px]">
+              あんしん、<br />おいしい、<br />いいとき。
+            </p>
+          </FadeIn>
+
+          <FadeIn delay={120}>
+            <div className="relative aspect-square overflow-hidden bg-dim sm:aspect-[4/3] lg:aspect-[5/6]">
               <Image
                 src="/images/about/hero/retreat_2025_56.webp"
                 alt="佐渡の田んぼで笑顔を見せる大人と子どもたち"
                 fill
-                sizes="(min-width: 1024px) 52vw, 100vw"
+                sizes="(min-width: 1024px) 38vw, 100vw"
                 className="object-cover"
               />
             </div>
           </FadeIn>
-          <div>
-            <p className="font-serif text-[44px] font-semibold leading-[1.45] tracking-[0.08em] text-primary sm:text-5xl md:text-[64px] lg:text-[68px]">
-              あんしん、<br />おいしい、<br />いいとき。
-            </p>
-            <div className="mt-10 flex flex-col gap-5 text-sm leading-loose text-gray-600 md:text-base">
-            <p className="whitespace-pre-line">日々の暮らしのなかに “ ありのまま ” でいられる姿を想像し</p>
-            <p className="whitespace-pre-line">{'「自然から学び、豊かさを分かち合うこと」を通じて\nあんしん と おいしさ から得られる\n" 時別な時間 ( とき )" を提供しつづけ'}</p>
-            <p className="whitespace-pre-line">{'「イケてる社会」を創造し\n「佐渡」という唯一無二の価値を守り続けていきます'}</p>
-            <Link
-              href="/about"
-              className="mt-3 inline-flex min-h-11 w-fit items-center gap-3 rounded-full border border-gray-300 px-6 py-3 text-xs text-primary transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hekishoku focus-visible:ring-offset-2"
-            >
-              詳しく知る →
-            </Link>
+        </div>
+
+        <FadeIn delay={180}>
+          <div className="mt-14 max-w-4xl text-base leading-[2.15] text-gray-600 md:mt-20 md:text-lg">
+            <div className="flex flex-col gap-8 md:gap-10">
+              <p>佐渡ヶ島は、新潟県の日本海に浮かぶ比較的大きな島です。</p>
+
+              <p>
+                文化的にも自然環境的にも“日本の縮図”と言われることが多く、<br className="hidden md:block" />
+                動植物種数に恵まれた“生物多様性の聖地”ともいわれています。
+              </p>
+
+              <p>
+                そして、<br />
+                ヒトと自然が共生していく道を選んだこの島には、<br className="hidden md:block" />
+                絶滅危惧種のトキと共生するために全島の農家が立ち上がり、<br className="hidden md:block" />
+                今の佐渡ヶ島の農業を形成してきたという、<br className="hidden md:block" />
+                わたしたちのようなこれからを創る世代の農家が胸を熱くする歴史があります。
+              </p>
+
+              <p>
+                島の自然が魅せる美しさ、楽しさ、厳しさ、ワクワク感。<br className="hidden md:block" />
+                その自然界の“イケてる”部分をもっと社会に伝え、還元していきたいという思いから、<br className="hidden md:block" />
+                わたしたち「イケベジ」は始まったのです。
+              </p>
+
+              <p>
+                自然のチカラに寄り添いながら作ったものが、みんなの活力につながり、<br className="hidden md:block" />
+                なんでもない日常がちょっとでも“特別な時間（とき）”に感じられますように。
+              </p>
+
+              <p className="font-serif text-xl font-semibold tracking-[0.12em] text-primary md:text-2xl">
+                そんな意味を込めて、<br />
+                「きょうも しぜんと いいときを。」
+              </p>
+              <Link
+                href="/about"
+                className="mt-3 inline-flex min-h-11 w-fit items-center gap-3 rounded-full border border-gray-300 px-6 py-3 text-xs leading-normal text-primary transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hekishoku focus-visible:ring-offset-2"
+              >
+                詳しく知る →
+              </Link>
             </div>
           </div>
-        </div>
+        </FadeIn>
       </div>
     </section>
   );
