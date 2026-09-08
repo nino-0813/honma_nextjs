@@ -38,9 +38,9 @@ const HeroVideo = () => {
   const showPlaceholder = !useMp4 || mp4Failed;
 
   return (
-    <div className="relative w-full bg-white px-4 py-5 md:px-10 md:py-12">
+    <div className="relative w-full bg-white px-5 py-8 md:px-12 md:py-20">
       {/* Mobile */}
-      <div className="relative mx-auto h-[62svh] w-full overflow-hidden rounded-[20px] md:hidden">
+      <div className="relative mx-auto h-[54svh] w-full overflow-hidden rounded-[20px] md:hidden">
         {useMp4 && isLoading && !mp4Failed && (
           <div className="absolute inset-0 bg-gray-200 flex items-center justify-center z-10">
             <div className="w-6 h-6 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
@@ -74,7 +74,7 @@ const HeroVideo = () => {
 
       {/* Desktop */}
       {/* デスクトップは周囲に余白をとった横長フレームで表示 */}
-      <div className="relative mx-auto hidden aspect-video w-full max-w-[1500px] overflow-hidden rounded-[24px] md:block">
+      <div className="relative mx-auto hidden aspect-video w-full max-w-[1180px] overflow-hidden rounded-[24px] md:block">
         {useMp4 && isLoading && !mp4Failed && (
           <div className="absolute inset-0 bg-gray-900 flex items-center justify-center z-10">
             <div className="text-white text-sm animate-pulse">読み込み中...</div>
