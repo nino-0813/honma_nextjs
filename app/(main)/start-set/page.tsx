@@ -36,9 +36,9 @@ const GALLERY = [
 ];
 
 const VARIETIES = [
-  { name: 'コシヒカリ', body: '粘りと甘みのバランス。まず基準にしたい一品種です。', image: '/images/home/collections/collection_koshihikari_800.webp', href: '/collections/rice/koshihikari' },
-  { name: '亀の尾', body: 'コシヒカリの祖先にあたる希少品種。すっきりとした後味。', image: '/images/home/collections/collection_kamenoo_800.webp', href: '/collections/rice/kamenoo' },
-  { name: 'にこまる', body: '大粒でつやがあり、冷めてもおいしい。お弁当にも。', image: '/images/home/collections/collection_koshihikari_800.webp', href: '/collections/rice/nikomaru' },
+  { name: 'コシヒカリ', taste: '甘み・粘り', body: 'ふっくら親しみやすい、毎日のごはんの王道。', image: '/images/home/collections/collection_koshihikari_800.webp', href: '/collections/rice/koshihikari' },
+  { name: '亀の尾', taste: '旨み・すっきり', body: '噛むほどに広がる、お米らしい素朴な味わい。', image: '/images/home/collections/collection_kamenoo_800.webp', href: '/collections/rice/kamenoo' },
+  { name: 'にこまる', taste: '大粒・もっちり', body: '粒感と食べごたえがあり、冷めてもおいしい。', image: '/images/renewal/lineup/rice.webp', href: '/collections/rice/nikomaru' },
 ];
 
 const BENEFITS = [
@@ -62,17 +62,33 @@ export default async function StartSetPage() {
     : GALLERY;
 
   return (
-    <div className="pt-32 pb-24 bg-white min-h-screen animate-fade-in overflow-x-clip w-full">
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-[10px] text-gray-400 mb-8 md:mb-12 tracking-widest">
+    <div className="min-h-screen w-full overflow-x-clip bg-white pb-24 pt-24 animate-fade-in md:pt-28">
+      <section className="border-b border-yuunagi/15 bg-yuunagi-soft/35 px-5 py-14 text-center md:py-20">
+        <p className="mb-4 text-[11px] font-medium tracking-[0.24em] text-yuunagi-ink">はじめてのイケベジに</p>
+        <h1 className="mx-auto max-w-4xl font-serif text-[32px] font-semibold leading-[1.55] tracking-[0.08em] text-primary md:text-5xl lg:text-[56px]">
+          まずは、3つのお米を<br className="sm:hidden" />食べ比べ。
+        </h1>
+        <p className="mx-auto mt-6 max-w-2xl text-sm leading-loose text-gray-600 md:text-base">
+          佐渡で同じように育てても、甘みも、香りも、食感も違う。<br className="hidden md:block" />
+          一膳ずつ味わいながら、あなたの「好き」を見つけるスタートセットです。
+        </p>
+        <div className="mt-7 flex flex-wrap justify-center gap-2 text-[11px] text-primary md:text-xs">
+          {['3品種 × 各2合', '農薬・化学肥料不使用', '送料無料', '20セット限定'].map((item) => (
+            <span key={item} className="rounded-full border border-yuunagi/30 bg-white px-4 py-2">{item}</span>
+          ))}
+        </div>
+      </section>
+
+      <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
+        <div className="mb-8 mt-7 text-[10px] tracking-widest text-gray-400 md:mb-10">
           <Link href="/" className="hover:text-black transition-colors">ホーム</Link>
           <span className="mx-2">/</span>
           <span className="text-black">スタートセット</span>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+        <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-16">
           {/* 左: 画像は固定 */}
-          <div className="lg:col-span-7 lg:sticky lg:top-24 lg:self-start">
+          <div className="lg:sticky lg:top-24 lg:col-span-7 lg:self-start">
             <div className="relative">
               {SHOW_PLACEHOLDER_BADGE && (
                 <span className="absolute top-2 left-2 z-20 rounded-sm bg-yuunagi-ink/90 px-1.5 py-0.5 text-[9px] tracking-wider text-white">
@@ -90,9 +106,9 @@ export default async function StartSetPage() {
             ) : (
             <div id="purchase-panel">
               <p className="text-xs tracking-[0.15em] text-yuunagi-ink mb-2">スタートセット</p>
-              <h1 className="text-xl md:text-2xl font-medium text-primary leading-relaxed tracking-wide mb-3">
+              <h2 className="text-xl md:text-2xl font-medium text-primary leading-relaxed tracking-wide mb-3">
                 自然栽培米 3品種 食べ比べセット
-              </h1>
+              </h2>
               <p className="text-[13px] leading-relaxed text-gray-600 mb-6">
                 コシヒカリ・亀の尾・にこまる。同じ田んぼの、同じ育て方でも、品種が違えば味も香りも変わります。
               </p>
@@ -177,6 +193,43 @@ export default async function StartSetPage() {
             disabledLabel="準備中"
           />
         )}
+
+        <section className="mt-24 border-y border-gray-100 py-20 md:mt-32 md:py-28">
+          <div className="mb-12 text-center md:mb-16">
+            <p className="mb-3 text-[11px] tracking-[0.2em] text-yuunagi-ink">FIND YOUR FAVORITE</p>
+            <h2 className="font-serif text-2xl font-semibold tracking-wider text-primary md:text-4xl">一膳ごとに、違いがわかる。</h2>
+            <p className="mx-auto mt-5 max-w-xl text-sm leading-loose text-gray-600">同じ佐渡のお米でも、品種ごとに個性があります。難しく考えず、いつものおかずと一緒にどうぞ。</p>
+          </div>
+          <div className="grid gap-6 md:grid-cols-3">
+            {VARIETIES.map((variety, index) => (
+              <Link key={variety.name} href={variety.href} className="group overflow-hidden rounded-[28px] border border-gray-100 bg-white transition-shadow duration-200 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yuunagi focus-visible:ring-offset-4">
+                <div className="relative aspect-[4/3] overflow-hidden bg-dim">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={variety.image} alt={`${variety.name}のお米`} loading="lazy" className="h-full w-full object-cover transition-transform duration-300 motion-reduce:transition-none md:group-hover:scale-[1.03]" />
+                  <span className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1.5 text-[10px] font-medium tracking-widest text-primary">0{index + 1}</span>
+                </div>
+                <div className="p-6 md:p-7">
+                  <p className="mb-2 text-[11px] tracking-[0.16em] text-yuunagi-ink">{variety.taste}</p>
+                  <h3 className="font-serif text-xl font-semibold text-primary md:text-2xl">{variety.name}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-gray-600">{variety.body}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-20 grid overflow-hidden rounded-[32px] bg-hekishoku text-white md:mt-28 lg:grid-cols-2">
+          <div className="min-h-[320px] lg:min-h-[480px]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/about/hero/retreat_2025_56.webp" alt="佐渡の田んぼで笑顔を見せる家族" loading="lazy" className="h-full w-full object-cover" />
+          </div>
+          <div className="flex flex-col justify-center p-8 md:p-12 lg:p-16">
+            <p className="mb-4 text-[11px] tracking-[0.2em] text-white/70">FROM SADO ISLAND</p>
+            <h2 className="font-serif text-2xl font-semibold leading-relaxed tracking-wider md:text-4xl">おいしさの先に、<br />残したい風景がある。</h2>
+            <p className="mt-6 text-sm leading-loose text-white/85 md:text-base">農薬や化学肥料に頼らず、島の自然と向き合って育てています。最初の一袋を選んでくれることが、佐渡の田んぼと次の季節につながります。</p>
+            <Link href="/about" className="mt-8 inline-flex min-h-12 w-fit items-center rounded-full border border-white/50 px-6 text-sm transition-colors duration-200 hover:bg-white hover:text-hekishoku focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-hekishoku">イケベジについて詳しく知る</Link>
+          </div>
+        </section>
 
         <ProductFeatures
           rows={[

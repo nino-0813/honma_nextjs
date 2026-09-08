@@ -9,10 +9,10 @@ import { isProductSoldOut } from '@/lib/productStatus';
 import StickyPurchaseBar from '@/components/product/StickyPurchaseBar';
 
 const BENEFITS = [
-  '3品種を少量ずつ、食べ比べていただけます',
-  '通常より20%OFF でお試しいただけます',
-  '定期便で使える初回クーポン（送料無料・20%OFF）つき',
-  'お届けに合わせて出荷直前に精米します',
+  'コシヒカリ・亀の尾・にこまるを2合ずつ',
+  'はじめての方にも試しやすい送料無料',
+  '農薬・化学肥料を使わず、佐渡で育てたお米',
+  '食べ比べながら、自分の好みを見つけられます',
 ];
 
 const VARIETIES = [
@@ -87,15 +87,19 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
   return (
     <>
       <div id="purchase-panel">
-        <p className="text-xs tracking-[0.15em] text-yuunagi-ink mb-2">スタートセット</p>
-        <h1 className="text-xl md:text-2xl font-medium text-primary leading-relaxed tracking-wide mb-3">{product.title}</h1>
-        {product.description && (
-          <p className="text-[13px] leading-relaxed whitespace-pre-line text-gray-600 mb-6">{product.description}</p>
-        )}
+        <div className="mb-5 flex flex-wrap items-center gap-2">
+          <span className="rounded-full bg-hekishoku px-3 py-1.5 text-[11px] font-medium tracking-[0.12em] text-white">はじめての方へ</span>
+          <span className="rounded-full border border-yuunagi/40 px-3 py-1.5 text-[11px] text-yuunagi-ink">20セット限定</span>
+        </div>
+        <p className="mb-3 text-xs tracking-[0.18em] text-yuunagi-ink">IKEVEGE START SET</p>
+        <h2 className="mb-4 text-2xl font-medium leading-relaxed tracking-wide text-primary md:text-3xl">{product.title}</h2>
+        <p className="mb-7 text-sm leading-loose text-gray-600">
+          どのお米から始めよう。そんな迷いごと楽しめる、3品種の小さな食べ比べセットです。
+        </p>
 
-        <div className="rounded-sm bg-yuunagi-soft/60 p-4 md:p-5 mb-6">
+        <div className="mb-6 rounded-2xl bg-yuunagi-soft/60 p-5 md:p-6">
           <div className="flex flex-wrap items-center gap-2 mb-2">
-            <span className="rounded-sm bg-yuunagi px-2 py-1 text-[10px] font-medium text-white">初回限定</span>
+            <span className="rounded-full bg-yuunagi px-2.5 py-1 text-[10px] font-medium text-white">初回限定</span>
           </div>
           <p className="text-3xl font-serif font-semibold text-primary tabular-nums">
             ¥{calculatedPrice.toLocaleString()}
@@ -139,8 +143,8 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
           </div>
         )}
 
-        <div className="border-2 border-gray-200 rounded-sm p-4 md:p-5 mb-6">
-          <p className="text-sm font-medium text-primary mb-4">このセットでできること</p>
+        <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-5 md:p-6">
+          <p className="mb-4 text-sm font-medium text-primary">はじめやすい4つの理由</p>
           <ul className="flex flex-col gap-2.5">
             {BENEFITS.map((benefit) => (
               <li key={benefit} className="flex items-start gap-2 text-[12px] md:text-[13px] text-gray-600 leading-relaxed">
@@ -158,7 +162,7 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
             <span className="w-8 text-center text-sm tabular-nums">{quantity}</span>
             <button type="button" aria-label="数量を1つ増やす" onClick={() => setQuantity((value) => value + 1)} className="h-10 w-10">＋</button>
           </div>
-          <button type="button" disabled={disabled} onClick={handleAdd} className="min-h-12 flex-1 rounded-full bg-yuunagi px-6 text-sm font-medium text-white transition-colors hover:bg-yuunagi-ink disabled:cursor-not-allowed disabled:opacity-40">
+          <button type="button" disabled={disabled} onClick={handleAdd} className="min-h-12 flex-1 cursor-pointer rounded-full bg-yuunagi px-6 text-sm font-medium text-white transition-colors duration-200 hover:bg-yuunagi-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yuunagi focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40">
             {soldOut ? '売り切れ' : outsideSalesPeriod ? '販売期間外' : 'カートに入れる'}
           </button>
         </div>
