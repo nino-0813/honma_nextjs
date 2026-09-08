@@ -32,34 +32,23 @@ export default function BrandAbout() {
         <FadeIn delay={180}>
           <div className="mt-14 max-w-4xl text-base leading-[2.15] text-gray-600 md:mt-20 md:text-lg">
             <div className="flex flex-col gap-8 md:gap-10">
-              <p>佐渡ヶ島は、新潟県の日本海に浮かぶ比較的大きな島です。</p>
-
               <p>
-                文化的にも自然環境的にも“日本の縮図”と言われることが多く、<br className="hidden md:block" />
-                動植物種数に恵まれた“生物多様性の聖地”ともいわれています。
+                ヒトと自然が共生していく道を選んだこの島には<br />
+                絶滅危惧種のトキと共生するために<br />
+                島の全ての農家がその取り組みに関わってきた歴史があります。
               </p>
 
               <p>
-                そして、<br />
-                ヒトと自然が共生していく道を選んだこの島には、<br className="hidden md:block" />
-                絶滅危惧種のトキと共生するために全島の農家が立ち上がり、<br className="hidden md:block" />
-                今の佐渡ヶ島の農業を形成してきたという、<br className="hidden md:block" />
-                わたしたちのようなこれからを創る世代の農家が胸を熱くする歴史があります。
+                そのバトンを受け取りイケベジは始まりました。
               </p>
 
               <p>
-                島の自然が魅せる美しさ、楽しさ、厳しさ、ワクワク感。<br className="hidden md:block" />
-                その自然界の“イケてる”部分をもっと社会に伝え、還元していきたいという思いから、<br className="hidden md:block" />
-                わたしたち「イケベジ」は始まったのです。
-              </p>
-
-              <p>
-                自然のチカラに寄り添いながら作ったものが、みんなの活力につながり、<br className="hidden md:block" />
-                なんでもない日常がちょっとでも“特別な時間（とき）”に感じられますように。
+                自然のチカラに寄り添ってつくった食べものが<br />
+                みんなの活力になり、なんてことのない日常でも<br />
+                格別な時間（とき）に感じられますように。
               </p>
 
               <p className="font-serif text-xl font-semibold tracking-[0.12em] text-primary md:text-2xl">
-                そんな意味を込めて、<br />
                 「きょうも しぜんと いいときを。」
               </p>
               <Link
