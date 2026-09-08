@@ -3,7 +3,6 @@ import HeroVideo from '@/components/HeroVideo';
 import AnnouncementPopup from '@/components/AnnouncementPopup';
 import Lineup from '@/components/home/Lineup';
 import BrandAbout from '@/components/home/BrandAbout';
-import LearnMore from '@/components/home/LearnMore';
 import SubscriptionCTA from '@/components/home/SubscriptionCTA';
 import News from '@/components/home/News';
 
@@ -55,10 +54,7 @@ export default function HomePage() {
       {/* 4. 定期便 */}
       <SubscriptionCTA />
 
-      {/* 5. もっと知る（詳細情報への入口を3つに整理） */}
-      <LearnMore />
-
-      {/* 6. お知らせ */}
+      {/* 5. お知らせ */}
       <News />
 
     </div>

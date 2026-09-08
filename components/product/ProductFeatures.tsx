@@ -19,10 +19,7 @@ export default function ProductFeatures({
     <section className="mt-24 md:mt-32 border-t border-gray-100 pt-16 md:pt-20">
       <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8 lg:gap-16">
         <FadeIn>
-          <p className="text-[32px] md:text-[46px] font-sans font-bold tracking-tight text-yuunagi leading-none">
-            Features
-          </p>
-          <p className="mt-1.5 text-sm md:text-base font-medium text-primary">
+          <p className="text-xl font-serif font-semibold tracking-wider text-primary md:text-2xl">
             商品詳細
           </p>
         </FadeIn>

@@ -126,20 +126,20 @@ export default function CollectionsPage() {
   };
 
   return (
-    <div className="pt-28 pb-32 min-h-screen bg-white overflow-x-hidden w-full">
+    <div className="min-h-screen w-full overflow-x-hidden bg-white pb-36 pt-32 md:pt-40">
       <div className="max-w-[1400px] mx-auto px-6 md:px-12">
-        <div className="text-center mb-8 md:mb-12 animate-fade-in">
-          <p className="text-center text-[13px] font-medium text-primary mb-3">
+        <div className="mb-16 text-center animate-fade-in md:mb-24">
+          <p className="mb-4 text-center text-[13px] font-medium text-primary">
             商品一覧
           </p>
-          <h1 className="text-xl md:text-2xl font-serif tracking-[0.15em] font-normal mb-4">{getPageTitle()}</h1>
+          <h1 className="mb-8 font-serif text-2xl font-normal tracking-[0.15em] md:mb-10 md:text-3xl">{getPageTitle()}</h1>
           {currentSubcategory === 'yearly' && !isLpView && (
             <p className="text-xs md:text-sm text-gray-600 leading-relaxed mb-6">
               すべて<span className="text-yuunagi-ink font-medium">10%OFF</span>でお届けします。
             </p>
           )}
           {!isLpView && (
-          <div className="overflow-x-auto pb-4 -mx-6 px-6 scrollbar-hide w-full">
+          <div className="-mx-6 w-full overflow-x-auto px-6 pb-4 scrollbar-hide">
             {currentCategory === 'お米' ? (
               <div className="flex gap-4 min-w-max justify-center md:justify-center">
                 <Link href="/collections/rice" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${!currentSubcategory ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
@@ -208,7 +208,7 @@ export default function CollectionsPage() {
         )}
 
         {!loading && !error && filteredProducts.length > 0 && (
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 sm:gap-x-6 gap-y-12 sm:gap-y-16">
+          <div className="grid grid-cols-2 gap-x-5 gap-y-16 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-20 lg:grid-cols-3 xl:grid-cols-4">
             {filteredProducts.map((product, index) => {
               const soldOut = isProductSoldOut(product);
               const preorder = !soldOut && isProductPreorder(product); // 在庫切れ優先

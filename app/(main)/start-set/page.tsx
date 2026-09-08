@@ -63,8 +63,7 @@ export default async function StartSetPage() {
 
   return (
     <div className="min-h-screen w-full overflow-x-clip bg-white pb-24 pt-24 animate-fade-in md:pt-28">
-      <section className="border-b border-yuunagi/15 bg-yuunagi-soft/35 px-5 py-14 text-center md:py-20">
-        <p className="mb-4 text-[11px] font-medium tracking-[0.24em] text-yuunagi-ink">はじめてのイケベジに</p>
+      <section className="border-b border-yuunagi/15 bg-yuunagi-soft/35 px-5 py-16 text-center md:py-24">
         <h1 className="mx-auto max-w-4xl font-serif text-[32px] font-semibold leading-[1.55] tracking-[0.08em] text-primary md:text-5xl lg:text-[56px]">
           まずは、3つのお米を<br className="sm:hidden" />食べ比べ。
         </h1>
@@ -72,11 +71,6 @@ export default async function StartSetPage() {
           佐渡で同じように育てても、甘みも、香りも、食感も違う。<br className="hidden md:block" />
           一膳ずつ味わいながら、あなたの「好き」を見つけるスタートセットです。
         </p>
-        <div className="mt-7 flex flex-wrap justify-center gap-2 text-[11px] text-primary md:text-xs">
-          {['3品種 × 各2合', '農薬・化学肥料不使用', '送料無料', '20セット限定'].map((item) => (
-            <span key={item} className="rounded-full border border-yuunagi/30 bg-white px-4 py-2">{item}</span>
-          ))}
-        </div>
       </section>
 
       <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
@@ -196,17 +190,15 @@ export default async function StartSetPage() {
 
         <section className="mt-24 border-y border-gray-100 py-20 md:mt-32 md:py-28">
           <div className="mb-12 text-center md:mb-16">
-            <p className="mb-3 text-[11px] tracking-[0.2em] text-yuunagi-ink">FIND YOUR FAVORITE</p>
             <h2 className="font-serif text-2xl font-semibold tracking-wider text-primary md:text-4xl">一膳ごとに、違いがわかる。</h2>
-            <p className="mx-auto mt-5 max-w-xl text-sm leading-loose text-gray-600">同じ佐渡のお米でも、品種ごとに個性があります。難しく考えず、いつものおかずと一緒にどうぞ。</p>
+            <p className="mx-auto mt-5 max-w-xl text-center text-sm leading-loose text-gray-600">同じ佐渡のお米でも、品種ごとに個性があります。<br />難しく考えず、いつものおかずと一緒にどうぞ。</p>
           </div>
           <div className="grid gap-6 md:grid-cols-3">
-            {VARIETIES.map((variety, index) => (
-              <Link key={variety.name} href={variety.href} className="group overflow-hidden rounded-[28px] border border-gray-100 bg-white transition-shadow duration-200 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yuunagi focus-visible:ring-offset-4">
+            {VARIETIES.map((variety) => (
+              <Link key={variety.name} href={variety.href} className="group overflow-hidden bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yuunagi focus-visible:ring-offset-4">
                 <div className="relative aspect-[4/3] overflow-hidden bg-dim">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={variety.image} alt={`${variety.name}のお米`} loading="lazy" className="h-full w-full object-cover transition-transform duration-300 motion-reduce:transition-none md:group-hover:scale-[1.03]" />
-                  <span className="absolute left-4 top-4 rounded-full bg-white/95 px-3 py-1.5 text-[10px] font-medium tracking-widest text-primary">0{index + 1}</span>
                 </div>
                 <div className="p-6 md:p-7">
                   <p className="mb-2 text-[11px] tracking-[0.16em] text-yuunagi-ink">{variety.taste}</p>
@@ -224,10 +216,9 @@ export default async function StartSetPage() {
             <img src="/images/about/hero/retreat_2025_56.webp" alt="佐渡の田んぼで笑顔を見せる家族" loading="lazy" className="h-full w-full object-cover" />
           </div>
           <div className="flex flex-col justify-center p-8 md:p-12 lg:p-16">
-            <p className="mb-4 text-[11px] tracking-[0.2em] text-white/70">FROM SADO ISLAND</p>
             <h2 className="font-serif text-2xl font-semibold leading-relaxed tracking-wider md:text-4xl">おいしさの先に、<br />残したい風景がある。</h2>
             <p className="mt-6 text-sm leading-loose text-white/85 md:text-base">農薬や化学肥料に頼らず、島の自然と向き合って育てています。最初の一袋を選んでくれることが、佐渡の田んぼと次の季節につながります。</p>
-            <Link href="/about" className="mt-8 inline-flex min-h-12 w-fit items-center rounded-full border border-white/50 px-6 text-sm transition-colors duration-200 hover:bg-white hover:text-hekishoku focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-hekishoku">イケベジについて詳しく知る</Link>
+            <Link href="/about" className="mt-8 inline-flex min-h-12 w-fit items-center rounded-full border border-white/50 px-6 text-sm transition-colors duration-200 hover:bg-white hover:text-hekishoku focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-hekishoku">詳しく知る →</Link>
           </div>
         </section>
 

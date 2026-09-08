@@ -82,8 +82,8 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
 
   return (
     <header
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ease-out-expo border-b overflow-x-hidden ${
-        isScrolled ? 'bg-white/95 backdrop-blur-md py-[18px] md:py-6 border-secondary shadow-sm' : 'bg-transparent py-4 md:py-6 border-transparent'
+      className={`fixed top-0 w-full z-50 transition-all duration-300 ease-out-expo overflow-x-hidden ${
+        isScrolled ? 'bg-white/95 backdrop-blur-md py-[18px] md:py-6' : 'bg-transparent py-4 md:py-6'
       }`}
     >
       <div className="w-full px-5 md:px-8 lg:px-10">

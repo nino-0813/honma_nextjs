@@ -96,17 +96,10 @@ export default function AboutPage() {
       </div>
 
       <section className="pt-12 md:pt-16 pb-16 md:pb-24 bg-white relative overflow-hidden">
-        <div className="absolute top-8 md:top-10 right-6 md:right-12 text-6xl md:text-[5.5rem] font-serif opacity-[0.03] vertical-text pointer-events-none hidden md:block">
-          自然と共に
-        </div>
         <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
           <FadeInSection>
-            <p className="text-xs font-bold tracking-[0.3em] text-gray-400 uppercase mb-4 md:mb-8">CONCEPT</p>
             <h2 className="text-2xl md:text-4xl font-serif font-medium tracking-widest leading-relaxed mb-4">
-              <span className="relative inline-block">
-                Farm to Social
-                <span className="absolute bottom-0 left-0 w-full h-px bg-primary -bottom-2 md:-bottom-2" />
-              </span>
+              <span>Farm to Social</span>
               <br />
               <span className="text-base md:text-2xl mt-2 md:mt-4 block text-gray-600">農から社会へ</span>
             </h2>
@@ -156,9 +149,7 @@ export default function AboutPage() {
       <section className="py-8 md:py-16 bg-secondary/30 relative">
         <div className="max-w-6xl mx-auto px-6">
           <FadeInSection className="text-center">
-            <p className="text-[11px] tracking-[0.22em] uppercase text-yuunagi-ink font-medium mb-3">Our Stances</p>
             <h3 className="text-2xl md:text-4xl font-serif tracking-widest mb-4">3つの姿勢</h3>
-            <div className="w-12 h-px bg-primary mx-auto" />
           </FadeInSection>
         </div>
       </section>
@@ -169,9 +160,8 @@ export default function AboutPage() {
             <div className="aspect-square bg-gray-100 relative z-10 max-w-md mx-auto md:mx-0">
               <ScrollGrayscaleImage src="/images/about/hero/retreat_2025_56.webp" alt="田んぼで笑顔を見せる親子" />
             </div>
-            <div className="absolute -bottom-6 -right-2 w-2/3 h-1/2 border border-primary z-0 hidden md:block" />
           </FadeInSection>
-          <FadeInSection className="w-full md:w-1/2 space-y-8">
+          <FadeInSection className="w-full md:w-1/2 space-y-12">
             <h3 className="text-2xl md:text-3xl font-serif tracking-widest">作り手が楽しむ</h3>
             <div className="text-sm md:text-base space-y-6 text-gray-600 leading-loose font-light font-serif">
               <div className="md:hidden space-y-4">
@@ -197,9 +187,8 @@ export default function AboutPage() {
             <div className="aspect-square bg-gray-100 relative z-10 max-w-md mx-auto md:mx-0">
               <ScrollGrayscaleImage src="/images/about/stories/IMG_8832.webp" alt="苗の様子を確かめるイケベジの作り手" />
             </div>
-            <div className="absolute -top-10 -left-10 w-2/3 h-1/2 bg-secondary z-0 hidden md:block" />
           </FadeInSection>
-          <FadeInSection className="w-full md:w-1/2 space-y-8 text-left">
+          <FadeInSection className="w-full md:w-1/2 space-y-12 text-left">
             <h3 className="text-2xl md:text-3xl font-serif tracking-widest">引き算のものづくり</h3>
             <div className="text-sm md:text-base space-y-6 text-gray-600 leading-loose font-light font-serif">
               <p>&quot;美味しい&quot;とは、品種が持つ本来の味わいがまっすぐに伝わること。</p>
@@ -226,9 +215,8 @@ export default function AboutPage() {
             <div className="aspect-square bg-gray-100 relative z-10 max-w-md mx-auto md:mx-0">
               <ScrollGrayscaleImage src="/images/about/stories/about_story_taue_123.webp" alt="田植えを体験する参加者たち" />
             </div>
-            <div className="absolute -bottom-6 -right-2 w-2/3 h-1/2 border border-primary z-0 hidden md:block" />
           </FadeInSection>
-          <FadeInSection className="w-full md:w-1/2 space-y-8">
+          <FadeInSection className="w-full md:w-1/2 space-y-12">
             <h3 className="text-2xl md:text-3xl font-serif tracking-widest">農へのアクセスを良好に</h3>
             <div className="text-sm md:text-base space-y-6 text-gray-600 leading-loose font-light font-serif">
               <p>近年、農家の減少により、島の子どもたちですら、自然が「身近にはあるものの、生活とは切り離された存在」となりつつあります。</p>

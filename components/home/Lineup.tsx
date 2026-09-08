@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import SectionHeading from './SectionHeading';
 import CircleButton from './CircleButton';
 import FadeIn from '@/components/FadeIn';
 
@@ -40,23 +39,6 @@ const TILES: {
 export default function Lineup() {
   return (
     <section id="products" className="pt-8 pb-20 md:pb-28 bg-white">
-      <div className="max-w-[1500px] mx-auto px-5 md:px-10">
-        <div className="flex items-end justify-between gap-6 mb-9 md:mb-12">
-          <FadeIn>
-            <SectionHeading en="Lineup" ja="ラインナップ" />
-          </FadeIn>
-          <Link
-            href="/collections"
-            className="shrink-0 inline-flex items-center gap-2 rounded-full border border-gray-300 px-5 py-2.5 text-xs md:text-[13px] text-primary hover:border-primary transition-colors"
-          >
-            すべての商品を見る
-            <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3">
-              <path d="M3 8h10M9 4l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </Link>
-        </div>
-      </div>
-
       {/* 写真全体を押せるラインナップタイル */}
       <ul className="grid grid-cols-1 gap-px bg-white sm:grid-cols-2 lg:grid-cols-3">
         {TILES.map((t, i) => (
@@ -92,6 +74,14 @@ export default function Lineup() {
           </li>
         ))}
       </ul>
+      <div className="mt-10 text-center md:mt-14">
+        <Link
+          href="/collections"
+          className="inline-flex min-h-11 items-center gap-2 rounded-full border border-gray-300 px-6 py-3 text-xs text-primary transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 md:text-[13px]"
+        >
+          すべての商品を見る →
+        </Link>
+      </div>
     </section>
   );
 }
