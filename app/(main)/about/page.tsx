@@ -84,8 +84,8 @@ export default function AboutPage() {
         <div className="relative w-full pb-4 flex justify-center">
           <div className="relative w-full max-w-4xl h-auto md:h-[60vh] overflow-hidden mx-auto">
             <img
-              src="/images/renewal/brand/access-2.webp"
-              alt="IKEVEGE"
+              src="/images/about/hero/about_hero_taue_92.webp"
+              alt="自然の中で過ごす子どもたち"
               width={1200}
               height={800}
               className="w-full h-auto md:h-full object-contain md:object-cover object-center"
@@ -167,7 +167,7 @@ export default function AboutPage() {
         <div className="flex flex-col md:flex-row gap-12 md:gap-24 items-center mb-32">
           <FadeInSection className="w-full md:w-2/5 relative">
             <div className="aspect-square bg-gray-100 relative z-10 max-w-md mx-auto md:mx-0">
-              <ScrollGrayscaleImage src="/images/renewal/brand/access-1.webp" alt="稲刈りを楽しむイケベジの作り手" />
+              <ScrollGrayscaleImage src="/images/about/hero/retreat_2025_56.webp" alt="田んぼで笑顔を見せる親子" />
             </div>
             <div className="absolute -bottom-6 -right-2 w-2/3 h-1/2 border border-primary z-0 hidden md:block" />
           </FadeInSection>
@@ -195,7 +195,7 @@ export default function AboutPage() {
         <div className="flex flex-col md:flex-row-reverse gap-12 md:gap-24 items-center mb-32">
           <FadeInSection className="w-full md:w-2/5 relative">
             <div className="aspect-square bg-gray-100 relative z-10 max-w-md mx-auto md:mx-0">
-              <ScrollGrayscaleImage src="/images/renewal/brand/access-2.webp" alt="佐渡の田んぼで収穫した稲" />
+              <ScrollGrayscaleImage src="/images/about/stories/IMG_8832.webp" alt="苗の様子を確かめるイケベジの作り手" />
             </div>
             <div className="absolute -top-10 -left-10 w-2/3 h-1/2 bg-secondary z-0 hidden md:block" />
           </FadeInSection>
@@ -224,7 +224,7 @@ export default function AboutPage() {
         <div className="flex flex-col md:flex-row gap-12 md:gap-24 items-center mb-32">
           <FadeInSection className="w-full md:w-2/5 relative">
             <div className="aspect-square bg-gray-100 relative z-10 max-w-md mx-auto md:mx-0">
-              <ScrollGrayscaleImage src="/images/renewal/brand/access-3.webp" alt="田んぼで農にふれる参加者たち" />
+              <ScrollGrayscaleImage src="/images/about/stories/about_story_taue_123.webp" alt="田植えを体験する参加者たち" />
             </div>
             <div className="absolute -bottom-6 -right-2 w-2/3 h-1/2 border border-primary z-0 hidden md:block" />
           </FadeInSection>

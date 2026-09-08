@@ -33,7 +33,10 @@ const POINTS = [
 
 export default function SubscriptionCTA() {
   return (
-    <section className="py-20 md:py-32 bg-hekishoku text-white">
+    <section
+      className="py-20 md:py-32 bg-hekishoku bg-cover bg-center text-white"
+      style={{ backgroundImage: "url('/images/renewal/subscription-texture.png')" }}
+    >
       <div className="max-w-[1500px] mx-auto px-5 md:px-10">
         <FadeIn>
           <SectionHeading ja="イケベジ定期便" tone="light" />
