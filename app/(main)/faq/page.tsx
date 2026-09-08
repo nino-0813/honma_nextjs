@@ -29,6 +29,15 @@ const faqData: FAQCategory[] = [
       { question: '「栽培期間中　◯◯不使用」と記載されているものは、栽培期間外には使用しているということでしょうか？', answer: 'いいえ、1年を通して一切使用しておりません。農林水産省のガイドライン上、記載が必要なためとなっております。' },
     ],
   },
+  {
+    title: '決済について',
+    items: [
+      {
+        question: '利用できる決済方法は何ですか？',
+        answer: '現在、クレジットカード、Google Pay、Apple Pay（iPhoneのみ）、PayPayをご利用いただけます。',
+      },
+    ],
+  },
 ];
 
 export default function FAQPage() {
