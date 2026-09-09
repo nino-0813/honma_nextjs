@@ -13,7 +13,7 @@ function getFilterNameFromParam(param: string) {
   if (param === 'rice') return 'お米';
   if (param === 'crescent') return 'Crescentmoon';
   if (param === 'other') return 'その他';
-  if (param === 'new-rice') return '新米いただけ';
+  if (param === 'shiitake') return '原木しいたけ';
   if (param === 'ticket') return 'チケット';
   return 'ALL';
 }
@@ -29,12 +29,35 @@ function getSubcategoryNameFromParam(param: string): string {
   return mapping[param] ?? param;
 }
 
-type CategoryLabel = 'ALL' | 'お米' | 'Crescentmoon' | 'その他' | '新米いただけ' | 'チケット';
+type CategoryLabel = 'ALL' | 'お米' | 'Crescentmoon' | 'その他' | '原木しいたけ' | 'チケット';
 
 const RICE_INTROS: Record<string, { title: string; lead: string; details: string[] }> = {
   koshihikari: { title: '従来コシヒカリ', lead: '王道の、もっちり感。', details: ['甘みと粘りがしっかり感じられる、親しみ深い味わい。', '炊きたての白ごはんはもちろん、毎日の食卓に素直になじみます。'] },
   kamenoo: { title: '亀の尾', lead: '凛とした粒感、すっきりした余韻。', details: ['品種改良されていない、野生味を残す希少なお米です。', '粘りは控えめで、寿司や炒飯などお米の輪郭を生かす料理にもよく合います。'] },
   nikomaru: { title: 'にこまる', lead: '大粒で、冷めても弾む。', details: ['三品種のなかで最も粒が大きく、ふっくらした弾力が続きます。', 'お弁当や丼ものにも合わせやすい、頼もしいお米です。'] },
+};
+
+const CATEGORY_STORIES: Record<string, { title: string; lead: string; blocks: { image: string; title: string; body: string }[] }> = {
+  shiitake: {
+    title: '原木しいたけ', lead: '島の森が育てる、豊かな香り。',
+    blocks: [
+      { image: '/images/renewal/lineup/shiitake.webp', title: '原木から、ゆっくり育つ', body: '佐渡の自然のなかで時間をかけて育った原木しいたけ。肉厚な食感と、噛むほど広がる香りをお楽しみください。' },
+      { image: '/images/about/stories/P3A9707.webp', title: '佐渡の山の恵みを食卓へ', body: '季節や天候と向き合いながら、自然のリズムを大切に育てています。' },
+    ],
+  },
+  crescent: {
+    title: 'Crescentmoon', lead: '佐渡の素材から生まれる、やさしいお菓子。',
+    blocks: [
+      { image: '/images/crescentmoon/589F7B72-C537-4904-A9AD-55F5EDFF1A71.jpg', title: 'ひとつずつ、丁寧に', body: '素材の味わいを大切に、手間を惜しまず焼き上げたお菓子をお届けします。' },
+      { image: '/images/renewal/lineup/others.webp', title: '日常に、小さな特別を', body: '贈りものにも、いつものお茶の時間にも。やさしいおいしさを佐渡から届けます。' },
+    ],
+  },
+};
+
+const RICE_STORY_IMAGES: Record<string, string> = {
+  koshihikari: '/images/home/collections/collection_koshihikari_800.webp',
+  kamenoo: '/images/home/collections/collection_kamenoo_800.webp',
+  nikomaru: '/images/renewal/lineup/rice.webp',
 };
 
 function getProductCategories(p: Product): string[] {
@@ -91,6 +114,7 @@ export default function CollectionsPage() {
       } else {
         result = supabaseProducts.filter((p) => {
           const cats = getProductCategories(p);
+          if (currentCategory === '原木しいたけ') return cats.some((cat) => /原木(しいたけ|椎茸)/.test(cat)) || /原木(しいたけ|椎茸)/.test(p.title);
           return cats.includes(currentCategory) || p.title.includes(currentCategory);
         });
       }
@@ -143,61 +167,71 @@ export default function CollectionsPage() {
               すべて<span className="text-yuunagi-ink font-medium">10%OFF</span>でお届けします。
             </p>
           )}
-          {!isLpView && (
           <div className="-mx-6 w-full overflow-x-auto px-6 pb-4 scrollbar-hide">
             {currentCategory === 'お米' ? (
               <div className="flex gap-4 min-w-max justify-center md:justify-center">
-                <Link href="/collections/rice" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${!currentSubcategory ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
+                <Link href="/collections/rice" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${!currentSubcategory ? 'bg-yuunagi text-white border-yuunagi' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
                   すべての商品
                 </Link>
-                <Link href="/collections/rice/yearly?view=lp" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentSubcategory === 'yearly' ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
+                <Link href="/collections/rice/yearly?view=lp" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentSubcategory === 'yearly' ? 'bg-yuunagi text-white border-yuunagi' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
                   イケベジ定期便
                 </Link>
                 <Link href="/start-set" className="px-4 py-2 rounded-full text-xs tracking-widest border border-gray-200 bg-white text-gray-600 hover:bg-gray-50">食べ比べセット</Link>
-                <Link href="/collections/rice/koshihikari" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentSubcategory === 'koshihikari' ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
+                <Link href="/collections/rice/koshihikari" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentSubcategory === 'koshihikari' ? 'bg-yuunagi text-white border-yuunagi' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
                   従来コシヒカリ
                 </Link>
-                <Link href="/collections/rice/kamenoo" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentSubcategory === 'kamenoo' ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
+                <Link href="/collections/rice/kamenoo" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentSubcategory === 'kamenoo' ? 'bg-yuunagi text-white border-yuunagi' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
                   亀の尾
                 </Link>
-                <Link href="/collections/rice/nikomaru" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentSubcategory === 'nikomaru' ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
+                <Link href="/collections/rice/nikomaru" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentSubcategory === 'nikomaru' ? 'bg-yuunagi text-white border-yuunagi' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
                   にこまる
                 </Link>
               </div>
             ) : (
               <div className="flex gap-4 min-w-max justify-center md:justify-center">
-                <Link href="/collections" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentCategory === 'ALL' ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200'}`}>
-                  すべての商品
+                <Link href="/collections/rice/yearly?view=lp" className="rounded-full border border-gray-200 bg-white px-4 py-2 text-xs tracking-widest text-gray-600">イケベジ定期便</Link>
+                <Link href="/start-set" className="rounded-full border border-gray-200 bg-white px-4 py-2 text-xs tracking-widest text-gray-600">スタートセット（食べ比べ）</Link>
+                <Link href="/collections/rice/koshihikari" className="rounded-full border border-gray-200 bg-white px-4 py-2 text-xs tracking-widest text-gray-600">コシヒカリ</Link>
+                <Link href="/collections/rice/kamenoo" className="rounded-full border border-gray-200 bg-white px-4 py-2 text-xs tracking-widest text-gray-600">亀の尾</Link>
+                <Link href="/collections/rice/nikomaru" className="rounded-full border border-gray-200 bg-white px-4 py-2 text-xs tracking-widest text-gray-600">にこまる</Link>
+                <Link href="/collections/shiitake" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentCategory === '原木しいたけ' ? 'bg-yuunagi text-white border-yuunagi' : 'bg-white text-gray-600 border-gray-200'}`}>
+                  原木しいたけ
                 </Link>
-                <Link href="/collections/rice" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${(currentCategory as CategoryLabel) === 'お米' ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200'}`}>
-                  お米
-                </Link>
-                <Link href="/collections/crescent" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentCategory === 'Crescentmoon' ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200'}`}>
-                  Crescentmoon
-                </Link>
-                <Link href="/collections/other" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentCategory === 'その他' ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200'}`}>
-                  その他
-                </Link>
-                <Link href="/collections/new-rice" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentCategory === '新米いただけ' ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200'}`}>
-                  新米いただけ
-                </Link>
-                <Link href="/start-set" className="px-4 py-2 rounded-full text-xs tracking-widest border border-gray-200 bg-white text-gray-600">スタートセット</Link>
-                <Link href="/collections/ticket" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentCategory === 'チケット' ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200'}`}>チケット</Link>
+                <Link href="/collections/crescent" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentCategory === 'Crescentmoon' ? 'bg-yuunagi text-white border-yuunagi' : 'bg-white text-gray-600 border-gray-200'}`}>クレセントムーン</Link>
               </div>
             )}
           </div>
-          )}
         </div>
 
         {currentSubcategory && RICE_INTROS[currentSubcategory] && (
-          <section className="mb-20 grid gap-10 border-y border-gray-100 py-14 md:mb-28 md:grid-cols-2 md:gap-16 md:py-20">
-            <div className="space-y-6">
-              <p className="text-sm text-yuunagi-ink">{RICE_INTROS[currentSubcategory].lead}</p>
-              <h2 className="font-serif text-3xl tracking-wider text-primary md:text-5xl">{RICE_INTROS[currentSubcategory].title}</h2>
+          <section className="mb-24 space-y-16 border-y border-gray-100 py-14 md:mb-32 md:space-y-24 md:py-20">
+            <div className="grid gap-10 md:grid-cols-2 md:gap-16">
+              <div className="space-y-6"><p className="text-sm text-yuunagi-ink">{RICE_INTROS[currentSubcategory].lead}</p><h2 className="font-serif text-3xl tracking-wider text-primary md:text-5xl">{RICE_INTROS[currentSubcategory].title}</h2></div>
+              <div className="space-y-5 text-sm leading-loose text-gray-600 md:text-base">{RICE_INTROS[currentSubcategory].details.map((text) => <p key={text}>{text}</p>)}</div>
             </div>
-            <div className="space-y-5 text-sm leading-loose text-gray-600 md:text-base">
-              {RICE_INTROS[currentSubcategory].details.map((text) => <p key={text}>{text}</p>)}
+            <div className="grid items-center gap-8 md:grid-cols-2 md:gap-16">
+              <div className="aspect-[16/10] overflow-hidden"><img src={RICE_STORY_IMAGES[currentSubcategory]} alt={`${RICE_INTROS[currentSubcategory].title}のお米`} className="h-full w-full object-cover" loading="lazy" /></div>
+              <div className="space-y-5"><h3 className="font-serif text-2xl text-primary md:text-3xl">品種の個性を、そのまま</h3><p className="text-sm leading-loose text-gray-600 md:text-base">同じ佐渡の田んぼでも、品種によって甘み、香り、食感は異なります。いつもの料理と一緒に、その違いをお楽しみください。</p></div>
             </div>
+            <div className="grid items-center gap-8 md:grid-cols-2 md:gap-16">
+              <div className="aspect-[16/10] overflow-hidden md:order-2"><img src="/images/about/stories/about_story_taue_123.webp" alt="佐渡の田んぼでの米づくり" className="h-full w-full object-cover" loading="lazy" /></div>
+              <div className="space-y-5"><h3 className="font-serif text-2xl text-primary md:text-3xl">佐渡の自然と育てる</h3><p className="text-sm leading-loose text-gray-600 md:text-base">島の気候と生きものに寄り添いながら、毎日の食卓へまっすぐ届けられるお米を育てています。</p></div>
+            </div>
+          </section>
+        )}
+
+        {categoryParam && CATEGORY_STORIES[categoryParam] && (
+          <section className="mb-24 space-y-16 md:mb-32 md:space-y-24">
+            <div className="text-center">
+              <p className="mb-5 text-sm text-yuunagi-ink">{CATEGORY_STORIES[categoryParam].lead}</p>
+              <h2 className="font-serif text-3xl tracking-wider text-primary md:text-5xl">{CATEGORY_STORIES[categoryParam].title}</h2>
+            </div>
+            {CATEGORY_STORIES[categoryParam].blocks.map((block, index) => (
+              <div key={block.title} className="grid items-center gap-8 md:grid-cols-2 md:gap-16">
+                <div className={`aspect-[16/10] overflow-hidden ${index % 2 ? 'md:order-2' : ''}`}><img src={block.image} alt="" className="h-full w-full object-cover" loading="lazy" /></div>
+                <div className="space-y-6"><h3 className="font-serif text-2xl text-primary md:text-3xl">{block.title}</h3><p className="text-sm leading-loose text-gray-600 md:text-base">{block.body}</p></div>
+              </div>
+            ))}
           </section>
         )}
 

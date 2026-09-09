@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
-import HeroVideo from '@/components/HeroVideo';
 import AnnouncementPopup from '@/components/AnnouncementPopup';
 import Lineup from '@/components/home/Lineup';
-import BrandAbout from '@/components/home/BrandAbout';
+import HeroStory from '@/components/home/HeroStory';
 import SubscriptionCTA from '@/components/home/SubscriptionCTA';
 
 export const metadata: Metadata = {
@@ -33,7 +32,7 @@ export const revalidate = 300;
  */
 export default function HomePage() {
   return (
-    <div className="animate-fade-in overflow-x-hidden w-full">
+    <div className="animate-fade-in overflow-x-clip w-full">
       <AnnouncementPopup />
 
       {/* ページの主題を検索エンジンに伝えるH1（デザイン上は非表示） */}
@@ -41,17 +40,15 @@ export default function HomePage() {
         佐渡島の自然栽培米・無農薬玄米｜イケベジ（IKEVEGE）公式オンラインショップ
       </h1>
 
-      {/* 1. トップ動画（テロップ入りの新素材が届いたら差し替え） */}
-      <HeroVideo />
-
-      {/* 2. イケベジのメッセージ */}
-      <BrandAbout />
+      {/* 1. トップ動画から手紙へつながるブランドストーリー */}
+      <HeroStory />
 
       {/* 3. ラインナップ */}
       <Lineup />
 
       {/* 4. 定期便 */}
       <SubscriptionCTA />
+
 
     </div>
   );

@@ -168,6 +168,7 @@ export default async function StartSetPage() {
         )}
 
         <ProductFeatures
+          alwaysOpenFirst
           rows={[
             {
               label: 'セット内容',
@@ -192,7 +193,11 @@ export default async function StartSetPage() {
             },
           ]}
         />
-        <div className="mt-8 flex justify-center"><RiceGuideModal /></div>
+        <div className="mt-8 flex flex-wrap justify-center gap-4">
+          <RiceGuideModal />
+          <Link href="/legal" className="inline-flex min-h-12 items-center justify-center rounded-full border border-gray-300 px-6 text-sm text-primary hover:border-primary">特定商取引法に基づく表記 →</Link>
+          <Link href="/rice-keep" className="inline-flex min-h-12 items-center justify-center rounded-full border border-gray-300 px-6 text-sm text-primary hover:border-primary">ライスキープを見る →</Link>
+        </div>
 
         <section className="mt-20 grid overflow-hidden bg-hekishoku text-white md:mt-28 lg:grid-cols-2">
           <div className="min-h-[320px] lg:min-h-[480px]"><img src="/images/about/hero/retreat_2025_56.webp" alt="佐渡の田んぼで笑顔を見せる家族" loading="lazy" className="h-full w-full object-cover" /></div>

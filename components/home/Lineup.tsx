@@ -23,15 +23,15 @@ const TILES: {
   },
   {
     en: 'Shiitake',
-    ja: '原木椎茸',
-    href: '/collections/other',
+    ja: '原木しいたけ',
+    href: '/collections/shiitake',
     image: '/images/renewal/lineup/shiitake.webp',
   },
   {
     en: 'Crescentmoon',
     ja: 'クレセントムーン',
     href: '/collections/crescent',
-    image: '/images/renewal/lineup/others.webp',
+    image: '/images/crescentmoon/589F7B72-C537-4904-A9AD-55F5EDFF1A71.jpg',
   },
 ];
 

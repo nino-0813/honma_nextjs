@@ -419,22 +419,6 @@ export default function ProductDetailView({ product }: { product: Product }) {
             <div id="purchase-panel">
               <h1 className="text-xl md:text-2xl font-medium text-primary leading-relaxed tracking-wide mb-3">{product.title}</h1>
 
-              {/* 簡潔な説明。全文はページ下部の「この商品について」に出す */}
-              {(() => {
-                const excerpt = (product.description ?? '')
-                  .replace(/https?:\/\/\S+/g, '')
-                  .split(/\n+/)
-                  .map((line) => line.trim())
-                  .filter((line) => line && !line.startsWith('※'))
-                  .join(' ');
-                if (!excerpt) return null;
-                const short = excerpt.length > 90 ? `${excerpt.slice(0, 90)}…` : excerpt;
-                return (
-                  <p className="text-[13px] leading-relaxed text-gray-600 mb-4">
-                    {short}
-                  </p>
-                );
-              })()}
               <div className="mb-8 border-b border-gray-100 pb-8">
                 {subscriptionEnabled && purchaseType === 'subscription' && subscriptionDiscountPercent > 0 ? (
                   <div className="flex items-baseline gap-3 mb-1">
@@ -462,30 +446,19 @@ export default function ProductDetailView({ product }: { product: Product }) {
                              {type.options.find((o) => o.id === selectedOptions[type.id])?.value ?? '未選択'}
                            </span>
                          </label>
-                         {/* 写真と価格を出すカード形式。横に溢れる場合はスクロールする */}
-                         <div className="flex gap-2.5 overflow-x-auto scrollbar-hide -mx-1 px-1 pb-1">
+                         <div className="flex flex-wrap gap-2.5">
                            {type.options.map(option => {
                              const selected = selectedOptions[type.id] === option.id;
-                             const optionPrice = product.price + (option.priceAdjustment || 0);
                              return (
                                <button
                                  key={option.id}
                                  onClick={() => handleOptionChange(type.id, option.id)}
                                  aria-pressed={selected}
-                                 className={`shrink-0 w-[104px] border rounded-sm overflow-hidden text-left transition-colors ${
-                                   selected ? 'border-hekishoku' : 'border-gray-200 hover:border-gray-400'
+                                 className={`min-h-11 rounded-full border px-4 py-2 text-sm transition-colors ${
+                                   selected ? 'border-primary bg-primary text-white' : 'border-gray-300 bg-white text-primary hover:border-primary'
                                  }`}
                                >
-                                 <span className="block aspect-square bg-dim overflow-hidden">
-                                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                                   <img src={product.image} alt="" aria-hidden="true" loading="lazy" className="w-full h-full object-cover" />
-                                 </span>
-                                 <span className={`block px-2 pt-2 text-[12px] leading-tight ${selected ? 'text-primary font-medium' : 'text-gray-600'}`}>
-                                   {option.value}
-                                 </span>
-                                 <span className="block px-2 pb-2 pt-0.5 text-[11px] text-gray-500 tabular-nums">
-                                   ¥{optionPrice.toLocaleString()}
-                                 </span>
+                                 {option.value}{option.priceAdjustment ? `（${option.priceAdjustment > 0 ? '+' : ''}¥${option.priceAdjustment.toLocaleString()}）` : ''}
                                </button>
                              );
                            })}
@@ -640,7 +613,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
 
               {/* 購入方法（ベースフードと同じく、特典を並べたラジオカード） */}
               {subscriptionEnabled && subscriptionIntervals.length > 0 && (
-              <div className="mb-6">
+              <div className="mb-6 flex flex-col">
                 <p className="text-sm font-medium text-primary">1. 購入方法を選ぶ</p>
                 <p className="mt-1 mb-3 text-[11px] text-gray-500">※カート内のすべての商品に適用されます</p>
 
@@ -649,7 +622,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                   type="button"
                   onClick={() => setPurchaseType('subscription')}
                   aria-pressed={purchaseType === 'subscription'}
-                  className={`w-full text-left border-2 rounded-sm p-4 md:p-5 transition-colors ${
+                  className={`order-2 mt-3 w-full text-left border-2 rounded-sm p-4 md:p-5 transition-colors ${
                     purchaseType === 'subscription' ? 'border-primary bg-white' : 'border-gray-200 bg-white hover:border-gray-300'
                   }`}
                 >
@@ -675,6 +648,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                         'お届けに合わせて出荷直前に精米します',
                         'お米が余りそうな月はスキップできます',
                         'お届けの間隔はマイページからいつでも変更できます',
+                        'いつでも解約できます',
                       ].map((t) => (
                         <li key={t} className="flex items-start gap-2 text-[12px] md:text-[13px] text-gray-600 leading-relaxed">
                           <svg className="shrink-0 mt-0.5 w-3.5 h-3.5 text-yuunagi" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -692,7 +666,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                   type="button"
                   onClick={() => setPurchaseType('one_time')}
                   aria-pressed={purchaseType === 'one_time'}
-                  className={`mt-3 w-full text-left border-2 rounded-sm p-4 md:p-5 transition-colors ${
+                  className={`order-1 w-full text-left border-2 rounded-sm p-4 md:p-5 transition-colors ${
                     purchaseType === 'one_time' ? 'border-primary bg-white' : 'border-gray-200 bg-white hover:border-gray-300'
                   }`}
                 >
@@ -709,7 +683,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
 
                 {/* 定期購入プラン選択 */}
                 {purchaseType === 'subscription' && subscriptionIntervals.length > 0 && (
-                  <div className="mt-6 bg-gray-50 rounded p-4">
+                  <div className="order-3 mt-6 bg-gray-50 rounded p-4">
                     <p className="text-xs font-medium text-gray-700 mb-3">2. お届け頻度を選ぶ</p>
                     <div className="space-y-2">
                       {subscriptionIntervals.map((interval) => (
@@ -786,7 +760,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                              // 追加処理は addSelectionToCart に集約している
                              if (addSelectionToCart()) openCart();
                            }}
-                           className="w-full py-4 text-sm tracking-widest uppercase bg-black text-white hover:bg-gray-800 transition-colors"
+                           className="w-full py-4 text-sm font-semibold tracking-widest bg-yuunagi text-white hover:bg-yuunagi-ink transition-colors"
                          >
                            {purchaseType === 'subscription'
                              ? `定期購入（${SUBSCRIPTION_INTERVAL_LABELS[subscriptionInterval]}）をカートに追加`
@@ -843,7 +817,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                                // 追加処理は addSelectionToCart に集約している
                                if (addSelectionToCart()) openCart();
                              }}
-                             className="w-full py-4 text-sm tracking-widest bg-white text-black border border-black hover:bg-gray-50 transition-colors group relative"
+                             className="group relative w-full bg-yuunagi py-4 text-sm font-semibold tracking-widest text-white transition-colors hover:bg-yuunagi-ink"
                            >
                              <div className="flex items-center justify-center w-full">
                                <span>

@@ -1,10 +1,10 @@
 'use client';
 
-import { useContext, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import type { Product } from '@/types';
 import { CartContext } from '@/providers/CartProvider';
-import { checkStockAvailability } from '@/lib/supabase';
+import { checkStockAvailability, getOrders, supabase } from '@/lib/supabase';
 import { isProductSoldOut } from '@/lib/productStatus';
 import StickyPurchaseBar from '@/components/product/StickyPurchaseBar';
 
@@ -18,6 +18,7 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
   const { addToCart, openCart, cartItems } = useContext(CartContext);
   const [quantity, setQuantity] = useState(1);
   const [stockError, setStockError] = useState('');
+  const [isFirstPurchase, setIsFirstPurchase] = useState(true);
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(() => {
     const initial: Record<string, string> = {};
     product.variants_config?.forEach((type) => {
@@ -27,13 +28,29 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
     return initial;
   });
 
-  const calculatedPrice = useMemo(() => {
+  useEffect(() => {
+    let active = true;
+    const checkHistory = async () => {
+      const { data } = await supabase?.auth.getUser() ?? { data: { user: null } };
+      if (!data.user) return;
+      const orders = await getOrders(data.user.id);
+      const boughtStartSet = orders.some((order) => order.order_items?.some((item) => item.product_id === product.id || item.product?.handle === 'start-set'));
+      if (active) setIsFirstPurchase(!boughtStartSet);
+    };
+    void checkHistory();
+    return () => { active = false; };
+  }, [product.id]);
+
+  useEffect(() => { if (isFirstPurchase) setQuantity(1); }, [isFirstPurchase]);
+
+  const basePrice = useMemo(() => {
     const adjustment = product.variants_config?.reduce((sum, type) => {
       const option = type.options.find((item) => item.id === selectedOptions[type.id]);
       return sum + (option?.priceAdjustment || 0);
     }, 0) || 0;
     return product.price + adjustment;
   }, [product, selectedOptions]);
+  const calculatedPrice = isFirstPurchase ? Math.round(basePrice * 0.9) : basePrice;
 
   const selectedVariant = useMemo(() => {
     if (!product.hasVariants) return undefined;
@@ -86,15 +103,15 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
           どのお米から始めよう。そんな迷いごと楽しめる、3品種の小さな食べ比べセットです。
         </p>
 
-        <div className="mb-6 rounded-2xl bg-yuunagi-soft/60 p-5 md:p-6">
+        <div className="mb-6 border border-gray-200 bg-white p-5 md:p-6">
           <div className="flex flex-wrap items-center gap-2 mb-2">
-            <span className="rounded-full bg-yuunagi px-2.5 py-1 text-[10px] font-medium text-white">初回限定</span>
+            <span className="rounded-full bg-primary px-2.5 py-1 text-[10px] font-medium text-white">{isFirstPurchase ? '初回 10%OFF' : '2回目以降'}</span>
           </div>
           <p className="text-3xl font-serif font-semibold text-primary tabular-nums">
             ¥{calculatedPrice.toLocaleString()}
             <span className="ml-1 text-xs text-gray-500">（税込）</span>
           </p>
-          <p className="mt-1 text-[11px] text-gray-500">{product.isFreeShipping ? '送料無料' : '＋送料'}</p>
+          <p className="mt-1 text-[11px] text-gray-500">送料無料</p>
         </div>
 
         {product.hasVariants && (
@@ -137,7 +154,7 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
           <div className="flex min-h-12 items-center rounded-full border border-gray-300 px-1">
             <button type="button" aria-label="数量を1つ減らす" disabled={quantity <= 1} onClick={() => setQuantity((value) => Math.max(1, value - 1))} className="h-10 w-10 disabled:opacity-30">−</button>
             <span className="w-8 text-center text-sm tabular-nums">{quantity}</span>
-            <button type="button" aria-label="数量を1つ増やす" onClick={() => setQuantity((value) => value + 1)} className="h-10 w-10">＋</button>
+            <button type="button" aria-label="数量を1つ増やす" disabled={isFirstPurchase} onClick={() => setQuantity((value) => value + 1)} className="h-10 w-10 disabled:opacity-30">＋</button>
           </div>
           <button type="button" disabled={disabled} onClick={handleAdd} className="min-h-12 flex-1 cursor-pointer rounded-full bg-yuunagi px-6 text-sm font-medium text-white transition-colors duration-200 hover:bg-yuunagi-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yuunagi focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40">
             {soldOut ? '売り切れ' : outsideSalesPeriod ? '販売期間外' : 'カートに入れる'}

@@ -2,7 +2,7 @@
  * ヘッダー・ドロワー共通のナビゲーション定義。
  *
  * 要件定義（2026-08-26 §6）に従い、アルファベット表記をやめて日本語に統一。
- * 表示順は「商品一覧 / スタートセット / 定期便 / イケベジとは」。
+ * 表示順は「イケベジとは / 商品一覧 / スタートセット / 定期便」。
  */
 
 export type NavItem = {
@@ -18,6 +18,7 @@ export type NavItem = {
 
 /** ヘッダーに横並びで出す主要項目 */
 export const PRIMARY_NAV: NavItem[] = [
+  { label: 'イケベジとは', href: '/about' },
   { label: '商品一覧', href: '/collections', matchPrefix: '/collections' },
   { label: 'スタートセット', href: '/start-set', isDraft: true },
   {
@@ -25,7 +26,6 @@ export const PRIMARY_NAV: NavItem[] = [
     href: '/collections/rice/yearly?view=lp',
     matchQuery: { key: 'view', value: 'lp' },
   },
-  { label: 'イケベジとは', href: '/about' },
 ];
 
 /** ハンバーガーの中だけに置く項目 */
@@ -46,7 +46,7 @@ export const CATEGORY_NAV = {
     { label: 'コシヒカリ', href: '/collections/rice/koshihikari', indent: true },
     { label: '亀の尾', href: '/collections/rice/kamenoo', indent: true },
     { label: 'にこまる', href: '/collections/rice/nikomaru', indent: true },
-    { label: '原木椎茸', href: '/collections/other' },
+    { label: '原木しいたけ', href: '/collections/shiitake' },
     { label: 'Crescentmoon', href: '/collections/crescent' },
     { label: 'その他', href: '/collections/other' },
   ],

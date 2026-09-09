@@ -9,8 +9,10 @@ import FadeIn from '@/components/FadeIn';
  */
 export default function ProductFeatures({
   rows,
+  alwaysOpenFirst = false,
 }: {
   rows: { label: string; sub?: string; body: string }[];
+  alwaysOpenFirst?: boolean;
 }) {
   const [open, setOpen] = useState<string | null>(rows[0]?.label ?? null);
   if (rows.length === 0) return null;
@@ -25,7 +27,13 @@ export default function ProductFeatures({
         </FadeIn>
 
         <ul className="border-t border-gray-200">
-          {rows.map((r) => {
+          {rows.map((r, index) => {
+            if (alwaysOpenFirst && index === 0) return (
+              <li key={r.label} className="border-b border-gray-200">
+                <div className="py-5 md:py-6"><span className="block text-sm font-medium text-primary md:text-base">{r.label}</span></div>
+                <div className="pb-6 whitespace-pre-wrap text-[13px] leading-loose text-gray-600 md:text-sm">{r.body}</div>
+              </li>
+            );
             const isOpen = open === r.label;
             return (
               <li key={r.label} className="border-b border-gray-200">

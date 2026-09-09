@@ -153,7 +153,7 @@ export default function YearlySubscriptionLP() {
               <p className="text-[11px] md:text-xs text-yuunagi-ink/70 leading-relaxed">
                 ※お米保存袋は1アカウントにつきおひとつまでとなります。複数種類のお米や期間の異なる定期便をご注文いただいてもプレゼントはおひとつとなります。
               </p>
-              <Link href="/collections/other" className="mt-4 inline-flex text-xs font-semibold text-yuunagi-ink underline underline-offset-4">
+              <Link href="/rice-keep" className="mt-4 inline-flex text-xs font-semibold text-yuunagi-ink underline underline-offset-4">
                 お米保存袋の商品を見る →
               </Link>
             </div>
@@ -294,11 +294,6 @@ export function YearlySubscriptionFooter() {
 
       {/* 06 定期便のご利用について */}
       <div className="max-w-3xl mx-auto px-2 mb-16 md:mb-24">
-        <div className="text-center mb-8">
-          <h3 className="text-xl md:text-2xl font-serif font-semibold text-primary tracking-wider">
-            定期便のご利用について
-          </h3>
-        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
           {[
             {
@@ -361,11 +356,6 @@ export function YearlySubscriptionFooter() {
 
       {/* 07 よくある質問 */}
       <div className="max-w-3xl mx-auto px-2 mb-16 md:mb-24">
-        <div className="text-center mb-8">
-          <h3 className="text-xl md:text-2xl font-serif font-medium text-primary tracking-wider">
-            よくある質問
-          </h3>
-        </div>
         <div className="space-y-3">
           {FAQ_ITEMS.map((item, i) => (
             <details
@@ -397,11 +387,6 @@ export function YearlySubscriptionFooter() {
 
       {/* 送料について */}
       <div className="max-w-3xl mx-auto px-2 mb-16 md:mb-24">
-        <div className="text-center mb-6">
-          <h3 className="text-xl md:text-2xl font-serif font-medium text-primary tracking-wider">
-            送料について
-          </h3>
-        </div>
         <div className="bg-gray-50 rounded-xl p-5 md:p-6 text-xs md:text-sm text-gray-600 leading-relaxed space-y-2">
           <p>
             毎回のお届け時に送料が別途かかります。送料は配送地域・商品の重量サイズによって異なります。
