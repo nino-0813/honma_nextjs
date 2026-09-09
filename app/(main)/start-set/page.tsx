@@ -2,12 +2,12 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import ProductGallery from '@/components/product/ProductGallery';
 import ProductFeatures from '@/components/product/ProductFeatures';
-import ProductStory from '@/components/product/ProductStory';
 import StickyPurchaseBar from '@/components/product/StickyPurchaseBar';
 import SubscriptionCTA from '@/components/home/SubscriptionCTA';
 import { SHOW_PLACEHOLDER_BADGE } from '@/components/home/placeholders';
 import { getProductByHandle, getPublishedProductByHandle } from '@/lib/supabase';
 import StartSetPurchasePanel from '@/components/start-set/StartSetPurchasePanel';
+import RiceGuideModal from '@/components/start-set/RiceGuideModal';
 
 export const metadata: Metadata = {
   title: 'スタートセット',
@@ -41,13 +41,6 @@ const VARIETIES = [
   { name: 'にこまる', taste: '大粒・もっちり', body: '粒感と食べごたえがあり、冷めてもおいしい。', image: '/images/renewal/lineup/rice.webp', href: '/collections/rice/nikomaru' },
 ];
 
-const BENEFITS = [
-  '3品種を少量ずつ、食べ比べていただけます',
-  '通常より20%OFF でお試しいただけます',
-  '定期便で使える初回クーポン（送料無料・20%OFF）つき',
-  'お届けに合わせて出荷直前に精米します',
-];
-
 // 管理画面で保存した内容を、確認用デプロイですぐ確認できるようにする。
 export const dynamic = 'force-dynamic';
 
@@ -63,9 +56,9 @@ export default async function StartSetPage() {
 
   return (
     <div className="min-h-screen w-full overflow-x-clip bg-white pb-24 pt-24 animate-fade-in md:pt-28">
-      <section className="border-b border-yuunagi/15 bg-yuunagi-soft/35 px-5 py-16 text-center md:py-24">
+      <section className="px-5 py-16 text-center md:py-24">
         <h1 className="mx-auto max-w-4xl font-serif text-[32px] font-semibold leading-[1.55] tracking-[0.08em] text-primary md:text-5xl lg:text-[56px]">
-          まずは、3つのお米を<br className="sm:hidden" />食べ比べ。
+          3品種 食べ比べセット
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-sm leading-loose text-gray-600 md:text-base">
           佐渡で同じように育てても、甘みも、香りも、食感も違う。<br className="hidden md:block" />
@@ -118,20 +111,6 @@ export default async function StartSetPage() {
                   <span className="ml-1 text-xs text-gray-500">（税込）</span>
                 </p>
                 <p className="mt-1 text-[11px] text-gray-500">＋送料　※価格は予定です</p>
-              </div>
-
-              <div className="border-2 border-gray-200 rounded-sm p-4 md:p-5 mb-6">
-                <p className="text-sm font-medium text-primary mb-4">このセットでできること</p>
-                <ul className="flex flex-col gap-2.5">
-                  {BENEFITS.map((b) => (
-                    <li key={b} className="flex items-start gap-2 text-[12px] md:text-[13px] text-gray-600 leading-relaxed">
-                      <svg className="shrink-0 mt-0.5 w-3.5 h-3.5 text-yuunagi" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8">
-                        <path d="M3 8.5l3.2 3.2L13 5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                      {b}
-                    </li>
-                  ))}
-                </ul>
               </div>
 
               <div className="rounded-sm border border-yuunagi-soft bg-yuunagi-soft/40 px-4 py-3 mb-4 text-[12px] text-yuunagi-ink">
@@ -188,51 +167,17 @@ export default async function StartSetPage() {
           />
         )}
 
-        <section className="mt-24 border-y border-gray-100 py-20 md:mt-32 md:py-28">
-          <div className="mb-12 text-center md:mb-16">
-            <h2 className="font-serif text-2xl font-semibold tracking-wider text-primary md:text-4xl">一膳ごとに、違いがわかる。</h2>
-            <p className="mx-auto mt-5 max-w-xl text-center text-sm leading-loose text-gray-600">同じ佐渡のお米でも、品種ごとに個性があります。<br />難しく考えず、いつものおかずと一緒にどうぞ。</p>
-          </div>
-          <div className="grid gap-6 md:grid-cols-3">
-            {VARIETIES.map((variety) => (
-              <Link key={variety.name} href={variety.href} className="group overflow-hidden bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yuunagi focus-visible:ring-offset-4">
-                <div className="relative aspect-[4/3] overflow-hidden bg-dim">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={variety.image} alt={`${variety.name}のお米`} loading="lazy" className="h-full w-full object-cover transition-transform duration-300 motion-reduce:transition-none md:group-hover:scale-[1.03]" />
-                </div>
-                <div className="p-6 md:p-7">
-                  <p className="mb-2 text-[11px] tracking-[0.16em] text-yuunagi-ink">{variety.taste}</p>
-                  <h3 className="font-serif text-xl font-semibold text-primary md:text-2xl">{variety.name}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-gray-600">{variety.body}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        <section className="mt-20 grid overflow-hidden rounded-[32px] bg-hekishoku text-white md:mt-28 lg:grid-cols-2">
-          <div className="min-h-[320px] lg:min-h-[480px]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/about/hero/retreat_2025_56.webp" alt="佐渡の田んぼで笑顔を見せる家族" loading="lazy" className="h-full w-full object-cover" />
-          </div>
-          <div className="flex flex-col justify-center p-8 md:p-12 lg:p-16">
-            <h2 className="font-serif text-2xl font-semibold leading-relaxed tracking-wider md:text-4xl">おいしさの先に、<br />残したい風景がある。</h2>
-            <p className="mt-6 text-sm leading-loose text-white/85 md:text-base">農薬や化学肥料に頼らず、島の自然と向き合って育てています。最初の一袋を選んでくれることが、佐渡の田んぼと次の季節につながります。</p>
-            <Link href="/about" className="mt-8 inline-flex min-h-12 w-fit items-center rounded-full border border-white/50 px-6 text-sm transition-colors duration-200 hover:bg-white hover:text-hekishoku focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-hekishoku">詳しく知る →</Link>
-          </div>
-        </section>
-
         <ProductFeatures
           rows={[
             {
               label: 'セット内容',
               body:
-                'コシヒカリ・亀の尾・にこまるの3品種を、それぞれ少量ずつお届けします。\n精米度合い（玄米 / 白米 / 分づき）はお選びいただけます。\n\n※ 内容量と組み合わせは確定次第、こちらに記載します。',
+                '従来コシヒカリ・亀の尾・にこまるの3品種を、それぞれ2合ずつお届けします。\n精米方法は玄米または白米からお選びいただけます。',
             },
             {
               label: '産地・栽培について',
               body:
-                '新潟県佐渡市。すべての圃場で農薬・化学肥料を使わずに栽培しています。\n佐渡市が定める「生き物を育む農法」をすべての圃場で実施しています。',
+                '新潟県佐渡市。すべての田んぼで農薬・除草剤・化学肥料を使わずに栽培しています。\n自然栽培を目指し、有機JAS認証の取得も予定しています。',
             },
             {
               label: 'お届けについて',
@@ -243,12 +188,20 @@ export default async function StartSetPage() {
             {
               label: '保存方法',
               body:
-                '直射日光と高温多湿を避け、冷蔵庫の野菜室で保管してください。\n精米後は2週間ほどで食べきっていただくのがいちばんおいしい状態です。',
+                '直射日光と高温多湿を避け、涼しい場所で保管してください。\nお米をよい状態で保つため、専用のRice Keep（お米保存袋）のご利用もおすすめしています。',
             },
           ]}
         />
+        <div className="mt-8 flex justify-center"><RiceGuideModal /></div>
 
-        <ProductStory />
+        <section className="mt-20 grid overflow-hidden bg-hekishoku text-white md:mt-28 lg:grid-cols-2">
+          <div className="min-h-[320px] lg:min-h-[480px]"><img src="/images/about/hero/retreat_2025_56.webp" alt="佐渡の田んぼで笑顔を見せる家族" loading="lazy" className="h-full w-full object-cover" /></div>
+          <div className="flex flex-col justify-center p-8 md:p-12 lg:p-16">
+            <h2 className="font-serif text-2xl font-semibold leading-relaxed tracking-wider md:text-4xl">おいしさの先に、<br />残したい風景がある。</h2>
+            <p className="mt-6 text-sm leading-loose text-white/85 md:text-base">最初の一袋を選んでくれることが、佐渡の田んぼと次の季節につながります。</p>
+            <Link href="/about" className="mt-8 inline-flex min-h-12 w-fit items-center border border-white/50 px-6 text-sm transition-colors hover:bg-white hover:text-hekishoku">詳しく知る →</Link>
+          </div>
+        </section>
 
         <div className="mt-20 md:mt-28 -mx-4 sm:-mx-6 lg:-mx-8">
           <SubscriptionCTA />

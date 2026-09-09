@@ -4,7 +4,6 @@ import AnnouncementPopup from '@/components/AnnouncementPopup';
 import Lineup from '@/components/home/Lineup';
 import BrandAbout from '@/components/home/BrandAbout';
 import SubscriptionCTA from '@/components/home/SubscriptionCTA';
-import News from '@/components/home/News';
 
 export const metadata: Metadata = {
   description:
@@ -53,9 +52,6 @@ export default function HomePage() {
 
       {/* 4. 定期便 */}
       <SubscriptionCTA />
-
-      {/* 5. お知らせ */}
-      <News />
 
     </div>
   );

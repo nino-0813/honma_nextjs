@@ -8,13 +8,6 @@ import { checkStockAvailability } from '@/lib/supabase';
 import { isProductSoldOut } from '@/lib/productStatus';
 import StickyPurchaseBar from '@/components/product/StickyPurchaseBar';
 
-const BENEFITS = [
-  'コシヒカリ・亀の尾・にこまるを2合ずつ',
-  'はじめての方にも試しやすい送料無料',
-  '農薬・化学肥料を使わず、佐渡で育てたお米',
-  '食べ比べながら、自分の好みを見つけられます',
-];
-
 const VARIETIES = [
   { name: 'コシヒカリ', image: '/images/home/collections/collection_koshihikari_800.webp', href: '/collections/rice/koshihikari' },
   { name: '亀の尾', image: '/images/home/collections/collection_kamenoo_800.webp', href: '/collections/rice/kamenoo' },
@@ -87,12 +80,8 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
   return (
     <>
       <div id="purchase-panel">
-        <div className="mb-5 flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-hekishoku px-3 py-1.5 text-[11px] font-medium tracking-[0.12em] text-white">はじめての方へ</span>
-          <span className="rounded-full border border-yuunagi/40 px-3 py-1.5 text-[11px] text-yuunagi-ink">20セット限定</span>
-        </div>
-        <p className="mb-3 text-xs tracking-[0.18em] text-yuunagi-ink">IKEVEGE START SET</p>
-        <h2 className="mb-4 text-2xl font-medium leading-relaxed tracking-wide text-primary md:text-3xl">{product.title}</h2>
+        <p className="mb-3 text-sm text-yuunagi-ink">スタートセット</p>
+        <h2 className="mb-4 text-2xl font-medium leading-relaxed tracking-wide text-primary md:text-3xl">3種食べ比べセット</h2>
         <p className="mb-7 text-sm leading-loose text-gray-600">
           どのお米から始めよう。そんな迷いごと楽しめる、3品種の小さな食べ比べセットです。
         </p>
@@ -114,7 +103,7 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
               <fieldset key={type.id}>
                 <legend className="mb-2 text-sm font-medium text-primary">{type.name}</legend>
                 <div className="flex flex-wrap gap-2">
-                  {type.options.map((option) => {
+                  {type.options.filter((option) => !/分づき/.test(option.value)).map((option) => {
                     const selected = selectedOptions[type.id] === option.id;
                     return (
                       <button
@@ -142,18 +131,6 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
             )}
           </div>
         )}
-
-        <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-5 md:p-6">
-          <p className="mb-4 text-sm font-medium text-primary">はじめやすい4つの理由</p>
-          <ul className="flex flex-col gap-2.5">
-            {BENEFITS.map((benefit) => (
-              <li key={benefit} className="flex items-start gap-2 text-[12px] md:text-[13px] text-gray-600 leading-relaxed">
-                <svg className="shrink-0 mt-0.5 w-3.5 h-3.5 text-yuunagi" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M3 8.5l3.2 3.2L13 5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                {benefit}
-              </li>
-            ))}
-          </ul>
-        </div>
 
         {stockError && <p role="alert" className="mb-4 text-sm text-red-600">{stockError}</p>}
         <div className="flex items-center gap-3">

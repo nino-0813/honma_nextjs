@@ -7,8 +7,7 @@ import FadeIn from '@/components/FadeIn';
  * 商品カテゴリーが増えても折り返せる写真タイルに
  * 白抜きの見出しと丸ボタンを重ねる。
  *
- * 注意: 原木椎茸は現在DB上 category='その他' のため、リンク先は暫定。
- * 管理画面でカテゴリを分けたら href を差し替える。
+ * 原木しいたけとCrescentmoonは現在の商品カテゴリへ誘導する。
  */
 const TILES: {
   en: string;
@@ -29,9 +28,9 @@ const TILES: {
     image: '/images/renewal/lineup/shiitake.webp',
   },
   {
-    en: 'Others',
-    ja: 'その他',
-    href: '/collections/other',
+    en: 'Crescentmoon',
+    ja: 'クレセントムーン',
+    href: '/collections/crescent',
     image: '/images/renewal/lineup/others.webp',
   },
 ];

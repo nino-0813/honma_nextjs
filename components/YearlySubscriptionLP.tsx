@@ -39,20 +39,10 @@ export default function YearlySubscriptionLP() {
     <section className="mt-12 md:mt-16 mb-10 md:mb-16">
       {/* 01 キャッチコピー */}
       <div className="max-w-3xl mx-auto text-center mb-16 md:mb-20">
-        <p className="text-[11px] md:text-xs text-yuunagi-ink tracking-[0.3em] uppercase mb-3 font-medium">
-          Subscription
-        </p>
         <h2 className="text-xl md:text-3xl font-serif font-semibold text-primary leading-[1.55] md:leading-[1.4] mb-4">
-          毎日のごはんに、
-          <br className="md:hidden" />
-          佐渡の田んぼをひとつ。
+          ともに作り、守り、育てていく<br />
+          イケベジ定期便
         </h2>
-        <div className="w-10 h-px bg-yuunagi mx-auto mb-4" />
-        <p className="text-xs md:text-sm text-gray-600 leading-loose">
-          イケベジのお米を、必要な量だけ、必要なタイミングでお届けします。
-          <br className="hidden md:block" />
-          専用保冷庫で大切に保管したお米を、お届けに合わせて精米。
-        </p>
       </div>
 
       {/* 02 2つの理由（画像付き横並びカード） */}
@@ -60,11 +50,11 @@ export default function YearlySubscriptionLP() {
         {REASONS.map((r, idx) => (
           <div
             key={r.title}
-            className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-md transition-all shadow-[0_10px_30px_-12px_rgba(0,0,0,0.12)]"
+            className="overflow-hidden bg-white"
           >
             <div className={`grid grid-cols-1 md:grid-cols-2 ${idx % 2 === 1 ? 'md:[&>*:first-child]:order-2' : ''}`}>
               {/* 画像 */}
-              <div className="relative aspect-[4/3] md:aspect-auto md:min-h-[360px] bg-stone-100 overflow-hidden">
+              <div className="relative aspect-[16/10] bg-stone-100 overflow-hidden md:aspect-auto md:min-h-[340px]">
                 <Image
                   src={r.image}
                   alt={r.imageAlt}
@@ -91,7 +81,7 @@ export default function YearlySubscriptionLP() {
       </div>
 
       {/* 03 新規お申し込み特典 */}
-      <div className="relative bg-yuunagi-soft/70 border border-yuunagi-soft rounded-2xl overflow-hidden mb-10 md:mb-14 shadow-[0_15px_40px_-12px_rgba(0,0,0,0.22)]">
+      <div className="relative mb-10 overflow-hidden bg-yuunagi-soft/70 md:mb-14">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
           {/* 画像 */}
           <div className="relative aspect-[4/3] md:aspect-auto md:min-h-[420px] bg-yuunagi-soft/50 overflow-hidden">
@@ -163,6 +153,9 @@ export default function YearlySubscriptionLP() {
               <p className="text-[11px] md:text-xs text-yuunagi-ink/70 leading-relaxed">
                 ※お米保存袋は1アカウントにつきおひとつまでとなります。複数種類のお米や期間の異なる定期便をご注文いただいてもプレゼントはおひとつとなります。
               </p>
+              <Link href="/collections/other" className="mt-4 inline-flex text-xs font-semibold text-yuunagi-ink underline underline-offset-4">
+                お米保存袋の商品を見る →
+              </Link>
             </div>
           </div>
         </div>
@@ -170,7 +163,6 @@ export default function YearlySubscriptionLP() {
 
       {/* 04 商品一覧見出し */}
       <div id="ikevege-subscription" className="text-center mb-6 mt-20 md:mt-28 pt-6 border-t border-gray-100 scroll-mt-28">
-        <p className="text-[11px] md:text-xs text-yuunagi-ink tracking-[0.3em] uppercase mb-3 font-medium">Products</p>
         <h3 className="text-xl md:text-2xl font-serif font-medium text-primary tracking-wider mb-2">
           イケベジ定期便
         </h3>
@@ -254,26 +246,16 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
 ];
 
 export function YearlySubscriptionFooter() {
-  const handleScrollToProducts = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    const el = document.getElementById('ikevege-subscription');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
-
   return (
     <section className="mt-16 md:mt-24 border-t border-gray-100 pt-12 md:pt-16">
       {/* 05 私たちの想い（画像左 + テキスト右） */}
       <div className="max-w-6xl mx-auto px-2 mb-16 md:mb-24">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
           {/* 画像（左） */}
-          <div className="relative aspect-[4/5] md:aspect-[4/5] overflow-hidden shadow-[0_15px_40px_-12px_rgba(0,0,0,0.2)]">
+          <div className="relative aspect-[4/5] overflow-hidden md:aspect-[4/5]">
             <Image
-              src="/images/about/stories/about_story_taue_123.jpg"
-              alt="佐渡の田んぼで田植えをするイケベジ"
+              src="/images/about/stories/P3A0011.jpg"
+              alt="佐渡の田んぼに立つイケベジの作り手"
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover"
@@ -282,9 +264,6 @@ export function YearlySubscriptionFooter() {
 
           {/* テキスト（右） */}
           <div className="md:pl-2">
-            <p className="text-[11px] md:text-xs text-yuunagi-ink tracking-[0.3em] uppercase mb-3 font-medium">
-              Our Thoughts
-            </p>
             <h3 className="text-2xl md:text-3xl font-serif font-semibold text-primary tracking-wider mb-6 md:mb-8">
               私たちの想い
             </h3>
@@ -316,7 +295,6 @@ export function YearlySubscriptionFooter() {
       {/* 06 定期便のご利用について */}
       <div className="max-w-3xl mx-auto px-2 mb-16 md:mb-24">
         <div className="text-center mb-8">
-          <p className="text-[11px] md:text-xs text-yuunagi-ink tracking-[0.3em] uppercase mb-3 font-medium">How It Works</p>
           <h3 className="text-xl md:text-2xl font-serif font-semibold text-primary tracking-wider">
             定期便のご利用について
           </h3>
@@ -384,7 +362,6 @@ export function YearlySubscriptionFooter() {
       {/* 07 よくある質問 */}
       <div className="max-w-3xl mx-auto px-2 mb-16 md:mb-24">
         <div className="text-center mb-8">
-          <p className="text-[11px] md:text-xs text-yuunagi-ink tracking-[0.3em] uppercase mb-3 font-medium">FAQ</p>
           <h3 className="text-xl md:text-2xl font-serif font-medium text-primary tracking-wider">
             よくある質問
           </h3>
@@ -421,7 +398,6 @@ export function YearlySubscriptionFooter() {
       {/* 送料について */}
       <div className="max-w-3xl mx-auto px-2 mb-16 md:mb-24">
         <div className="text-center mb-6">
-          <p className="text-[11px] md:text-xs text-yuunagi-ink tracking-[0.3em] uppercase mb-3 font-medium">Shipping</p>
           <h3 className="text-xl md:text-2xl font-serif font-medium text-primary tracking-wider">
             送料について
           </h3>
@@ -440,30 +416,6 @@ export function YearlySubscriptionFooter() {
         </div>
       </div>
 
-      {/* 08 最後のCTA */}
-      <div className="relative max-w-4xl mx-auto px-2">
-        <div className="bg-gradient-to-b from-stone-50 to-yuunagi-soft/40 rounded-3xl px-6 md:px-12 py-14 md:py-20 text-center">
-          <h3 className="text-xl md:text-3xl font-serif font-semibold text-primary leading-[1.6] md:leading-[1.5] mb-6">
-            毎日のごはんに、
-            <br className="md:hidden" />
-            佐渡の田んぼをひとつ。
-          </h3>
-          <div className="w-10 h-px bg-yuunagi mx-auto mb-6" />
-          <p className="text-sm md:text-base text-primary font-medium mb-8">
-            イケベジのお米の定期便、はじめてみませんか。
-          </p>
-          <a
-            href="#ikevege-subscription"
-            onClick={handleScrollToProducts}
-            className="inline-flex items-center gap-2 bg-primary text-white text-xs md:text-sm tracking-[0.2em] uppercase px-8 md:px-10 py-4 rounded-full hover:bg-yuunagi-ink transition-colors"
-          >
-            定期便の商品を見る
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
-            </svg>
-          </a>
-        </div>
-      </div>
     </section>
   );
 }

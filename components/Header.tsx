@@ -90,18 +90,13 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
         <div className="flex justify-between items-center">
           <div className="flex-shrink-0 flex items-center z-50">
             <Link href="/" className="hover:opacity-70 transition-opacity block" aria-label="イケベジ ホーム">
-              {/* ヒーロー動画の上では白、背景が白くなったら濃色に切り替える */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={
-                  isHomePage && !isScrolled
-                    ? '/images/ikevege_wordmark_white.png'
-                    : '/images/ikevege_wordmark_dark.png'
-                }
+                src="/images/ikevege_wordmark_dark.png"
                 alt="イケベジ"
                 width={196}
                 height={34}
-                className={`w-auto object-contain transition-all duration-300 ease-out-expo ${
+                className={`w-auto object-contain opacity-60 transition-all duration-300 ease-out-expo ${
                   isScrolled ? 'h-5 md:h-7' : 'h-6 md:h-8'
                 }`}
               />
@@ -111,7 +106,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
           <nav className="ml-auto mr-8 hidden items-center space-x-7 md:flex lg:mr-10 lg:space-x-9">
             {PRIMARY_NAV.map((item) => {
               const active = isActive(item);
-              const onHero = isHomePage && !isScrolled;
+              const onHero = false;
               return (
                 <Link
                   key={item.label}
@@ -134,14 +129,10 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
           </nav>
 
           <div className="flex items-center gap-5 sm:gap-6">
-            <Link href="/account" className={`hidden sm:block transition-colors ${
-              isHomePage && !isScrolled ? 'text-white hover:text-white/80' : 'text-primary hover:text-gray-500'
-            }`} title={isLoggedIn ? 'mypage' : 'ログイン'}>
+            <Link href="/account" className="hidden text-primary transition-colors hover:text-gray-500 sm:block" title={isLoggedIn ? 'mypage' : 'ログイン'}>
               <IconUser className="w-5 h-5" />
             </Link>
-            <button type="button" onClick={onOpenCart} className={`transition-colors relative ${
-              isHomePage && !isScrolled ? 'text-white hover:text-white/80' : 'text-primary hover:text-gray-500'
-            }`}>
+            <button type="button" onClick={onOpenCart} className="relative text-primary transition-colors hover:text-gray-500">
               <IconBag className="w-5 h-5" />
               {mounted && cartItemCount > 0 && (
                 <span className="absolute -top-1.5 -right-1.5 bg-primary text-white text-[9px] font-medium w-4 h-4 flex items-center justify-center rounded-full">
@@ -150,9 +141,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
               )}
             </button>
             {/* ハンバーガーはPCでも出す（副次メニューをここに集約） */}
-            <button type="button" onClick={onOpenMenu} aria-label="メニューを開く" className={`transition-colors ${
-              isHomePage && !isScrolled ? 'text-white hover:text-white/80' : 'text-primary hover:text-gray-500'
-            }`}>
+            <button type="button" onClick={onOpenMenu} aria-label="メニューを開く" className="text-primary transition-colors hover:text-gray-500">
               <IconMenu className="w-5 h-5" />
             </button>
           </div>
