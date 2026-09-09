@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import SectionHeading from './SectionHeading';
 import { PLACEHOLDER_NEWS, SHOW_PLACEHOLDER_BADGE } from './placeholders';
 import FadeIn from '@/components/FadeIn';
 
@@ -51,7 +50,7 @@ export default async function News() {
           <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-8 lg:gap-12">
             <div className="flex flex-col gap-5">
               <FadeIn>
-                <SectionHeading en="News" ja="お知らせ" />
+                <h2 className="font-serif text-2xl tracking-wider text-primary md:text-3xl">お知らせ</h2>
               </FadeIn>
               <Link
                 href="/blog"

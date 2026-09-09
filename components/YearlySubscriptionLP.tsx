@@ -111,28 +111,28 @@ export default function YearlySubscriptionLP() {
           </div>
 
           {/* テキスト */}
-          <div className="p-6 md:py-10 md:px-10 flex flex-col justify-center">
-            <div className="mb-6">
-              <p className="text-sm md:text-base text-yuunagi-ink mb-2 font-semibold tracking-[0.05em]">
+          <div className="p-6 md:py-12 md:px-12 flex flex-col justify-center">
+            <div className="mb-7 md:mb-9">
+              <p className="text-lg md:text-[1.625rem] text-yuunagi-ink mb-1 md:mb-2 font-medium tracking-[0.04em] leading-snug">
                 新規お申し込み特典
               </p>
-              <h3 className="text-2xl md:text-[1.875rem] font-bold text-yuunagi-ink leading-[1.4] tracking-[0.04em]">
+              <h3 className="text-[1.75rem] md:text-[2.25rem] font-bold text-yuunagi-ink leading-[1.35] tracking-[0.03em]">
                 究極のお米保存袋をプレゼント
               </h3>
             </div>
 
-            <p className="text-sm md:text-base text-yuunagi-ink/80 leading-loose mb-6 font-semibold">
+            <p className="text-base md:text-xl text-yuunagi-ink/90 leading-[1.7] mb-7 md:mb-9 font-medium">
               新しく定期便をお申し込みいただいた方に、
               <br className="hidden md:block" />
               「冷蔵庫のいらないお米保存袋」をプレゼントします。
             </p>
 
-            <ul className="space-y-2.5 font-semibold mb-6">
+            <ul className="space-y-3 md:space-y-4 font-medium mb-8 md:mb-10">
               {['防虫・防湿に強い専用素材', '冷蔵庫不要でシンク下にも収まる', '繰り返し使えるジッパー付き'].map(
                 (item) => (
-                  <li key={item} className="flex items-start gap-2.5 text-xs md:text-sm text-yuunagi-ink/80">
+                  <li key={item} className="flex items-start gap-3 text-lg md:text-[1.375rem] text-yuunagi-ink/90 leading-snug">
                     <svg
-                      className="w-4 h-4 md:w-5 md:h-5 text-yuunagi flex-shrink-0 mt-0.5"
+                      className="w-5 h-5 md:w-6 md:h-6 text-yuunagi flex-shrink-0 mt-0.5"
                       fill="none"
                       stroke="currentColor"
                       strokeWidth={2.5}
@@ -147,13 +147,13 @@ export default function YearlySubscriptionLP() {
             </ul>
 
             <div className="pt-4 border-t border-yuunagi-soft/60 space-y-1.5">
-              <p className="text-[11px] md:text-xs text-yuunagi-ink/70 font-bold">
+              <p className="text-sm md:text-base text-yuunagi-ink/75 font-bold">
                 ※数量限定・なくなり次第終了
               </p>
-              <p className="text-[11px] md:text-xs text-yuunagi-ink/70 leading-relaxed">
+              <p className="text-sm md:text-base text-yuunagi-ink/75 leading-relaxed">
                 ※お米保存袋は1アカウントにつきおひとつまでとなります。複数種類のお米や期間の異なる定期便をご注文いただいてもプレゼントはおひとつとなります。
               </p>
-              <Link href="/rice-keep" className="mt-4 inline-flex text-xs font-semibold text-yuunagi-ink underline underline-offset-4">
+              <Link href="/rice-keep" className="mt-4 inline-flex text-sm md:text-base font-semibold text-yuunagi-ink underline underline-offset-4">
                 お米保存袋の商品を見る →
               </Link>
             </div>
@@ -264,10 +264,10 @@ export function YearlySubscriptionFooter() {
 
           {/* テキスト（右） */}
           <div className="md:pl-2">
-            <h3 className="text-2xl md:text-3xl font-serif font-semibold text-primary tracking-wider mb-6 md:mb-8">
+            <h3 className="text-[1.75rem] md:text-[2.5rem] font-serif font-semibold text-primary tracking-wider leading-snug mb-8 md:mb-10">
               私たちの想い
             </h3>
-            <div className="space-y-5 text-sm md:text-base text-gray-700 leading-loose">
+            <div className="space-y-7 md:space-y-9 text-base md:text-[1.375rem] text-gray-800 leading-[1.8] md:leading-[1.85]">
               <p>
                 みなさんに安心して、美味しいお米を食べてほしい。
                 <br />
@@ -292,6 +292,7 @@ export function YearlySubscriptionFooter() {
         </div>
       </div>
 
+      <div className="hidden">
       {/* 06 定期便のご利用について */}
       <div className="max-w-3xl mx-auto px-2 mb-16 md:mb-24">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
@@ -399,6 +400,55 @@ export function YearlySubscriptionFooter() {
             をご確認ください。
           </p>
         </div>
+      </div>
+      </div>
+
+      {/* 06 詳細案内への入口 */}
+      <nav aria-label="定期便についての詳細" className="max-w-4xl mx-auto px-2 mb-16 md:mb-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 border-y border-gray-200 md:divide-x md:divide-gray-200">
+          {[
+            {
+              href: '/subscription-guide',
+              title: '定期便のご利用について',
+              description: 'お届け・変更・スキップ・解約・保存について',
+            },
+            {
+              href: '/subscription-faq',
+              title: 'よくある質問',
+              description: '定期便についてよくいただくご質問',
+            },
+          ].map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="group flex min-h-52 flex-col items-center justify-center px-6 py-12 text-center transition-colors hover:bg-gray-50"
+            >
+              <h3 className="font-serif text-2xl tracking-[0.08em] text-primary md:text-3xl">
+                {item.title}
+              </h3>
+              <p className="mt-4 text-sm leading-relaxed text-gray-500 md:text-base">
+                {item.description}
+              </p>
+              <span className="mt-7 flex h-11 w-11 items-center justify-center rounded-full border border-gray-300 text-lg text-primary transition-all group-hover:border-primary group-hover:bg-primary group-hover:text-white">
+                →
+              </span>
+            </Link>
+          ))}
+        </div>
+      </nav>
+
+      {/* 07 商品一覧へ戻るアクション */}
+      <div className="mx-auto mb-16 max-w-4xl px-4 text-center md:mb-24">
+        <p className="font-serif text-2xl leading-relaxed tracking-[0.06em] text-primary md:text-4xl">
+          毎日のごはんに、佐渡の田んぼをひとつ。
+        </p>
+        <Link
+          href="#ikevege-subscription"
+          className="mt-9 inline-flex min-w-64 items-center justify-center gap-4 border border-primary bg-primary px-8 py-4 text-sm tracking-[0.12em] text-white transition-colors hover:bg-white hover:text-primary md:mt-12 md:min-w-80 md:py-5 md:text-base"
+        >
+          定期便の商品を見る
+          <span aria-hidden="true">↑</span>
+        </Link>
       </div>
 
     </section>
