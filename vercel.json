@@ -15,6 +15,12 @@
       "destination": "/api/$1"
     }
   ],
+  "crons": [
+    {
+      "path": "/api/expire-bank-transfers",
+      "schedule": "0 15 * * *"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

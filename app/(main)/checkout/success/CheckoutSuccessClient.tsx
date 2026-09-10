@@ -12,6 +12,8 @@ const CheckoutSuccess = () => {
   const { clearCart } = useContext(CartContext);
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const isBankTransfer = searchParams?.get('bank_transfer') === '1';
+  const instructionsUrl = searchParams?.get('instructions_url');
   const didClearCartRef = useRef(false);
   // GA4 purchase イベント重複送信防止
   const didFirePurchaseRef = useRef(false);
@@ -46,7 +48,7 @@ const CheckoutSuccess = () => {
                 setOrderNumber(data.order_number);
 
                 // GA4: 購入完了イベント（1回だけ送信、リロード時の重複もガード）
-                if (!didFirePurchaseRef.current) {
+                if (data.payment_status === 'paid' && !didFirePurchaseRef.current) {
                   didFirePurchaseRef.current = true;
                   try {
                     const items = Array.isArray((data as any).order_items)
@@ -95,11 +97,11 @@ const CheckoutSuccess = () => {
     <main className="min-h-screen bg-white pt-24 pb-16">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          {/* 成功アイコン */}
+          {/* 受付／成功アイコン */}
           <div className="mb-8">
-            <div className="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
+            <div className={`mx-auto w-20 h-20 rounded-full flex items-center justify-center ${isBankTransfer ? 'bg-amber-100' : 'bg-green-100'}`}>
               <svg
-                className="w-12 h-12 text-green-600"
+                className={`w-12 h-12 ${isBankTransfer ? 'text-amber-700' : 'text-green-600'}`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -110,19 +112,29 @@ const CheckoutSuccess = () => {
           </div>
 
           <h1 className="text-3xl md:text-4xl font-serif font-medium text-gray-900 mb-4">
-            <span className="sm:hidden">
-              ご注文
-              <br />
-              ありがとうございます
-            </span>
-            <span className="hidden sm:inline">ご注文ありがとうございます</span>
+            {isBankTransfer ? 'ご注文を受け付けました' : (
+              <><span className="sm:hidden">ご注文<br />ありがとうございます</span><span className="hidden sm:inline">ご注文ありがとうございます</span></>
+            )}
           </h1>
 
           <p className="text-base md:text-lg text-gray-600 mb-8 leading-relaxed">
-            お客様のご注文内容を担当者が確認次第
-            <br />
-            メールをお送りさせていただきます。
+            {isBankTransfer ? (
+              <>現在は入金待ちです。<br />振込先・金額・期限をご確認のうえ、お振り込みください。</>
+            ) : (
+              <>お客様のご注文内容を担当者が確認次第<br />メールをお送りさせていただきます。</>
+            )}
           </p>
+
+          {isBankTransfer && instructionsUrl && (
+            <div className="mb-8 rounded border border-amber-200 bg-amber-50 p-5 text-left">
+              <p className="mb-3 text-sm leading-relaxed text-gray-700">
+                振込手数料はお客様負担です。入金確認後に発送準備を開始します。
+              </p>
+              <a href={instructionsUrl} target="_blank" rel="noreferrer" className="inline-flex bg-primary px-6 py-3 text-sm tracking-widest text-white hover:bg-gray-800">
+                振込先を確認する
+              </a>
+            </div>
+          )}
 
           {loading ? (
             <div className="mb-8">
