@@ -123,7 +123,8 @@ export async function POST(request: Request) {
       currency: 'jpy',
       customer: customer.id,
       setup_future_usage: 'off_session',
-      automatic_payment_methods: { enabled: true },
+      // 定期便は銀行振込を許可せず、カード払いだけに固定する。
+      payment_method_types: ['card'],
       metadata: {
         ...metadata,
         type: 'subscription_init',

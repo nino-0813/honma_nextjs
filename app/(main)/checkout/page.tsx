@@ -222,7 +222,7 @@ const CheckoutForm = ({ formData, total, clientSecret, onSuccess, shippingCostIs
   formData: any;
   total: number;
   clientSecret: string;
-  onSuccess: (paymentIntentId?: string) => void;
+  onSuccess: (paymentIntentId?: string, bankTransfer?: boolean, instructionsUrl?: string | null) => void;
   shippingCostIssue?: string | null;
   salesPeriodIssue?: string | null;
   useDifferentShippingAddress?: boolean;
@@ -400,6 +400,17 @@ const CheckoutForm = ({ formData, total, clientSecret, onSuccess, shippingCostIs
         // GA4 purchase を成功ページで発火させるため payment_intent ID を渡す
         onSuccess(paymentIntent.id);
         // clearCart()は成功ページで実行するため、ここでは呼ばない
+      } else if (paymentIntent && paymentIntent.status === 'requires_action') {
+        const nextAction = paymentIntent.next_action as any;
+        if (nextAction?.type === 'display_bank_transfer_instructions') {
+          onSuccess(
+            paymentIntent.id,
+            true,
+            nextAction.display_bank_transfer_instructions?.hosted_instructions_url ?? null,
+          );
+        } else {
+          setError('お支払い手続きが完了していません。表示された案内をご確認ください。');
+        }
       }
     } catch (err: any) {
       console.error('決済エラー:', err);
@@ -440,7 +451,7 @@ const CheckoutForm = ({ formData, total, clientSecret, onSuccess, shippingCostIs
           disabled={!stripe || !elements || loading || !!shippingCostIssue || !!salesPeriodIssue}
           className="w-full py-4 bg-primary text-white text-sm tracking-widest uppercase hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? '処理中...' : salesPeriodIssue ? '販売期間外の商品があります' : shippingCostIssue ? '送料を確認してください' : `¥${total.toLocaleString()} を支払う`}
+          {loading ? '処理中...' : salesPeriodIssue ? '販売期間外の商品があります' : shippingCostIssue ? '送料を確認してください' : `¥${total.toLocaleString()} の注文を確定する`}
         </button>
       </div>
     </form>
@@ -1491,6 +1502,9 @@ const Checkout = () => {
             body: JSON.stringify({
               amount: total,
               currency: 'jpy',
+              email: formData.email,
+              name: `${formData.lastName ?? ''} ${formData.firstName ?? ''}`.trim(),
+              phone: formData.phone || undefined,
               metadata: {
                 itemCount: String(cartItems.length),
                 subtotal: String(subtotal),
@@ -1522,13 +1536,14 @@ const Checkout = () => {
           const piId = responseData?.paymentIntentId;
           const livemode = responseData?.livemode;
           const secretKeyPrefix = responseData?.secretKeyPrefix;
+          const custId = responseData?.customerId;
           if (!cs) throw new Error('clientSecretが取得できませんでした');
           if (!piId) throw new Error('paymentIntentIdが取得できませんでした');
 
           setPaymentClientSecret(cs);
           setPaymentIntentId(piId);
+          setStripeCustomerId(custId ?? null);
           setStripeSubscriptionId(null);
-          setStripeCustomerId(null);
           if (typeof livemode === 'boolean') setPaymentIntentLivemode(livemode);
           if (typeof secretKeyPrefix === 'string') setPaymentIntentSecretKeyPrefix(secretKeyPrefix);
           setPaymentIntentAmount(total);
@@ -2114,12 +2129,15 @@ const Checkout = () => {
 
   const [isRedirectingToSuccess, setIsRedirectingToSuccess] = useState(false);
 
-  const handleSuccess = (paymentIntentId?: string) => {
+  const handleSuccess = (paymentIntentId?: string, bankTransfer?: boolean, instructionsUrl?: string | null) => {
     setIsRedirectingToSuccess(true);
     setTimeout(() => {
       // payment_intent を付与して成功ページの GA4 purchase 発火を確実にする
+      const bankParams = bankTransfer
+        ? `&bank_transfer=1${instructionsUrl ? `&instructions_url=${encodeURIComponent(instructionsUrl)}` : ''}`
+        : '';
       const url = paymentIntentId
-        ? `/checkout/success?payment_intent=${encodeURIComponent(paymentIntentId)}`
+        ? `/checkout/success?payment_intent=${encodeURIComponent(paymentIntentId)}${bankParams}`
         : '/checkout/success';
       router.push(url);
     }, 100);

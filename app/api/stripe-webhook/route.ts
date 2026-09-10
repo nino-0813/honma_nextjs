@@ -641,6 +641,66 @@ export async function POST(request: Request) {
       }
     }
 
+    if (event.type === 'payment_intent.requires_action') {
+      const pi: any = event.data.object;
+      if (pi?.next_action?.type !== 'display_bank_transfer_instructions') {
+        return NextResponse.json({ received: true, skipped: 'not_bank_transfer' });
+      }
+      const { data: order, error: orderErr } = await supabaseAdmin
+        .from('orders')
+        .select('id, order_number, inventory_reserved_at')
+        .eq('payment_intent_id', pi.id)
+        .maybeSingle();
+      if (orderErr) throw orderErr;
+      if (!order) {
+        try { await supabaseAdmin.from('stripe_webhook_events').delete().eq('event_id', event.id); } catch {}
+        return NextResponse.json({ error: 'order_not_found' }, { status: 500 });
+      }
+      if (!order.inventory_reserved_at) {
+        const { error: reserveErr } = await supabaseAdmin.rpc('reserve_bank_transfer_order', { p_order_id: order.id });
+        if (reserveErr) {
+          try { await stripe.paymentIntents.cancel(pi.id); } catch (cancelErr) {
+            console.error('[BankTransfer] PaymentIntent cancel failed', cancelErr);
+          }
+          await supabaseAdmin.from('orders').update({
+            payment_status: 'failed', order_status: 'cancelled',
+            notes: `[bank_transfer] inventory_reservation_failed: ${reserveErr.message}`,
+            updated_at: new Date().toISOString(),
+          }).eq('id', order.id);
+          return NextResponse.json({ error: 'inventory_reservation_failed' }, { status: 409 });
+        }
+      }
+      await supabaseAdmin.from('orders').update({
+        order_number: order.order_number || generateOrderNumber(),
+        payment_method: 'bank_transfer', payment_status: 'pending', order_status: 'pending',
+        updated_at: new Date().toISOString(),
+      }).eq('id', order.id);
+      return NextResponse.json({ received: true, bank_transfer: true });
+    }
+
+    if (event.type === 'payment_intent.partially_funded') {
+      const pi: any = event.data.object;
+      await supabaseAdmin.from('orders').update({
+        payment_status: 'pending', payment_method: 'bank_transfer', updated_at: new Date().toISOString(),
+      }).eq('payment_intent_id', pi.id);
+      return NextResponse.json({ received: true, partially_funded: true });
+    }
+
+    if (event.type === 'payment_intent.canceled') {
+      const pi: any = event.data.object;
+      const { data: order } = await supabaseAdmin.from('orders')
+        .select('id, payment_status, inventory_reserved_at, inventory_released_at')
+        .eq('payment_intent_id', pi.id).maybeSingle();
+      if (order?.inventory_reserved_at && !order.inventory_released_at && order.payment_status !== 'paid') {
+        const { error: releaseErr } = await supabaseAdmin.rpc('release_bank_transfer_order', { p_order_id: order.id });
+        if (releaseErr) throw releaseErr;
+      }
+      if (order) {
+        await supabaseAdmin.from('orders').update({ payment_status: 'failed', order_status: 'cancelled' }).eq('id', order.id);
+      }
+      return NextResponse.json({ received: true, canceled: true });
+    }
+
     if (event.type === 'payment_intent.succeeded') {
       const pi: any = event.data.object;
       const paymentIntentId = pi.id as string;
@@ -656,7 +716,7 @@ export async function POST(request: Request) {
         const result = await supabaseAdmin
           .from('orders')
           .select(
-            'id, created_at, order_number, first_name, last_name, email, phone, shipping_address, shipping_city, shipping_postal_code, subtotal, shipping_cost, total, payment_status, order_status, coupon_id, notes, auth_user_id, stripe_subscription_id, subscription_interval'
+            'id, created_at, order_number, first_name, last_name, email, phone, shipping_address, shipping_city, shipping_postal_code, subtotal, shipping_cost, total, payment_status, order_status, coupon_id, notes, auth_user_id, stripe_subscription_id, subscription_interval, inventory_reserved_at'
           )
           .eq('payment_intent_id', paymentIntentId)
           .maybeSingle();
@@ -768,18 +828,18 @@ export async function POST(request: Request) {
           .eq('order_id', order.id);
         if (itemsErr) throw itemsErr;
 
-        for (const it of items || []) {
-          const pid = it.product_id;
-          const qty = Number(it.quantity || 0);
-          const selected = it.selected_options ?? null;
-          if (!pid || !qty) continue;
-          const { error: rpcErr } = await supabaseAdmin.rpc('decrement_product_stock', {
-            p_product_id: pid,
-            p_selected_options: selected,
-            p_qty: qty,
-          });
-          if (rpcErr) {
-            console.error('decrement_product_stock failed', { pid, qty, rpcErr });
+        if (!order.inventory_reserved_at) {
+          for (const it of items || []) {
+            const pid = it.product_id;
+            const qty = Number(it.quantity || 0);
+            const selected = it.selected_options ?? null;
+            if (!pid || !qty) continue;
+            const { error: rpcErr } = await supabaseAdmin.rpc('decrement_product_stock', {
+              p_product_id: pid,
+              p_selected_options: selected,
+              p_qty: qty,
+            });
+            if (rpcErr) console.error('decrement_product_stock failed', { pid, qty, rpcErr });
           }
         }
 
