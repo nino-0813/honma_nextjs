@@ -8,6 +8,7 @@ import { FadeInImage } from '@/components/UI';
 import type { Product } from '@/types';
 import { isProductPreorder, isProductSoldOut } from '@/lib/productStatus';
 import YearlySubscriptionLP, { YearlySubscriptionFooter } from '@/components/YearlySubscriptionLP';
+import ProductCategoryNav, { type ProductCategoryKey } from '@/components/product/ProductCategoryNav';
 
 function getFilterNameFromParam(param: string) {
   if (param === 'rice') return 'お米';
@@ -157,6 +158,20 @@ export default function CollectionsPage() {
     return currentCategory;
   };
 
+  const categoryNavKey: ProductCategoryKey = currentSubcategory === 'yearly'
+    ? 'subscription'
+    : currentSubcategory === 'koshihikari'
+      ? 'koshihikari'
+      : currentSubcategory === 'kamenoo'
+        ? 'kamenoo'
+        : currentSubcategory === 'nikomaru'
+          ? 'nikomaru'
+          : currentCategory === '原木しいたけ'
+            ? 'shiitake'
+            : currentCategory === 'Crescentmoon'
+              ? 'crescent'
+              : 'all';
+
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-white pb-36 pt-32 md:pt-40">
       <div className="max-w-[1400px] mx-auto px-6 md:px-12">
@@ -169,52 +184,18 @@ export default function CollectionsPage() {
               すべて<span className="text-yuunagi-ink font-medium">10%OFF</span>でお届けします。
             </p>
           )}
-          <div className="-mx-6 w-full overflow-x-auto px-6 pb-4 scrollbar-hide">
-            {currentCategory === 'お米' ? (
-              <div className="flex gap-4 min-w-max justify-center md:justify-center">
-                <Link href="/collections/rice" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${!currentSubcategory ? 'bg-yuunagi text-white border-yuunagi' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
-                  すべての商品
-                </Link>
-                <Link href="/collections/rice/yearly?view=lp" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentSubcategory === 'yearly' ? 'bg-yuunagi text-white border-yuunagi' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
-                  イケベジ定期便
-                </Link>
-                <Link href="/start-set" className="px-4 py-2 rounded-full text-xs tracking-widest border border-gray-200 bg-white text-gray-600 hover:bg-gray-50">食べ比べセット</Link>
-                <Link href="/collections/rice/koshihikari" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentSubcategory === 'koshihikari' ? 'bg-yuunagi text-white border-yuunagi' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
-                  従来コシヒカリ
-                </Link>
-                <Link href="/collections/rice/kamenoo" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentSubcategory === 'kamenoo' ? 'bg-yuunagi text-white border-yuunagi' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
-                  亀の尾
-                </Link>
-                <Link href="/collections/rice/nikomaru" className={`px-4 py-2 rounded-full text-xs tracking-widest border transition-colors ${currentSubcategory === 'nikomaru' ? 'bg-yuunagi text-white border-yuunagi' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
-                  にこまる
-                </Link>
-              </div>
-            ) : (
-              <div className="flex min-w-max justify-center gap-3 md:gap-5">
-                <Link href="/collections" className={`rounded-full border px-5 py-2.5 text-xs tracking-widest transition-colors md:px-6 md:text-sm ${currentCategory === 'ALL' ? 'border-black bg-black text-white' : 'border-gray-200 bg-white text-gray-600'}`}>すべて</Link>
-                <Link href="/collections/rice/yearly?view=lp" className="rounded-full border border-gray-200 bg-white px-5 py-2.5 text-xs tracking-widest text-gray-600 transition-colors hover:border-gray-400 md:px-6 md:text-sm">イケベジ定期便</Link>
-                <Link href="/start-set" className="rounded-full border border-gray-200 bg-white px-5 py-2.5 text-xs tracking-widest text-gray-600 transition-colors hover:border-gray-400 md:px-6 md:text-sm">スタートセット（食べ比べ）</Link>
-                <Link href="/collections/rice/koshihikari" className="rounded-full border border-gray-200 bg-white px-5 py-2.5 text-xs tracking-widest text-gray-600 transition-colors hover:border-gray-400 md:px-6 md:text-sm">コシヒカリ</Link>
-                <Link href="/collections/rice/kamenoo" className="rounded-full border border-gray-200 bg-white px-5 py-2.5 text-xs tracking-widest text-gray-600 transition-colors hover:border-gray-400 md:px-6 md:text-sm">亀の尾</Link>
-                <Link href="/collections/rice/nikomaru" className="rounded-full border border-gray-200 bg-white px-5 py-2.5 text-xs tracking-widest text-gray-600 transition-colors hover:border-gray-400 md:px-6 md:text-sm">にこまる</Link>
-                <Link href="/collections/shiitake" className={`rounded-full border px-5 py-2.5 text-xs tracking-widest transition-colors md:px-6 md:text-sm ${currentCategory === '原木しいたけ' ? 'bg-yuunagi text-white border-yuunagi' : 'bg-white text-gray-600 border-gray-200'}`}>
-                  原木しいたけ
-                </Link>
-                <Link href="/collections/crescent" className={`rounded-full border px-5 py-2.5 text-xs tracking-widest transition-colors md:px-6 md:text-sm ${currentCategory === 'Crescentmoon' ? 'bg-yuunagi text-white border-yuunagi' : 'bg-white text-gray-600 border-gray-200'}`}>クレセントムーン</Link>
-              </div>
-            )}
-          </div>
+          <ProductCategoryNav current={categoryNavKey} />
         </div>
 
         {currentCategory === 'ALL' && (
-          <section className="mx-auto mb-24 max-w-5xl text-center md:mb-32">
-            <p className="font-serif text-base font-semibold tracking-[0.06em] text-primary md:text-xl">
+          <section className="mx-auto mb-16 max-w-4xl text-center md:mb-24">
+            <p className="font-serif text-sm font-semibold tracking-[0.06em] text-primary md:text-base">
               新潟県産コシヒカリを疑う？
             </p>
-            <h2 className="mt-3 font-serif text-3xl font-semibold leading-tight tracking-[0.06em] text-primary md:text-4xl">
+            <h2 className="mt-3 font-serif text-2xl font-semibold leading-tight tracking-[0.06em] text-primary md:text-3xl">
               3品種 食べ比べセット
             </h2>
-            <div className="mx-auto mt-8 max-w-4xl space-y-8 font-serif text-sm leading-[2] text-gray-700 md:mt-10 md:text-base md:leading-[2.1]">
+            <div className="mx-auto mt-7 max-w-3xl space-y-6 font-serif text-sm leading-[1.9] text-gray-700 md:mt-8 md:text-[15px] md:leading-[2]">
               <p>
                 日本には1000種を超えるお米の品種があります。<br />
                 それを代表する「新潟県産コシヒカリ」間違いないです。<br />

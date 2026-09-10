@@ -8,6 +8,7 @@ import { SHOW_PLACEHOLDER_BADGE } from '@/components/home/placeholders';
 import { getProductByHandle, getPublishedProductByHandle } from '@/lib/supabase';
 import StartSetPurchasePanel from '@/components/start-set/StartSetPurchasePanel';
 import RiceGuideModal from '@/components/start-set/RiceGuideModal';
+import ProductCategoryNav from '@/components/product/ProductCategoryNav';
 
 export const metadata: Metadata = {
   title: 'スタートセット',
@@ -56,6 +57,10 @@ export default async function StartSetPage() {
 
   return (
     <div className="min-h-screen w-full overflow-x-clip bg-white pb-24 pt-24 animate-fade-in md:pt-28">
+      <div className="mx-auto max-w-[1400px] px-5 pt-10 md:px-12 md:pt-14">
+        <ProductCategoryNav current="start-set" />
+      </div>
+
       <section className="px-5 py-12 text-center md:py-16">
         <h1 className="mx-auto max-w-4xl font-serif text-[28px] font-semibold leading-[1.5] tracking-[0.08em] text-primary md:text-4xl lg:text-[40px]">
           3品種 食べ比べセット
