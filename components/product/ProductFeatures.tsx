@@ -10,9 +10,11 @@ import FadeIn from '@/components/FadeIn';
 export default function ProductFeatures({
   rows,
   alwaysOpenFirst = false,
+  showTitle = true,
 }: {
-  rows: { label: string; sub?: string; body: string }[];
+  rows: { label: string; sub?: string; body: string; link?: { href: string; label: string } }[];
   alwaysOpenFirst?: boolean;
+  showTitle?: boolean;
 }) {
   const [open, setOpen] = useState<string | null>(rows[0]?.label ?? null);
   if (rows.length === 0) return null;
@@ -20,18 +22,23 @@ export default function ProductFeatures({
   return (
     <section className="mt-24 md:mt-32 border-t border-gray-100 pt-16 md:pt-20">
       <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8 lg:gap-16">
-        <FadeIn>
-          <p className="text-xl font-serif font-semibold tracking-wider text-primary md:text-2xl">
-            商品詳細
-          </p>
-        </FadeIn>
+        {showTitle ? (
+          <FadeIn>
+            <p className="text-xl font-serif font-semibold tracking-wider text-primary md:text-2xl">
+              商品詳細
+            </p>
+          </FadeIn>
+        ) : <div aria-hidden="true" />}
 
         <ul className="border-t border-gray-200">
           {rows.map((r, index) => {
             if (alwaysOpenFirst && index === 0) return (
               <li key={r.label} className="border-b border-gray-200">
                 <div className="py-5 md:py-6"><span className="block text-sm font-medium text-primary md:text-base">{r.label}</span></div>
-                <div className="pb-6 whitespace-pre-wrap text-[13px] leading-loose text-gray-600 md:text-sm">{r.body}</div>
+                <div className="pb-6 text-[13px] leading-loose text-gray-600 md:text-sm">
+                  <p className="whitespace-pre-wrap">{r.body}</p>
+                  {r.link && <a href={r.link.href} className="mt-5 inline-flex border-b border-primary pb-0.5 font-medium text-primary transition-opacity hover:opacity-60">{r.link.label}</a>}
+                </div>
               </li>
             );
             const isOpen = open === r.label;
@@ -56,8 +63,9 @@ export default function ProductFeatures({
                 </button>
                 <div className={`accordion-body ${isOpen ? 'is-open' : ''}`}>
                   <div>
-                    <div className="pb-6 text-[13px] md:text-sm leading-loose text-gray-600 whitespace-pre-wrap">
-                      {r.body}
+                    <div className="pb-6 text-[13px] md:text-sm leading-loose text-gray-600">
+                      <p className="whitespace-pre-wrap">{r.body}</p>
+                      {r.link && <a href={r.link.href} className="mt-5 inline-flex border-b border-primary pb-0.5 font-medium text-primary transition-opacity hover:opacity-60">{r.link.label}</a>}
                     </div>
                   </div>
                 </div>

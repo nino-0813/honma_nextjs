@@ -28,7 +28,7 @@ export const metadata: Metadata = {
  *   商品が登録されたら /products/[handle] と同じ購入導線に差し替える。
  */
 const LIST_PRICE = 2340;
-const PRICE = 1872;
+const PRICE = 2106;
 
 const GALLERY = [
   '/images/renewal/products/rice-lineup.webp',
@@ -56,11 +56,11 @@ export default async function StartSetPage() {
 
   return (
     <div className="min-h-screen w-full overflow-x-clip bg-white pb-24 pt-24 animate-fade-in md:pt-28">
-      <section className="px-5 py-16 text-center md:py-24">
-        <h1 className="mx-auto max-w-4xl font-serif text-[32px] font-semibold leading-[1.55] tracking-[0.08em] text-primary md:text-5xl lg:text-[56px]">
+      <section className="px-5 py-12 text-center md:py-16">
+        <h1 className="mx-auto max-w-4xl font-serif text-[28px] font-semibold leading-[1.5] tracking-[0.08em] text-primary md:text-4xl lg:text-[40px]">
           3品種 食べ比べセット
         </h1>
-        <p className="mx-auto mt-6 max-w-2xl text-sm leading-loose text-gray-600 md:text-base">
+        <p className="mx-auto mt-5 max-w-2xl text-[13px] leading-loose text-gray-600 md:text-sm">
           佐渡で同じように育てても、甘みも、香りも、食感も違う。<br className="hidden md:block" />
           一膳ずつ味わいながら、あなたの「好き」を見つけるスタートセットです。
         </p>
@@ -92,18 +92,14 @@ export default async function StartSetPage() {
               <StartSetPurchasePanel product={product} />
             ) : (
             <div id="purchase-panel">
-              <p className="text-xs tracking-[0.15em] text-yuunagi-ink mb-2">スタートセット</p>
-              <h2 className="text-xl md:text-2xl font-medium text-primary leading-relaxed tracking-wide mb-3">
-                自然栽培米 3品種 食べ比べセット
+              <p className="text-xs tracking-[0.15em] text-gray-500 mb-2">初回限定</p>
+              <h2 className="text-xl md:text-2xl font-medium text-primary leading-relaxed tracking-wide mb-6">
+                スタートセット
               </h2>
-              <p className="text-[13px] leading-relaxed text-gray-600 mb-6">
-                コシヒカリ・亀の尾・にこまる。同じ田んぼの、同じ育て方でも、品種が違えば味も香りも変わります。
-              </p>
 
-              <div className="rounded-sm bg-yuunagi-soft/60 p-4 md:p-5 mb-6">
+              <div className="border border-gray-200 bg-white p-4 md:p-5 mb-6">
                 <div className="flex flex-wrap items-center gap-2 mb-2">
-                  <span className="rounded-sm bg-yuunagi px-2 py-1 text-[10px] font-medium text-white">20%OFF</span>
-                  <span className="rounded-sm bg-hekishoku px-2 py-1 text-[10px] font-medium text-white">初回限定</span>
+                  <span className="rounded-full bg-primary px-3 py-1 text-[10px] font-medium text-white">初回 送料無料＆10%OFF</span>
                   <span className="text-xs text-gray-500 line-through tabular-nums">¥{LIST_PRICE.toLocaleString()}</span>
                 </div>
                 <p className="text-3xl font-serif font-semibold text-primary tabular-nums">
@@ -120,7 +116,7 @@ export default async function StartSetPage() {
               <div className="flex flex-col gap-3">
                 <Link
                   href="/collections/rice"
-                  className="flex items-center justify-center rounded-full bg-yuunagi py-4 text-sm font-medium text-white hover:bg-yuunagi-ink transition-colors"
+                  className="flex items-center justify-center rounded-full bg-primary py-4 text-sm font-medium text-white hover:bg-black transition-colors"
                 >
                   お米の一覧を見る
                 </Link>
@@ -173,40 +169,52 @@ export default async function StartSetPage() {
             {
               label: 'セット内容',
               body:
-                '従来コシヒカリ・亀の尾・にこまるの3品種を、それぞれ2合ずつお届けします。\n精米方法は玄米または白米からお選びいただけます。',
-            },
-            {
-              label: '産地・栽培について',
-              body:
-                '新潟県佐渡市。すべての田んぼで農薬・除草剤・化学肥料を使わずに栽培しています。\n自然栽培を目指し、有機JAS認証の取得も予定しています。',
-            },
-            {
-              label: 'お届けについて',
-              sub: '発送 / 送料',
-              body:
-                'ご注文から5日以内に発送いたします。\nお届け日の指定は承っておりません。\n送料は地域とサイズにより異なります。',
-            },
-            {
-              label: '保存方法',
-              body:
-                '直射日光と高温多湿を避け、涼しい場所で保管してください。\nお米をよい状態で保つため、専用のRice Keep（お米保存袋）のご利用もおすすめしています。',
+                '従来コシヒカリ・亀の尾・にこまるの3品種をお届けします。\n精米方法は玄米または白米からお選びいただけます。\n\n' +
+                '・従来コシヒカリ（自然栽培）\n' +
+                '肥料も農薬も一切使わない「自然栽培」で育てた、イケベジの定番品種。余計なものを加えず、お米が本来持つ生命力に寄り添う「引き算の物づくり」を実践することで、野生味あふれる甘みと豊かな風味をそのまま引き出しています。イケベジの田んぼの中でも、山から流れ出る川から一番に入水できる田んぼから連なる、たった8枚の限られた田んぼでのみ栽培しています。田んぼの位置まで究極にこだわり抜いた、至高のお米です。\n\n' +
+                '・にこまる（無農薬無化学肥料）\n' +
+                '本来は西日本で多く栽培される品種を、佐渡の地であえて育てているのが「にこまる」です。佐渡の銘酒から出る酒粕と、豊かな海が育む牡蠣殻を肥料として活用し、地域で行き場を失っていた資源を土に還しながら育てました。大粒で贅沢な食感と豊かな甘みが持ち味で、第27回米・食味分析鑑定コンクール国際大会の国際総合部門にて金賞（最多得票）を受賞。世界最高米の原料にも選出されました。\n\n' +
+                '・亀の尾（無農薬無化学肥料）\n' +
+                'コシヒカリやササニシキなど、いまの人気品種の祖先にあたる希少な在来品種「亀の尾」。あっさりとした素朴な味で、もち米系統が入らないお米本来の味を楽しめます。高アミロース米にあたり、通常の品種よりも消化がゆっくりで、身体に優しい逸品です。佐渡で使われなくなった竹を細かくチップにして堆肥化し、田んぼに混ぜ込むことで、多孔質な竹が土壌微生物のすみかとなり、時間をかけてゆっくりと栄養が届く土づくりを実践しています。',
             },
           ]}
         />
         <div className="mt-8 flex flex-wrap justify-center gap-4">
           <RiceGuideModal />
-          <Link href="/legal" className="inline-flex min-h-12 items-center justify-center rounded-full border border-gray-300 px-6 text-sm text-primary hover:border-primary">特定商取引法に基づく表記 →</Link>
-          <Link href="/rice-keep" className="inline-flex min-h-12 items-center justify-center rounded-full border border-gray-300 px-6 text-sm text-primary hover:border-primary">ライスキープを見る →</Link>
         </div>
 
-        <section className="mt-20 grid overflow-hidden bg-hekishoku text-white md:mt-28 lg:grid-cols-2">
-          <div className="min-h-[320px] lg:min-h-[480px]"><img src="/images/about/hero/retreat_2025_56.webp" alt="佐渡の田んぼで笑顔を見せる家族" loading="lazy" className="h-full w-full object-cover" /></div>
+        <section className="mt-16 grid overflow-hidden bg-hekishoku text-white md:mt-20 lg:grid-cols-2">
+          <div className="min-h-[320px] lg:min-h-[480px]"><img src="/images/about/hero/retreat_2025_56.webp" alt="佐渡の田んぼで過ごす家族" loading="lazy" className="h-full w-full object-cover" /></div>
           <div className="flex flex-col justify-center p-8 md:p-12 lg:p-16">
-            <h2 className="font-serif text-2xl font-semibold leading-relaxed tracking-wider md:text-4xl">おいしさの先に、<br />残したい風景がある。</h2>
-            <p className="mt-6 text-sm leading-loose text-white/85 md:text-base">最初の一袋を選んでくれることが、佐渡の田んぼと次の季節につながります。</p>
+            <h2 className="font-serif text-xl font-semibold leading-relaxed tracking-wider md:text-3xl">おいしさだけじゃない、<br />イケベジが届けたいこと</h2>
+            <p className="mt-6 text-sm leading-loose text-white/85 md:text-base">お客様の日常の「いいとき」を彩る一員であるとともに、「子どもたちがここに生まれて良かったと思える社会」を創ることが、私たちの目指すビジョンです。</p>
             <Link href="/about" className="mt-8 inline-flex min-h-12 w-fit items-center border border-white/50 px-6 text-sm transition-colors hover:bg-white hover:text-hekishoku">詳しく知る →</Link>
           </div>
         </section>
+
+        <ProductFeatures
+          showTitle={false}
+          rows={[
+            {
+              label: '産地・栽培について',
+              body:
+                '新潟県佐渡・豊田集落。すべての圃場で農薬・化学肥料を使わずに栽培しています。\n佐渡市が定める「生き物を育む農法」をすべての圃場で実施しています。\n※今後JAS有機認証を取得予定',
+            },
+            {
+              label: 'お届けについて',
+              sub: '発送 / 送料',
+              body:
+                'ご注文から5日以内に発送いたします。\nお届け日の指定は承っておりません。\n送料は地域とサイズにより異なります。\n\n詳細は特定商取引法に基づく表記をご確認ください。',
+              link: { href: '/legal#shipping', label: '送料の価格表を見る →' },
+            },
+            {
+              label: '保存方法',
+              body:
+                'おすすめ：イケベジのオンラインストアでも取り扱いがあります「ライスキープ」をおすすめします。\n保存袋のプロ × お米のプロが共同開発した、常温保存が可能な究極のお米保存袋。これまで冷蔵が必須だったお米保存の常識を覆し、「新米のまま備蓄」を可能にしてくれます。',
+              link: { href: '/rice-keep', label: 'ライスキープの商品を見る →' },
+            },
+          ]}
+        />
 
         <div className="mt-20 md:mt-28 -mx-4 sm:-mx-6 lg:-mx-8">
           <SubscriptionCTA />

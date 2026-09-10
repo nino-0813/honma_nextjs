@@ -41,7 +41,7 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
     return () => { active = false; };
   }, [product.id]);
 
-  useEffect(() => { if (isFirstPurchase) setQuantity(1); }, [isFirstPurchase]);
+  useEffect(() => { setQuantity(1); }, [isFirstPurchase]);
 
   const basePrice = useMemo(() => {
     const adjustment = product.variants_config?.reduce((sum, type) => {
@@ -97,15 +97,16 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
   return (
     <>
       <div id="purchase-panel">
-        <p className="mb-3 text-sm text-yuunagi-ink">スタートセット</p>
-        <h2 className="mb-4 text-2xl font-medium leading-relaxed tracking-wide text-primary md:text-3xl">3種食べ比べセット</h2>
-        <p className="mb-7 text-sm leading-loose text-gray-600">
-          どのお米から始めよう。そんな迷いごと楽しめる、3品種の小さな食べ比べセットです。
-        </p>
+        <p className="mb-3 text-sm text-gray-500">{isFirstPurchase ? '初回限定' : '2回目以降'}</p>
+        <h2 className="mb-7 text-2xl font-medium leading-relaxed tracking-wide text-primary md:text-3xl">
+          {isFirstPurchase ? 'スタートセット' : '3種食べ比べセット'}
+        </h2>
 
         <div className="mb-6 border border-gray-200 bg-white p-5 md:p-6">
           <div className="flex flex-wrap items-center gap-2 mb-2">
-            <span className="rounded-full bg-primary px-2.5 py-1 text-[10px] font-medium text-white">{isFirstPurchase ? '初回 10%OFF' : '2回目以降'}</span>
+            <span className="rounded-full bg-primary px-3 py-1 text-[10px] font-medium tracking-wide text-white">
+              {isFirstPurchase ? '初回 送料無料＆10%OFF' : '2回目以降 送料無料'}
+            </span>
           </div>
           <p className="text-3xl font-serif font-semibold text-primary tabular-nums">
             ¥{calculatedPrice.toLocaleString()}
@@ -116,11 +117,14 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
 
         {product.hasVariants && (
           <div className="mb-6 space-y-5">
-            {product.variants_config?.length ? product.variants_config.map((type) => (
+            {product.variants_config?.length ? product.variants_config.map((type) => {
+              const millingOptions = type.options.filter((option) => /玄米|白米/.test(option.value) && !/分づき/.test(option.value));
+              if (millingOptions.length === 0) return null;
+              return (
               <fieldset key={type.id}>
-                <legend className="mb-2 text-sm font-medium text-primary">{type.name}</legend>
+                <legend className="mb-2 text-sm font-medium text-primary">精米方法</legend>
                 <div className="flex flex-wrap gap-2">
-                  {type.options.filter((option) => !/分づき/.test(option.value)).map((option) => {
+                  {millingOptions.map((option) => {
                     const selected = selectedOptions[type.id] === option.id;
                     return (
                       <button
@@ -136,16 +140,17 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
                   })}
                 </div>
               </fieldset>
-            )) : (
+              );
+            }) : product.variants?.some((variant) => /玄米|白米/.test(variant)) ? (
               <fieldset>
-                <legend className="mb-2 text-sm font-medium text-primary">種類</legend>
+                <legend className="mb-2 text-sm font-medium text-primary">精米方法</legend>
                 <div className="flex flex-wrap gap-2">
-                  {product.variants?.map((variant) => (
+                  {product.variants?.filter((variant) => /玄米|白米/.test(variant) && !/分づき/.test(variant)).map((variant) => (
                     <button key={variant} type="button" aria-pressed={selectedOptions.legacy === variant} onClick={() => setSelectedOptions({ legacy: variant })} className={`min-h-11 rounded-full border px-4 py-2 text-sm ${selectedOptions.legacy === variant ? 'border-primary bg-primary text-white' : 'border-gray-300 bg-white text-primary'}`}>{variant}</button>
                   ))}
                 </div>
               </fieldset>
-            )}
+            ) : null}
           </div>
         )}
 
@@ -154,9 +159,9 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
           <div className="flex min-h-12 items-center rounded-full border border-gray-300 px-1">
             <button type="button" aria-label="数量を1つ減らす" disabled={quantity <= 1} onClick={() => setQuantity((value) => Math.max(1, value - 1))} className="h-10 w-10 disabled:opacity-30">−</button>
             <span className="w-8 text-center text-sm tabular-nums">{quantity}</span>
-            <button type="button" aria-label="数量を1つ増やす" disabled={isFirstPurchase} onClick={() => setQuantity((value) => value + 1)} className="h-10 w-10 disabled:opacity-30">＋</button>
+            <button type="button" aria-label="数量を1つ増やす" disabled onClick={() => setQuantity(1)} className="h-10 w-10 disabled:opacity-30">＋</button>
           </div>
-          <button type="button" disabled={disabled} onClick={handleAdd} className="min-h-12 flex-1 cursor-pointer rounded-full bg-yuunagi px-6 text-sm font-medium text-white transition-colors duration-200 hover:bg-yuunagi-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yuunagi focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40">
+          <button type="button" disabled={disabled} onClick={handleAdd} className="min-h-12 flex-1 cursor-pointer rounded-full bg-primary px-6 text-sm font-medium text-white transition-colors duration-200 hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40">
             {soldOut ? '売り切れ' : outsideSalesPeriod ? '販売期間外' : 'カートに入れる'}
           </button>
         </div>
@@ -174,7 +179,7 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
         </div>
       </div>
 
-      <StickyPurchaseBar title={product.title} price={calculatedPrice} image={product.images?.[0] || product.image} quantity={quantity} onQuantityChange={setQuantity} onAddToCart={addSelectionToCart} disabled={disabled} disabledLabel={soldOut ? '売り切れ' : '販売期間外'} />
+      <StickyPurchaseBar title={product.title} price={calculatedPrice} image={product.images?.[0] || product.image} quantity={1} onQuantityChange={() => setQuantity(1)} onAddToCart={addSelectionToCart} disabled={disabled} disabledLabel={soldOut ? '売り切れ' : '販売期間外'} />
     </>
   );
 }

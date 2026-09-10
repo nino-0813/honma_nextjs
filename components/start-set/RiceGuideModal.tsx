@@ -19,7 +19,7 @@ export default function RiceGuideModal() {
   return (
     <>
       <button type="button" onClick={() => setOpen(true)} className="inline-flex min-h-12 items-center justify-center rounded-full border border-primary px-6 text-sm text-primary transition-colors hover:bg-primary hover:text-white">
-        3品種の比較表を見る →
+        3品種の比較表（PDF）を見る →
       </button>
       {open && (
         <div role="dialog" aria-modal="true" aria-label="イケベジ品種比較表" className="fixed inset-0 z-[100] flex items-center justify-center bg-black/65 p-3 md:p-8" onClick={() => setOpen(false)}>
