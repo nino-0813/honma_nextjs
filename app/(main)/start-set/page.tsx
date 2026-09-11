@@ -56,9 +56,11 @@ export default async function StartSetPage() {
     : GALLERY;
 
   return (
-    <div className="min-h-screen w-full overflow-x-clip bg-white pb-24 pt-24 animate-fade-in md:pt-28">
-      <div className="mx-auto max-w-[1400px] px-5 pt-8 md:px-12 md:pt-12">
-        <ProductCategoryNav current="start-set" />
+    <div className="min-h-screen w-full overflow-x-clip bg-white pb-24 pt-32 animate-fade-in md:pt-40">
+      <div className="sticky top-16 z-30 border-y border-gray-100 bg-white/95 py-3 backdrop-blur-md md:top-20">
+        <div className="mx-auto max-w-[1400px] px-5 md:px-12">
+          <ProductCategoryNav current="start-set" />
+        </div>
       </div>
 
       <section className="px-5 py-12 text-center md:py-16">

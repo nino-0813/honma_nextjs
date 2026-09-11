@@ -228,6 +228,21 @@ export default function AboutPage() {
         </div>
       </section>
 
+      <section className="bg-white px-6 pb-12 pt-4 md:pb-16 md:pt-8">
+        <FadeInSection className="mx-auto max-w-3xl text-center">
+          <p className="font-serif text-xl leading-relaxed tracking-[0.06em] text-primary md:text-3xl">
+            毎日のごはんに、佐渡の田んぼをひとつ。
+          </p>
+          <Link
+            href="/collections"
+            className="mt-8 inline-flex min-h-12 items-center justify-center gap-3 rounded-full bg-primary px-10 py-4 text-sm font-medium tracking-[0.08em] text-white transition-colors hover:bg-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 md:mt-10"
+          >
+            商品一覧を見る
+            <span aria-hidden="true">→</span>
+          </Link>
+        </FadeInSection>
+      </section>
+
       <section className="pt-8 pb-16 md:py-24 bg-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <FadeInSection>

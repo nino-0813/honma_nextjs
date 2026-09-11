@@ -174,11 +174,15 @@ export default function CollectionsPage() {
 
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-white pb-36 pt-32 md:pt-40">
+      <div className="sticky top-16 z-30 border-y border-gray-100 bg-white/95 py-3 backdrop-blur-md md:top-20">
+        <div className="mx-auto max-w-[1400px] px-6 md:px-12">
+          <ProductCategoryNav current={categoryNavKey} />
+        </div>
+      </div>
       <div className="max-w-[1400px] mx-auto px-6 md:px-12">
         <div className="mb-16 text-center animate-fade-in md:mb-24">
-          <ProductCategoryNav current={categoryNavKey} />
           {currentCategory !== 'ALL' && (
-            <h1 className="mt-10 font-serif text-2xl font-normal tracking-[0.15em] md:mt-14 md:text-3xl">{getPageTitle()}</h1>
+            <h1 className="mt-12 font-serif text-2xl font-normal tracking-[0.15em] md:mt-16 md:text-3xl">{getPageTitle()}</h1>
           )}
           {currentSubcategory === 'yearly' && !isLpView && (
             <p className="mt-5 text-xs leading-relaxed text-gray-600 md:text-sm">

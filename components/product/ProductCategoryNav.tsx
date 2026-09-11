@@ -15,7 +15,7 @@ const ITEMS: { key: ProductCategoryKey; label: string; href: string }[] = [
 
 export default function ProductCategoryNav({ current }: { current: ProductCategoryKey }) {
   return (
-    <nav aria-label="商品カテゴリー" className="-mx-6 overflow-x-auto px-6 pb-4 scrollbar-hide md:-mx-12 md:px-12">
+    <nav aria-label="商品カテゴリー" className="-mx-6 overflow-x-auto px-6 scrollbar-hide md:-mx-12 md:px-12">
       <div className="flex min-w-max justify-center gap-3 md:gap-4">
         {ITEMS.map((item) => {
           const active = item.key === current;
