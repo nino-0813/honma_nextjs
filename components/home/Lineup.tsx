@@ -28,7 +28,7 @@ const TILES: {
     image: '/images/renewal/lineup/shiitake.webp',
   },
   {
-    en: 'Crescentmoon',
+    en: 'Others',
     ja: 'クレセントムーン',
     href: '/collections/crescent',
     image: '/images/crescentmoon/589F7B72-C537-4904-A9AD-55F5EDFF1A71.jpg',

@@ -35,7 +35,7 @@ export default function SubscriptionCTA() {
         <div className="mt-12 text-center">
           <Link
             href="/collections/rice/yearly?view=lp"
-            className="inline-flex min-h-12 items-center gap-2 rounded-full bg-yuunagi px-10 py-4 text-sm font-medium text-white transition-colors hover:bg-yuunagi-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yuunagi focus-visible:ring-offset-2"
+            className="inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-10 py-4 text-sm font-medium text-white transition-colors hover:bg-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             定期便をはじめる
             <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4">

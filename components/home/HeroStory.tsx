@@ -15,11 +15,17 @@ export default function HeroStory() {
     const stage = stageRef.current;
     if (!section || !stage || window.matchMedia('(max-width: 1023px)').matches) return;
     let frame = 0;
-    const update = () => {
-      frame = 0;
+    let targetProgress = 0;
+    let currentProgress = 0;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const readProgress = () => {
       const rect = section.getBoundingClientRect();
       const distance = Math.max(1, section.offsetHeight - window.innerHeight);
-      const progress = Math.min(1, Math.max(0, -rect.top / distance));
+      return Math.min(1, Math.max(0, -rect.top / distance));
+    };
+
+    const render = (progress: number) => {
       stage.style.setProperty('--story-progress', String(progress));
       const videoProgress = Math.min(1, progress / 0.24);
       stage.style.setProperty('--video-progress', String(videoProgress));
@@ -34,36 +40,61 @@ export default function HeroStory() {
         item.style.pointerEvents = opacity > 0.6 ? 'auto' : 'none';
       });
     };
-    const onScroll = () => { if (!frame) frame = requestAnimationFrame(update); };
-    update();
+
+    const animate = () => {
+      const difference = targetProgress - currentProgress;
+      currentProgress = reduceMotion || Math.abs(difference) < 0.0001
+        ? targetProgress
+        : currentProgress + difference * 0.11;
+      render(currentProgress);
+      if (Math.abs(targetProgress - currentProgress) >= 0.0001) {
+        frame = requestAnimationFrame(animate);
+      } else {
+        frame = 0;
+      }
+    };
+
+    const onScroll = () => {
+      targetProgress = readProgress();
+      if (!frame) frame = requestAnimationFrame(animate);
+    };
+    const onResize = () => {
+      targetProgress = readProgress();
+      currentProgress = targetProgress;
+      render(currentProgress);
+    };
+
+    targetProgress = readProgress();
+    currentProgress = targetProgress;
+    render(currentProgress);
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
+    window.addEventListener('resize', onResize);
     return () => {
       if (frame) cancelAnimationFrame(frame);
       window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
+      window.removeEventListener('resize', onResize);
     };
   }, []);
 
   return (
     <section ref={sectionRef} className="relative bg-[#f8f7f3] lg:h-[320vh]">
       <div ref={stageRef} className="mx-auto max-w-[1440px] px-5 pb-20 pt-6 md:px-12 lg:sticky lg:top-20 lg:h-[calc(100vh-5rem)] lg:overflow-hidden lg:py-8" style={{ '--story-progress': 0, '--video-progress': 0 } as React.CSSProperties}>
-        <div className="relative mx-auto aspect-video w-full overflow-hidden rounded-[20px] bg-gray-200 shadow-[0_24px_70px_rgba(48,44,35,0.12)] lg:absolute lg:left-[4%] lg:top-1/2 lg:w-[calc(92%-var(--video-progress)*42%)] lg:-translate-y-1/2 lg:rounded-[calc(24px-var(--video-progress)*10px)]">
+        <div className="relative mx-auto aspect-video w-full overflow-hidden bg-gray-200 shadow-[0_24px_70px_rgba(48,44,35,0.12)] lg:absolute lg:left-[4%] lg:top-1/2 lg:w-[calc(92%-var(--video-progress)*42%)] lg:-translate-y-1/2 lg:will-change-[width]">
           <video src={VIDEO} poster={POSTER} autoPlay muted loop playsInline preload="auto" className="h-full w-full object-cover" />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-black/5" />
         </div>
 
         <div className="mt-12 space-y-20 lg:absolute lg:right-[4%] lg:top-1/2 lg:mt-0 lg:h-[min(72vh,620px)] lg:w-[41%] lg:-translate-y-1/2">
-          <div data-story-step className="lg:absolute lg:inset-x-0 lg:top-1/2 lg:opacity-0 motion-reduce:transition-none">
+          <div data-story-step className="lg:absolute lg:inset-x-0 lg:top-1/2 lg:opacity-0 lg:will-change-[transform,opacity] motion-reduce:transition-none">
             <h2 className="font-serif text-[42px] font-semibold leading-[1.55] tracking-[0.08em] text-[#26231e] md:text-[56px] lg:text-[clamp(40px,3.2vw,58px)]">あんしん、<br />おいしい、<br />いいとき。</h2>
           </div>
-          <div data-story-step className="lg:absolute lg:inset-x-0 lg:top-1/2 lg:opacity-0 motion-reduce:transition-none">
+          <div data-story-step className="lg:absolute lg:inset-x-0 lg:top-1/2 lg:opacity-0 lg:will-change-[transform,opacity] motion-reduce:transition-none">
             <div className="space-y-7 font-serif text-[16px] leading-[2.15] tracking-[0.045em] text-[#37332c] md:text-[18px]">
               <p>ヒトと自然が共生していく道を選んだこの島には、絶滅危惧種のトキと共生するために、島のすべての農家がその取り組みに関わってきた歴史があります。</p>
               <p>そのバトンを受け取り、イケベジは始まりました。</p>
             </div>
           </div>
-          <div data-story-step className="lg:absolute lg:inset-x-0 lg:top-1/2 lg:opacity-0 motion-reduce:transition-none">
+          <div data-story-step className="lg:absolute lg:inset-x-0 lg:top-1/2 lg:opacity-0 lg:will-change-[transform,opacity] motion-reduce:transition-none">
             <div className="space-y-7 font-serif text-[16px] leading-[2.15] tracking-[0.045em] text-[#37332c] md:text-[18px]">
               <p>自然のチカラに寄り添ってつくった食べものが、みんなの活力になり、なんてことのない日常でも格別な時間（とき）に感じられますように。</p>
               <p className="text-[19px] font-semibold tracking-[0.1em] text-[#26231e] md:text-[22px]">「きょうも しぜんと いいときを。」</p>

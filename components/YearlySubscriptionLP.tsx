@@ -104,7 +104,7 @@ export default function YearlySubscriptionLP() {
                   For New Members
                 </span>
               </div>
-              <p className="font-serif text-5xl md:text-7xl tracking-[0.2em] leading-none">
+              <p className="font-serif text-4xl tracking-[0.2em] leading-none md:text-5xl">
                 Gift
               </p>
             </div>
@@ -113,24 +113,27 @@ export default function YearlySubscriptionLP() {
           {/* テキスト */}
           <div className="p-6 md:py-12 md:px-12 flex flex-col justify-center">
             <div className="mb-7 md:mb-9">
-              <p className="text-lg md:text-[1.625rem] text-yuunagi-ink mb-1 md:mb-2 font-medium tracking-[0.04em] leading-snug">
+              <p className="mb-1 font-serif text-xl font-medium leading-snug tracking-[0.04em] text-yuunagi-ink md:text-2xl">
                 新規お申し込み特典
               </p>
-              <h3 className="text-[1.75rem] md:text-[2.25rem] font-bold text-yuunagi-ink leading-[1.35] tracking-[0.03em]">
+              <p className="mb-2 text-xs leading-relaxed tracking-[0.06em] text-yuunagi-ink/80 md:text-sm">
+                保存袋のプロ × お米のプロが共同開発
+              </p>
+              <h3 className="font-serif text-[26px] font-bold leading-[1.4] tracking-[0.03em] text-yuunagi-ink md:text-[32px]">
                 究極のお米保存袋をプレゼント
               </h3>
             </div>
 
-            <p className="text-base md:text-xl text-yuunagi-ink/90 leading-[1.7] mb-7 md:mb-9 font-medium">
+            <p className="mb-7 text-[15px] font-medium leading-[1.85] text-yuunagi-ink/90 md:mb-9 md:text-[17px]">
               新しく定期便をお申し込みいただいた方に、
               <br className="hidden md:block" />
               「冷蔵庫のいらないお米保存袋」をプレゼントします。
             </p>
 
             <ul className="space-y-3 md:space-y-4 font-medium mb-8 md:mb-10">
-              {['防虫・防湿に強い専用素材', '冷蔵庫不要でシンク下にも収まる', '繰り返し使えるジッパー付き'].map(
+              {['防虫・防湿に強い専用素材', '冷蔵庫不要で、常温保存が可能'].map(
                 (item) => (
-                  <li key={item} className="flex items-start gap-3 text-lg md:text-[1.375rem] text-yuunagi-ink/90 leading-snug">
+                  <li key={item} className="flex items-start gap-3 text-lg leading-relaxed text-yuunagi-ink/90 md:text-xl">
                     <svg
                       className="w-5 h-5 md:w-6 md:h-6 text-yuunagi flex-shrink-0 mt-0.5"
                       fill="none"
@@ -264,10 +267,10 @@ export function YearlySubscriptionFooter() {
 
           {/* テキスト（右） */}
           <div className="md:pl-2">
-            <h3 className="text-[1.75rem] md:text-[2.5rem] font-serif font-semibold text-primary tracking-wider leading-snug mb-8 md:mb-10">
+            <h3 className="mb-6 font-serif text-xl font-semibold leading-snug tracking-wider text-primary md:mb-8 md:text-2xl">
               私たちの想い
             </h3>
-            <div className="space-y-7 md:space-y-9 text-base md:text-[1.375rem] text-gray-800 leading-[1.8] md:leading-[1.85]">
+            <div className="space-y-5 text-sm leading-[1.9] text-gray-700 md:space-y-6 md:text-[15px]">
               <p>
                 みなさんに安心して、美味しいお米を食べてほしい。
                 <br />
@@ -423,7 +426,7 @@ export function YearlySubscriptionFooter() {
               href={item.href}
               className="group flex min-h-52 flex-col items-center justify-center px-6 py-12 text-center transition-colors hover:bg-gray-50"
             >
-              <h3 className="font-serif text-2xl tracking-[0.08em] text-primary md:text-3xl">
+              <h3 className="font-serif text-xl tracking-[0.08em] text-primary md:text-2xl">
                 {item.title}
               </h3>
               <p className="mt-4 text-sm leading-relaxed text-gray-500 md:text-base">
@@ -439,7 +442,7 @@ export function YearlySubscriptionFooter() {
 
       {/* 07 商品一覧へ戻るアクション */}
       <div className="mx-auto mb-16 max-w-4xl px-4 text-center md:mb-24">
-        <p className="font-serif text-2xl leading-relaxed tracking-[0.06em] text-primary md:text-4xl">
+        <p className="font-serif text-xl leading-relaxed tracking-[0.06em] text-primary md:text-3xl">
           毎日のごはんに、佐渡の田んぼをひとつ。
         </p>
         <Link

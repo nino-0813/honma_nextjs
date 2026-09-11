@@ -216,7 +216,7 @@ export default function CollectionsPage() {
         {currentSubcategory && RICE_INTROS[currentSubcategory] && (
           <section className="mb-24 space-y-16 border-y border-gray-100 py-14 md:mb-32 md:space-y-24 md:py-20">
             <div className="grid gap-10 md:grid-cols-2 md:gap-16">
-              <div className="space-y-6"><p className="text-sm text-yuunagi-ink">{RICE_INTROS[currentSubcategory].lead}</p><h2 className="font-serif text-3xl tracking-wider text-primary md:text-5xl">{RICE_INTROS[currentSubcategory].title}</h2></div>
+              <div className="space-y-6"><p className="text-sm text-yuunagi-ink">{RICE_INTROS[currentSubcategory].lead}</p><h2 className="font-serif text-2xl tracking-wider text-primary md:text-3xl">{RICE_INTROS[currentSubcategory].title}</h2></div>
               <div className="space-y-5 text-sm leading-loose text-gray-600 md:text-base">{RICE_INTROS[currentSubcategory].details.map((text) => <p key={text}>{text}</p>)}</div>
             </div>
             <div className="grid items-center gap-8 md:grid-cols-2 md:gap-16">
@@ -234,7 +234,7 @@ export default function CollectionsPage() {
           <section className="mb-24 space-y-16 md:mb-32 md:space-y-24">
             <div className="text-center">
               <p className="mb-5 text-sm text-yuunagi-ink">{CATEGORY_STORIES[categoryParam].lead}</p>
-              <h2 className="font-serif text-3xl tracking-wider text-primary md:text-5xl">{CATEGORY_STORIES[categoryParam].title}</h2>
+              <h2 className="font-serif text-2xl tracking-wider text-primary md:text-3xl">{CATEGORY_STORIES[categoryParam].title}</h2>
             </div>
             {CATEGORY_STORIES[categoryParam].blocks.map((block, index) => (
               <div key={block.title} className="grid items-center gap-8 md:grid-cols-2 md:gap-16">
