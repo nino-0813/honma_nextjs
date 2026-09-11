@@ -29,7 +29,7 @@ const TILES: {
   },
   {
     en: 'Others',
-    ja: 'クレセントムーン',
+    ja: 'その他',
     href: '/collections/crescent',
     image: '/images/crescentmoon/589F7B72-C537-4904-A9AD-55F5EDFF1A71.jpg',
   },
@@ -73,7 +73,7 @@ export default function Lineup() {
           </li>
         ))}
       </ul>
-      <div className="mt-10 text-center md:mt-14">
+      <div className="mx-auto mt-10 flex max-w-[1500px] justify-end px-5 md:mt-14 md:px-10">
         <Link
           href="/collections"
           className="inline-flex min-h-11 items-center gap-2 rounded-full border border-gray-300 px-6 py-3 text-xs text-primary transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 md:text-[13px]"

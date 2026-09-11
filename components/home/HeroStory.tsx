@@ -77,14 +77,14 @@ export default function HeroStory() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative bg-[#f8f7f3] lg:h-[320vh]">
-      <div ref={stageRef} className="mx-auto max-w-[1440px] px-5 pb-20 pt-6 md:px-12 lg:sticky lg:top-20 lg:h-[calc(100vh-5rem)] lg:overflow-hidden lg:py-8" style={{ '--story-progress': 0, '--video-progress': 0 } as React.CSSProperties}>
-        <div className="relative mx-auto aspect-video w-full overflow-hidden bg-gray-200 shadow-[0_24px_70px_rgba(48,44,35,0.12)] lg:absolute lg:left-[4%] lg:top-1/2 lg:w-[calc(92%-var(--video-progress)*42%)] lg:-translate-y-1/2 lg:will-change-[width]">
+    <section ref={sectionRef} className="relative bg-white lg:h-[320vh]">
+      <div ref={stageRef} className="w-full px-5 pb-20 pt-6 md:px-10 lg:sticky lg:top-20 lg:h-[calc(100vh-5rem)] lg:overflow-hidden lg:py-8" style={{ '--story-progress': 0, '--video-progress': 0 } as React.CSSProperties}>
+        <div className="relative mx-auto aspect-video w-full overflow-hidden bg-gray-200 shadow-[0_24px_70px_rgba(48,44,35,0.12)] lg:absolute lg:left-[2%] lg:top-1/2 lg:h-[calc(100%-4rem)] lg:w-[calc(96%-var(--video-progress)*46%)] lg:-translate-y-1/2 lg:aspect-auto lg:will-change-[width]">
           <video src={VIDEO} poster={POSTER} autoPlay muted loop playsInline preload="auto" className="h-full w-full object-cover" />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-black/5" />
         </div>
 
-        <div className="mt-12 space-y-20 lg:absolute lg:right-[4%] lg:top-1/2 lg:mt-0 lg:h-[min(72vh,620px)] lg:w-[41%] lg:-translate-y-1/2">
+        <div className="mt-14 space-y-24 lg:absolute lg:right-[4%] lg:top-1/2 lg:mt-0 lg:h-[min(72vh,620px)] lg:w-[41%] lg:-translate-y-1/2">
           <div data-story-step className="lg:absolute lg:inset-x-0 lg:top-1/2 lg:opacity-0 lg:will-change-[transform,opacity] motion-reduce:transition-none">
             <h2 className="font-serif text-[42px] font-semibold leading-[1.55] tracking-[0.08em] text-[#26231e] md:text-[56px] lg:text-[clamp(40px,3.2vw,58px)]">あんしん、<br />おいしい、<br />いいとき。</h2>
           </div>
