@@ -57,7 +57,7 @@ export default async function StartSetPage() {
 
   return (
     <div className="min-h-screen w-full overflow-x-clip bg-white pb-24 pt-24 animate-fade-in md:pt-28">
-      <div className="mx-auto max-w-[1400px] px-5 pt-10 md:px-12 md:pt-14">
+      <div className="mx-auto max-w-[1400px] px-5 pt-8 md:px-12 md:pt-12">
         <ProductCategoryNav current="start-set" />
       </div>
 
