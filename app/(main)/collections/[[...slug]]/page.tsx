@@ -177,7 +177,7 @@ export default function CollectionsPage() {
               : 'all';
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden bg-white pb-36 pt-32 md:pt-40">
+    <div className="min-h-screen w-full overflow-x-hidden bg-white pb-36 pt-20 md:pt-24">
       <div className="sticky top-16 z-30 border-y border-gray-100 bg-white/95 py-3 backdrop-blur-md md:top-20">
         <div className="mx-auto max-w-[1400px] px-6 md:px-12">
           <ProductCategoryNav current={categoryNavKey} />
