@@ -170,6 +170,10 @@ export default function CollectionsPage() {
             ? 'shiitake'
             : currentCategory === 'Crescentmoon'
               ? 'crescent'
+              : currentCategory === 'チケット'
+                ? 'ticket'
+                : currentCategory === 'お米'
+                  ? 'rice'
               : 'all';
 
   return (
@@ -190,32 +194,6 @@ export default function CollectionsPage() {
             </p>
           )}
         </div>
-
-        {currentCategory === 'ALL' && (
-          <section className="mx-auto mb-16 max-w-4xl text-center md:mb-24">
-            <p className="font-serif text-sm font-semibold tracking-[0.06em] text-primary md:text-base">
-              新潟県産コシヒカリを疑う？
-            </p>
-            <h2 className="mt-3 font-serif text-2xl font-semibold leading-tight tracking-[0.06em] text-primary md:text-3xl">
-              3品種 食べ比べセット
-            </h2>
-            <div className="mx-auto mt-7 max-w-3xl space-y-6 font-serif text-sm leading-[1.9] text-gray-700 md:mt-8 md:text-[15px] md:leading-[2]">
-              <p>
-                日本には1000種を超えるお米の品種があります。<br />
-                それを代表する「新潟県産コシヒカリ」間違いないです。<br />
-                しかし、お米の美味しい！は「合うか合わないか」から始まると考えています。
-              </p>
-              <p>
-                明治時代に農民によって発見され、コシヒカリの祖先である在来種「亀の尾」<br />
-                現代の気候に合わせた改良が行われたコシヒカリの遺伝子を濃く受け継ぐ「にこまる」<br />
-                新潟県のコシヒカリの約3%ほどの生産量の「従来コシヒカリ」
-              </p>
-              <p>
-                その個性を比較し、愉しみ、ぜひあなたにフィットするお米を日常の食卓へ。
-              </p>
-            </div>
-          </section>
-        )}
 
         {currentSubcategory && RICE_INTROS[currentSubcategory] && (
           <section className="mb-24 space-y-16 border-y border-gray-100 py-14 md:mb-32 md:space-y-24 md:py-20">
@@ -305,11 +283,11 @@ export default function CollectionsPage() {
                     />
                   </div>
                 </div>
-                <div className="flex-1 flex flex-col gap-2 text-center">
+                <div className="flex flex-1 flex-col gap-2 text-left">
                   <h2 className="text-sm font-medium text-primary leading-relaxed group-hover:text-gray-600 transition-colors line-clamp-2 min-h-[2.8em]">
                     {product.handle === 'start-set' ? '3種食べ比べセット' : product.title}
                   </h2>
-                  <p className="text-sm text-gray-900 font-serif tracking-wide flex items-center justify-center gap-2 flex-wrap">
+                  <p className="flex flex-wrap items-center justify-start gap-2 font-serif text-sm tracking-wide text-gray-900">
                     {(() => {
                       // 定期便ページ（LPビュー）では10%OFFの値引き価格を表示する
                       const discountPercent = isLpView
@@ -321,7 +299,7 @@ export default function CollectionsPage() {
                       if (discountPercent > 0) {
                         const discounted = Math.round(product.price * (1 - discountPercent / 100));
                         return (
-                          <span className="flex items-center gap-2 flex-wrap justify-center">
+                          <span className="flex flex-wrap items-center justify-start gap-2">
                             <span className="text-gray-400 line-through text-xs">
                               ¥{product.price.toLocaleString()}
                             </span>

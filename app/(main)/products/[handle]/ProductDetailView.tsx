@@ -26,9 +26,12 @@ type PurchaseType = 'one_time' | 'subscription';
 const PRODUCT_NAV = [
   { label: 'すべての商品', href: '/collections' },
   { label: 'お米', href: '/collections/rice' },
-  { label: '定期便', href: '/collections/rice/yearly?view=lp' },
-  { label: '原木椎茸', href: '/collections/other' },
-  { label: 'その他', href: '/collections/other' },
+  { label: '従来コシヒカリ', href: '/collections/rice/koshihikari' },
+  { label: '亀の尾', href: '/collections/rice/kamenoo' },
+  { label: 'にこまる', href: '/collections/rice/nikomaru' },
+  { label: '原木しいたけ', href: '/collections/shiitake' },
+  { label: 'クレセントムーン', href: '/collections/crescent' },
+  { label: 'チケット', href: '/collections/ticket' },
 ];
 
 export default function ProductDetailView({ product }: { product: Product }) {

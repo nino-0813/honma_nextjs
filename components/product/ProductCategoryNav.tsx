@@ -1,16 +1,16 @@
 import Link from 'next/link';
 
-export type ProductCategoryKey = 'all' | 'subscription' | 'start-set' | 'koshihikari' | 'kamenoo' | 'nikomaru' | 'shiitake' | 'crescent';
+export type ProductCategoryKey = 'all' | 'rice' | 'subscription' | 'start-set' | 'koshihikari' | 'kamenoo' | 'nikomaru' | 'shiitake' | 'crescent' | 'ticket';
 
 const ITEMS: { key: ProductCategoryKey; label: string; href: string }[] = [
   { key: 'all', label: 'すべての商品', href: '/collections' },
-  { key: 'subscription', label: 'イケベジ定期便', href: '/collections/rice/yearly?view=lp' },
-  { key: 'start-set', label: '食べ比べセット', href: '/start-set' },
+  { key: 'rice', label: 'お米', href: '/collections/rice' },
   { key: 'koshihikari', label: '従来コシヒカリ', href: '/collections/rice/koshihikari' },
   { key: 'kamenoo', label: '亀の尾', href: '/collections/rice/kamenoo' },
   { key: 'nikomaru', label: 'にこまる', href: '/collections/rice/nikomaru' },
   { key: 'shiitake', label: '原木しいたけ', href: '/collections/shiitake' },
   { key: 'crescent', label: 'クレセントムーン', href: '/collections/crescent' },
+  { key: 'ticket', label: 'チケット', href: '/collections/ticket' },
 ];
 
 export default function ProductCategoryNav({ current }: { current: ProductCategoryKey }) {
