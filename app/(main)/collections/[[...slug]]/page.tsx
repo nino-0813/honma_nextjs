@@ -184,9 +184,9 @@ export default function CollectionsPage() {
         </div>
       </div>
       <div className="max-w-[1400px] mx-auto px-6 md:px-12">
-        <div className="mb-16 text-center animate-fade-in md:mb-24">
+        <div className={`mb-16 text-center animate-fade-in md:mb-24 ${currentCategory !== 'ALL' ? 'pt-12 md:pt-16' : ''}`}>
           {currentCategory !== 'ALL' && (
-            <h1 className="mt-12 font-serif text-2xl font-normal tracking-[0.15em] md:mt-16 md:text-3xl">{getPageTitle()}</h1>
+            <h1 className="font-serif text-2xl font-normal tracking-[0.15em] md:text-3xl">{getPageTitle()}</h1>
           )}
           {currentSubcategory === 'yearly' && !isLpView && (
             <p className="mt-5 text-xs leading-relaxed text-gray-600 md:text-sm">
