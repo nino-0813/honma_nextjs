@@ -31,7 +31,7 @@ export const PLACEHOLDER_TOPICS: TopicCard[] = [
     isPlaceholder: true,
   },
   {
-    title: '3品種を食べ比べできるスタートセット',
+    title: 'イケベジのお米3種を楽しめるお試しセット',
     label: 'キャンペーン',
     image: '/images/renewal/products/rice-lineup.webp',
     href: '/collections/rice',

@@ -66,7 +66,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title, actions }) =
           <NavItem href="/admin/subscriptions" icon={IconRefreshCw} label="定期購入" />
           <NavItem href="/admin/products" icon={IconPackage} label="商品管理" />
           <NavItem href="/admin/inventory" icon={IconArchive} label="在庫システム" />
-          <NavItem href="/admin/start-set" icon={IconPackage} label="スタートセット設定" />
+          <NavItem href="/admin/start-set" icon={IconPackage} label="お試しセット設定" />
           <NavItem href="/admin/shipping-methods" icon={IconSettings} label="発送方法管理" />
           <NavItem href="/admin/discounts" icon={IconPercent} label="クーポン" />
           <NavItem href="/admin/customer-list" icon={IconUsers} label="顧客リスト" />

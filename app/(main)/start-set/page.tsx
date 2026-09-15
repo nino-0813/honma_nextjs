@@ -11,9 +11,9 @@ import RiceGuideModal from '@/components/start-set/RiceGuideModal';
 import ProductCategoryNav from '@/components/product/ProductCategoryNav';
 
 export const metadata: Metadata = {
-  title: 'スタートセット',
+  title: 'お試しセット',
   description:
-    '佐渡島の自然栽培米を3品種を食べ比べできるスタートセット。イケベジをはじめて試す方へ。',
+    '佐渡島の自然栽培米3品種を少量ずつ楽しめるお試しセット。イケベジをはじめて試す方へ。',
   alternates: { canonical: '/start-set' },
   // 商品が確定するまで検索結果には出さない
   robots: { index: false, follow: true },
@@ -65,21 +65,15 @@ export default async function StartSetPage() {
 
       <section className="px-5 py-12 text-center md:py-16">
         <h1 className="mx-auto max-w-4xl font-serif text-[28px] font-semibold leading-[1.5] tracking-[0.08em] text-primary md:text-4xl lg:text-[40px]">
-          3品種 食べ比べセット
+          お試しセット
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-[13px] leading-loose text-gray-600 md:text-sm">
           佐渡で同じように育てても、甘みも、香りも、食感も違う。<br className="hidden md:block" />
-          一膳ずつ味わいながら、あなたの「好き」を見つけるスタートセットです。
+          一膳ずつ味わいながら、あなたの「好き」を見つけるお試しセットです。
         </p>
       </section>
 
       <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 mt-7 text-[10px] tracking-widest text-gray-400 md:mb-10">
-          <Link href="/" className="hover:text-black transition-colors">ホーム</Link>
-          <span className="mx-2">/</span>
-          <span className="text-black">スタートセット</span>
-        </div>
-
         <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-16">
           {/* 左: 画像は固定 */}
           <div className="lg:sticky lg:top-24 lg:col-span-7 lg:self-start">
@@ -89,7 +83,7 @@ export default async function StartSetPage() {
                   仮素材
                 </span>
               )}
-              <ProductGallery images={gallery} alt={product?.title || 'イケベジ スタートセット'} />
+              <ProductGallery images={gallery} alt={product?.title || 'イケベジ お試しセット'} />
             </div>
           </div>
 
@@ -99,10 +93,10 @@ export default async function StartSetPage() {
               <StartSetPurchasePanel product={product} />
             ) : (
             <div id="purchase-panel">
-              <p className="text-xs tracking-[0.15em] text-gray-500 mb-2">初回限定</p>
               <h2 className="text-xl md:text-2xl font-medium text-primary leading-relaxed tracking-wide mb-6">
-                スタートセット
+                お試しセット
               </h2>
+              <p className="-mt-4 mb-6 text-sm leading-relaxed text-gray-600">内容：イケベジのお米３種 ２合×３個</p>
 
               <div className="border border-gray-200 bg-white p-4 md:p-5 mb-6">
                 <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -135,9 +129,7 @@ export default async function StartSetPage() {
                 </Link>
               </div>
 
-              {/* セット内容 */}
               <div className="mt-8">
-                <p className="text-sm text-primary mb-3">セット内容：3品種</p>
                 <div className="flex gap-2.5 overflow-x-auto scrollbar-hide -mx-1 px-1 pb-1">
                   {VARIETIES.map((v) => (
                     <Link
@@ -161,7 +153,7 @@ export default async function StartSetPage() {
 
         {!product && (
           <StickyPurchaseBar
-            title="自然栽培米 3品種 食べ比べセット"
+            title="お試しセット"
             price={PRICE}
             image={GALLERY[0]}
             note="準備中"

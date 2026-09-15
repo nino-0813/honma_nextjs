@@ -174,6 +174,9 @@ export default function CollectionsPage() {
       ? categoryParam
       : null;
   const categoryIntro = categoryIntroKey ? CATEGORY_INTROS[categoryIntroKey] : null;
+  const showSubscriptionCta = categoryParam === 'rice' && (
+    !currentSubcategory || ['koshihikari', 'kamenoo', 'nikomaru'].includes(currentSubcategory)
+  );
 
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-white pb-36 pt-20 md:pt-24">
@@ -270,7 +273,7 @@ export default function CollectionsPage() {
                 </div>
                 <div className="flex flex-1 flex-col gap-2 text-left">
                   <h2 className="text-sm font-medium text-primary leading-relaxed group-hover:text-gray-600 transition-colors line-clamp-2 min-h-[2.8em]">
-                    {product.handle === 'start-set' ? '3種食べ比べセット' : product.title}
+                    {product.handle === 'start-set' ? 'お試しセット' : product.title}
                   </h2>
                   <p className="flex flex-wrap items-center justify-start gap-2 font-serif text-sm tracking-wide text-gray-900">
                     {(() => {
@@ -318,6 +321,17 @@ export default function CollectionsPage() {
               </Link>
               );
             })}
+          </div>
+        )}
+
+        {!loading && !error && showSubscriptionCta && (
+          <div className="mt-20 flex justify-center md:mt-28">
+            <Link
+              href="/collections/rice/yearly?view=lp"
+              className="inline-flex min-h-12 items-center justify-center rounded-full bg-primary px-10 py-3 text-sm font-medium tracking-wider text-white transition-colors duration-200 hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            >
+              定期便を始める
+            </Link>
           </div>
         )}
 

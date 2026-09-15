@@ -127,7 +127,7 @@ export default function AnnouncementPopup() {
           <p className="text-xs md:text-sm text-gray-600 leading-loose mb-7">
             コシヒカリ・亀の尾・にこまるの3品種を、
             <br className="hidden md:block" />
-            少量ずつお試しいただけるスタートセットをご用意しました。
+            少量ずつお試しいただけるお試しセットをご用意しました。
           </p>
 
           <div className="flex flex-col gap-3">
@@ -136,7 +136,7 @@ export default function AnnouncementPopup() {
               onClick={close}
               className="block w-full py-3 rounded-full bg-yuunagi text-white text-sm font-medium tracking-wider hover:bg-yuunagi-ink transition-colors"
             >
-              スタートセットを見る
+              お試しセットを見る
             </Link>
             <Link
               href="/collections/rice/yearly?view=lp"

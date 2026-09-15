@@ -30,7 +30,13 @@ const SUBSCRIPTION_INTERVAL_OPTIONS: SubscriptionInterval[] = [
 ];
 
 const CATEGORIES = [
-  { id: 'お米', name: 'お米', subcategories: ['コシヒカリ', '亀の尾', 'にこまる', '年間契約', 'スタートセット'] },
+  { id: 'お米', name: 'お米', subcategories: [
+    { value: 'コシヒカリ', label: 'コシヒカリ' },
+    { value: '亀の尾', label: '亀の尾' },
+    { value: 'にこまる', label: 'にこまる' },
+    { value: '年間契約', label: '年間契約' },
+    { value: 'スタートセット', label: 'お試しセット' },
+  ] },
   { id: 'Crescentmoon', name: 'Crescentmoon', subcategories: [] },
   { id: 'その他', name: 'その他', subcategories: [] },
 ];
@@ -121,13 +127,13 @@ const ProductEditor = () => {
       fetchProduct(routeParam, isUuid);
     } else if (isNew) {
       if (isStartSet) {
-        setTitle('自然栽培米 3品種 食べ比べセット');
+        setTitle('お試しセット');
         setPrice('1872');
         setTaxRate('8');
         setCategories(['お米']);
         setSubcategories(['スタートセット']);
         setDescription(
-          'コシヒカリ・亀の尾・にこまる。同じ田んぼの、同じ育て方でも、品種が違えば味も香りも変わります。\n\n3品種を少量ずつ、食べ比べていただける初回限定セットです。'
+          'コシヒカリ・亀の尾・にこまる。同じ田んぼの、同じ育て方でも、品種が違えば味も香りも変わります。\n\n3品種を少量ずつお試しいただけるセットです。'
         );
         setHandle('start-set');
         setSku('START-SET');
@@ -153,7 +159,7 @@ const ProductEditor = () => {
       setCategories(['お米']);
       return;
     }
-    const riceSubs = CATEGORIES.find((c) => c.id === 'お米')?.subcategories ?? [];
+    const riceSubs = (CATEGORIES.find((c) => c.id === 'お米')?.subcategories ?? []).map((sub) => sub.value);
     const riceSelected = categories.includes('お米');
     if (!riceSelected) {
       if (subcategories.length > 0) setSubcategories([]);
@@ -892,16 +898,16 @@ const ProductEditor = () => {
                   <label className="block text-xs font-medium text-gray-700 mb-1">サブカテゴリー</label>
                   <div className="grid grid-cols-2 gap-2">
                     {(CATEGORIES.find((c) => c.id === 'お米')?.subcategories ?? []).map((sub) => {
-                      const checked = subcategories.includes(sub);
+                      const checked = subcategories.includes(sub.value);
                       return (
-                        <label key={sub} className="flex items-center gap-2 text-sm">
+                        <label key={sub.value} className="flex items-center gap-2 text-sm">
                           <input
                             type="checkbox"
                             checked={checked}
-                            onChange={() => setSubcategories((prev) => { const next = checked ? prev.filter((x) => x !== sub) : [...prev, sub]; return next.length > 0 ? next : prev; })}
+                            onChange={() => setSubcategories((prev) => { const next = checked ? prev.filter((x) => x !== sub.value) : [...prev, sub.value]; return next.length > 0 ? next : prev; })}
                             className="rounded border-gray-300 text-black focus:ring-black bg-white"
                           />
-                          <span className="text-gray-800">{sub}</span>
+                          <span className="text-gray-800">{sub.label}</span>
                         </label>
                       );
                     })}
@@ -921,7 +927,7 @@ const ProductEditor = () => {
                   required
                 />
                 {isStartSet && (
-                  <p className="mt-1 text-[11px] text-gray-500">スタートセットの公開URLと連携するため変更できません。</p>
+                  <p className="mt-1 text-[11px] text-gray-500">お試しセットの公開URLと連携するため変更できません。</p>
                 )}
               </div>
             </div>

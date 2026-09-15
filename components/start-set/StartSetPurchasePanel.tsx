@@ -14,19 +14,16 @@ const VARIETIES = [
   { name: 'にこまる', image: '/images/renewal/lineup/rice.webp', href: '/collections/rice/nikomaru' },
 ];
 
+type MillingMethod = '白米' | '玄米';
+
 export default function StartSetPurchasePanel({ product }: { product: Product }) {
   const { addToCart, openCart, cartItems } = useContext(CartContext);
   const [quantity, setQuantity] = useState(1);
   const [stockError, setStockError] = useState('');
   const [isFirstPurchase, setIsFirstPurchase] = useState(true);
-  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(() => {
-    const initial: Record<string, string> = {};
-    product.variants_config?.forEach((type) => {
-      if (type.options[0]) initial[type.id] = type.options[0].id;
-    });
-    if (!product.variants_config?.length && product.variants?.[0]) initial.legacy = product.variants[0];
-    return initial;
-  });
+  const [millingSelections, setMillingSelections] = useState<Record<string, MillingMethod>>(() =>
+    Object.fromEntries(VARIETIES.map((variety) => [variety.name, '白米']))
+  );
 
   useEffect(() => {
     let active = true;
@@ -43,25 +40,12 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
 
   useEffect(() => { setQuantity(1); }, [isFirstPurchase]);
 
-  const basePrice = useMemo(() => {
-    const adjustment = product.variants_config?.reduce((sum, type) => {
-      const option = type.options.find((item) => item.id === selectedOptions[type.id]);
-      return sum + (option?.priceAdjustment || 0);
-    }, 0) || 0;
-    return product.price + adjustment;
-  }, [product, selectedOptions]);
+  const basePrice = product.price;
   const calculatedPrice = isFirstPurchase ? Math.round(basePrice * 0.9) : basePrice;
 
   const selectedVariant = useMemo(() => {
-    if (!product.hasVariants) return undefined;
-    if (product.variants_config?.length) {
-      return product.variants_config
-        .map((type) => type.options.find((item) => item.id === selectedOptions[type.id])?.value)
-        .filter(Boolean)
-        .join(' / ');
-    }
-    return selectedOptions.legacy || product.variants?.[0];
-  }, [product, selectedOptions]);
+    return VARIETIES.map((variety) => `${variety.name}：${millingSelections[variety.name]}`).join(' / ');
+  }, [millingSelections]);
 
   const soldOut = isProductSoldOut(product);
   const now = Date.now();
@@ -74,18 +58,15 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
   const addSelectionToCart = () => {
     if (disabled) return false;
     setStockError('');
-    if (product.hasVariants) {
-      const existing = cartItems.find((item) => item.product.id === product.id && item.variant === selectedVariant);
-      const result = checkStockAvailability(product, selectedOptions, quantity, existing?.quantity || 0);
-      if (!result.available) {
-        setStockError(result.message);
-        return false;
-      }
+    const existing = cartItems.find((item) => item.product.id === product.id && item.variant === selectedVariant);
+    const result = checkStockAvailability(product, {}, quantity, existing?.quantity || 0);
+    if (!result.available) {
+      setStockError(result.message);
+      return false;
     }
-    addToCart(product, quantity, {
+    addToCart({ ...product, title: 'お試しセット' }, quantity, {
       variant: selectedVariant,
       finalPrice: calculatedPrice,
-      selectedOptions: product.hasVariants ? selectedOptions : undefined,
     });
     return true;
   };
@@ -97,10 +78,10 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
   return (
     <>
       <div id="purchase-panel">
-        <p className="mb-3 text-sm text-gray-500">{isFirstPurchase ? '初回限定' : '2回目以降'}</p>
-        <h2 className="mb-7 text-2xl font-medium leading-relaxed tracking-wide text-primary md:text-3xl">
-          {isFirstPurchase ? 'スタートセット' : '3種食べ比べセット'}
+        <h2 className="mb-2 text-2xl font-medium leading-relaxed tracking-wide text-primary md:text-3xl">
+          お試しセット
         </h2>
+        <p className="mb-7 text-sm leading-relaxed text-gray-600">内容：イケベジのお米３種 ２合×３個</p>
 
         <div className="mb-6 border border-gray-200 bg-white p-5 md:p-6">
           <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -108,51 +89,19 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
               {isFirstPurchase ? '初回 送料無料＆10%OFF' : '2回目以降 送料無料'}
             </span>
           </div>
-          <p className="text-3xl font-serif font-semibold text-primary tabular-nums">
-            ¥{calculatedPrice.toLocaleString()}
-            <span className="ml-1 text-xs text-gray-500">（税込）</span>
-          </p>
+          {isFirstPurchase ? (
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <span className="font-serif text-base text-gray-400 line-through tabular-nums">¥{basePrice.toLocaleString()}</span>
+              <span className="font-serif text-3xl font-semibold text-primary tabular-nums">¥{calculatedPrice.toLocaleString()}</span>
+              <span className="text-xs text-gray-500">（税込）</span>
+            </div>
+          ) : (
+            <p className="font-serif text-3xl font-semibold text-primary tabular-nums">
+              ¥{calculatedPrice.toLocaleString()}<span className="ml-1 text-xs text-gray-500">（税込）</span>
+            </p>
+          )}
           <p className="mt-1 text-[11px] text-gray-500">送料無料</p>
         </div>
-
-        {product.hasVariants && (
-          <div className="mb-6 space-y-5">
-            {product.variants_config?.length ? product.variants_config.map((type) => {
-              const millingOptions = type.options.filter((option) => /玄米|白米/.test(option.value) && !/分づき/.test(option.value));
-              if (millingOptions.length === 0) return null;
-              return (
-              <fieldset key={type.id}>
-                <legend className="mb-2 text-sm font-medium text-primary">精米方法</legend>
-                <div className="flex flex-wrap gap-2">
-                  {millingOptions.map((option) => {
-                    const selected = selectedOptions[type.id] === option.id;
-                    return (
-                      <button
-                        key={option.id}
-                        type="button"
-                        aria-pressed={selected}
-                        onClick={() => setSelectedOptions((current) => ({ ...current, [type.id]: option.id }))}
-                        className={`min-h-11 rounded-full border px-4 py-2 text-sm transition-colors ${selected ? 'border-primary bg-primary text-white' : 'border-gray-300 bg-white text-primary hover:border-primary'}`}
-                      >
-                        {option.value}{option.priceAdjustment ? `（${option.priceAdjustment > 0 ? '+' : ''}¥${option.priceAdjustment.toLocaleString()}）` : ''}
-                      </button>
-                    );
-                  })}
-                </div>
-              </fieldset>
-              );
-            }) : product.variants?.some((variant) => /玄米|白米/.test(variant)) ? (
-              <fieldset>
-                <legend className="mb-2 text-sm font-medium text-primary">精米方法</legend>
-                <div className="flex flex-wrap gap-2">
-                  {product.variants?.filter((variant) => /玄米|白米/.test(variant) && !/分づき/.test(variant)).map((variant) => (
-                    <button key={variant} type="button" aria-pressed={selectedOptions.legacy === variant} onClick={() => setSelectedOptions({ legacy: variant })} className={`min-h-11 rounded-full border px-4 py-2 text-sm ${selectedOptions.legacy === variant ? 'border-primary bg-primary text-white' : 'border-gray-300 bg-white text-primary'}`}>{variant}</button>
-                  ))}
-                </div>
-              </fieldset>
-            ) : null}
-          </div>
-        )}
 
         {stockError && <p role="alert" className="mb-4 text-sm text-red-600">{stockError}</p>}
         <div className="flex items-center gap-3">
@@ -167,19 +116,39 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
         </div>
 
         <div className="mt-8">
-          <p className="text-sm text-primary mb-3">セット内容：3品種</p>
-          <div className="flex gap-2.5 overflow-x-auto scrollbar-hide -mx-1 px-1 pb-1">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             {VARIETIES.map((variety) => (
-              <Link key={variety.name} href={variety.href} className="shrink-0 w-[104px] border border-gray-200 rounded-sm overflow-hidden hover:border-gray-400 transition-colors">
-                <span className="block aspect-square bg-dim overflow-hidden"><img src={variety.image} alt="" aria-hidden="true" loading="lazy" className="w-full h-full object-cover" /></span>
-                <span className="block px-2 py-2 text-[12px] text-primary">{variety.name}</span>
-              </Link>
+              <fieldset key={variety.name} className="overflow-hidden border border-gray-200 bg-white">
+                <legend className="sr-only">{variety.name}の精米方法</legend>
+                <Link href={variety.href} className="block aspect-square overflow-hidden bg-dim">
+                  <img src={variety.image} alt={`${variety.name}のお米`} loading="lazy" className="h-full w-full object-cover" />
+                </Link>
+                <div className="p-3">
+                  <Link href={variety.href} className="text-[12px] text-primary hover:underline">{variety.name}</Link>
+                  <div className="mt-3 grid grid-cols-2 gap-1.5">
+                    {(['白米', '玄米'] as MillingMethod[]).map((method) => {
+                      const selected = millingSelections[variety.name] === method;
+                      return (
+                        <button
+                          key={method}
+                          type="button"
+                          aria-pressed={selected}
+                          onClick={() => setMillingSelections((current) => ({ ...current, [variety.name]: method }))}
+                          className={`min-h-11 border px-2 text-xs transition-colors ${selected ? 'border-primary bg-primary text-white' : 'border-gray-300 bg-white text-primary hover:border-primary'}`}
+                        >
+                          {method}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </fieldset>
             ))}
           </div>
         </div>
       </div>
 
-      <StickyPurchaseBar title={product.title} price={calculatedPrice} image={product.images?.[0] || product.image} quantity={1} onQuantityChange={() => setQuantity(1)} onAddToCart={addSelectionToCart} disabled={disabled} disabledLabel={soldOut ? '売り切れ' : '販売期間外'} />
+      <StickyPurchaseBar title="お試しセット" price={calculatedPrice} image={product.images?.[0] || product.image} quantity={1} onQuantityChange={() => setQuantity(1)} onAddToCart={addSelectionToCart} disabled={disabled} disabledLabel={soldOut ? '売り切れ' : '販売期間外'} />
     </>
   );
 }
