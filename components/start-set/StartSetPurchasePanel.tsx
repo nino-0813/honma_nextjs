@@ -1,6 +1,6 @@
 'use client';
 
-import { useContext, useEffect, useMemo, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
 import type { Product } from '@/types';
 import { CartContext } from '@/providers/CartProvider';
@@ -21,9 +21,7 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
   const [quantity, setQuantity] = useState(1);
   const [stockError, setStockError] = useState('');
   const [isFirstPurchase, setIsFirstPurchase] = useState(true);
-  const [millingSelections, setMillingSelections] = useState<Record<string, MillingMethod>>(() =>
-    Object.fromEntries(VARIETIES.map((variety) => [variety.name, '白米']))
-  );
+  const [millingMethod, setMillingMethod] = useState<MillingMethod>('白米');
 
   useEffect(() => {
     let active = true;
@@ -43,9 +41,7 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
   const basePrice = product.price;
   const calculatedPrice = isFirstPurchase ? Math.round(basePrice * 0.9) : basePrice;
 
-  const selectedVariant = useMemo(() => {
-    return VARIETIES.map((variety) => `${variety.name}：${millingSelections[variety.name]}`).join(' / ');
-  }, [millingSelections]);
+  const selectedVariant = `${millingMethod}3個セット（コシヒカリ・亀の尾・にこまる）`;
 
   const soldOut = isProductSoldOut(product);
   const now = Date.now();
@@ -103,6 +99,27 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
           <p className="mt-1 text-[11px] text-gray-500">送料無料</p>
         </div>
 
+        <fieldset className="mb-6">
+          <legend className="mb-3 text-sm font-medium text-primary">精米方法</legend>
+          <div className="grid grid-cols-2 gap-2">
+            {(['白米', '玄米'] as MillingMethod[]).map((method) => {
+              const selected = millingMethod === method;
+              return (
+                <button
+                  key={method}
+                  type="button"
+                  aria-pressed={selected}
+                  onClick={() => setMillingMethod(method)}
+                  className={`min-h-12 border px-4 py-3 text-sm transition-colors ${selected ? 'border-primary bg-primary text-white' : 'border-gray-300 bg-white text-primary hover:border-primary'}`}
+                >
+                  {method}（3個セット）
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-2 text-[11px] leading-relaxed text-gray-500">コシヒカリ・亀の尾・にこまるの3品種すべてが、選択した精米方法になります。</p>
+        </fieldset>
+
         {stockError && <p role="alert" className="mb-4 text-sm text-red-600">{stockError}</p>}
         <div className="flex items-center gap-3">
           <div className="flex min-h-12 items-center rounded-full border border-gray-300 px-1">
@@ -118,31 +135,15 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
         <div className="mt-8">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             {VARIETIES.map((variety) => (
-              <fieldset key={variety.name} className="overflow-hidden border border-gray-200 bg-white">
-                <legend className="sr-only">{variety.name}の精米方法</legend>
+              <div key={variety.name} className="overflow-hidden border border-gray-200 bg-white">
                 <Link href={variety.href} className="block aspect-square overflow-hidden bg-dim">
                   <img src={variety.image} alt={`${variety.name}のお米`} loading="lazy" className="h-full w-full object-cover" />
                 </Link>
                 <div className="p-3">
                   <Link href={variety.href} className="text-[12px] text-primary hover:underline">{variety.name}</Link>
-                  <div className="mt-3 grid grid-cols-2 gap-1.5">
-                    {(['白米', '玄米'] as MillingMethod[]).map((method) => {
-                      const selected = millingSelections[variety.name] === method;
-                      return (
-                        <button
-                          key={method}
-                          type="button"
-                          aria-pressed={selected}
-                          onClick={() => setMillingSelections((current) => ({ ...current, [variety.name]: method }))}
-                          className={`min-h-11 border px-2 text-xs transition-colors ${selected ? 'border-primary bg-primary text-white' : 'border-gray-300 bg-white text-primary hover:border-primary'}`}
-                        >
-                          {method}
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <p className="mt-1 text-[11px] text-gray-500">{millingMethod}</p>
                 </div>
-              </fieldset>
+              </div>
             ))}
           </div>
         </div>
