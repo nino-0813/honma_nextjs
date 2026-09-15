@@ -21,11 +21,11 @@ export default function HeroStory() {
 
       <section className="bg-white px-6 pb-24 pt-10 md:px-12 md:pb-32 md:pt-16">
         <div className="mx-auto max-w-[1120px]">
-          <h1 className="text-center font-serif text-[28px] font-normal leading-relaxed tracking-[0.12em] text-[#26231e] md:text-[40px]">
+          <h1 className="text-center font-serif text-3xl font-semibold leading-[1.55] tracking-wide text-primary md:text-[44px]">
             きょうも しぜんと いいときを。
           </h1>
 
-          <div className="mx-auto mt-12 max-w-[960px] space-y-7 text-center font-serif text-[15px] leading-[2.25] tracking-[0.055em] text-[#37332c] md:mt-16 md:text-[17px] md:leading-[2.4]">
+          <div className="mx-auto mt-8 flex max-w-3xl flex-col gap-6 text-center text-sm leading-[2] text-gray-600 md:text-base">
             <p>
               佐渡ヶ島は新潟県の日本海に浮かぶ大きな島です。1000m超える深い山と、広大な平野を持ち合わせ、島特有の長い秋が、お米をゆっくりと登熟させ、極上のお米が育まれる地域です。
             </p>
