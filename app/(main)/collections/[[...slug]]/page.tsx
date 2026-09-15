@@ -36,14 +36,14 @@ const CATEGORY_INTROS: Record<string, { image: string; alt: string; lead: string
   koshihikari: {
     image: '/images/home/collections/collection_koshihikari_800.webp',
     alt: '従来コシヒカリのお米',
-    lead: '王道の、もっちり感。',
-    details: ['甘みと粘りがしっかり感じられる、親しみ深い味わい。', '炊きたての白ごはんはもちろん、毎日の食卓に素直になじみます。'],
+    lead: '雑味のない甘さ。',
+    details: ['佐渡の自然の力に委ねた、無肥料・無農薬の自然栽培。日本を代表するブランド米だからこそ、風味を邪魔せず、本来持つ甘みを最大限まで引き出しました。'],
   },
   kamenoo: {
     image: '/images/home/collections/collection_kamenoo_800.webp',
     alt: '亀の尾のお米',
     lead: '凛とした粒感、すっきりした余韻。',
-    details: ['品種改良されていない、野生味を残す希少なお米です。', '粘りは控えめで、寿司や炒飯などお米の輪郭を生かす料理にもよく合います。'],
+    details: ['品種改良がされていなく、コシヒカリの祖先に当たる「亀の尾」。手作りの竹堆肥を使用し微生物たくさんの土壌で育まれた、上品で軽やかな食味をお楽しみください。'],
   },
   nikomaru: {
     image: '/images/renewal/lineup/rice.webp',
