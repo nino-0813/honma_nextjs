@@ -36,11 +36,6 @@ export default function HomePage() {
     <div className="animate-fade-in overflow-x-clip w-full">
       <AnnouncementPopup />
 
-      {/* ページの主題を検索エンジンに伝えるH1（デザイン上は非表示） */}
-      <h1 className="sr-only">
-        佐渡島の自然栽培米・無農薬玄米｜イケベジ（IKEVEGE）公式オンラインショップ
-      </h1>
-
       {/* 1. トップ動画から手紙へつながるブランドストーリー */}
       <HeroStory />
 
