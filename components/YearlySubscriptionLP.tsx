@@ -6,31 +6,17 @@ import Image from 'next/image';
 
 type Reason = {
   title: string;
-  paragraphs: string[];
-  image: string;
-  imageAlt: string;
+  description: string;
 };
 
 const REASONS: Reason[] = [
   {
     title: 'いつでも10%OFF',
-    paragraphs: [
-      '毎日食べるものだから、おいしさと続けやすさの両方を大事にしました。',
-      '定期便でお申し込みいただくと、通常価格よりいつでも10%OFFでお届けします。',
-      '定期的なお届けを通して、お客様とイケベジが一緒に歩んでいくための定期便価格です。',
-    ],
-    image: '/images/sunset-family.jpg',
-    imageAlt: '夕陽のなかで子どもを抱き上げる親子',
+    description: '通常価格よりいつでも10%OFFでお届け',
   },
   {
-    title: '専用保冷庫から「瑞々しいお米」をお届け',
-    paragraphs: [
-      'お米のおいしさは、田んぼで育つ時間だけでなく、収穫後の保管と、精米のタイミングにも大きく左右されます。',
-      'イケベジでは、収穫したお米を専用保冷庫で保管しています。そして、お届けに合わせて出荷直前に精米。',
-      '田んぼから食卓までのあいだに、できることを一つずつ積み重ねてお届けします。',
-    ],
-    image: '/images/about/stories/IMG_8832.jpg',
-    imageAlt: '佐渡の田んぼでお米を育てるイケベジ',
+    title: '瑞々しいお米を一年中',
+    description: '専用の保冷庫で保管、管理したお米を、発送直前に精米',
   },
 ];
 
@@ -40,42 +26,20 @@ export default function YearlySubscriptionLP() {
       {/* 01 キャッチコピー */}
       <div className="max-w-3xl mx-auto text-center mb-16 md:mb-20">
         <h2 className="text-xl md:text-3xl font-serif font-semibold text-primary leading-[1.55] md:leading-[1.4] mb-4">
-          ともに作り、守り、育てていく<br />
-          イケベジ定期便
+          ともに作り、守り、育てていく
         </h2>
       </div>
 
-      {/* 02 2つの理由（画像付き横並びカード） */}
-      <div className="space-y-6 md:space-y-8 mb-10 md:mb-14">
-        {REASONS.map((r, idx) => (
-          <div
-            key={r.title}
-            className="overflow-hidden bg-white"
-          >
-            <div className={`grid grid-cols-1 md:grid-cols-2 ${idx % 2 === 1 ? 'md:[&>*:first-child]:order-2' : ''}`}>
-              {/* 画像 */}
-              <div className="relative aspect-[16/10] bg-stone-100 overflow-hidden md:aspect-auto md:min-h-[340px]">
-                <Image
-                  src={r.image}
-                  alt={r.imageAlt}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  className="object-cover"
-                />
-              </div>
-
-              {/* テキスト */}
-              <div className="p-6 md:p-10 flex flex-col justify-center">
-                <h3 className="text-xl md:text-2xl font-bold text-primary mb-5 leading-snug tracking-[0.03em]">
-                  {r.title}
-                </h3>
-                <div className="space-y-3 text-sm md:text-base text-gray-700 leading-loose">
-                  {r.paragraphs.map((p, i) => (
-                    <p key={i}>{p}</p>
-                  ))}
-                </div>
-              </div>
-            </div>
+      {/* 02 定期便で届ける2つの価値 */}
+      <div className="mb-10 grid border-y border-gray-200 md:mb-14 md:grid-cols-2 md:divide-x md:divide-gray-200">
+        {REASONS.map((reason) => (
+          <div key={reason.title} className="flex min-h-48 flex-col justify-center px-6 py-10 text-center md:min-h-64 md:px-12 md:py-14">
+            <h3 className="font-serif text-xl font-semibold leading-relaxed tracking-[0.06em] text-primary md:text-2xl">
+              {reason.title}
+            </h3>
+            <p className="mt-5 text-sm leading-loose text-gray-600 md:text-base">
+              {reason.description}
+            </p>
           </div>
         ))}
       </div>
@@ -124,12 +88,6 @@ export default function YearlySubscriptionLP() {
               </h3>
             </div>
 
-            <p className="mb-7 text-[15px] font-medium leading-[1.85] text-yuunagi-ink/90 md:mb-9 md:text-[17px]">
-              新しく定期便をお申し込みいただいた方に、
-              <br className="hidden md:block" />
-              「冷蔵庫のいらないお米保存袋」をプレゼントします。
-            </p>
-
             <ul className="space-y-3 md:space-y-4 font-medium mb-8 md:mb-10">
               {['防虫・防湿に強い専用素材', '冷蔵庫不要で、常温保存が可能'].map(
                 (item) => (
@@ -150,10 +108,10 @@ export default function YearlySubscriptionLP() {
             </ul>
 
             <div className="pt-4 border-t border-yuunagi-soft/60 space-y-1.5">
-              <p className="text-sm md:text-base text-yuunagi-ink/75 font-bold">
+              <p className="text-[10px] leading-relaxed text-yuunagi-ink/75 font-bold">
                 ※数量限定・なくなり次第終了
               </p>
-              <p className="text-sm md:text-base text-yuunagi-ink/75 leading-relaxed">
+              <p className="text-[10px] leading-relaxed text-yuunagi-ink/75">
                 ※お米保存袋は1アカウントにつきおひとつまでとなります。複数種類のお米や期間の異なる定期便をご注文いただいてもプレゼントはおひとつとなります。
               </p>
               <Link href="/rice-keep" className="mt-4 inline-flex text-sm md:text-base font-semibold text-yuunagi-ink underline underline-offset-4">
@@ -166,12 +124,9 @@ export default function YearlySubscriptionLP() {
 
       {/* 04 商品一覧見出し */}
       <div id="ikevege-subscription" className="text-center mb-6 mt-20 md:mt-28 pt-6 border-t border-gray-100 scroll-mt-28">
-        <h3 className="text-xl md:text-2xl font-serif font-medium text-primary tracking-wider mb-2">
-          イケベジ定期便
+        <h3 className="mx-auto max-w-3xl font-serif text-lg font-medium leading-loose tracking-wider text-primary md:text-2xl">
+          田んぼから食卓までのあいだに、できることを一つずつ積み重ねてお届けします。
         </h3>
-        <p className="text-xs md:text-sm text-gray-600 leading-relaxed">
-          すべて<span className="text-yuunagi-ink font-medium">10%OFF</span>でお届けします。
-        </p>
       </div>
     </section>
   );
@@ -439,20 +394,6 @@ export function YearlySubscriptionFooter() {
           ))}
         </div>
       </nav>
-
-      {/* 07 商品一覧へ戻るアクション */}
-      <div className="mx-auto mb-16 max-w-4xl px-4 text-center md:mb-24">
-        <p className="font-serif text-xl leading-relaxed tracking-[0.06em] text-primary md:text-3xl">
-          毎日のごはんに、佐渡の田んぼをひとつ。
-        </p>
-        <Link
-          href="#ikevege-subscription"
-          className="mt-9 inline-flex min-w-64 items-center justify-center gap-4 border border-primary bg-primary px-8 py-4 text-sm tracking-[0.12em] text-white transition-colors hover:bg-white hover:text-primary md:mt-12 md:min-w-80 md:py-5 md:text-base"
-        >
-          定期便の商品を見る
-          <span aria-hidden="true">↑</span>
-        </Link>
-      </div>
 
     </section>
   );
