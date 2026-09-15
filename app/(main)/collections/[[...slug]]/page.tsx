@@ -32,6 +32,39 @@ function getSubcategoryNameFromParam(param: string): string {
 
 type CategoryLabel = 'ALL' | 'お米' | 'Crescentmoon' | 'その他' | '原木しいたけ' | 'チケット';
 
+const CATEGORY_INTROS: Record<string, { image: string; alt: string; lead: string; details: string[] }> = {
+  koshihikari: {
+    image: '/images/home/collections/collection_koshihikari_800.webp',
+    alt: '従来コシヒカリのお米',
+    lead: '王道の、もっちり感。',
+    details: ['甘みと粘りがしっかり感じられる、親しみ深い味わい。', '炊きたての白ごはんはもちろん、毎日の食卓に素直になじみます。'],
+  },
+  kamenoo: {
+    image: '/images/home/collections/collection_kamenoo_800.webp',
+    alt: '亀の尾のお米',
+    lead: '凛とした粒感、すっきりした余韻。',
+    details: ['品種改良されていない、野生味を残す希少なお米です。', '粘りは控えめで、寿司や炒飯などお米の輪郭を生かす料理にもよく合います。'],
+  },
+  nikomaru: {
+    image: '/images/renewal/lineup/rice.webp',
+    alt: 'にこまるのお米',
+    lead: '大粒で、冷めても弾む。',
+    details: ['三品種のなかで最も粒が大きく、ふっくらした弾力が続きます。', 'お弁当や丼ものにも合わせやすい、頼もしいお米です。'],
+  },
+  shiitake: {
+    image: '/images/renewal/lineup/shiitake.webp',
+    alt: '佐渡の原木しいたけ',
+    lead: '島の森が育てる、豊かな香り。',
+    details: ['佐渡の自然のなかで時間をかけて育った原木しいたけ。', '肉厚な食感と、噛むほど広がる香りをお楽しみください。'],
+  },
+  crescent: {
+    image: '/images/crescentmoon/589F7B72-C537-4904-A9AD-55F5EDFF1A71.jpg',
+    alt: 'Crescentmoonのお菓子',
+    lead: '佐渡の素材から生まれる、やさしいお菓子。',
+    details: ['素材の味わいを大切に、手間を惜しまずひとつずつ丁寧に焼き上げています。', '贈りものにも、いつものお茶の時間にも。やさしいおいしさを佐渡から届けます。'],
+  },
+};
+
 function getProductCategories(p: Product): string[] {
   const cats = (p as Product & { categories?: string[] }).categories;
   if (Array.isArray(cats) && cats.length > 0) return cats;
@@ -135,6 +168,13 @@ export default function CollectionsPage() {
                   ? 'rice'
               : 'all';
 
+  const categoryIntroKey = currentSubcategory && ['koshihikari', 'kamenoo', 'nikomaru'].includes(currentSubcategory)
+    ? currentSubcategory
+    : categoryParam && ['shiitake', 'crescent'].includes(categoryParam)
+      ? categoryParam
+      : null;
+  const categoryIntro = categoryIntroKey ? CATEGORY_INTROS[categoryIntroKey] : null;
+
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-white pb-36 pt-20 md:pt-24">
       <div className="sticky top-16 z-30 mb-16 bg-white/95 py-3 backdrop-blur-md md:top-20 md:mb-20">
@@ -150,6 +190,27 @@ export default function CollectionsPage() {
             </p>
           )}
         </div>
+
+        {categoryIntro && (
+          <section className="mb-20 grid items-center gap-8 md:mb-28 md:grid-cols-2 md:gap-16">
+            <div className="aspect-[16/10] overflow-hidden bg-gray-100">
+              <img
+                src={categoryIntro.image}
+                alt={categoryIntro.alt}
+                loading="lazy"
+                className="h-full w-full object-cover"
+              />
+            </div>
+            <div className="space-y-5 text-gray-600">
+              <p className="font-serif text-xl leading-relaxed tracking-wide text-primary md:text-2xl">
+                {categoryIntro.lead}
+              </p>
+              <div className="space-y-3 text-sm leading-loose md:text-base">
+                {categoryIntro.details.map((detail) => <p key={detail}>{detail}</p>)}
+              </div>
+            </div>
+          </section>
+        )}
 
         {loading && (
           <div className="flex items-center justify-center py-32">
