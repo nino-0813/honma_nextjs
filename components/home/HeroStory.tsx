@@ -5,8 +5,8 @@ const VIDEO = '/videos/hero.mp4';
 export default function HeroStory() {
   return (
     <>
-      <section className="bg-white px-4 pb-14 pt-20 md:px-8 md:pb-20 md:pt-24">
-        <div className="mx-auto w-[92%] max-w-[1440px] overflow-hidden bg-black md:w-[90%]">
+      <section className="bg-white pt-20 md:pt-24">
+        <div className="flex justify-center py-[clamp(28px,5vw,72px)]">
           <video
             src={VIDEO}
             autoPlay
@@ -14,7 +14,7 @@ export default function HeroStory() {
             loop
             playsInline
             preload="metadata"
-            className="aspect-video h-auto w-full object-cover"
+            className="block aspect-video h-auto max-h-[calc(100svh-8rem)] w-auto max-w-[84%] bg-black object-contain md:max-h-[calc(100svh-15rem)]"
           />
         </div>
       </section>
