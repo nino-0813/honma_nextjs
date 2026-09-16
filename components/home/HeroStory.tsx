@@ -14,7 +14,7 @@ export default function HeroStory() {
             loop
             playsInline
             preload="metadata"
-            className="block aspect-video h-auto max-h-[calc(100svh-8rem)] w-auto max-w-[84%] bg-black object-contain md:max-h-[calc(100svh-15rem)]"
+            className="block aspect-square h-auto w-[min(84vw,calc(100svh-8rem))] max-w-[900px] bg-black object-cover object-center md:w-[min(72vw,calc(100svh-15rem))]"
           />
         </div>
       </section>
