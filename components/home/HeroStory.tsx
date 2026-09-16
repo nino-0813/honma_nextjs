@@ -6,7 +6,7 @@ export default function HeroStory() {
   return (
     <>
       <section className="bg-white pt-20 md:pt-24">
-        <div className="flex justify-center py-[clamp(28px,5vw,72px)]">
+        <div className="flex justify-center pb-[clamp(32px,5vw,72px)]">
           <video
             src={VIDEO}
             autoPlay
@@ -14,7 +14,7 @@ export default function HeroStory() {
             loop
             playsInline
             preload="metadata"
-            className="block aspect-square h-auto w-[min(84vw,calc(100svh-8rem))] max-w-[900px] bg-black object-cover object-center md:w-[min(72vw,calc(100svh-15rem))]"
+            className="block aspect-video h-auto w-[80%] max-w-[1600px] bg-black object-cover object-center"
           />
         </div>
       </section>
