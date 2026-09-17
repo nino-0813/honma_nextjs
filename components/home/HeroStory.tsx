@@ -28,8 +28,8 @@ export default function HeroStory() {
       </section>
 
       <section className="bg-white px-6 pb-24 pt-16 md:px-12 md:pb-24 md:pt-24 lg:min-h-[88svh]">
-        <div className="mx-auto flex min-h-[720px] max-w-[1500px] flex-col lg:min-h-[calc(88svh-12rem)]">
-          <div className="max-w-[1380px] space-y-8 font-serif text-[15px] leading-[2] tracking-[0.025em] text-black md:space-y-9 md:text-[18px] md:leading-[1.9] lg:text-[20px]">
+        <div className="mx-auto flex min-h-[720px] w-full flex-col md:w-[76%] lg:min-h-[calc(88svh-12rem)]">
+          <div className="w-full space-y-7 font-serif text-[13px] leading-[2] tracking-[0.025em] text-black md:space-y-8 md:text-[15px] md:leading-[1.9] lg:text-[16px]">
             <p>
               佐渡ヶ島は新潟県の日本海に浮かぶ大きな島です。1000m超える深い山と、広大な平野を持ち合わせ、島特有の長い秋が、お米をゆっくりと登熟させ、極上のお米が育まれる地域です。
             </p>
