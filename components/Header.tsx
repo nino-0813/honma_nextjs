@@ -27,8 +27,6 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
       location === '/collections/rice/yearly' && params.get('view') === 'lp'
     );
   }, [location]);
-  const isHomePage = location === '/';
-  const [isScrolled, setIsScrolled] = useState(false);
   const { cartItems } = useContext(CartContext);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -54,22 +52,6 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
     }
   }, []);
 
-  // トップページはヒーロー動画が画面いっぱいのため、動画を抜けるまで透明のままにする。
-  // 他のページは従来どおり少しスクロールしたら背景を出す。
-  useEffect(() => {
-    const handleScroll = () => {
-      const threshold = isHomePage ? Math.max(window.innerHeight - 90, 100) : 50;
-      setIsScrolled(window.scrollY > threshold);
-    };
-    handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('resize', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleScroll);
-    };
-  }, [isHomePage]);
-
   const isActive = (item: { href: string; matchPrefix?: string; matchQuery?: { key: string; value: string } }) => {
     // 定期便リンクは ?view=lp が付いている時だけアクティブ
     if (item.matchQuery) return isSubscriptionLp;
@@ -81,11 +63,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
   };
 
   return (
-    <header
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ease-out-expo overflow-x-hidden ${
-        isScrolled ? 'bg-white/95 backdrop-blur-md py-[18px] md:py-6' : 'bg-transparent py-4 md:py-6'
-      }`}
-    >
+    <header className="fixed top-0 z-50 w-full overflow-x-hidden bg-white/95 py-[18px] backdrop-blur-md md:py-6">
       <div className="w-full px-5 md:px-8 lg:px-10">
         <div className="flex justify-between items-center">
           <div className="flex-shrink-0 flex items-center z-50">
@@ -96,9 +74,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
                 alt="イケベジ"
                 width={196}
                 height={34}
-                className={`w-auto object-contain opacity-60 transition-all duration-300 ease-out-expo ${
-                  isScrolled ? 'h-5 md:h-7' : 'h-6 md:h-8'
-                }`}
+                className="h-5 w-auto object-contain opacity-60 md:h-7"
               />
             </Link>
           </div>
