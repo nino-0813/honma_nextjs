@@ -326,6 +326,17 @@ export default function CollectionsPage() {
           </div>
         )}
 
+        {!loading && !error && isLpView && (
+          <div className="mt-16 flex justify-center border-t border-gray-100 pt-12 md:mt-24 md:pt-16">
+            <Link
+              href="/subscription-faq"
+              className="inline-flex min-h-11 items-center rounded-full border border-gray-300 px-7 text-sm text-primary transition-colors hover:border-primary hover:bg-primary hover:text-white"
+            >
+              よくある質問を見る →
+            </Link>
+          </div>
+        )}
+
         {!loading && !error && showSubscriptionCta && (
           <div className="mt-20 flex justify-center md:mt-28">
             <Link
@@ -337,7 +348,6 @@ export default function CollectionsPage() {
           </div>
         )}
 
-        {/* 年間契約ページではフッターセクション（FAQ・送料）を表示 */}
       </div>
     </div>
   );
