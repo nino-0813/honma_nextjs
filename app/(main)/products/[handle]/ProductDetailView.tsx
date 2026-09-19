@@ -108,6 +108,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
   const [subscriptionInterval, setSubscriptionInterval] = useState<SubscriptionInterval>(
     subscriptionIntervals[0] ?? 'monthly'
   );
+  const [wantsRiceKeepGift, setWantsRiceKeepGift] = useState(false);
   const subscriptionPrice = Math.round(calculatedPrice * (1 - subscriptionDiscountPercent / 100));
   const subscriptionRiceSeason = product.subscriptionRiceSeason ?? null;
 
@@ -191,7 +192,10 @@ export default function ProductDetailView({ product }: { product: Product }) {
     addToCart(product, quantity, {
       variant: variantString,
       finalPrice: product.hasVariants ? calculatedPrice : undefined,
-      selectedOptions: product.hasVariants ? selectedOptions : undefined,
+      selectedOptions: {
+        ...(product.hasVariants ? selectedOptions : {}),
+        rice_keep_gift: wantsRiceKeepGift ? '希望する' : '希望しない',
+      },
       subscription: {
         purchaseType: 'subscription',
         subscriptionInterval,
@@ -727,6 +731,24 @@ export default function ProductDetailView({ product }: { product: Product }) {
                       ))}
                     </div>
                   </div>
+                )}
+
+                {purchaseType === 'subscription' && (
+                  <fieldset className="order-4 mt-6 border-t border-gray-100 pt-5">
+                    <legend className="text-xs font-medium text-gray-700">3. お米保存袋（任意）</legend>
+                    <p className="mt-1 text-[11px] leading-relaxed text-gray-500">数量限定・1アカウントにつきおひとつまで</p>
+                    <div className="mt-3 grid grid-cols-2 gap-2">
+                      {[
+                        { value: false, label: '希望しない' },
+                        { value: true, label: '希望する' },
+                      ].map((option) => (
+                        <label key={option.label} className={`flex min-h-11 cursor-pointer items-center justify-center border px-3 text-xs transition-colors ${wantsRiceKeepGift === option.value ? 'border-primary bg-primary text-white' : 'border-gray-200 bg-white text-gray-600 hover:border-gray-400'}`}>
+                          <input type="radio" name="rice-keep-gift" checked={wantsRiceKeepGift === option.value} onChange={() => setWantsRiceKeepGift(option.value)} className="sr-only" />
+                          {option.label}
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
                 )}
               </div>
               )}

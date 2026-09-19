@@ -110,7 +110,9 @@ export function CartProvider({
           ...newCart[existingItemIndex],
           quantity: newQuantity,
           finalPrice: newCart[existingItemIndex].finalPrice ?? priceAfterDiscount,
-          selectedOptions: newCart[existingItemIndex].selectedOptions ?? selectedOptions,
+          selectedOptions: selectedOptions
+            ? { ...(newCart[existingItemIndex].selectedOptions ?? {}), ...selectedOptions }
+            : newCart[existingItemIndex].selectedOptions,
         };
         return newCart;
       }

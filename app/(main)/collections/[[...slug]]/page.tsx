@@ -7,7 +7,7 @@ import { useProducts } from '@/hooks/useProducts';
 import { FadeInImage } from '@/components/UI';
 import type { Product } from '@/types';
 import { isProductPreorder, isProductSoldOut } from '@/lib/productStatus';
-import YearlySubscriptionLP, { YearlySubscriptionFooter } from '@/components/YearlySubscriptionLP';
+import YearlySubscriptionLP from '@/components/YearlySubscriptionLP';
 import ProductCategoryNav, { type ProductCategoryKey } from '@/components/product/ProductCategoryNav';
 
 function getFilterNameFromParam(param: string) {
@@ -180,11 +180,13 @@ export default function CollectionsPage() {
 
   return (
     <div className="page-top-offset min-h-screen w-full overflow-x-hidden bg-white pb-36">
-      <div className="sticky top-16 z-30 mb-12 bg-white/95 py-3 backdrop-blur-md md:top-20 md:mb-16">
-        <div className="mx-auto max-w-[1400px] px-6 md:px-12">
-          <ProductCategoryNav current={categoryNavKey} />
+      {!isLpView && (
+        <div className="sticky top-16 z-30 mb-12 bg-white/95 py-3 backdrop-blur-md md:top-20 md:mb-16">
+          <div className="mx-auto max-w-[1400px] px-6 md:px-12">
+            <ProductCategoryNav current={categoryNavKey} />
+          </div>
         </div>
-      </div>
+      )}
       <div className="max-w-[1400px] mx-auto px-6 md:px-12">
         {currentSubcategory === 'yearly' && !isLpView && (
           <div className="mb-12 text-center animate-fade-in md:mb-16">
@@ -336,7 +338,6 @@ export default function CollectionsPage() {
         )}
 
         {/* 年間契約ページではフッターセクション（FAQ・送料）を表示 */}
-        {!loading && !error && isLpView && <YearlySubscriptionFooter />}
       </div>
     </div>
   );
