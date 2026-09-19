@@ -179,20 +179,20 @@ export default function CollectionsPage() {
   );
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden bg-white pb-36 pt-20 md:pt-24">
-      <div className="sticky top-16 z-30 mb-16 bg-white/95 py-3 backdrop-blur-md md:top-20 md:mb-20">
+    <div className="page-top-offset min-h-screen w-full overflow-x-hidden bg-white pb-36">
+      <div className="sticky top-16 z-30 mb-12 bg-white/95 py-3 backdrop-blur-md md:top-20 md:mb-16">
         <div className="mx-auto max-w-[1400px] px-6 md:px-12">
           <ProductCategoryNav current={categoryNavKey} />
         </div>
       </div>
       <div className="max-w-[1400px] mx-auto px-6 md:px-12">
-        <div className="mb-16 text-center animate-fade-in md:mb-24">
-          {currentSubcategory === 'yearly' && !isLpView && (
+        {currentSubcategory === 'yearly' && !isLpView && (
+          <div className="mb-12 text-center animate-fade-in md:mb-16">
             <p className="text-xs leading-relaxed text-gray-600 md:text-sm">
               すべて<span className="text-yuunagi-ink font-medium">10%OFF</span>でお届けします。
             </p>
-          )}
-        </div>
+          </div>
+        )}
 
         {categoryIntro && (
           <section className="mb-20 grid items-center gap-8 md:mb-28 md:grid-cols-2 md:gap-16">

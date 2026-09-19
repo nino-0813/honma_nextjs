@@ -71,7 +71,7 @@ export default function AboutPage() {
   }, []);
 
   return (
-    <div className="pt-20 animate-fade-in bg-white overflow-x-hidden w-full">
+    <div className="page-top-offset w-full overflow-x-hidden bg-white animate-fade-in">
       <div className="relative w-full">
         <div className="relative z-10 bg-white pt-4 md:pt-8 pb-12 md:pb-16 flex flex-col items-center justify-center text-black">
           <p className="text-[13px] font-medium text-primary mb-3">

@@ -96,7 +96,7 @@ export default function AmbassadorPage() {
   }, []);
 
   return (
-    <div className="pt-20 animate-fade-in bg-white overflow-x-hidden w-full">
+    <div className="page-top-offset w-full overflow-x-hidden bg-white animate-fade-in">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 md:pt-8 pb-12 md:pb-16 text-center">
         <p className="text-[13px] font-medium text-primary mb-3">
           取り組み

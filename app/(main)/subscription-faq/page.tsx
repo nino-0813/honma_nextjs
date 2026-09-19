@@ -3,7 +3,7 @@ import { SUBSCRIPTION_FAQ_ITEMS } from '@/lib/subscription-content';
 
 export default function SubscriptionFaqPage() {
   return (
-    <main className="min-h-screen bg-white pb-24 pt-32 md:pb-32 md:pt-40">
+    <main className="page-top-offset min-h-screen bg-white pb-24 md:pb-32">
       <div className="mx-auto max-w-4xl px-6 md:px-12">
         <header className="mb-16 text-center md:mb-24">
           <h1 className="font-serif text-3xl tracking-[0.1em] text-primary md:text-5xl">

@@ -74,7 +74,7 @@ const AmbassadorProductDetail = () => {
   }
 
   return (
-    <div className="pt-32 pb-24 bg-white min-h-screen animate-fade-in overflow-x-hidden w-full">
+    <div className="page-top-offset min-h-screen w-full overflow-x-hidden bg-white pb-24 animate-fade-in">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-[10px] text-gray-400 mb-8 md:mb-12 tracking-widest uppercase">
           <Link href="/" className="hover:text-black transition-colors">

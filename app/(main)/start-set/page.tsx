@@ -56,14 +56,14 @@ export default async function StartSetPage() {
     : GALLERY;
 
   return (
-    <div className="min-h-screen w-full overflow-x-clip bg-white pb-24 pt-32 animate-fade-in md:pt-40">
-      <div className="mb-16 bg-white py-3 md:mb-20">
+    <div className="page-top-offset min-h-screen w-full overflow-x-clip bg-white pb-24 animate-fade-in">
+      <div className="mb-12 bg-white py-3 md:mb-16">
         <div className="mx-auto max-w-[1400px] px-6 md:px-12">
           <ProductCategoryNav current="start-set" />
         </div>
       </div>
 
-      <section className="px-5 py-12 text-center md:py-16">
+      <section className="px-5 pb-12 text-center md:pb-16">
         <h1 className="mx-auto max-w-4xl font-serif text-[28px] font-semibold leading-[1.5] tracking-[0.08em] text-primary md:text-4xl lg:text-[40px]">
           お試しセット
         </h1>

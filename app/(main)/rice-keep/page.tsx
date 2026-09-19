@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: 'ライスキープ', description: '�
 
 export default function RiceKeepPage() {
   return (
-    <main className="min-h-screen bg-white px-5 pb-28 pt-32 md:px-12 md:pt-40">
+    <main className="page-top-offset min-h-screen bg-white px-5 pb-28 md:px-12">
       <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2 lg:gap-20">
         <div className="relative aspect-[4/5] overflow-hidden bg-gray-50"><Image src="/images/rice-keep-bag.jpg" alt="お米保存袋 ライスキープ" fill className="object-cover" sizes="(max-width:1024px) 100vw, 50vw" priority /></div>
         <div>

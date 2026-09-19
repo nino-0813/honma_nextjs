@@ -247,7 +247,7 @@ export default function BlogDetailView({
 
   if (loading) {
     return (
-      <div className="pt-28 pb-24 min-h-screen bg-white">
+      <div className="page-top-offset min-h-screen bg-white pb-24">
         <div className="max-w-4xl mx-auto px-6 md:px-12">
           <div className="text-center py-16">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
@@ -260,7 +260,7 @@ export default function BlogDetailView({
 
   if (isUnpublished) {
     return (
-      <div className="pt-28 pb-24 min-h-screen bg-white">
+      <div className="page-top-offset min-h-screen bg-white pb-24">
         <div className="max-w-4xl mx-auto px-6 md:px-12">
           <div className="text-center py-16">
             <p className="text-red-500 mb-4">この記事は非公開です</p>
@@ -273,7 +273,7 @@ export default function BlogDetailView({
 
   if (!article) {
     return (
-      <div className="pt-28 pb-24 min-h-screen bg-white">
+      <div className="page-top-offset min-h-screen bg-white pb-24">
         <div className="max-w-4xl mx-auto px-6 md:px-12">
           <div className="text-center py-16">
             <p className="text-red-500 mb-4">記事が見つかりませんでした</p>
@@ -336,7 +336,7 @@ export default function BlogDetailView({
   }
 
   return (
-    <div className="pt-20 md:pt-28 pb-24 min-h-screen bg-white">
+    <div className="page-top-offset min-h-screen bg-white pb-24">
       <style>{`
         .blog-prose { font-family: "Helvetica Neue", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Arial, "Noto Sans JP", Meiryo, sans-serif; }
         .blog-prose img { max-width: 100%; height: auto; margin: 1rem 0; border-radius: 0.75rem; }

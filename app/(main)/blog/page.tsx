@@ -56,7 +56,7 @@ export default function BlogPage() {
   };
 
   return (
-    <div className="pt-28 pb-24 min-h-screen bg-white overflow-x-hidden w-full">
+    <div className="page-top-offset min-h-screen w-full overflow-x-hidden bg-white pb-24">
       <div className="max-w-6xl mx-auto px-6 md:px-12">
         <div className="mb-12 text-center">
           <p className="text-center text-[13px] font-medium text-primary mb-3">
