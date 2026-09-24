@@ -294,6 +294,7 @@ export interface Order {
   payment_intent_id?: string | null;
   total: number;
   payment_status: string;
+  payment_method?: string | null;
   shipping_method?: string | null;
   subscription_interval?: string | null;
   stripe_subscription_id?: string | null;
@@ -365,12 +366,13 @@ export const getOrders = async (userId: string): Promise<Order[]> => {
 
   console.log('[getOrders] userId:', userId);
 
-  // まず、auth_user_idで注文を取得（支払い済みのみ）
+  // 支払い済み注文に加え、銀行振込の入金待ち注文も表示する。
+  // カード決済途中のドラフト（pending）は表示しない。
   const { data: ordersData, error: ordersError } = await supabase
     .from('orders')
     .select('*')
     .eq('auth_user_id', userId)
-    .eq('payment_status', 'paid')
+    .or('payment_status.eq.paid,and(payment_status.eq.pending,payment_method.eq.bank_transfer)')
     .order('created_at', { ascending: false });
 
   if (ordersError) {
@@ -454,9 +456,12 @@ export const getOrders = async (userId: string): Promise<Order[]> => {
   console.log('[getOrders] 注文データ:', ordersData);
   console.log('[getOrders] 注文明細データ:', itemsByOrderId);
 
-  // データを整形（念のため、支払い済みのみをフィルタリング）
+  // データを整形（カード決済途中のpendingは除外）
   return (uniqueOrdersData || [])
-    .filter((order: any) => order.payment_status === 'paid')
+    .filter((order: any) =>
+      order.payment_status === 'paid' ||
+      (order.payment_status === 'pending' && order.payment_method === 'bank_transfer')
+    )
     .map((order: any) => {
       const orderItems = itemsByOrderId[order.id] || [];
       const fallbackItems = orderItems.length === 0 ? parseFallbackOrderItems(order.shipping_method) : [];
@@ -466,6 +471,7 @@ export const getOrders = async (userId: string): Promise<Order[]> => {
         payment_intent_id: order.payment_intent_id ?? null,
         total: order.total,
         payment_status: order.payment_status,
+        payment_method: order.payment_method ?? null,
         shipping_method: order.shipping_method ?? null,
         subscription_interval: order.subscription_interval ?? null,
         stripe_subscription_id: order.stripe_subscription_id ?? null,
