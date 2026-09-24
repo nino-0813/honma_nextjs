@@ -30,7 +30,7 @@ function MainLayoutInner({
   return (
     <>
       <Header onOpenCart={onOpenCart} onOpenMenu={onOpenMenu} />
-      {/* overflow-x-hidden だと sticky が効かなくなるため clip を使う */}
+      {/* overflow-x-hidden は縦方向にもスクロール領域を作り position:sticky を無効化するため clip を使う */}
       <main className="flex-1 w-full overflow-x-clip">{children}</main>
       <Footer />
       <CartDrawer

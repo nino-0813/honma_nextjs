@@ -44,7 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ja">
       <head>
-        {/* 見出し用の明朝体。CSPは fonts.googleapis.com / fonts.gstatic.com を許可済み */}
+        {/* 見出し・本文の明朝体。CSPは fonts.googleapis.com / fonts.gstatic.com を許可済み */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
