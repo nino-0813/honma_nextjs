@@ -961,7 +961,9 @@ const MyPage = () => {
                                 : 'bg-red-100 text-red-700'
                           }`}
                         >
-                          {getPaymentStatusText(order.payment_status)}
+                          {order.payment_status === 'pending' && order.payment_method === 'bank_transfer'
+                            ? '銀行振込・入金待ち'
+                            : getPaymentStatusText(order.payment_status)}
                         </span>
                         <span className="text-sm font-serif font-medium">
                           ¥{order.total.toLocaleString()}

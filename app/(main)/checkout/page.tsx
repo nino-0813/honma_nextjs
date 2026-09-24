@@ -403,6 +403,15 @@ const CheckoutForm = ({ formData, total, clientSecret, onSuccess, shippingCostIs
       } else if (paymentIntent && paymentIntent.status === 'requires_action') {
         const nextAction = paymentIntent.next_action as any;
         if (nextAction?.type === 'display_bank_transfer_instructions') {
+          // Webhook到着前でも、マイページに「銀行振込・入金待ち」として表示できるよう記録する。
+          // 在庫確保自体は署名検証済みWebhook側のRPCが担当する。
+          if (supabase) {
+            const { error: bankOrderError } = await supabase
+              .from('orders')
+              .update({ payment_method: 'bank_transfer', payment_status: 'pending' })
+              .eq('payment_intent_id', paymentIntent.id);
+            if (bankOrderError) console.warn('[Checkout] bank transfer order marker failed', bankOrderError);
+          }
           onSuccess(
             paymentIntent.id,
             true,

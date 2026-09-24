@@ -91,6 +91,8 @@ const ORDER_TEMPLATE_ID = Number(process.env.BREVO_ORDER_TEMPLATE_ID || 1); // �
 const SUBSCRIPTION_TEMPLATE_ID = Number(process.env.BREVO_SUBSCRIPTION_TEMPLATE_ID || 4); // 定期便（お客様向け）
 const ADMIN_NOTIFY_TEMPLATE_ID = Number(process.env.BREVO_ADMIN_TEMPLATE_ID || 3); // 受注通知（管理者向け・通常注文）
 const SUBSCRIPTION_ADMIN_TEMPLATE_ID = Number(process.env.BREVO_SUBSCRIPTION_ADMIN_TEMPLATE_ID || 7); // 受注通知_定期便（管理者向け・定期便のみ）
+const BANK_TRANSFER_ORDER_TEMPLATE_ID = Number(process.env.BREVO_BANK_TRANSFER_ORDER_TEMPLATE_ID || 8); // 銀行振込受付（お客様向け）
+const BANK_TRANSFER_PAID_TEMPLATE_ID = Number(process.env.BREVO_BANK_TRANSFER_PAID_TEMPLATE_ID || 9); // 銀行振込入金確認（お客様向け）
 // 受注通知の宛先（管理者）
 const ADMIN_NOTIFY_EMAIL = process.env.BREVO_ADMIN_EMAIL || 'info@ikevege.com';
 
@@ -106,16 +108,21 @@ const fmtJaDate = (d: Date): string =>
 /**
  * 注文確認メールを送信する。
  *
- * - 決済成功（paidへ遷移）した瞬間に1回だけ呼ばれる想定。
+ * - カード決済成功、銀行振込受付、銀行振込入金確認の各タイミングで呼び分ける。
  * - お客様向け: 通常注文はテンプレ #1、定期便（subscription_interval あり）はテンプレ #4。
  *   #4 では お届け頻度(cycle) と 発送開始日(start) を追加で差し込む。
- * - 管理者向け: 毎回テンプレ #3（受注通知）を ADMIN_NOTIFY_EMAIL へ送る。
+ * - 管理者向け: 決済成功時のみテンプレ #3（受注通知）を ADMIN_NOTIFY_EMAIL へ送る。
  * - 送信失敗しても Stripe webhook 全体を止めないよう、呼び出し側で try/catch すること。
  */
 async function sendOrderConfirmationEmail(
   supabaseAdmin: any,
   order: any,
-  orderNumber: string
+  orderNumber: string,
+  options: {
+    customerTemplateId?: number;
+    sendAdmin?: boolean;
+    extraParams?: Record<string, unknown>;
+  } = {}
 ): Promise<void> {
   // 明細（注文時のスナップショットが order_items に保存されている）
   const { data: items, error: itemsErr } = await supabaseAdmin
@@ -163,6 +170,7 @@ async function sendOrderConfirmationEmail(
     shipping_cost: numJa(order.shipping_cost),
     total: numJa(order.total),
     items: templateItems,
+    ...(options.extraParams || {}),
   };
 
   // 定期便かどうか（subscription_interval が入っていれば定期便）
@@ -171,10 +179,10 @@ async function sendOrderConfirmationEmail(
   // ===== お客様向けメール =====
   if (order.email) {
     try {
-      let templateId = ORDER_TEMPLATE_ID;
+      let templateId = options.customerTemplateId || ORDER_TEMPLATE_ID;
       const params: Record<string, unknown> = { name: customerName, ...baseParams };
 
-      if (isSubscription) {
+      if (isSubscription && !options.customerTemplateId) {
         templateId = SUBSCRIPTION_TEMPLATE_ID;
         // お届け頻度ラベル
         params.cycle =
@@ -226,6 +234,8 @@ async function sendOrderConfirmationEmail(
   // ===== 管理者向け受注通知メール（毎回） =====
   // テンプレ #3 は {{ params.name }} / {{ params.address }} を表示する
   // 定期便注文の場合はテンプレ #7（受注通知_定期便）を代わりに使う
+  if (options.sendAdmin === false) return;
+
   try {
     const adminTemplateId = isSubscription ? SUBSCRIPTION_ADMIN_TEMPLATE_ID : ADMIN_NOTIFY_TEMPLATE_ID;
     const result = await sendBrevoEmail({
@@ -648,7 +658,7 @@ export async function POST(request: Request) {
       }
       const { data: order, error: orderErr } = await supabaseAdmin
         .from('orders')
-        .select('id, order_number, inventory_reserved_at')
+        .select('*')
         .eq('payment_intent_id', pi.id)
         .maybeSingle();
       if (orderErr) throw orderErr;
@@ -670,11 +680,32 @@ export async function POST(request: Request) {
           return NextResponse.json({ error: 'inventory_reservation_failed' }, { status: 409 });
         }
       }
+      const bankOrderNumber = order.order_number || generateOrderNumber();
       await supabaseAdmin.from('orders').update({
-        order_number: order.order_number || generateOrderNumber(),
+        order_number: bankOrderNumber,
         payment_method: 'bank_transfer', payment_status: 'pending', order_status: 'pending',
         updated_at: new Date().toISOString(),
       }).eq('id', order.id);
+
+      if (!isDuplicateEvent) {
+        const instructionsUrl = pi.next_action?.display_bank_transfer_instructions?.hosted_instructions_url || '';
+        const dueDate = order.payment_due_at
+          ? new Date(order.payment_due_at)
+          : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        try {
+          await sendOrderConfirmationEmail(supabaseAdmin, order, bankOrderNumber, {
+            customerTemplateId: BANK_TRANSFER_ORDER_TEMPLATE_ID,
+            sendAdmin: false,
+            extraParams: {
+              instructions_url: instructionsUrl,
+              payment_instructions_url: instructionsUrl,
+              payment_due: fmtJaDate(dueDate),
+            },
+          });
+        } catch (mailErr: any) {
+          console.error('[BankTransfer] pending mail failed (ignored)', mailErr?.message || mailErr);
+        }
+      }
       return NextResponse.json({ received: true, bank_transfer: true });
     }
 
@@ -716,7 +747,7 @@ export async function POST(request: Request) {
         const result = await supabaseAdmin
           .from('orders')
           .select(
-            'id, created_at, order_number, first_name, last_name, email, phone, shipping_address, shipping_city, shipping_postal_code, subtotal, shipping_cost, total, payment_status, order_status, coupon_id, notes, auth_user_id, stripe_subscription_id, subscription_interval, inventory_reserved_at'
+            'id, created_at, order_number, first_name, last_name, email, phone, shipping_address, shipping_city, shipping_postal_code, subtotal, shipping_cost, total, payment_status, payment_method, order_status, coupon_id, notes, auth_user_id, stripe_subscription_id, subscription_interval, inventory_reserved_at, payment_due_at'
           )
           .eq('payment_intent_id', paymentIntentId)
           .maybeSingle();
@@ -768,6 +799,9 @@ export async function POST(request: Request) {
       }
 
       const wasPaid = order.payment_status === 'paid';
+      const wasBankTransfer =
+        order.payment_method === 'bank_transfer' ||
+        (Array.isArray(pi.payment_method_types) && pi.payment_method_types.includes('customer_balance'));
 
       const nextOrderNumber = order.order_number || generateOrderNumber();
       const nowIso = new Date().toISOString();
@@ -781,7 +815,7 @@ export async function POST(request: Request) {
         .update({
           payment_status: 'paid',
           paid_at: nowIso,
-          payment_method: (pi.payment_method_types && pi.payment_method_types[0]) || 'card',
+          payment_method: wasBankTransfer ? 'bank_transfer' : ((pi.payment_method_types && pi.payment_method_types[0]) || 'card'),
           order_number: nextOrderNumber,
           order_status: 'processing',
           notes: nextNotes ?? null,
@@ -817,7 +851,12 @@ export async function POST(request: Request) {
 
         // お客様へ注文確認メールを送信（失敗してもwebhookは止めない）
         try {
-          await sendOrderConfirmationEmail(supabaseAdmin, order, nextOrderNumber);
+          await sendOrderConfirmationEmail(
+            supabaseAdmin,
+            order,
+            nextOrderNumber,
+            wasBankTransfer ? { customerTemplateId: BANK_TRANSFER_PAID_TEMPLATE_ID } : undefined
+          );
         } catch (mailErr: any) {
           console.error('[OrderMail] failed to send (ignored)', mailErr?.message || mailErr);
         }
