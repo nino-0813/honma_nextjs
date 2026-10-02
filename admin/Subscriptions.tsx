@@ -19,6 +19,7 @@ interface AdminSubscriptionRow {
   canceled_at: string | null;
   created_at: string;
   updated_at: string;
+  customer_name?: string | null;
 }
 
 interface OrderSummary {
@@ -80,7 +81,56 @@ const Subscriptions: React.FC = () => {
         .select('*')
         .order('created_at', { ascending: false });
       if (err) throw err;
-      setSubs((data ?? []) as AdminSubscriptionRow[]);
+
+      const subscriptionRows = (data ?? []) as AdminSubscriptionRow[];
+      const subscriptionIds = subscriptionRows.map((row) => row.stripe_subscription_id);
+      const authUserIds = Array.from(
+        new Set(subscriptionRows.map((row) => row.auth_user_id).filter((id): id is string => Boolean(id)))
+      );
+
+      const [ordersRes, profilesRes] = await Promise.all([
+        subscriptionIds.length > 0
+          ? supabase
+              .from('orders')
+              .select('stripe_subscription_id, first_name, last_name, created_at')
+              .in('stripe_subscription_id', subscriptionIds)
+              .order('created_at', { ascending: false })
+          : Promise.resolve({ data: [], error: null }),
+        authUserIds.length > 0
+          ? supabase.from('profiles').select('id, first_name, last_name').in('id', authUserIds)
+          : Promise.resolve({ data: [], error: null }),
+      ]);
+
+      if (ordersRes.error) {
+        console.warn('定期購入者名の注文情報取得に失敗しました:', ordersRes.error);
+      }
+      if (profilesRes.error) {
+        console.warn('定期購入者名のプロフィール取得に失敗しました:', profilesRes.error);
+      }
+
+      const namesBySubscriptionId = new Map<string, string>();
+      for (const order of ordersRes.data ?? []) {
+        const subscriptionId = order.stripe_subscription_id;
+        if (!subscriptionId || namesBySubscriptionId.has(subscriptionId)) continue;
+        const name = `${order.last_name ?? ''} ${order.first_name ?? ''}`.trim();
+        if (name) namesBySubscriptionId.set(subscriptionId, name);
+      }
+
+      const namesByUserId = new Map<string, string>();
+      for (const profile of profilesRes.data ?? []) {
+        const name = `${profile.last_name ?? ''} ${profile.first_name ?? ''}`.trim();
+        if (name) namesByUserId.set(profile.id, name);
+      }
+
+      setSubs(
+        subscriptionRows.map((row) => ({
+          ...row,
+          customer_name:
+            namesBySubscriptionId.get(row.stripe_subscription_id) ||
+            (row.auth_user_id ? namesByUserId.get(row.auth_user_id) : null) ||
+            null,
+        }))
+      );
     } catch (e: any) {
       setError(e?.message || '定期購入の取得に失敗しました');
     } finally {
@@ -99,6 +149,7 @@ const Subscriptions: React.FC = () => {
       if (search) {
         const q = search.toLowerCase();
         const hit =
+          s.customer_name?.toLowerCase().includes(q) ||
           s.email?.toLowerCase().includes(q) ||
           s.stripe_subscription_id?.toLowerCase().includes(q) ||
           s.stripe_customer_id?.toLowerCase().includes(q);
@@ -324,7 +375,7 @@ const Subscriptions: React.FC = () => {
         <div className="bg-white border border-gray-200 rounded-lg p-4 flex flex-col sm:flex-row gap-3">
           <input
             type="text"
-            placeholder="メール / Subscription ID / Customer ID で検索"
+            placeholder="顧客名 / メール / Subscription ID / Customer ID で検索"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:border-black focus:ring-1 focus:ring-black"
@@ -408,8 +459,11 @@ const Subscriptions: React.FC = () => {
                     return (
                       <tr key={sub.id} className="border-b border-gray-100 hover:bg-gray-50">
                         <td className="px-4 py-3">
-                          <div className="text-gray-900">{sub.email}</div>
-                          <div className="text-xs text-gray-500 mt-0.5">{sub.stripe_customer_id}</div>
+                          <div className="font-medium text-gray-900">{sub.customer_name || sub.email}</div>
+                          {sub.customer_name && (
+                            <div className="text-xs text-gray-500 mt-0.5">{sub.email}</div>
+                          )}
+                          <div className="text-[11px] text-gray-400 mt-0.5">{sub.stripe_customer_id}</div>
                         </td>
                         <td className="px-4 py-3 font-mono text-xs text-gray-600">
                           {sub.stripe_subscription_id}
@@ -466,6 +520,12 @@ const Subscriptions: React.FC = () => {
               <section>
                 <h3 className="font-semibold text-gray-900 mb-3">顧客情報</h3>
                 <div className="bg-gray-50 rounded-lg p-4 space-y-1">
+                  {activeSub.customer_name && (
+                    <div>
+                      <span className="text-xs text-gray-500">氏名: </span>
+                      <span className="font-medium text-gray-900">{activeSub.customer_name}</span>
+                    </div>
+                  )}
                   <div>
                     <span className="text-xs text-gray-500">メール: </span>
                     <span className="text-gray-900">{activeSub.email}</span>
