@@ -1,46 +1,40 @@
 import Link from 'next/link';
 import FadeIn from '@/components/FadeIn';
 
-/**
- * 定期便の社会的意義を、風景写真と共に簡潔に伝える。
- */
+const COMMUNITY_IMAGES = [
+  { src: '/images/renewal/activities/harvest-retreat.webp', alt: '田んぼに集うイケベジの仲間たち' },
+  { src: '/images/renewal/about/safety.webp', alt: '苗を育てる農作業' },
+  { src: '/images/renewal/about/delicious.webp', alt: 'お米の食味分析鑑定コンクール' },
+  { src: '/images/renewal/about/smiles.webp', alt: '佐渡の田んぼに集まった子どもたち' },
+];
+
 export default function SubscriptionCTA() {
   return (
-    <section className="bg-white py-20 text-primary md:py-32">
-      <div className="max-w-[1500px] mx-auto px-5 md:px-10">
+    <section className="bg-white px-[10%] pb-32 text-primary md:pb-48">
+      <div className="mx-auto max-w-[1440px]">
         <FadeIn>
-          <p className="text-center text-sm font-medium tracking-[0.16em] text-primary">イケベジ定期便</p>
-        </FadeIn>
-
-        <div className="mx-auto mt-6 max-w-3xl text-center">
-          <FadeIn delay={80}>
-            <h2 className="font-serif text-3xl font-semibold leading-[1.55] tracking-wide text-primary md:text-[44px]">
-              4700人とつくる里山
-            </h2>
-            <div className="mt-8 flex flex-col gap-6 text-sm leading-[2] text-gray-600 md:text-base">
+          <div className="max-w-[820px]">
+            <h2 className="font-serif text-[26px] font-semibold leading-[1.55] tracking-[0.08em] md:text-[42px] lg:text-[50px]">4700人とつくる里山</h2>
+            <div className="mt-8 space-y-6 font-serif text-[10px] leading-[2.25] tracking-[0.04em] text-gray-600 md:mt-12 md:text-[14px] md:leading-[2.35]">
               <p>イケベジは佐渡ヶ島と共にこれからも前に進み続けます。<br />その佐渡の中で、イケベジが生まれ継ないでいく集落が「豊田集落」</p>
-              <p>定期便は、リーズナブルに安定してお届けする仕組みであると共に、<br className="hidden md:block" />お客様とイケベジが一緒に歩んでいくための形です。</p>
-              <p>無意識の日常の一杯のご飯が、着実に日本の農業を変え、<br className="hidden md:block" />この「豊田集落」を繋いでいく一杯になります。</p>
+              <p>定期便は、リーズナブルに安定してお届けする仕組みであると共に、<br />お客様とイケベジが一緒に歩んでいくための形です。</p>
+              <p>無意識の日常の一杯のご飯が、着実に日本の農業を変え、<br />この「豊田集落」を繋いでいく一杯になります。</p>
             </div>
-          </FadeIn>
-        </div>
-
-        <FadeIn delay={140}>
-          <div className="mx-auto mt-12 aspect-[16/9] max-w-6xl overflow-hidden bg-dim md:mt-16 md:aspect-[16/7]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/home/satoyama-toyota.webp" alt="佐渡の豊田集落の里山風景" loading="lazy" className="h-full w-full object-cover" />
           </div>
         </FadeIn>
-
-        <div className="mt-12 text-center">
-          <Link
-            href="/collections/rice/yearly?view=lp"
-            className="inline-flex min-h-12 items-center gap-2 rounded-full border border-primary bg-white px-10 py-4 text-sm font-medium text-primary transition-colors hover:bg-primary hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-          >
-            定期便をはじめる
-            <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4">
-              <path d="M3 8h10M9 4l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+        <FadeIn className="mt-16 md:mt-24">
+          <div className="grid grid-cols-2 overflow-hidden">
+            {COMMUNITY_IMAGES.map((image) => (
+              <div key={image.src} className="aspect-[4/3] overflow-hidden bg-dim">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={image.src} alt={image.alt} loading="lazy" className="h-full w-full object-cover" />
+              </div>
+            ))}
+          </div>
+        </FadeIn>
+        <div className="mt-16 text-center md:mt-24">
+          <Link href="/collections/rice/yearly?view=lp" className="inline-flex min-h-11 items-center rounded-full border border-primary bg-white px-8 text-xs font-medium text-primary transition-colors hover:bg-primary hover:text-white md:min-h-12 md:px-10 md:text-sm">
+            定期便をはじめる →
           </Link>
         </div>
       </div>

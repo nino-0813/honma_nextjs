@@ -105,7 +105,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
           </nav>
 
           <div className="flex items-center gap-5 sm:gap-6">
-            <Link href="/account" className="hidden text-primary transition-colors hover:text-gray-500 sm:block" title={isLoggedIn ? 'mypage' : 'ログイン'}>
+            <Link href="/account" className="block text-primary transition-colors hover:text-gray-500" title={isLoggedIn ? 'mypage' : 'ログイン'}>
               <IconUser className="w-5 h-5" />
             </Link>
             <button type="button" onClick={onOpenCart} className="relative text-primary transition-colors hover:text-gray-500">
