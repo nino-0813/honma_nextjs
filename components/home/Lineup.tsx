@@ -11,9 +11,9 @@ const TILES = [
 export default function Lineup() {
   return (
     <section id="products" className="bg-white pb-32 md:pb-48">
-      <ul className="grid grid-cols-2 gap-px bg-white">
+      <ul className="grid grid-cols-2 gap-px bg-white lg:grid-cols-3">
         {TILES.map((tile, index) => (
-          <li key={tile.ja} className={index === 2 ? 'col-start-1' : ''}>
+          <li key={tile.ja} className={index === 2 ? 'col-start-1 lg:col-start-auto' : ''}>
             <FadeIn delay={index * 70}>
               <Link href={tile.href} aria-label={`${tile.ja}の商品を見る`} className="group block">
                 <span className="relative block aspect-square overflow-hidden bg-dim md:aspect-[16/10]">
