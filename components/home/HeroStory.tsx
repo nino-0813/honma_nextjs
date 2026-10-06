@@ -51,6 +51,10 @@ export default function HeroStory() {
           <div className="mx-auto mt-28 max-w-[780px] font-serif text-[11px] font-medium leading-[2.25] tracking-[0.06em] text-[#24211d] md:mt-44 md:text-[14px] md:leading-[2.35] lg:mt-52 lg:text-[15px]">
             <FadeIn>
               <div className="space-y-8 md:space-y-11">
+                <div>
+                  <p>拝啓</p>
+                  <p>イケベジを知ってくれた　あなたへ</p>
+                </div>
                 <p>
                   佐渡ヶ島は<br />
                   豊かな自然や文化が詰まった「日本の縮図」といわれる島です。
@@ -58,14 +62,14 @@ export default function HeroStory() {
                 <div>
                   <p>そして</p>
                   <p className="text-yuunagi">
-                    トキとの共生を選び<br />
-                    全島の農家が立ち上がったという この島の歴史は<br />
-                    佐渡の未来を紡ぐ農家にとって誇りであり、胸を熱くする原点です。
+                    トキとの共生を選び 全島の農家が立ち上がったという この島の歴史は<br />
+                    佐渡の未来を担う農家たちの胸を熱くする物語であり<br />
+                    私たちもまた この歴史のバトンを受け継いでいます。
                   </p>
                 </div>
                 <p>
                   島の自然が魅せる美しさ、楽しさ、厳しさ、ワクワク感<br />
-                  その自然界の “イケてる” 部分をもっと社会に伝え還元していきたい<br />
+                  その自然界の “イケてる” をもっと社会に伝え還元していきたい<br />
                   という思いから わたしたち「イケベジ」は始まったのです。
                 </p>
                 <p>
@@ -81,7 +85,7 @@ export default function HeroStory() {
               <div className="mt-14 text-right md:mt-20">
                 <p>敬具</p>
                 <p>佐渡ヶ島より　愛を込めて</p>
-                <p>イケているベジタブル　イケベジより</p>
+                <p>イケベジより</p>
               </div>
             </FadeIn>
           </div>
