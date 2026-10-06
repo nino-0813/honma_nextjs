@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import { trackPageView } from '@/lib/analytics';
 
 export default function RootClientEffects() {
   const pathname = usePathname();
@@ -48,6 +49,10 @@ export default function RootClientEffects() {
     if (currentPath === '/admin' && !adminReturnPath) {
       sessionStorage.setItem('basic_auth_passed', 'true');
     }
+
+    // GA4: 初回表示と Next.js のクライアント遷移を1回ずつ計測する。
+    // layout 側は send_page_view: false のため、ここが page_view の唯一の送信元。
+    trackPageView(`${currentPath}${window.location.search}`);
   }, [pathname]);
 
   return null;

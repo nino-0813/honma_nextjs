@@ -87,7 +87,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   function gtag(){dataLayer.push(arguments);}
                   gtag('js', new Date());
                   gtag('config', '${GA_MEASUREMENT_ID}', {
-                    page_path: window.location.pathname,
+                    // page_view は RootClientEffects から送信し、SPA遷移も含めて重複を防ぐ
+                    send_page_view: false,
                   });
                 `,
               }}

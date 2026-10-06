@@ -20,6 +20,23 @@ declare global {
 
 const CURRENCY = 'JPY';
 
+/** Next.js のクライアント遷移を含むページ表示 */
+export function trackPageView(path: string): void {
+  if (typeof window === 'undefined') return;
+  if (typeof window.gtag !== 'function') return;
+  try {
+    window.gtag('event', 'page_view', {
+      page_path: path,
+      page_location: window.location.href,
+      page_title: document.title,
+    });
+  } catch (e) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn('[analytics] page_view', e);
+    }
+  }
+}
+
 /** 共通: gtag が読み込まれていれば送信 */
 function send(eventName: string, params: Record<string, any>): void {
   if (typeof window === 'undefined') return;
