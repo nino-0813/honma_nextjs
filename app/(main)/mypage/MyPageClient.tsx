@@ -676,14 +676,38 @@ const MyPage = () => {
   const openProductChangeModal = async (subId: string, currentTitle: string) => {
     setProductChangeOpen(true);
     setProductChangeSubId(subId);
-    setProductChangeCurrentTitle(currentTitle);
+    setProductChangeCurrentTitle(currentTitle || '確認中…');
     setProductChoiceId('');
     setMillingChoiceId('');
     setProductChangeError(null);
     setProductChangeMessage(null);
-    const weight = currentTitle.match(/(\d+(?:\.\d+)?)\s*kg/i)?.[1];
-    if (!supabase || !weight) {
+    if (!supabase) {
       setProductChangeError('現在の重量を確認できません');
+      return;
+    }
+    let resolvedTitle = currentTitle;
+    if (!resolvedTitle) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) throw new Error('セッションが切れています');
+        const response = await fetch('/api/subscription-product-info', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+          body: JSON.stringify({ subscription_id: subId }),
+        });
+        const payload = await response.json().catch(() => null);
+        if (!response.ok) throw new Error(payload?.error || '現在の商品を確認できません');
+        resolvedTitle = payload?.product?.product_title || '';
+        setProductChangeCurrentTitle(resolvedTitle || '商品名を確認できません');
+      } catch (error: any) {
+        setProductChangeCurrentTitle('商品名を確認できません');
+        setProductChangeError(error?.message || '現在の商品を確認できません');
+        return;
+      }
+    }
+    const weight = resolvedTitle.match(/(\d+(?:\.\d+)?)\s*kg/i)?.[1];
+    if (!weight) {
+      setProductChangeError('現在の商品の重量を確認できません。管理者へお問い合わせください');
       return;
     }
     const { data, error } = await supabase.from('products')
@@ -1308,7 +1332,8 @@ const MyPage = () => {
                                 type="button"
                                 onClick={() => {
                                   const current = (subscriptionItems[sub.stripe_subscription_id] || [])[0];
-                                  if (current) openProductChangeModal(sub.stripe_subscription_id, current.product_title);
+                                  const savedTitle = (sub.metadata as any)?.current_product?.product_title || '';
+                                  openProductChangeModal(sub.stripe_subscription_id, current?.product_title || savedTitle);
                                 }}
                                 className="text-sm text-violet-700 hover:text-violet-800 underline underline-offset-2"
                               >
