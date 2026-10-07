@@ -1609,9 +1609,16 @@ const Orders = () => {
                               </div>
                               {it.variant ? <div className="text-xs text-gray-500 mt-1">種類: {it.variant}</div> : null}
                               {it.selected_options ? (
-                                <div className="text-xs text-gray-500 mt-1">
-                                  オプション: {typeof it.selected_options === 'string' ? it.selected_options : JSON.stringify(it.selected_options)}
-                                </div>
+                                <>
+                                  {typeof it.selected_options === 'object' && it.selected_options?.rice_keep_gift ? (
+                                    <div className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${String(it.selected_options.rice_keep_gift).startsWith('希望する') ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-600'}`}>
+                                      保存袋特典: {String(it.selected_options.rice_keep_gift)}
+                                    </div>
+                                  ) : null}
+                                  <div className="text-xs text-gray-500 mt-1">
+                                    オプション: {typeof it.selected_options === 'string' ? it.selected_options : JSON.stringify(it.selected_options)}
+                                  </div>
+                                </>
                               ) : null}
                             </div>
                             <select

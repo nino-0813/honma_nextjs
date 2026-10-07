@@ -108,12 +108,46 @@ export default function ProductDetailView({ product }: { product: Product }) {
   const [subscriptionInterval, setSubscriptionInterval] = useState<SubscriptionInterval>(
     subscriptionIntervals[0] ?? 'monthly'
   );
-  const [wantsRiceKeepGift, setWantsRiceKeepGift] = useState(false);
+  const [giftEligibility, setGiftEligibility] = useState<boolean | null>(null);
+  const [giftEligibilityLoading, setGiftEligibilityLoading] = useState(false);
+  const [wantsRiceKeepGift, setWantsRiceKeepGift] = useState<boolean | null>(null);
   const subscriptionPrice = Math.round(calculatedPrice * (1 - subscriptionDiscountPercent / 100));
   const subscriptionRiceSeason = product.subscriptionRiceSeason ?? null;
 
   // 定期購入の注意事項モーダル
   const [showSubscriptionNotice, setShowSubscriptionNotice] = useState(false);
+
+  useEffect(() => {
+    if (purchaseType !== 'subscription') return;
+    let active = true;
+    const checkEligibility = async () => {
+      setGiftEligibilityLoading(true);
+      try {
+        const { data: { session } } = await supabase!.auth.getSession();
+        if (!session?.access_token) {
+          // 未ログイン時は選択を許可し、決済完了時にサーバー側で再判定する。
+          if (active) setGiftEligibility(true);
+          return;
+        }
+        const response = await fetch('/api/subscription-gift-eligibility', {
+          headers: { Authorization: `Bearer ${session.access_token}` },
+        });
+        const payload = await response.json().catch(() => null);
+        if (!response.ok) throw new Error(payload?.error || '特典の確認に失敗しました');
+        if (active) {
+          setGiftEligibility(Boolean(payload.eligible));
+          if (!payload.eligible) setWantsRiceKeepGift(null);
+        }
+      } catch (error) {
+        console.warn('保存袋特典の資格確認に失敗しました:', error);
+        if (active) setGiftEligibility(null);
+      } finally {
+        if (active) setGiftEligibilityLoading(false);
+      }
+    };
+    checkEligibility();
+    return () => { active = false; };
+  }, [purchaseType]);
 
   // 本日（日本時間）の日付表示（ハイドレーションズレ防止のためクライアントで設定）
   const [todayJp, setTodayJp] = useState<string>('');
@@ -152,6 +186,11 @@ export default function ProductDetailView({ product }: { product: Product }) {
   const executeSubscriptionAddToCart = () => {
     if (!product) return;
     setStockError('');
+    if (giftEligibility === true && wantsRiceKeepGift === null) {
+      setStockError('お米保存袋を「希望する」または「希望しない」から選択してください。');
+      setShowSubscriptionNotice(false);
+      return;
+    }
     const variantString =
       product.hasVariants
         ? (() => {
@@ -194,7 +233,9 @@ export default function ProductDetailView({ product }: { product: Product }) {
       finalPrice: product.hasVariants ? calculatedPrice : undefined,
       selectedOptions: {
         ...(product.hasVariants ? selectedOptions : {}),
-        rice_keep_gift: wantsRiceKeepGift ? '希望する' : '希望しない',
+        ...(giftEligibility === true && wantsRiceKeepGift !== null
+          ? { rice_keep_gift: wantsRiceKeepGift ? '希望する（1枚）' : '希望しない' }
+          : {}),
       },
       subscription: {
         purchaseType: 'subscription',
@@ -732,11 +773,15 @@ export default function ProductDetailView({ product }: { product: Product }) {
                     </div>
                   </div>
                 )}
-
-                {purchaseType === 'subscription' && (
+                {purchaseType === 'subscription' && giftEligibilityLoading && (
+                  <p className="order-4 mt-4 text-xs text-gray-500">初回特典の対象を確認しています…</p>
+                )}
+                {purchaseType === 'subscription' && !giftEligibilityLoading && giftEligibility === true && (
                   <fieldset className="order-4 mt-6 border-t border-gray-100 pt-5">
-                    <legend className="text-xs font-medium text-gray-700">3. お米保存袋（任意）</legend>
-                    <p className="mt-1 text-[11px] leading-relaxed text-gray-500">数量限定・1アカウントにつきおひとつまで</p>
+                    <legend className="text-xs font-medium text-gray-700">3. 初回限定 お米保存袋</legend>
+                    <p className="mt-1 text-[11px] leading-relaxed text-gray-500">
+                      定期便を初めてご注文のお客様限定です。初回発送に1枚同梱します。注文後の変更はできません。
+                    </p>
                     <div className="mt-3 grid grid-cols-2 gap-2">
                       {[
                         { value: false, label: '希望しない' },
