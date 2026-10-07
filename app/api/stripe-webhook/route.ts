@@ -1258,7 +1258,9 @@ export async function POST(request: Request) {
       cloneOrder.notes = `[定期請求] サイクル ${invoice.number || ''} - 元注文 ${original.order_number ?? original.id}`;
       if (newItems.length > 0) cloneOrder.subtotal = computedSubtotal;
       if (currentShipping?.postal_code) {
-        cloneOrder.shipping_name = currentShipping.name || null;
+        const shippingNameParts = String(currentShipping.name || '').trim().split(/\s+/).filter(Boolean);
+        cloneOrder.shipping_last_name = shippingNameParts[0] || null;
+        cloneOrder.shipping_first_name = shippingNameParts.slice(1).join(' ') || null;
         cloneOrder.shipping_phone = currentShipping.phone || null;
         cloneOrder.shipping_postal_code = currentShipping.postal_code;
         cloneOrder.shipping_city = currentShipping.city;
