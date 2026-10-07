@@ -1159,6 +1159,41 @@ export async function POST(request: Request) {
       const nowIso = new Date().toISOString();
       const amountPaid = Number(invoice.amount_paid ?? 0);
 
+      // 契約変更は過去注文ではなく subscriptions.metadata に保持する。
+      // 新しい発送回だけに現在の商品・配送先スナップショットを反映する。
+      const { data: subscriptionRow } = await supabaseAdmin
+        .from('subscriptions')
+        .select('metadata')
+        .eq('stripe_subscription_id', stripeSubscriptionId)
+        .maybeSingle();
+      const currentProduct = subscriptionRow?.metadata?.current_product;
+      const currentShipping = subscriptionRow?.metadata?.shipping;
+
+      const { data: origItems } = await supabaseAdmin
+        .from('order_items')
+        .select('*')
+        .eq('order_id', original.id);
+
+      const newItems = (origItems || []).map((it: any) => {
+        const next: any = { ...it };
+        delete next.id;
+        delete next.created_at;
+        if (it.is_subscription && currentProduct?.product_id) {
+          Object.assign(next, {
+            product_id: currentProduct.product_id,
+            product_title: currentProduct.product_title,
+            product_price: Number(currentProduct.product_price || 0),
+            product_image: currentProduct.product_image || null,
+            variant: currentProduct.variant || null,
+            selected_options: currentProduct.selected_options || null,
+            quantity: Math.max(1, Number(currentProduct.quantity || 1)),
+            line_total: Number(currentProduct.line_total || 0),
+          });
+        }
+        return next;
+      });
+      const computedSubtotal = newItems.reduce((sum: number, it: any) => sum + Number(it.line_total || 0), 0);
+
       // 注文の複製（id, order_number, payment_intent_id 等は差し替え）
       const cloneOrder: any = { ...original };
       delete cloneOrder.id;
@@ -1170,6 +1205,14 @@ export async function POST(request: Request) {
       cloneOrder.order_status = 'processing';
       cloneOrder.updated_at = nowIso;
       cloneOrder.notes = `[定期請求] サイクル ${invoice.number || ''} - 元注文 ${original.order_number ?? original.id}`;
+      if (newItems.length > 0) cloneOrder.subtotal = computedSubtotal;
+      if (currentShipping?.postal_code) {
+        cloneOrder.shipping_name = currentShipping.name || null;
+        cloneOrder.shipping_phone = currentShipping.phone || null;
+        cloneOrder.shipping_postal_code = currentShipping.postal_code;
+        cloneOrder.shipping_city = currentShipping.city;
+        cloneOrder.shipping_address = currentShipping.address;
+      }
       // 金額が異なる場合はinvoiceの値で上書き（送料変動などのため）
       if (amountPaid && Number(original.total) !== amountPaid) {
         cloneOrder.total = amountPaid;
@@ -1185,20 +1228,9 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'clone_order_failed' }, { status: 500 });
       }
 
-      // 注文明細を複製
-      const { data: origItems } = await supabaseAdmin
-        .from('order_items')
-        .select('*')
-        .eq('order_id', original.id);
-
-      if (origItems && origItems.length > 0) {
-        const newItems = origItems.map((it: any) => {
-          const next: any = { ...it };
-          delete next.id;
-          delete next.created_at;
-          next.order_id = inserted.id;
-          return next;
-        });
+      // 注文明細を複製（契約変更後の商品スナップショットを使用）
+      if (newItems.length > 0) {
+        newItems.forEach((it: any) => { it.order_id = inserted.id; });
         const { error: itemsErr } = await supabaseAdmin.from('order_items').insert(newItems);
         if (itemsErr) {
           console.error('[Webhook] clone order_items insert error:', itemsErr);
@@ -1206,8 +1238,8 @@ export async function POST(request: Request) {
       }
 
       // 在庫減算
-      if (origItems) {
-        for (const it of origItems) {
+      if (newItems) {
+        for (const it of newItems) {
           if (!it.product_id || !it.quantity) continue;
           const { error: rpcErr } = await supabaseAdmin.rpc('decrement_product_stock', {
             p_product_id: it.product_id,
@@ -1230,10 +1262,10 @@ export async function POST(request: Request) {
             `${original.first_name ?? ''} ${original.last_name ?? ''}`.trim(),
           email: original.email,
           phone: original.phone,
-          shipping_address: original.shipping_address,
-          shipping_city: original.shipping_city,
-          shipping_postal_code: original.shipping_postal_code,
-          subtotal: original.subtotal,
+          shipping_address: cloneOrder.shipping_address,
+          shipping_city: cloneOrder.shipping_city,
+          shipping_postal_code: cloneOrder.shipping_postal_code,
+          subtotal: cloneOrder.subtotal,
           shipping_cost: original.shipping_cost,
           total: cloneOrder.total,
           payment_status: 'paid',

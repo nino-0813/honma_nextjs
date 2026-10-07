@@ -320,6 +320,18 @@ const MyPage = () => {
                   quantity: Number(it.quantity || 1),
                   selected_options: it.selected_options || null,
                 }));
+                const currentProduct = (subsRows.find((s) => s.stripe_subscription_id === subId)?.metadata as any)?.current_product;
+                if (currentProduct && result[subId]?.[0]) {
+                  result[subId][0] = {
+                    ...result[subId][0],
+                    product_id: currentProduct.product_id,
+                    product_title: currentProduct.product_title,
+                    product_image: currentProduct.product_image,
+                    product_price: Number(currentProduct.product_price || 0),
+                    quantity: Number(currentProduct.quantity || 1),
+                    selected_options: currentProduct.selected_options || null,
+                  };
+                }
               }
               setSubscriptionItems(result);
             }

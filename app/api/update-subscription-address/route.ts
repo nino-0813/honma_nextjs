@@ -151,33 +151,7 @@ export async function POST(request: Request) {
       });
     }
 
-    // この定期購入に紐づく "最初の" orders 行（webhook が複製元として使用する原本）を更新
-    // → 次回サイクル以降の発送はこの住所が使われる
-    const { data: firstOrder } = await supabaseAdmin
-      .from('orders')
-      .select('id')
-      .eq('stripe_subscription_id', subscription_id)
-      .order('created_at', { ascending: true })
-      .limit(1)
-      .maybeSingle();
-
-    if (firstOrder?.id) {
-      const { error: orderUpdateError } = await supabaseAdmin
-        .from('orders')
-        .update({
-          shipping_postal_code,
-          shipping_city,
-          shipping_address,
-          // shipping_name / shipping_phone はマイグレーションで追加されているなら更新
-          ...(shipping_name ? { shipping_name } : {}),
-          ...(shipping_phone ? { shipping_phone } : {}),
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', firstOrder.id);
-      if (orderUpdateError) throw orderUpdateError;
-    }
-
-    // subscriptions.metadata にも保存（参照用）
+    // 過去の注文履歴は書き換えず、次回以降に使う配送先を契約 metadata に保存する。
     const newMetadata = {
       ...(ownership.metadata as any),
       shipping: {
