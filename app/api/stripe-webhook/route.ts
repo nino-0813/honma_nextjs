@@ -975,6 +975,13 @@ export async function POST(request: Request) {
         }
       }
 
+      // アプリ側で保持する予約変更を Stripe webhook で消さない。
+      const { data: existingSubscription } = await supabaseAdmin
+        .from('subscriptions')
+        .select('metadata')
+        .eq('stripe_subscription_id', stripeSubscriptionId)
+        .maybeSingle();
+
       const row = {
         stripe_subscription_id: stripeSubscriptionId,
         stripe_customer_id: stripeCustomerId,
@@ -985,6 +992,7 @@ export async function POST(request: Request) {
         // Stripeのmetadataに加えて、Stripe Subscriptionトップレベルの cancel_at_period_end も保存
         // これにより「期末解約予約中」の状態がwebhook再受信でも消えなくなる
         metadata: {
+          ...((existingSubscription?.metadata as Record<string, unknown>) ?? {}),
           ...(sub.metadata ?? {}),
           cancel_at_period_end: Boolean(sub.cancel_at_period_end),
           // cancel_at（将来のキャンセル予定時刻）も入れておく

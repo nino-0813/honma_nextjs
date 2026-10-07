@@ -231,6 +231,35 @@ export function isWithinChangeDeadline(now: Date, nextShipping: Date | null): bo
   return now.getTime() <= deadline.getTime();
 }
 
+/** 次回発送を1サイクル進める。締切後変更の適用回を決めるために使う。 */
+export function advanceShippingDate(nextShipping: Date, interval: string | null | undefined): Date {
+  const p = toJSTParts(nextShipping);
+  if (interval === 'weekly' || interval === 'biweekly') {
+    const days = interval === 'weekly' ? 7 : 14;
+    return new Date(nextShipping.getTime() + days * 24 * 60 * 60 * 1000);
+  }
+  return jstDateOnlyToUtcDate(p.year, p.month + (intervalMonths(interval) || 1), p.day);
+}
+
+/**
+ * 変更が反映される発送日を返す。
+ * 9日終日までなら次回、10日以降ならその次の発送から反映する。
+ */
+export function getSubscriptionChangeTiming(
+  now: Date,
+  nextShipping: Date,
+  interval: string | null | undefined,
+): { effectiveShippingDate: Date; appliesToNextShipment: boolean; applyAt: Date } {
+  const appliesToNextShipment = isWithinChangeDeadline(now, nextShipping);
+  const effectiveShippingDate = appliesToNextShipment
+    ? nextShipping
+    : advanceShippingDate(nextShipping, interval);
+  const p = toJSTParts(effectiveShippingDate);
+  // Stripeの請求（10日05:00 JST）より前に確実に適用するため9日00:00 JST。
+  const applyAt = jstMomentToUtcDate(p.year, p.month, 9, 0);
+  return { effectiveShippingDate, appliesToNextShipment, applyAt };
+}
+
 export function computeBillingCycleAnchor(
   checkoutDate: Date,
   interval: string | null | undefined,
