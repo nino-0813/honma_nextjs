@@ -457,6 +457,44 @@ async function createDeferredSubscription(
 }
 
 /**
+ * 保存袋特典を顧客単位で一生涯1回に制限し、発送準備で確認できる形に正規化する。
+ * Subscription は初回決済後に作成されるため、現在の注文を除く過去履歴で判定する。
+ */
+async function enforceFirstSubscriptionGift(supabaseAdmin: any, order: any) {
+  if (!order?.auth_user_id || !order?.id) return;
+  const [{ data: priorSubscription }, { data: priorPaidOrder }] = await Promise.all([
+    supabaseAdmin.from('subscriptions').select('id').eq('auth_user_id', order.auth_user_id).limit(1).maybeSingle(),
+    supabaseAdmin.from('orders').select('id').eq('auth_user_id', order.auth_user_id)
+      .eq('payment_status', 'paid').not('subscription_interval', 'is', null)
+      .neq('id', order.id).limit(1).maybeSingle(),
+  ]);
+  const eligible = !priorSubscription && !priorPaidOrder;
+  const { data: items, error } = await supabaseAdmin.from('order_items')
+    .select('id, is_subscription, selected_options').eq('order_id', order.id);
+  if (error) throw error;
+
+  let giftAssigned = false;
+  for (const item of (items || []).filter((entry: any) => Boolean(entry.is_subscription))) {
+    const raw = item.selected_options;
+    const options = raw && typeof raw === 'object' && !Array.isArray(raw) ? { ...raw } : {};
+    const requested = String(options.rice_keep_gift || '').startsWith('希望する');
+    if (!eligible) {
+      options.rice_keep_gift = '対象外（初回特典利用済み）';
+    } else if (requested && !giftAssigned) {
+      options.rice_keep_gift = '希望する（初回発送に1枚同梱）';
+      giftAssigned = true;
+    } else if (requested) {
+      options.rice_keep_gift = '対象外（保存袋は1顧客につき1枚）';
+    } else {
+      options.rice_keep_gift = '希望しない';
+    }
+    const { error: updateError } = await supabaseAdmin.from('order_items')
+      .update({ selected_options: options }).eq('id', item.id);
+    if (updateError) throw updateError;
+  }
+}
+
+/**
  * 注文に対してイベントマイルを付与する（ログインユーザーのみ）。
  *
  * - 同一 order_id に対する 'earn' 履歴があれば再付与しない（idempotent）
@@ -826,6 +864,14 @@ export async function POST(request: Request) {
 
       // 副作用（在庫減算/GAS/クーポン）は「paidへ遷移する瞬間」にだけ実行
       if (!wasPaid) {
+        if (pi?.metadata?.type === 'subscription_init') {
+          try {
+            await enforceFirstSubscriptionGift(supabaseAdmin, order);
+          } catch (giftError: any) {
+            // 特典判定に失敗しても決済処理自体は止めず、管理ログに残す。
+            console.error('[SubscriptionGift] eligibility enforcement failed', giftError?.message || giftError);
+          }
+        }
         try {
           const payload = {
             created_at: order.created_at,
