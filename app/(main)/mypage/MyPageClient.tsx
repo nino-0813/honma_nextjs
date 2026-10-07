@@ -36,6 +36,7 @@ interface SubscriptionItemView {
   product_image: string | null;
   product_price: number;
   quantity: number;
+  selected_options?: Record<string, string> | null;
 }
 
 const SUBSCRIPTION_STATUS_LABELS: Record<string, { label: string; cls: string }> = {
@@ -121,6 +122,16 @@ const MyPage = () => {
   const [addressError, setAddressError] = useState<string | null>(null);
   const [addressSaving, setAddressSaving] = useState(false);
   const [addressPostalSearching, setAddressPostalSearching] = useState(false);
+  // 品種・精米区分変更（重量変更は送料仕様確定まで選択不可）
+  const [productChangeOpen, setProductChangeOpen] = useState(false);
+  const [productChangeSubId, setProductChangeSubId] = useState<string | null>(null);
+  const [productChangeCurrentTitle, setProductChangeCurrentTitle] = useState('');
+  const [productChoices, setProductChoices] = useState<any[]>([]);
+  const [productChoiceId, setProductChoiceId] = useState('');
+  const [millingChoiceId, setMillingChoiceId] = useState('');
+  const [productChangeSaving, setProductChangeSaving] = useState(false);
+  const [productChangeError, setProductChangeError] = useState<string | null>(null);
+  const [productChangeMessage, setProductChangeMessage] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'orders' | 'subscriptions' | 'miles' | 'profile'>('orders');
   const [mileBalance, setMileBalance] = useState<number>(0);
   const [mileTransactions, setMileTransactions] = useState<EventMileTransaction[]>([]);
@@ -291,7 +302,7 @@ const MyPage = () => {
             if (orderIds.length > 0) {
               const { data: itemsData } = await supabase
                 .from('order_items')
-                .select('order_id, product_id, product_title, product_image, product_price, quantity, is_subscription')
+                .select('order_id, product_id, product_title, product_image, product_price, quantity, is_subscription, selected_options')
                 .in('order_id', orderIds);
               const itemsByOrderId: Record<string, any[]> = {};
               (itemsData ?? []).forEach((it: any) => {
@@ -307,6 +318,7 @@ const MyPage = () => {
                   product_image: it.product_image || null,
                   product_price: Number(it.product_price || 0),
                   quantity: Number(it.quantity || 1),
+                  selected_options: it.selected_options || null,
                 }));
               }
               setSubscriptionItems(result);
@@ -646,6 +658,61 @@ const MyPage = () => {
       setAddressError(e?.message || '配送先の更新に失敗しました');
     } finally {
       setAddressSaving(false);
+    }
+  };
+
+  const openProductChangeModal = async (subId: string, currentTitle: string) => {
+    setProductChangeOpen(true);
+    setProductChangeSubId(subId);
+    setProductChangeCurrentTitle(currentTitle);
+    setProductChoiceId('');
+    setMillingChoiceId('');
+    setProductChangeError(null);
+    setProductChangeMessage(null);
+    const weight = currentTitle.match(/(\d+(?:\.\d+)?)\s*kg/i)?.[1];
+    if (!supabase || !weight) {
+      setProductChangeError('現在の重量を確認できません');
+      return;
+    }
+    const { data, error } = await supabase.from('products')
+      .select('id, title, variants_config, subscription_enabled, status, is_active')
+      .eq('status', 'active').eq('is_active', true).eq('subscription_enabled', true);
+    if (error) {
+      setProductChangeError('変更可能な商品を取得できませんでした');
+      return;
+    }
+    setProductChoices((data || []).filter((p: any) => p.title?.match(/(\d+(?:\.\d+)?)\s*kg/i)?.[1] === weight));
+  };
+
+  const selectedProductChoice = productChoices.find((p) => p.id === productChoiceId);
+  const millingOptions = (() => {
+    const types = Array.isArray(selectedProductChoice?.variants_config) ? selectedProductChoice.variants_config : [];
+    return types.find((v: any) => String(v?.name || v?.label || '').includes('種類') || String(v?.name || v?.label || '').includes('精米'))?.options || [];
+  })();
+
+  const submitProductChange = async () => {
+    if (!supabase || !productChangeSubId || !productChoiceId || !millingChoiceId) {
+      setProductChangeError('品種と精米区分を選択してください');
+      return;
+    }
+    setProductChangeSaving(true);
+    setProductChangeError(null);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('セッションが切れています');
+      const res = await fetch('/api/update-subscription-product', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({ subscription_id: productChangeSubId, product_id: productChoiceId, milling_option_id: millingChoiceId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || '商品変更に失敗しました');
+      setProductChangeMessage(data.message || `${formatJapaneseDate(new Date(data.effective_shipping_date))}発送分から変更します`);
+      if (user?.id) await loadUserData(user.id);
+    } catch (e: any) {
+      setProductChangeError(e?.message || '商品変更に失敗しました');
+    } finally {
+      setProductChangeSaving(false);
     }
   };
 
@@ -1160,6 +1227,17 @@ const MyPage = () => {
                         );
                       })()}
 
+                      {(sub.metadata as any)?.pending_changes?.product?.effective_shipping_date && (
+                        <p className="text-xs text-amber-700 bg-amber-50 px-3 py-2 rounded">
+                          商品内容の変更予約: {formatJapaneseDate(new Date((sub.metadata as any).pending_changes.product.effective_shipping_date))}発送分から反映
+                        </p>
+                      )}
+                      {(sub.metadata as any)?.pending_changes?.shipping?.effective_shipping_date && (
+                        <p className="text-xs text-amber-700 bg-amber-50 px-3 py-2 rounded">
+                          配送先の変更予約: {formatJapaneseDate(new Date((sub.metadata as any).pending_changes.shipping.effective_shipping_date))}発送分から反映
+                        </p>
+                      )}
+
                       {/* 解約・停止に関する日付表示 */}
                       {sub.status === 'canceled' && sub.canceled_at && (
                         <p className="text-xs text-gray-500">
@@ -1216,6 +1294,16 @@ const MyPage = () => {
                             <div className="flex flex-wrap gap-3 justify-end">
                               <button
                                 type="button"
+                                onClick={() => {
+                                  const current = (subscriptionItems[sub.stripe_subscription_id] || [])[0];
+                                  if (current) openProductChangeModal(sub.stripe_subscription_id, current.product_title);
+                                }}
+                                className="text-sm text-violet-700 hover:text-violet-800 underline underline-offset-2"
+                              >
+                                品種・精米区分を変更
+                              </button>
+                              <button
+                                type="button"
                                 onClick={() => openSkipModal(sub)}
                                 title={skipDisabled ? skipDisabledReason : '次回お届けを1ヶ月スキップ'}
                                 className={`text-sm underline underline-offset-2 ${
@@ -1241,9 +1329,8 @@ const MyPage = () => {
                               <button
                                 type="button"
                                 onClick={() => openAddressModal(sub)}
-                                disabled={!withinDeadline}
-                                title={!withinDeadline ? '次回発送月の9日終日を過ぎているため変更できません' : '配送先を変更'}
-                                className="text-sm text-emerald-700 hover:text-emerald-800 underline underline-offset-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:no-underline"
+                                title={withinDeadline ? '次回発送から配送先を変更' : 'その次の発送から配送先を変更'}
+                                className="text-sm text-emerald-700 hover:text-emerald-800 underline underline-offset-2"
                               >
                                 配送先を変更
                               </button>
@@ -1749,6 +1836,40 @@ const MyPage = () => {
         }}
       />
 
+      {productChangeOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-8" onClick={() => !productChangeSaving && setProductChangeOpen(false)}>
+          <div className="bg-white max-w-md w-full p-6" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-base font-medium mb-2">品種・精米区分を変更</h3>
+            <p className="text-xs text-gray-600 mb-4">現在: {productChangeCurrentTitle}<br />9日終日までの変更は次回発送、10日以降はその次の発送から継続して反映します。</p>
+            {productChangeMessage ? (
+              <>
+                <p className="text-sm text-emerald-700 bg-emerald-50 p-3 mb-4">{productChangeMessage}</p>
+                <button type="button" onClick={() => setProductChangeOpen(false)} className="w-full py-2.5 bg-primary text-white text-sm">閉じる</button>
+              </>
+            ) : (
+              <>
+                <label className="block text-xs font-medium mb-1">品種（重量は現在と同じ）</label>
+                <select value={productChoiceId} onChange={(e) => { setProductChoiceId(e.target.value); setMillingChoiceId(''); }} className="w-full border border-gray-300 rounded px-3 py-2 text-sm mb-3">
+                  <option value="">選択してください</option>
+                  {productChoices.map((p) => <option key={p.id} value={p.id}>{p.title}</option>)}
+                </select>
+                <label className="block text-xs font-medium mb-1">精米区分</label>
+                <select value={millingChoiceId} onChange={(e) => setMillingChoiceId(e.target.value)} disabled={!productChoiceId} className="w-full border border-gray-300 rounded px-3 py-2 text-sm mb-2 disabled:bg-gray-100">
+                  <option value="">選択してください</option>
+                  {millingOptions.map((o: any) => <option key={o.id} value={o.id}>{o.label || o.name || o.value || o.id}</option>)}
+                </select>
+                <p className="text-[11px] text-gray-500 mb-4">重量変更は、配送先別の送料計算が確定するまでご利用いただけません。</p>
+                {productChangeError && <p className="text-sm text-red-600 mb-3">{productChangeError}</p>}
+                <div className="flex gap-3">
+                  <button type="button" onClick={submitProductChange} disabled={productChangeSaving} className="flex-1 py-2.5 bg-primary text-white text-sm disabled:opacity-50">{productChangeSaving ? '変更中…' : '変更する'}</button>
+                  <button type="button" onClick={() => setProductChangeOpen(false)} disabled={productChangeSaving} className="flex-1 py-2.5 border border-gray-300 text-sm">キャンセル</button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* 配送先変更モーダル */}
       {addressStep !== 'closed' && (
         <div
@@ -1765,8 +1886,8 @@ const MyPage = () => {
               <>
                 <h3 className="text-base font-medium mb-3">配送先を変更</h3>
                 <p className="text-xs text-gray-600 leading-relaxed mb-4">
-                  以下を入力して送信すると、お問い合わせフォームに変更内容が反映された状態で開きます。<br />
-                  ※ 変更のない部分は空欄で結構です。<br />
+                  変更後の配送先を入力してください。<br />
+                  9日終日までなら次回発送、10日以降ならその次の発送から反映します。<br />
                   ※ 配送地域が変わると送料が変動する場合があります。
                 </p>
                 <div className="space-y-3 mb-5">
@@ -1831,42 +1952,18 @@ const MyPage = () => {
                     />
                   </div>
                 </div>
-                <p className="text-[11px] text-amber-700 mb-4">
-                  ※ 配送先の変更は次回発送月の9日までにお手続きください。
-                </p>
+                <p className="text-[11px] text-amber-700 mb-4">※ スキップ後は、スキップ後の実際の次回発送月を基準に締切を判定します。</p>
                 {addressError && (
                   <p className="text-sm text-red-600 mb-3">{addressError}</p>
                 )}
                 <div className="flex gap-3">
                   <button
                     type="button"
-                    onClick={() => {
-                      // 入力された情報からお問い合わせ用メッセージを組み立てて /contact へ
-                      const fields: string[] = [];
-                      if (addressForm.name) fields.push(`配送先氏名: ${addressForm.name}`);
-                      if (addressForm.phone) fields.push(`電話番号: ${addressForm.phone}`);
-                      if (addressForm.postal) fields.push(`郵便番号: ${addressForm.postal}`);
-                      if (addressForm.city) fields.push(`都道府県・市区町村: ${addressForm.city}`);
-                      if (addressForm.address) fields.push(`番地・建物名: ${addressForm.address}`);
-                      if (fields.length === 0) {
-                        setAddressError('変更したい項目を1つ以上入力してください');
-                        return;
-                      }
-                      const body =
-                        `【配送先変更のご依頼】\n` +
-                        (addressTargetSubId ? `定期購入ID: ${addressTargetSubId}\n` : '') +
-                        `\n` +
-                        fields.join('\n') +
-                        `\n\n` +
-                        `※ 変更のない部分は記載しておりません。\n` +
-                        `※ 配送先の変更により、送料が変動する場合がございます。`;
-                      const params = new URLSearchParams({ subject: '配送先変更', message: body });
-                      closeAddressModal();
-                      window.location.href = `/contact?${params.toString()}`;
-                    }}
+                    onClick={submitAddressUpdate}
+                    disabled={addressSaving}
                     className="flex-1 py-2.5 px-4 bg-primary text-white text-sm tracking-widest hover:bg-gray-800 transition-colors"
                   >
-                    お問い合わせに送信
+                    {addressSaving ? '変更中…' : '変更する'}
                   </button>
                   <button
                     type="button"
@@ -1876,6 +1973,13 @@ const MyPage = () => {
                     キャンセル
                   </button>
                 </div>
+              </>
+            )}
+            {addressStep === 'completed' && (
+              <>
+                <h3 className="text-base font-medium mb-3">配送先変更を受け付けました</h3>
+                <p className="text-sm text-gray-600 mb-5">適用される発送回は、定期購入一覧で確認できます。</p>
+                <button type="button" onClick={closeAddressModal} className="w-full py-2.5 bg-primary text-white text-sm">閉じる</button>
               </>
             )}
           </div>

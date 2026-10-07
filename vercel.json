@@ -19,6 +19,10 @@
     {
       "path": "/api/expire-bank-transfers",
       "schedule": "0 15 * * *"
+    },
+    {
+      "path": "/api/apply-subscription-changes",
+      "schedule": "0 15 * * *"
     }
   ],
   "headers": [
