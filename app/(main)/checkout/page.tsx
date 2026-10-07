@@ -533,6 +533,7 @@ const Checkout = () => {
   const [paymentIntentAmount, setPaymentIntentAmount] = useState<number | null>(null);
   const [paymentInitError, setPaymentInitError] = useState<string | null>(null);
   const creatingPaymentIntentRef = useRef(false);
+  const paymentIdempotencyKeyRef = useRef<string | null>(null);
   const upsertingOrderDraftRef = useRef(false);
   const lastOrderDraftKeyRef = useRef<string | null>(null);
   // 定期購入用
@@ -1450,6 +1451,39 @@ const Checkout = () => {
         creatingPaymentIntentRef.current = true;
         setPaymentInitError(null);
 
+        // リロードやReactの再実行でも同じチェックアウトには同じキーを使い、
+        // Stripe側でPaymentIntentの多重作成を防止する。
+        const checkoutSignature = JSON.stringify({
+          type: subscriptionCartInfo.isSubscriptionCart ? 'subscription' : 'single',
+          interval: subscriptionCartInfo.interval || null,
+          email: formData.email.trim().toLowerCase(),
+          total,
+          items: cartItems.map((item) => ({
+            id: item.product.id,
+            quantity: item.quantity,
+            price: item.finalPrice ?? item.product.price,
+            variant: item.variant || null,
+            selectedOptions: item.selectedOptions || null,
+          })),
+        });
+        const storageKey = 'ikevege_active_checkout_payment';
+        let idempotencyKey = '';
+        try {
+          const saved = JSON.parse(sessionStorage.getItem(storageKey) || 'null');
+          if (saved?.signature === checkoutSignature && typeof saved?.key === 'string') {
+            idempotencyKey = saved.key;
+          }
+        } catch {
+          // 壊れた一時データは新しいキーで置き換える。
+        }
+        if (!idempotencyKey) {
+          idempotencyKey = typeof crypto?.randomUUID === 'function'
+            ? crypto.randomUUID().replace(/-/g, '')
+            : `${Date.now()}_${Math.random().toString(36).slice(2)}`;
+          sessionStorage.setItem(storageKey, JSON.stringify({ signature: checkoutSignature, key: idempotencyKey }));
+        }
+        paymentIdempotencyKeyRef.current = idempotencyKey;
+
         if (subscriptionCartInfo.isSubscriptionCart && subscriptionCartInfo.interval) {
           // 定期購入カート: Subscription を作成
           const items = subscriptionCartInfo.subscriptionItems.map((it) => ({
@@ -1468,6 +1502,7 @@ const Checkout = () => {
               interval: subscriptionCartInfo.interval,
               items,
               shipping_cost: shippingCost,
+              idempotency_key: idempotencyKey,
               metadata: {
                 itemCount: String(cartItems.length),
                 subtotal: String(subtotal),
@@ -1514,6 +1549,7 @@ const Checkout = () => {
               email: formData.email,
               name: `${formData.lastName ?? ''} ${formData.firstName ?? ''}`.trim(),
               phone: formData.phone || undefined,
+              idempotency_key: idempotencyKey,
               metadata: {
                 itemCount: String(cartItems.length),
                 subtotal: String(subtotal),
@@ -2139,6 +2175,12 @@ const Checkout = () => {
   const [isRedirectingToSuccess, setIsRedirectingToSuccess] = useState(false);
 
   const handleSuccess = (paymentIntentId?: string, bankTransfer?: boolean, instructionsUrl?: string | null) => {
+    try {
+      sessionStorage.removeItem('ikevege_active_checkout_payment');
+      paymentIdempotencyKeyRef.current = null;
+    } catch {
+      // ストレージが利用できない環境でも決済完了処理は続行する。
+    }
     setIsRedirectingToSuccess(true);
     setTimeout(() => {
       // payment_intent を付与して成功ページの GA4 purchase 発火を確実にする

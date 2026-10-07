@@ -62,6 +62,7 @@ interface CreateSubscriptionBody {
   items: SubscriptionItemInput[]; // 定期購入アイテム（すべて同一間隔）
   shipping_cost?: number; // 1回あたりの送料
   metadata?: Record<string, string>;
+  idempotency_key?: string;
 }
 
 export async function POST(request: Request) {
@@ -72,7 +73,11 @@ export async function POST(request: Request) {
     }
 
     const body = (await request.json()) as CreateSubscriptionBody;
-    const { email, name, phone, interval, items, shipping_cost, metadata = {} } = body ?? {};
+    const { email, name, phone, interval, items, shipping_cost, metadata = {}, idempotency_key } = body ?? {};
+
+    if (!idempotency_key || !/^[A-Za-z0-9_-]{8,120}$/.test(idempotency_key)) {
+      return NextResponse.json({ error: '決済の再送防止キーが不正です' }, { status: 400 });
+    }
 
     if (!email || !email.trim()) {
       return NextResponse.json({ error: 'メールアドレスが必要です' }, { status: 400 });
@@ -131,7 +136,7 @@ export async function POST(request: Request) {
         interval,
         item_count: String(items.length),
       },
-    });
+    }, { idempotencyKey: `subscription_checkout_${idempotency_key}` });
 
     if (!paymentIntent?.client_secret) {
       return NextResponse.json(
