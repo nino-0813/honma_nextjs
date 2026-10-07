@@ -1137,6 +1137,11 @@ export async function POST(request: Request) {
         (invoice.parent?.subscription_details?.billing_reason as string | undefined) ||
         '';
 
+      // APIバージョンや決済方法によって payment_intent が返らない場合がある。
+      // invoice IDを決定的な代替キーにして、通知再送や paid 系イベントの重複受信でも
+      // 同じ請求から注文が複数作成されないようにする。
+      const recurringPaymentKey = stripePaymentIntentId || `invoice:${invoice.id}`;
+
       console.log('[Webhook] invoice received:', {
         eventType,
         invoiceId: invoice.id,
@@ -1169,11 +1174,11 @@ export async function POST(request: Request) {
       }
 
       // 既に同じpayment_intent_idでordersが存在すれば重複生成しない
-      if (stripePaymentIntentId) {
+      {
         const { data: existing } = await supabaseAdmin
           .from('orders')
           .select('id')
-          .eq('payment_intent_id', stripePaymentIntentId)
+          .eq('payment_intent_id', recurringPaymentKey)
           .maybeSingle();
         if (existing) {
           return NextResponse.json({ received: true, skipped: 'order_already_exists' });
@@ -1245,7 +1250,7 @@ export async function POST(request: Request) {
       delete cloneOrder.id;
       delete cloneOrder.created_at;
       cloneOrder.order_number = newOrderNumber;
-      cloneOrder.payment_intent_id = stripePaymentIntentId;
+      cloneOrder.payment_intent_id = recurringPaymentKey;
       cloneOrder.payment_status = 'paid';
       cloneOrder.paid_at = nowIso;
       cloneOrder.order_status = 'processing';
@@ -1280,6 +1285,11 @@ export async function POST(request: Request) {
         const { error: itemsErr } = await supabaseAdmin.from('order_items').insert(newItems);
         if (itemsErr) {
           console.error('[Webhook] clone order_items insert error:', itemsErr);
+          // 明細なしの注文を残すと、再送時に重複判定されて復旧できなくなる。
+          // 注文を戻し、イベント記録も外してStripeの再送で一式を再作成できるようにする。
+          await supabaseAdmin.from('orders').delete().eq('id', inserted.id);
+          await supabaseAdmin.from('stripe_webhook_events').delete().eq('event_id', event.id);
+          return NextResponse.json({ error: 'clone_order_items_failed' }, { status: 500 });
         }
       }
 
@@ -1327,6 +1337,19 @@ export async function POST(request: Request) {
       // イベントマイル付与（定期購入も支払い完了の都度付与）
       await grantEventMilesForOrder(supabaseAdmin, inserted.id);
 
+      // 継続決済も通常の受注と同様に、お客様・管理者へ受注通知を送る。
+      // メール失敗は注文生成を巻き戻さず、Webhook成功後にログから再送できるようにする。
+      try {
+        await sendOrderConfirmationEmail(
+          supabaseAdmin,
+          { ...cloneOrder, id: inserted.id },
+          newOrderNumber,
+          { sendAdmin: true }
+        );
+      } catch (mailErr: any) {
+        console.error('[OrderMail] recurring order mail failed (ignored)', mailErr?.message || mailErr);
+      }
+
       // subscriptions テーブルの next_billing_at を進める
       try {
         const { data: subFromStripe } = await stripe.subscriptions.retrieve(stripeSubscriptionId).then(
@@ -1359,9 +1382,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ received: true, new_order_id: inserted.id });
     }
 
-    if (event.type === 'invoice.payment_failed') {
-      const invoice: any = event.data.object;
-      const stripeSubscriptionId = invoice.subscription as string | null;
+    if (eventType === 'invoice.payment_failed' || eventType === 'invoice_payment.failed') {
+      const failedObject: any = event.data.object;
+      let invoice: any = failedObject;
+      if (eventType === 'invoice_payment.failed' && failedObject.invoice) {
+        invoice = await stripe.invoices.retrieve(
+          typeof failedObject.invoice === 'string' ? failedObject.invoice : failedObject.invoice.id,
+          { expand: ['parent', 'subscription'] }
+        );
+      }
+      const failedSubscriptionRef =
+        invoice.subscription ||
+        invoice.parent?.subscription_details?.subscription ||
+        invoice.parent?.subscription;
+      const stripeSubscriptionId =
+        typeof failedSubscriptionRef === 'string'
+          ? failedSubscriptionRef
+          : failedSubscriptionRef?.id || null;
       if (stripeSubscriptionId) {
         await supabaseAdmin
           .from('subscriptions')
