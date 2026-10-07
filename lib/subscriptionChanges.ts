@@ -18,8 +18,11 @@ export async function applySubscriptionProductChange(args: {
   millingOptionId: string;
 }) {
   const { db, stripe, subscriptionId, productId, millingOptionId } = args;
+  const { data: subscriptionRow, error: subscriptionError } = await db.from('subscriptions')
+    .select('id, metadata').eq('stripe_subscription_id', subscriptionId).maybeSingle();
+  if (subscriptionError || !subscriptionRow) throw new Error('定期便の契約情報が見つかりません');
   const { data: firstOrder, error: orderError } = await db.from('orders')
-    .select('id, subtotal, shipping_cost, total')
+    .select('id')
     .eq('stripe_subscription_id', subscriptionId)
     .order('created_at', { ascending: true }).limit(1).maybeSingle();
   if (orderError || !firstOrder) throw new Error('定期便の元注文が見つかりません');
@@ -34,7 +37,8 @@ export async function applySubscriptionProductChange(args: {
   if (productError || !product || product.status !== 'active' || product.is_active === false || product.subscription_enabled === false) {
     throw new Error('選択した商品は定期便に利用できません');
   }
-  if (!weightOf(currentItem.product_title) || weightOf(currentItem.product_title) !== weightOf(product.title)) {
+  const currentTitle = subscriptionRow.metadata?.current_product?.product_title || currentItem.product_title;
+  if (!weightOf(currentTitle) || weightOf(currentTitle) !== weightOf(product.title)) {
     throw new Error('重量変更は現在準備中です。同じ重量の商品を選択してください');
   }
 
@@ -74,29 +78,34 @@ export async function applySubscriptionProductChange(args: {
     proration_behavior: 'none',
   });
 
-  const selectedOptions = { ...(currentItem.selected_options || {}), [millingType.id]: milling.id };
-  const quantity = Math.max(1, Number(currentItem.quantity || 1));
-  const oldLineTotal = Number(currentItem.line_total || 0);
+  const selectedOptions = {
+    ...(subscriptionRow.metadata?.current_product?.selected_options || currentItem.selected_options || {}),
+    [millingType.id]: milling.id,
+  };
+  const quantity = Math.max(1, Number(subscriptionRow.metadata?.current_product?.quantity || currentItem.quantity || 1));
   const lineTotal = unitAmount * quantity;
-  const subtotal = Number(firstOrder.subtotal || 0) - oldLineTotal + lineTotal;
-  const total = subtotal + Number(firstOrder.shipping_cost || 0);
-  const { error: updateItemError } = await db.from('order_items').update({
+  const currentProduct = {
     product_id: product.id,
     product_title: product.title,
     product_price: unitAmount,
     product_image: product.image || product.images?.[0] || null,
     variant: milling.label || milling.name || milling.value || milling.id,
     selected_options: selectedOptions,
+    quantity,
     line_total: lineTotal,
-  }).eq('id', currentItem.id);
-  if (updateItemError) {
+    updated_at: new Date().toISOString(),
+  };
+  // 過去の注文履歴は書き換えず、今後の請求・注文に使う契約スナップショットを更新する。
+  const { error: updateSubscriptionError } = await db.from('subscriptions').update({
+    metadata: { ...(subscriptionRow.metadata || {}), current_product: currentProduct },
+    updated_at: new Date().toISOString(),
+  }).eq('id', subscriptionRow.id);
+  if (updateSubscriptionError) {
     await stripe.subscriptions.update(subscriptionId, {
       items: [{ id: stripeItem.id, price: stripeItem.price.id, quantity: stripeItem.quantity || 1 }],
       proration_behavior: 'none',
     });
-    throw updateItemError;
+    throw updateSubscriptionError;
   }
-  const { error: updateOrderError } = await db.from('orders').update({ subtotal, total, updated_at: new Date().toISOString() }).eq('id', firstOrder.id);
-  if (updateOrderError) throw updateOrderError;
-  return { product, milling, unitAmount };
+  return { product, milling, unitAmount, currentProduct };
 }

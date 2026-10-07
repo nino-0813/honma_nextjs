@@ -25,10 +25,13 @@ export async function GET(request: Request) {
     const pendingShipping = sub.metadata?.pending_changes?.shipping;
     if (pending?.apply_at && new Date(pending.apply_at).getTime() <= Date.now()) try {
       await applySubscriptionProductChange({ db, stripe, subscriptionId: sub.stripe_subscription_id, productId: pending.product_id, millingOptionId: pending.milling_option_id });
-      const pendingChanges = { ...(sub.metadata?.pending_changes || {}) };
+      // applySubscriptionProductChange が current_product を保存するため、古い metadata で上書きしない。
+      const { data: refreshed } = await db.from('subscriptions').select('metadata').eq('id', sub.id).single();
+      const freshMetadata = refreshed?.metadata || sub.metadata || {};
+      const pendingChanges = { ...(freshMetadata?.pending_changes || {}) };
       delete pendingChanges.product;
       await db.from('subscriptions').update({
-        metadata: { ...(sub.metadata || {}), pending_changes: pendingChanges, last_product_change: { ...pending, applied_at: new Date().toISOString() } },
+        metadata: { ...freshMetadata, pending_changes: pendingChanges, last_product_change: { ...pending, applied_at: new Date().toISOString() } },
         updated_at: new Date().toISOString(),
       }).eq('id', sub.id);
       applied++;
@@ -45,14 +48,6 @@ export async function GET(request: Request) {
           },
         });
       }
-      const { data: order } = await db.from('orders').select('id').eq('stripe_subscription_id', sub.stripe_subscription_id).order('created_at', { ascending: true }).limit(1).maybeSingle();
-      if (!order) throw new Error('定期便の元注文が見つかりません');
-      const { error: orderError } = await db.from('orders').update({
-        shipping_name: pendingShipping.name || null, shipping_phone: pendingShipping.phone || null,
-        shipping_postal_code: pendingShipping.postal_code, shipping_city: pendingShipping.city,
-        shipping_address: pendingShipping.address, updated_at: new Date().toISOString(),
-      }).eq('id', order.id);
-      if (orderError) throw orderError;
       const pendingChanges = { ...(current?.metadata?.pending_changes || {}) };
       delete pendingChanges.shipping;
       await db.from('subscriptions').update({
