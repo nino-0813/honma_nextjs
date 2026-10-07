@@ -20,7 +20,11 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { amount, currency = 'jpy', metadata = {}, email, name, phone } = body ?? {};
+    const { amount, currency = 'jpy', metadata = {}, email, name, phone, idempotency_key } = body ?? {};
+
+    if (!idempotency_key || !/^[A-Za-z0-9_-]{8,120}$/.test(idempotency_key)) {
+      return NextResponse.json({ error: '決済の再送防止キーが不正です' }, { status: 400 });
+    }
 
     if (!amount || amount <= 0) {
       return NextResponse.json({ error: '金額が無効です' }, { status: 400 });
@@ -59,7 +63,7 @@ export async function POST(request: Request) {
           },
         },
       } : {}),
-    });
+    }, { idempotencyKey: `single_checkout_${idempotency_key}` });
 
     return NextResponse.json({
       clientSecret: paymentIntent.client_secret,
