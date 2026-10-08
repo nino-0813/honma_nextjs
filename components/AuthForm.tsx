@@ -150,12 +150,23 @@ const AuthForm: React.FC<AuthFormProps> = ({ onAuthSuccess, initialEmail = '' })
           try {
             const referralCode = localStorage.getItem('ikevege_referral_code');
             if (referralCode) {
-              await fetch('/api/track-referral', {
+              const response = await fetch('/api/track-referral', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: data.user.id, email, referralCode }),
+                headers: {
+                  'Content-Type': 'application/json',
+                  ...(data.session?.access_token
+                    ? { Authorization: `Bearer ${data.session.access_token}` }
+                    : {}),
+                },
+                body: JSON.stringify({ userId: data.user.id, referralCode }),
               });
-              localStorage.removeItem('ikevege_referral_code');
+              const result = await response.json().catch(() => null);
+              if (response.ok && result?.ok) {
+                localStorage.removeItem('ikevege_referral_code');
+                localStorage.removeItem('ikevege_referral_captured_at');
+              } else {
+                console.error('紹介の記録に失敗しました。次回再試行します:', result);
+              }
             }
           } catch (referralError) {
             console.error('紹介の記録に失敗しました:', referralError);
@@ -573,4 +584,3 @@ const AuthForm: React.FC<AuthFormProps> = ({ onAuthSuccess, initialEmail = '' })
 };
 
 export default AuthForm;
-

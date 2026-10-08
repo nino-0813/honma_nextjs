@@ -26,20 +26,39 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Supabaseが設定されていません' }, { status: 500 });
     }
 
-    const body = (await request.json()) as { userId?: string; email?: string; referralCode?: string };
-    const { email, referralCode } = body ?? {};
-    if (!email || !referralCode) {
-      return NextResponse.json({ ok: false, error: 'email/referralCodeが必要です' }, { status: 400 });
+    const body = (await request.json()) as { userId?: string; referralCode?: string };
+    const userId = body?.userId?.trim();
+    const referralCode = body?.referralCode?.trim().toLowerCase();
+    if (!userId || !referralCode) {
+      return NextResponse.json({ ok: false, error: 'userId/referralCodeが必要です' }, { status: 400 });
+    }
+
+    // クライアントから渡されたメールアドレスは信用せず、Supabase Authの本人情報を使う。
+    const authHeader = request.headers.get('authorization');
+    const accessToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
+    if (accessToken) {
+      const { data, error } = await supabaseAdmin.auth.getUser(accessToken);
+      if (error || !data.user || data.user.id !== userId) {
+        return NextResponse.json({ ok: false, error: '認証情報が一致しません' }, { status: 401 });
+      }
+    }
+    const { data: authUserData, error: authUserError } = await supabaseAdmin.auth.admin.getUserById(userId);
+    const email = authUserData?.user?.email?.trim().toLowerCase();
+    if (authUserError || !email) {
+      return NextResponse.json({ ok: false, error: '登録ユーザーを確認できません' }, { status: 404 });
     }
 
     const { data: referrer, error: referrerErr } = await supabaseAdmin
       .from('customers')
-      .select('id, last_name, first_name')
-      .eq('referral_code', referralCode)
+      .select('id, last_name, first_name, email')
+      .ilike('referral_code', referralCode)
       .maybeSingle();
     if (referrerErr) throw referrerErr;
     if (!referrer) {
       return NextResponse.json({ ok: false, reason: 'invalid_code' });
+    }
+    if (referrer.email?.trim().toLowerCase() === email) {
+      return NextResponse.json({ ok: false, reason: 'self_referral' }, { status: 400 });
     }
 
     const referrerName = `${referrer.last_name ?? ''}${referrer.first_name ? ` ${referrer.first_name}` : ''}`.trim();
@@ -48,11 +67,12 @@ export async function POST(request: Request) {
       .from('customers')
       .select('id, referrer_name, referred_by_customer_id')
       .eq('email', email)
+      .limit(1)
       .maybeSingle();
     if (existingErr) throw existingErr;
 
     if (existing) {
-      if (!existing.referrer_name && !existing.referred_by_customer_id) {
+      if (!existing.referred_by_customer_id) {
         const { error: updErr } = await supabaseAdmin
           .from('customers')
           .update({ referrer_name: referrerName, referred_by_customer_id: referrer.id })
