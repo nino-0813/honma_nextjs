@@ -35,4 +35,11 @@
 - Product data was verified with the existing local environment without copying secrets into the worktree.
 - Existing visual assets were reused; no replacement artwork or unapproved pending layout option was introduced.
 
+## Pass 4 — full-viewport home video
+
+- Source screenshot: `/Users/yusukeninomiya/Desktop/スクリーンショット 2026-10-09 21.44.39.png`.
+- The home video now occupies exactly `100svh`, eliminating the white area beneath the first view.
+- `object-contain` is retained so the full source frame remains visible; any aspect-ratio remainder uses the existing black video background rather than cropping the footage.
+- Verified in the in-app browser at the same initial page state: the video fills the complete available viewport and no following content is visible before scrolling.
+
 final result: passed

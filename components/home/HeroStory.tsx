@@ -22,7 +22,7 @@ export default function HeroStory() {
             loop
             playsInline
             preload="metadata"
-            className="block h-[72svh] min-h-[520px] w-full bg-black object-contain object-center md:h-[88svh]"
+            className="block h-[100svh] w-full bg-black object-contain object-center"
           />
         </div>
       </section>
