@@ -39,7 +39,7 @@
 
 - Source screenshot: `/Users/yusukeninomiya/Desktop/スクリーンショット 2026-10-09 21.44.39.png`.
 - The home video now occupies exactly `100svh`, eliminating the white area beneath the first view.
-- `object-contain` is retained so the full source frame remains visible; any aspect-ratio remainder uses the existing black video background rather than cropping the footage.
-- Verified in the in-app browser at the same initial page state: the video fills the complete available viewport and no following content is visible before scrolling.
+- The video uses `object-cover` so differing viewport ratios no longer produce black side bars. A small amount of edge cropping is accepted to keep the first view fully covered.
+- Verified in the in-app browser at the same initial page state: the video fills the complete available viewport with no black bars and no following content visible before scrolling.
 
 final result: passed
