@@ -56,8 +56,19 @@ export default function ProductCategoryNav({ current }: { current: ProductCatego
         <CategoryItems items={MAIN_ITEMS} activeKey={mainActiveKey} />
       </div>
       {isRiceCategory && (
-        <div className="relative mt-3 overflow-x-auto px-6 pt-3 scrollbar-hide before:absolute before:left-1/2 before:top-0 before:h-px before:w-16 before:-translate-x-1/2 before:bg-gray-200 md:px-12">
-          <CategoryItems items={RICE_ITEMS} activeKey={riceActiveKey} />
+        <div className="mt-4 overflow-x-auto px-6 scrollbar-hide md:px-12">
+          <div className="flex min-w-max items-center justify-center gap-5 text-[11px] tracking-[0.08em] text-gray-500">
+            <span className="text-[10px] text-gray-400">お米の品種</span>
+            <span className="h-3 w-px bg-gray-300" aria-hidden="true" />
+            {RICE_ITEMS.map((item) => {
+              const active = item.key === riceActiveKey;
+              return active ? (
+                <span key={item.key} aria-current="page" className="border-b border-primary pb-1 font-semibold text-primary">{item.label}</span>
+              ) : (
+                <Link key={item.key} href={item.href} className="pb-1 transition-colors hover:text-primary">{item.label}</Link>
+              );
+            })}
+          </div>
         </div>
       )}
     </nav>

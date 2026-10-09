@@ -22,7 +22,7 @@ export default function HeroStory() {
             loop
             playsInline
             preload="metadata"
-            className="block h-[72svh] min-h-[520px] w-full bg-black object-cover object-center md:h-[88svh]"
+            className="block h-[72svh] min-h-[520px] w-full bg-black object-contain object-center md:h-[88svh]"
           />
         </div>
       </section>
@@ -50,7 +50,7 @@ export default function HeroStory() {
                 </p>
                 <div>
                   <p>そして</p>
-                  <p className="text-yuunagi">
+                  <p className="text-[#24211d]">
                     トキとの共生を選び 全島の農家が立ち上がったという この島の歴史は<br />
                     佐渡の未来を担う農家たちの胸を熱くする物語であり<br />
                     私たちもまた この歴史のバトンを受け継いでいます。
@@ -79,7 +79,7 @@ export default function HeroStory() {
             </FadeIn>
           </div>
 
-          <FadeIn className="mt-16 md:mt-24">
+          <FadeIn className="mx-auto mt-16 max-w-[780px] md:mt-24">
             <div className="flex justify-end">
               <Link href="/about" className="inline-flex min-h-10 items-center rounded-full border border-gray-300 px-6 text-[10px] tracking-[0.08em] text-[#37332c] transition-colors hover:border-[#37332c] hover:bg-[#37332c] hover:text-white md:min-h-11 md:px-7 md:text-xs">
                 詳しく知る →

@@ -5,6 +5,7 @@ import type { Product } from '@/types';
 import { CartContext } from '@/providers/CartProvider';
 import { checkStockAvailability, getOrders, supabase } from '@/lib/supabase';
 import { isProductSoldOut } from '@/lib/productStatus';
+import StickyPurchaseBar from '@/components/product/StickyPurchaseBar';
 
 type MillingMethod = '白米' | '玄米';
 
@@ -69,7 +70,14 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
         <h2 className="mb-2 text-2xl font-medium leading-relaxed tracking-wide text-primary md:text-3xl">
           お試しセット
         </h2>
-        <p className="mb-7 text-sm leading-relaxed text-gray-600">内容：イケベジのお米３種 ２合×３個</p>
+        <div className="mb-7 text-sm leading-relaxed text-gray-600">
+          <p>内容：イケベジのお米３種 ２合×３個</p>
+          <ul className="mt-3 space-y-1 text-[11px] tracking-[0.06em] text-gray-500">
+            <li>従来コシヒカリ</li>
+            <li>亀の尾</li>
+            <li>にこまる</li>
+          </ul>
+        </div>
 
         <div className="mb-6 border border-gray-200 bg-white p-5 md:p-6">
           <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -125,6 +133,16 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
         </div>
 
       </div>
+      <StickyPurchaseBar
+        title="お試しセット"
+        price={calculatedPrice}
+        image={product.images?.[0] || product.image}
+        quantity={quantity}
+        onQuantityChange={(next) => setQuantity(Math.max(1, next))}
+        onAddToCart={addSelectionToCart}
+        disabled={disabled}
+        disabledLabel={soldOut ? '売り切れ' : '販売期間外'}
+      />
     </>
   );
 }

@@ -32,6 +32,17 @@ function getSubcategoryNameFromParam(param: string): string {
 
 type CategoryLabel = 'ALL' | 'お米' | 'Crescentmoon' | 'その他' | '原木しいたけ' | 'チケット';
 
+const FARMING_TERMS = ['農薬・化学肥料不使用栽培', '無農薬無化学肥料', '自然栽培'];
+
+function getProductTitleParts(title: string) {
+  const matched = title.match(/^【([^】]+)】\s*(.*)$/);
+  if (!matched) return { primary: title, secondary: '' };
+  const [, name, remainder] = matched;
+  const farming = FARMING_TERMS.find((term) => remainder.includes(term));
+  const secondary = farming ? remainder.replace(farming, '').replace(/\s{2,}/g, ' ').trim() : remainder.trim();
+  return { primary: farming ? `${name} ／ ${farming}` : name, secondary };
+}
+
 const CATEGORY_INTROS: Record<string, { image: string; alt: string; lead: string; details: string[] }> = {
   koshihikari: {
     image: '/images/home/collections/collection_koshihikari_800.webp',
@@ -181,7 +192,7 @@ export default function CollectionsPage() {
   return (
     <div className="page-top-offset min-h-screen w-full overflow-x-hidden bg-white pb-36">
       {!isLpView && (
-        <div className="sticky top-14 z-30 mb-16 bg-white/95 py-3 backdrop-blur-md md:top-16 md:mb-20">
+        <div className="sticky top-14 z-30 mb-20 bg-white/95 py-3 backdrop-blur-md md:top-16 md:mb-24">
           <div className="mx-auto max-w-[1400px] px-6 md:px-12">
             <ProductCategoryNav current={categoryNavKey} />
           </div>
@@ -251,6 +262,7 @@ export default function CollectionsPage() {
             {filteredProducts.map((product, index) => {
               const soldOut = isProductSoldOut(product);
               const preorder = !soldOut && isProductPreorder(product); // 在庫切れ優先
+              const titleParts = getProductTitleParts(product.handle === 'start-set' ? 'お試しセット' : product.title);
               return (
               <Link
                 key={product.id}
@@ -274,8 +286,9 @@ export default function CollectionsPage() {
                   </div>
                 </div>
                 <div className="flex flex-1 flex-col gap-2 text-left">
-                  <h2 className="text-sm font-medium text-primary leading-[1.9] group-hover:text-gray-600 transition-colors line-clamp-3 min-h-[5.7em]">
-                    {product.handle === 'start-set' ? 'お試しセット' : product.title}
+                  <h2 className="min-h-[5.7em] text-primary transition-colors group-hover:text-gray-600">
+                    <span className="block text-[12px] font-semibold leading-relaxed">{titleParts.primary}</span>
+                    {titleParts.secondary && <span className="mt-1 block text-[13px] font-medium leading-[1.8] line-clamp-2">{titleParts.secondary}</span>}
                   </h2>
                   <p className="flex flex-wrap items-center justify-start gap-2 font-serif text-sm tracking-wide text-gray-900">
                     {(() => {

@@ -6,6 +6,7 @@ import SubscriptionCTA from '@/components/home/SubscriptionCTA';
 import { SHOW_PLACEHOLDER_BADGE } from '@/components/home/placeholders';
 import { getProductByHandle, getPublishedProductByHandle } from '@/lib/supabase';
 import StartSetPurchasePanel from '@/components/start-set/StartSetPurchasePanel';
+import RiceGuideModal from '@/components/start-set/RiceGuideModal';
 
 export const metadata: Metadata = {
   title: 'お試しセット',
@@ -87,7 +88,10 @@ export default async function StartSetPage() {
               <h2 className="text-xl md:text-2xl font-medium text-primary leading-relaxed tracking-wide mb-6">
                 お試しセット
               </h2>
-              <p className="-mt-4 mb-6 text-sm leading-relaxed text-gray-600">内容：イケベジのお米３種 ２合×３個</p>
+              <div className="-mt-4 mb-6 text-sm leading-relaxed text-gray-600">
+                <p>内容：イケベジのお米３種 ２合×３個</p>
+                <ul className="mt-3 space-y-1 text-[11px] tracking-[0.06em] text-gray-500"><li>従来コシヒカリ</li><li>亀の尾</li><li>にこまる</li></ul>
+              </div>
 
               <div className="border border-gray-200 bg-white p-4 md:p-5 mb-6">
                 <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -151,22 +155,29 @@ export default async function StartSetPage() {
           </div>
         </section>
 
-        <ProductFeatures
-          alwaysOpenFirst
-          rows={[
-            {
-              label: 'セット内容',
-              body:
-                '従来コシヒカリ・亀の尾・にこまるの3品種をお届けします。\n精米方法は玄米または白米からお選びいただけます。\n\n' +
-                '・従来コシヒカリ（自然栽培）\n' +
-                '肥料も農薬も一切使わない「自然栽培」で育てた、イケベジの定番品種。余計なものを加えず、お米が本来持つ生命力に寄り添う「引き算の物づくり」を実践することで、野生味あふれる甘みと豊かな風味をそのまま引き出しています。イケベジの田んぼの中でも、山から流れ出る川から一番に入水できる田んぼから連なる、たった8枚の限られた田んぼでのみ栽培しています。田んぼの位置まで究極にこだわり抜いた、至高のお米です。\n\n' +
-                '・にこまる（無農薬無化学肥料）\n' +
-                '本来は西日本で多く栽培される品種を、佐渡の地であえて育てているのが「にこまる」です。佐渡の銘酒から出る酒粕と、豊かな海が育む牡蠣殻を肥料として活用し、地域で行き場を失っていた資源を土に還しながら育てました。大粒で贅沢な食感と豊かな甘みが持ち味で、第27回米・食味分析鑑定コンクール国際大会の国際総合部門にて金賞（最多得票）を受賞。世界最高米の原料にも選出されました。\n\n' +
-                '・亀の尾（無農薬無化学肥料）\n' +
-                'コシヒカリやササニシキなど、いまの人気品種の祖先にあたる希少な在来品種「亀の尾」。あっさりとした素朴な味で、もち米系統が入らないお米本来の味を楽しめます。高アミロース米にあたり、通常の品種よりも消化がゆっくりで、身体に優しい逸品です。佐渡で使われなくなった竹を細かくチップにして堆肥化し、田んぼに混ぜ込むことで、多孔質な竹が土壌微生物のすみかとなり、時間をかけてゆっくりと栄養が届く土づくりを実践しています。',
-            },
-          ]}
-        />
+        <section className="mt-24 pt-16 md:mt-32 md:pt-20">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[280px_1fr] lg:gap-16">
+            <h2 className="font-serif text-xl font-semibold tracking-wider text-primary md:text-2xl">商品詳細</h2>
+            <div>
+              <h3 className="text-sm font-medium text-primary md:text-base">セット内容</h3>
+              <p className="mt-5 text-[13px] leading-loose text-gray-600 md:text-sm">従来コシヒカリ・亀の尾・にこまるの3品種をお届けします。<br />精米方法は玄米または白米からお選びいただけます。</p>
+              <div className="mt-8 space-y-7">
+                {VARIETIES.map((variety) => (
+                  <article key={variety.name}>
+                    <Link href={variety.href} className="inline-flex items-center border-b border-primary pb-1 text-sm font-semibold tracking-[0.08em] text-primary transition-opacity hover:opacity-60">
+                      {variety.name}の商品を見る →
+                    </Link>
+                    <p className="mt-2 text-[11px] tracking-[0.08em] text-gray-500">{variety.taste}</p>
+                    <p className="mt-2 text-[13px] leading-loose text-gray-600 md:text-sm">{variety.body}</p>
+                  </article>
+                ))}
+              </div>
+              <div className="mt-9 flex justify-start">
+                <RiceGuideModal />
+              </div>
+            </div>
+          </div>
+        </section>
         <ProductFeatures
           showTitle={false}
           rows={[

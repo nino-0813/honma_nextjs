@@ -171,7 +171,7 @@ export default function AboutPage() {
         </FadeInSection>
       </section>
 
-      <section className="border-t border-[#e5e5e0] bg-[#fafaf6] px-6 py-24 md:py-28">
+      <section className="border-t border-[#d8d8d2] bg-[#f1f1ed] px-6 py-24 md:py-28">
         <div className="mx-auto max-w-[1120px]">
           <FadeInSection className="text-center">
             <span className="block text-[11px] tracking-[0.3em] text-gray-500">KNOW MORE</span>

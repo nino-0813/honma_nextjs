@@ -12,19 +12,21 @@ const REASONS = [
 export default function YearlySubscriptionLP() {
   return (
     <section className="mb-12 md:mb-20">
-      <div className="mx-auto max-w-3xl text-center">
-        <p className="text-xs font-medium tracking-[0.16em] text-primary md:text-sm">イケベジ定期便</p>
-        <h1 className="mt-5 font-serif text-3xl font-semibold leading-[1.5] tracking-wide text-primary md:text-[44px]">
-          4700人とつくるイケベジ定期便
-        </h1>
-        <div className="mt-8 space-y-6 text-sm leading-[2] text-gray-600 md:text-base">
-          <p>イケベジは佐渡ヶ島と共にこれからも前に進み続けます。<br />その佐渡の中で、イケベジが生まれ継ないでいく集落が「豊田集落」</p>
-          <p>定期便は、リーズナブルに安定してお届けする仕組みであると共に、<br className="hidden md:block" />お客様とイケベジが一緒に歩んでいくための形です。</p>
-          <p>無意識の日常の一杯のご飯が、着実に日本の農業を変え、<br className="hidden md:block" />この「豊田集落」を繋いでいく一杯になります。</p>
+      <div className="flex min-h-[58svh] items-center justify-center px-4 py-16 md:min-h-[64svh]">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="text-xs font-medium tracking-[0.16em] text-primary md:text-sm">イケベジ定期便</p>
+          <h1 className="mt-5 font-serif text-3xl font-semibold leading-[1.5] tracking-wide text-primary md:text-[44px]">
+            4700人とつくるイケベジ定期便
+          </h1>
+          <div className="mt-8 space-y-6 text-sm leading-[2] text-gray-600 md:text-base">
+            <p>イケベジは佐渡ヶ島と共にこれからも前に進み続けます。<br />その佐渡の中で、イケベジが生まれ継ないでいく集落が「豊田集落」</p>
+            <p>定期便は、リーズナブルに安定してお届けする仕組みであると共に、<br className="hidden md:block" />お客様とイケベジが一緒に歩んでいくための形です。</p>
+            <p>無意識の日常の一杯のご飯が、着実に日本の農業を変え、<br className="hidden md:block" />この「豊田集落」を繋いでいく一杯になります。</p>
+          </div>
         </div>
       </div>
 
-      <div className="relative mx-auto mt-12 aspect-[16/9] max-w-6xl overflow-hidden bg-gray-100 md:mt-16 md:aspect-[16/7]">
+      <div className="relative mx-auto mt-8 aspect-[16/9] max-w-6xl overflow-hidden bg-gray-100 md:mt-12 md:aspect-[16/7]">
         <Image src="/images/home/satoyama-toyota.webp" alt="佐渡の豊田集落の里山風景" fill priority sizes="(max-width: 1280px) 100vw, 1152px" className="object-cover" />
       </div>
 
@@ -42,7 +44,7 @@ export default function YearlySubscriptionLP() {
       </nav>
 
       <div id="ikevege-subscription" className="mt-24 scroll-mt-28 border-t border-gray-100 pt-20 text-center md:mt-32 md:pt-28">
-        <h2 className="mx-auto max-w-5xl font-serif text-lg font-medium leading-loose tracking-[0.08em] text-primary md:text-[26px]">田んぼから食卓までのあいだに、できることを一つずつ積み重ねてお届けします。</h2>
+        <h2 className="mx-auto max-w-5xl font-serif text-lg font-medium leading-loose tracking-[0.06em] text-primary md:text-[22px] lg:whitespace-nowrap lg:text-[26px]">田んぼから食卓までのあいだに、できることを一つずつ積み重ねてお届けします。</h2>
       </div>
     </section>
   );

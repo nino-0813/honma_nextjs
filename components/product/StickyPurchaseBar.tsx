@@ -41,6 +41,7 @@ export default function StickyPurchaseBar({
   const qty = quantity ?? 1;
   const isDisabled = disabled || !interactive;
   const [visible, setVisible] = useState(false);
+  const [footerVisible, setFooterVisible] = useState(false);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -51,6 +52,17 @@ export default function StickyPurchaseBar({
       { threshold: 0 }
     );
     observer.observe(target);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const footer = document.getElementById('site-footer');
+    if (!footer) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setFooterVisible(entry.isIntersecting),
+      { threshold: 0.01 }
+    );
+    observer.observe(footer);
     return () => observer.disconnect();
   }, []);
 
@@ -77,7 +89,7 @@ export default function StickyPurchaseBar({
     <div
       aria-hidden={!visible}
       className={`fixed inset-x-0 bottom-0 z-40 transition-transform duration-300 ease-out-expo ${
-        visible ? 'translate-y-0' : 'translate-y-full pointer-events-none'
+        visible && !footerVisible ? 'translate-y-0' : 'translate-y-full pointer-events-none'
       }`}
     >
       <div className="mx-auto max-w-[1100px] px-3 pb-3 md:px-4 md:pb-4">

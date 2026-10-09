@@ -71,7 +71,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
   };
 
   return (
-    <header className={`fixed top-0 z-50 w-full overflow-x-hidden border-b border-transparent bg-white/95 py-4 backdrop-blur-md transition-all duration-500 md:py-[18px] ${location === '/' && !hasScrolled ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}>
+    <header className={`fixed top-0 z-50 w-full overflow-x-hidden border-b border-transparent bg-white/95 py-3 backdrop-blur-md transition-all duration-500 md:py-3.5 ${location === '/' && !hasScrolled ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}>
       <div className="mx-auto w-full max-w-[1760px] px-5 md:px-8 lg:px-12">
         <div className="flex justify-between items-center">
           <div className="flex-shrink-0 flex items-center z-50">

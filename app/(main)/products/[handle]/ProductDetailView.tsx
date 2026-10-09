@@ -11,6 +11,7 @@ import { supabase, checkStockAvailability, getStockForVariant } from '@/lib/supa
 import { isProductPreorder } from '@/lib/productStatus';
 import { computeFirstShippingDate, formatJapaneseDate } from '@/lib/subscriptionShipping';
 import ProductGuide from '@/components/product/ProductGuide';
+import StickyPurchaseBar from '@/components/product/StickyPurchaseBar';
 import ProductGallery from '@/components/product/ProductGallery';
 import ProductCategoryNav from '@/components/product/ProductCategoryNav';
 import ProductStory from '@/components/product/ProductStory';
@@ -1032,6 +1033,19 @@ export default function ProductDetailView({ product }: { product: Product }) {
             </div>
           </div>
         )}
+
+        <StickyPurchaseBar
+          title={product.title}
+          price={calculatedPrice}
+          image={product.image}
+          note={isProductPreorder(product) ? '予約商品' : undefined}
+          quantity={quantity}
+          onQuantityChange={(next) => {
+            setStockError('');
+            setQuantity(next);
+          }}
+          onAddToCart={addSelectionToCart}
+        />
 
         {/* 下スクロールで読む詳細（説明全文・炊き方 / 戻し方・保管方法） */}
         <ProductGuide product={product} />
