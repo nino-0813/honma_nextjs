@@ -181,7 +181,7 @@ export default function CollectionsPage() {
   return (
     <div className="page-top-offset min-h-screen w-full overflow-x-hidden bg-white pb-36">
       {!isLpView && (
-        <div className="sticky top-16 z-30 mb-12 bg-white/95 py-3 backdrop-blur-md md:top-20 md:mb-16">
+        <div className="sticky top-14 z-30 mb-16 bg-white/95 py-3 backdrop-blur-md md:top-16 md:mb-20">
           <div className="mx-auto max-w-[1400px] px-6 md:px-12">
             <ProductCategoryNav current={categoryNavKey} />
           </div>
@@ -247,7 +247,7 @@ export default function CollectionsPage() {
         )}
 
         {!loading && !error && filteredProducts.length > 0 && (
-          <div className="grid grid-cols-2 gap-x-5 gap-y-16 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-20 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-16 sm:grid-cols-2 sm:gap-x-10 sm:gap-y-24 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-12">
             {filteredProducts.map((product, index) => {
               const soldOut = isProductSoldOut(product);
               const preorder = !soldOut && isProductPreorder(product); // 在庫切れ優先
@@ -262,7 +262,7 @@ export default function CollectionsPage() {
                 className="group block opacity-0 animate-fade-in-up"
                 style={{ animationDelay: `${index * 60}ms` }}
               >
-                <div className="relative aspect-square bg-white border border-gray-100 overflow-hidden mb-5 flex items-center justify-center">
+                <div className="relative aspect-square bg-white overflow-hidden mb-6 flex items-center justify-center">
                   <div className="absolute inset-0 flex items-center justify-center bg-white p-2 transition-transform duration-500 ease-out group-hover:scale-[1.015] motion-reduce:transition-none">
                     <FadeInImage
                       src={product.images?.length ? product.images[0] : product.image || ''}
@@ -274,7 +274,7 @@ export default function CollectionsPage() {
                   </div>
                 </div>
                 <div className="flex flex-1 flex-col gap-2 text-left">
-                  <h2 className="text-sm font-medium text-primary leading-relaxed group-hover:text-gray-600 transition-colors line-clamp-2 min-h-[2.8em]">
+                  <h2 className="text-sm font-medium text-primary leading-[1.9] group-hover:text-gray-600 transition-colors line-clamp-3 min-h-[5.7em]">
                     {product.handle === 'start-set' ? 'お試しセット' : product.title}
                   </h2>
                   <p className="flex flex-wrap items-center justify-start gap-2 font-serif text-sm tracking-wide text-gray-900">

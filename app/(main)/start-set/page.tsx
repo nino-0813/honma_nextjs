@@ -2,13 +2,10 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import ProductGallery from '@/components/product/ProductGallery';
 import ProductFeatures from '@/components/product/ProductFeatures';
-import StickyPurchaseBar from '@/components/product/StickyPurchaseBar';
 import SubscriptionCTA from '@/components/home/SubscriptionCTA';
 import { SHOW_PLACEHOLDER_BADGE } from '@/components/home/placeholders';
 import { getProductByHandle, getPublishedProductByHandle } from '@/lib/supabase';
 import StartSetPurchasePanel from '@/components/start-set/StartSetPurchasePanel';
-import RiceGuideModal from '@/components/start-set/RiceGuideModal';
-import ProductCategoryNav from '@/components/product/ProductCategoryNav';
 
 export const metadata: Metadata = {
   title: 'お試しセット',
@@ -57,13 +54,7 @@ export default async function StartSetPage() {
 
   return (
     <div className="page-top-offset min-h-screen w-full overflow-x-clip bg-white pb-24 animate-fade-in">
-      <div className="mb-12 bg-white py-3 md:mb-16">
-        <div className="mx-auto max-w-[1400px] px-6 md:px-12">
-          <ProductCategoryNav current="start-set" />
-        </div>
-      </div>
-
-      <section className="px-5 pb-12 text-center md:pb-16">
+      <section className="px-5 pb-16 pt-14 text-center md:pb-20 md:pt-24">
         <h1 className="mx-auto max-w-4xl font-serif text-[28px] font-semibold leading-[1.5] tracking-[0.08em] text-primary md:text-4xl lg:text-[40px]">
           お試しセット
         </h1>
@@ -151,16 +142,14 @@ export default async function StartSetPage() {
           </div>
         </div>
 
-        {!product && (
-          <StickyPurchaseBar
-            title="お試しセット"
-            price={PRICE}
-            image={GALLERY[0]}
-            note="準備中"
-            disabled
-            disabledLabel="準備中"
-          />
-        )}
+        <section className="mt-20 grid overflow-hidden bg-hekishoku text-white md:mt-28 lg:grid-cols-2">
+          <div className="min-h-[320px] lg:min-h-[480px]"><img src="/images/about/hero/retreat_2025_56.webp" alt="佐渡の田んぼで過ごす家族" loading="lazy" className="h-full w-full object-cover" /></div>
+          <div className="flex flex-col justify-center p-8 md:p-12 lg:p-16">
+            <h2 className="font-serif text-xl font-semibold leading-relaxed tracking-wider md:text-3xl">おいしさだけじゃない、<br />イケベジが届けたいこと</h2>
+            <p className="mt-6 text-sm leading-loose text-white/85 md:text-base">お客様の日常の「いいとき」を彩る一員であるとともに、「子どもたちがここに生まれて良かったと思える社会」を創ることが、私たちの目指すビジョンです。</p>
+            <Link href="/about" className="mt-8 inline-flex min-h-12 w-fit items-center border border-white/50 px-6 text-sm transition-colors hover:bg-white hover:text-hekishoku">詳しく知る →</Link>
+          </div>
+        </section>
 
         <ProductFeatures
           alwaysOpenFirst
@@ -178,19 +167,6 @@ export default async function StartSetPage() {
             },
           ]}
         />
-        <div className="mt-8 flex flex-wrap justify-center gap-4">
-          <RiceGuideModal />
-        </div>
-
-        <section className="mt-16 grid overflow-hidden bg-hekishoku text-white md:mt-20 lg:grid-cols-2">
-          <div className="min-h-[320px] lg:min-h-[480px]"><img src="/images/about/hero/retreat_2025_56.webp" alt="佐渡の田んぼで過ごす家族" loading="lazy" className="h-full w-full object-cover" /></div>
-          <div className="flex flex-col justify-center p-8 md:p-12 lg:p-16">
-            <h2 className="font-serif text-xl font-semibold leading-relaxed tracking-wider md:text-3xl">おいしさだけじゃない、<br />イケベジが届けたいこと</h2>
-            <p className="mt-6 text-sm leading-loose text-white/85 md:text-base">お客様の日常の「いいとき」を彩る一員であるとともに、「子どもたちがここに生まれて良かったと思える社会」を創ることが、私たちの目指すビジョンです。</p>
-            <Link href="/about" className="mt-8 inline-flex min-h-12 w-fit items-center border border-white/50 px-6 text-sm transition-colors hover:bg-white hover:text-hekishoku">詳しく知る →</Link>
-          </div>
-        </section>
-
         <ProductFeatures
           showTitle={false}
           rows={[

@@ -65,8 +65,10 @@ export default function AboutPage() {
 
   return (
     <main className="page-top-offset w-full overflow-x-hidden bg-white text-[#1c1d1d]">
-      <header className="px-6 pb-10 pt-8 text-center md:pb-14 md:pt-12">
-        <p className="text-[13px] tracking-[0.16em]">イケベジとは</p>
+      <header className="px-6 pb-14 pt-16 text-center md:pb-20 md:pt-24">
+        <p className="text-[11px] tracking-[0.24em] text-gray-500">自然の“イケてる”を、暮らしのそばへ。</p>
+        <h1 className="mt-5 font-serif text-[26px] font-medium leading-[1.8] tracking-[0.13em] md:text-[38px]">農を通じて、<br className="md:hidden" />人と自然のいい関係をつくる。</h1>
+        <p className="mx-auto mt-6 max-w-[620px] text-[12px] leading-[2.1] tracking-[0.08em] text-gray-600 md:text-sm">イケベジは佐渡の田んぼから、おいしい作物と、自然に触れる体験を届けるチームです。</p>
       </header>
 
       <section className="mx-auto w-full max-w-[1120px] px-4 md:px-6">
@@ -75,12 +77,12 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="px-6 py-24 text-center md:py-32">
+      <section className="px-6 py-20 text-center md:py-28">
         <FadeInSection className="mx-auto max-w-[680px]">
-          <h1 className="text-[25px] font-medium leading-[1.9] tracking-[0.14em] md:text-[34px]">
+          <h2 className="text-[25px] font-medium leading-[1.9] tracking-[0.14em] md:text-[34px]">
             子どもたちが<br />「ここに生まれてよかった」と<br />思える社会を。
-          </h1>
-          <div className="mt-12 space-y-7 text-[13px] font-light leading-[2.3] tracking-[0.1em] text-gray-600 md:mt-14 md:text-sm">
+          </h2>
+          <div className="mt-10 space-y-5 text-[13px] font-light leading-[2.15] tracking-[0.08em] text-gray-600 md:mt-12 md:text-sm">
             <p>自然界では、多様な命が、無理なく、<br />あるがままに響き合い、めぐり続けている。<br />その在り方を、私たちは“イケてる”と呼んでいます。</p>
             <p>お米を育てて届けること。<br />田んぼをひらき、体験や学びの場をつくること。</p>
             <p>イケベジは、農を起点に、<br />自然の在り方を社会へと伝える<br />「通訳」で在り続けます。</p>
@@ -88,12 +90,13 @@ export default function AboutPage() {
         </FadeInSection>
       </section>
 
-      <section className="bg-[#f4f4f0] px-4 py-24 md:px-6 md:py-28">
+      <section className="bg-[#f7f6f0] px-4 py-24 md:px-6 md:py-28">
         <FadeInSection className="mx-auto max-w-[1120px]">
           <h2 className="text-center text-[24px] font-medium tracking-[0.2em] md:text-[32px]">きょうも しぜんと いいときを。</h2>
-          <div className="mx-auto mt-12 max-w-[680px] space-y-7 text-center text-[13px] font-light leading-[2.3] tracking-[0.09em] text-gray-600 md:text-sm">
-            <p>炊きたてのごはんを囲む、家族の食卓。<br />食べる人の顔を思い浮かべながら、台所に立つ時間。<br />田植えや稲刈りで、泥だらけになって笑う子どもたち。<br />そして、田んぼで汗を流す作り手自身の時間。</p>
-            <p className="font-medium text-[#1c1d1d]">そのどれもが、イケベジの届けたい「いいとき」です。</p>
+          <div className="mx-auto mt-12 max-w-[720px] space-y-7 text-center text-[13px] font-light leading-[2.3] tracking-[0.09em] text-gray-600 md:text-sm">
+            <p>「しぜんと」には、自然と向き合うことと、気負わず自然体でいること。<br />ふたつの意味を込めています。</p>
+            <p>炊きたてのごはんを囲む食卓も、泥だらけになって笑う田植えも、田んぼで汗を流す作り手の時間も。自然がそばにあると、何気ない一日が少しだけ豊かになる。</p>
+            <p className="font-medium text-[#1c1d1d]">そんな時間を増やすことが、イケベジの届けたい「いいとき」です。</p>
           </div>
 
           <div className="mt-14 grid grid-cols-2 gap-3 md:mt-16 md:grid-cols-3">

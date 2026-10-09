@@ -1,18 +1,10 @@
 'use client';
 
 import { useContext, useEffect, useState } from 'react';
-import Link from 'next/link';
 import type { Product } from '@/types';
 import { CartContext } from '@/providers/CartProvider';
 import { checkStockAvailability, getOrders, supabase } from '@/lib/supabase';
 import { isProductSoldOut } from '@/lib/productStatus';
-import StickyPurchaseBar from '@/components/product/StickyPurchaseBar';
-
-const VARIETIES = [
-  { name: 'コシヒカリ', image: '/images/home/collections/collection_koshihikari_800.webp', href: '/collections/rice/koshihikari' },
-  { name: '亀の尾', image: '/images/home/collections/collection_kamenoo_800.webp', href: '/collections/rice/kamenoo' },
-  { name: 'にこまる', image: '/images/renewal/lineup/rice.webp', href: '/collections/rice/nikomaru' },
-];
 
 type MillingMethod = '白米' | '玄米';
 
@@ -132,24 +124,7 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
           </button>
         </div>
 
-        <div className="mt-8">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            {VARIETIES.map((variety) => (
-              <div key={variety.name} className="overflow-hidden border border-gray-200 bg-white">
-                <Link href={variety.href} className="block aspect-square overflow-hidden bg-dim">
-                  <img src={variety.image} alt={`${variety.name}のお米`} loading="lazy" className="h-full w-full object-cover" />
-                </Link>
-                <div className="p-3">
-                  <Link href={variety.href} className="text-[12px] text-primary hover:underline">{variety.name}</Link>
-                  <p className="mt-1 text-[11px] text-gray-500">{millingMethod}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
-
-      <StickyPurchaseBar title="お試しセット" price={calculatedPrice} image={product.images?.[0] || product.image} quantity={1} onQuantityChange={() => setQuantity(1)} onAddToCart={addSelectionToCart} disabled={disabled} disabledLabel={soldOut ? '売り切れ' : '販売期間外'} />
     </>
   );
 }

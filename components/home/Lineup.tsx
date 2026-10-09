@@ -10,7 +10,7 @@ const TILES = [
 
 export default function Lineup() {
   return (
-    <section id="products" className="bg-white pb-32 md:pb-48">
+    <section id="products" className="bg-white px-4 pb-32 md:px-8 md:pb-48 lg:px-10">
       <ul className="grid grid-cols-2 gap-px bg-white lg:grid-cols-3">
         {TILES.map((tile, index) => (
           <li key={tile.ja} className={index === 2 ? 'col-start-1 lg:col-start-auto' : ''}>
@@ -31,9 +31,9 @@ export default function Lineup() {
           </li>
         ))}
       </ul>
-      <div className="mt-14 flex justify-end px-5 md:mt-20 md:px-10">
+      <div className="mt-10 flex justify-end md:mt-14">
         <Link href="/collections" className="inline-flex min-h-10 items-center rounded-full border border-gray-300 px-6 text-[10px] text-primary transition-colors hover:border-primary md:min-h-11 md:px-7 md:text-xs">
-          すべての商品を見る →
+          商品一覧へ →
         </Link>
       </div>
     </section>

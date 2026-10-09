@@ -11,8 +11,8 @@ import { supabase, checkStockAvailability, getStockForVariant } from '@/lib/supa
 import { isProductPreorder } from '@/lib/productStatus';
 import { computeFirstShippingDate, formatJapaneseDate } from '@/lib/subscriptionShipping';
 import ProductGuide from '@/components/product/ProductGuide';
-import StickyPurchaseBar from '@/components/product/StickyPurchaseBar';
 import ProductGallery from '@/components/product/ProductGallery';
+import ProductCategoryNav from '@/components/product/ProductCategoryNav';
 import ProductStory from '@/components/product/ProductStory';
 import SubscriptionCTA from '@/components/home/SubscriptionCTA';
 import {
@@ -22,17 +22,6 @@ import {
 } from '@/lib/analytics';
 
 type PurchaseType = 'one_time' | 'subscription';
-
-const PRODUCT_NAV = [
-  { label: 'すべての商品', href: '/collections' },
-  { label: 'お米', href: '/collections/rice' },
-  { label: '従来コシヒカリ', href: '/collections/rice/koshihikari' },
-  { label: '亀の尾', href: '/collections/rice/kamenoo' },
-  { label: 'にこまる', href: '/collections/rice/nikomaru' },
-  { label: '原木しいたけ', href: '/collections/shiitake' },
-  { label: 'クレセントムーン', href: '/collections/crescent' },
-  { label: 'チケット', href: '/collections/ticket' },
-];
 
 export default function ProductDetailView({ product }: { product: Product }) {
   const { products: allProducts } = useProducts();
@@ -434,19 +423,11 @@ export default function ProductDetailView({ product }: { product: Product }) {
           <span className="text-black">{product.title}</span>
         </div>
 
-        <nav aria-label="商品カテゴリー" className="-mx-4 mb-10 overflow-x-auto px-4 pb-2 scrollbar-hide sm:-mx-6 sm:px-6 md:mb-14">
-          <div className="flex min-w-max gap-3">
-            {PRODUCT_NAV.map((item) => (
-              <Link key={`${item.label}-${item.href}`} href={item.href} className="rounded-full border border-gray-200 px-4 py-2.5 text-xs text-gray-600 transition-colors hover:border-primary hover:text-primary">
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        </nav>
+        <div className="mb-12 md:mb-16"><ProductCategoryNav current="all" /></div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           {/* 左の画像は固定。右の詳細を読み終えるまで残り、そのあと一緒に流れていく */}
-          <div className="lg:col-span-7 lg:sticky lg:top-24 lg:self-start">
+          <div className="lg:col-span-7 lg:self-start">
             {(() => {
               const gallery = product.images && product.images.length > 0
                 ? product.images
@@ -1051,20 +1032,6 @@ export default function ProductDetailView({ product }: { product: Product }) {
             </div>
           </div>
         )}
-
-        {/* 画面下の固定購入バー（購入パネルが画面外に出たら出現） */}
-        <StickyPurchaseBar
-          title={product.title}
-          price={calculatedPrice}
-          image={product.image}
-          note={isProductPreorder(product) ? '予約商品' : undefined}
-          quantity={quantity}
-          onQuantityChange={(next) => {
-            setStockError('');
-            setQuantity(next);
-          }}
-          onAddToCart={addSelectionToCart}
-        />
 
         {/* 下スクロールで読む詳細（説明全文・炊き方 / 戻し方・保管方法） */}
         <ProductGuide product={product} />

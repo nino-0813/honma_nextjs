@@ -30,11 +30,19 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
   const { cartItems } = useContext(CartContext);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [hasScrolled, setHasScrolled] = useState(false);
 
   const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const updateHeader = () => setHasScrolled(window.scrollY > 72);
+    updateHeader();
+    window.addEventListener('scroll', updateHeader, { passive: true });
+    return () => window.removeEventListener('scroll', updateHeader);
   }, []);
 
   useEffect(() => {
@@ -63,8 +71,8 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
   };
 
   return (
-    <header className="fixed top-0 z-50 w-full overflow-x-hidden bg-white/95 py-[18px] backdrop-blur-md md:py-6">
-      <div className="w-full px-5 md:px-8 lg:px-10">
+    <header className={`fixed top-0 z-50 w-full overflow-x-hidden border-b border-transparent bg-white/95 py-4 backdrop-blur-md transition-all duration-500 md:py-[18px] ${location === '/' && !hasScrolled ? '-translate-y-full opacity-0' : 'translate-y-0 opacity-100'}`}>
+      <div className="mx-auto w-full max-w-[1760px] px-5 md:px-8 lg:px-12">
         <div className="flex justify-between items-center">
           <div className="flex-shrink-0 flex items-center z-50">
             <Link href="/" className="hover:opacity-70 transition-opacity block" aria-label="イケベジ ホーム">
@@ -74,7 +82,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
                 alt="イケベジ"
                 width={196}
                 height={34}
-                className="h-5 w-auto object-contain opacity-60 md:h-7"
+                className="h-5 w-auto object-contain opacity-65 md:h-6"
               />
             </Link>
           </div>
@@ -90,7 +98,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
                   className={`text-[13px] lg:text-sm font-medium tracking-[0.08em] transition-colors relative group whitespace-nowrap ${
                     active
                       ? onHero ? 'text-white' : 'text-primary'
-                      : onHero ? 'text-white hover:text-white/80' : 'text-gray-500 hover:text-primary'
+                      : onHero ? 'text-white hover:text-white/80' : 'text-gray-600 hover:text-primary'
                   }`}
                 >
                   {item.label}

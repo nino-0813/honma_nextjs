@@ -13,8 +13,8 @@ const STORY_IMAGES = [
 export default function HeroStory() {
   return (
     <>
-      <section className="bg-white pt-20 md:pt-24">
-        <div className="mx-auto w-[80%] max-w-[1600px]">
+      <section className="bg-white">
+        <div className="w-full">
           <video
             src={VIDEO}
             autoPlay
@@ -22,7 +22,7 @@ export default function HeroStory() {
             loop
             playsInline
             preload="metadata"
-            className="block aspect-video h-auto w-full bg-black object-cover object-center"
+            className="block h-[72svh] min-h-[520px] w-full bg-black object-cover object-center md:h-[88svh]"
           />
         </div>
       </section>
@@ -35,17 +35,6 @@ export default function HeroStory() {
               しぜんと<br />
               いいときを。
             </h1>
-          </FadeIn>
-
-          <FadeIn className="mt-28 md:mt-44 lg:mt-52">
-            <div className="grid grid-cols-2 overflow-hidden">
-              {STORY_IMAGES.map((image) => (
-                <div key={image.src} className="aspect-[4/3] overflow-hidden bg-dim">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={image.src} alt={image.alt} loading="lazy" className="h-full w-full object-cover" />
-                </div>
-              ))}
-            </div>
           </FadeIn>
 
           <div className="mx-auto mt-28 max-w-[780px] font-serif text-[11px] font-medium leading-[2.25] tracking-[0.06em] text-[#24211d] md:mt-44 md:text-[14px] md:leading-[2.35] lg:mt-52 lg:text-[15px]">
@@ -90,14 +79,22 @@ export default function HeroStory() {
             </FadeIn>
           </div>
 
-          <FadeIn className="mt-32 md:mt-48">
-            <p className="text-center font-serif text-[17px] font-semibold tracking-[0.16em] text-primary md:text-[25px]">
-              きょうも　しぜんと　いいときを。
-            </p>
-            <div className="mt-12 flex justify-end md:mt-16">
+          <FadeIn className="mt-16 md:mt-24">
+            <div className="flex justify-end">
               <Link href="/about" className="inline-flex min-h-10 items-center rounded-full border border-gray-300 px-6 text-[10px] tracking-[0.08em] text-[#37332c] transition-colors hover:border-[#37332c] hover:bg-[#37332c] hover:text-white md:min-h-11 md:px-7 md:text-xs">
                 詳しく知る →
               </Link>
+            </div>
+          </FadeIn>
+
+          <FadeIn className="mt-24 md:mt-36">
+            <div className="grid grid-cols-2 overflow-hidden">
+              {STORY_IMAGES.map((image, index) => (
+                <div key={image.src} className={`${index === 0 || index === 3 ? 'aspect-[5/4]' : 'aspect-[4/3]'} overflow-hidden bg-dim`}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={image.src} alt={image.alt} loading="lazy" className={`h-full w-full object-cover ${index === 1 ? 'object-[50%_35%]' : ''}`} />
+                </div>
+              ))}
             </div>
           </FadeIn>
         </div>

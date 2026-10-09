@@ -7,7 +7,7 @@ import { IconInstagram, IconYoutube } from './Icons';
 const Footer = () => {
   return (
     <footer className="border-t border-gray-100 bg-white py-7 text-primary md:py-8">
-      <div className="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1760px] px-5 md:px-8 lg:px-12">
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <ul className="flex flex-wrap gap-x-5 gap-y-3 text-[11px] tracking-[0.05em] text-gray-500">
               <li><Link href="/legal" className="transition-colors hover:text-primary">特定商取引法</Link></li>

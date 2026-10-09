@@ -15,7 +15,7 @@ export default function YearlySubscriptionLP() {
       <div className="mx-auto max-w-3xl text-center">
         <p className="text-xs font-medium tracking-[0.16em] text-primary md:text-sm">イケベジ定期便</p>
         <h1 className="mt-5 font-serif text-3xl font-semibold leading-[1.5] tracking-wide text-primary md:text-[44px]">
-          4700人とつくる里山
+          4700人とつくるイケベジ定期便
         </h1>
         <div className="mt-8 space-y-6 text-sm leading-[2] text-gray-600 md:text-base">
           <p>イケベジは佐渡ヶ島と共にこれからも前に進み続けます。<br />その佐渡の中で、イケベジが生まれ継ないでいく集落が「豊田集落」</p>
@@ -37,12 +37,12 @@ export default function YearlySubscriptionLP() {
         ))}
       </div>
 
-      <nav aria-label="定期便についての詳細" className="mx-auto mt-10 flex max-w-5xl justify-center md:mt-12">
+      <nav aria-label="定期便についての詳細" className="mx-auto mt-16 flex max-w-5xl justify-center md:mt-24">
         <Link href="/subscription-guide" className="inline-flex min-h-11 items-center rounded-full border border-gray-300 px-7 text-sm text-primary transition-colors hover:border-primary hover:bg-primary hover:text-white">ご利用方法を詳しく見る →</Link>
       </nav>
 
-      <div id="ikevege-subscription" className="mt-20 scroll-mt-28 border-t border-gray-100 pt-12 text-center md:mt-28 md:pt-16">
-        <h2 className="mx-auto max-w-3xl font-serif text-lg font-medium leading-loose tracking-wider text-primary md:text-2xl">田んぼから食卓までのあいだに、できることを一つずつ積み重ねてお届けします。</h2>
+      <div id="ikevege-subscription" className="mt-24 scroll-mt-28 border-t border-gray-100 pt-20 text-center md:mt-32 md:pt-28">
+        <h2 className="mx-auto max-w-5xl font-serif text-lg font-medium leading-loose tracking-[0.08em] text-primary md:text-[26px]">田んぼから食卓までのあいだに、できることを一つずつ積み重ねてお届けします。</h2>
       </div>
     </section>
   );
