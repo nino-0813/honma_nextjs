@@ -42,4 +42,11 @@
 - The video uses `object-cover` so differing viewport ratios no longer produce black side bars. A small amount of edge cropping is accepted to keep the first view fully covered.
 - Verified in the in-app browser at the same initial page state: the video fills the complete available viewport with no black bars and no following content visible before scrolling.
 
+## Pass 5 — home story photo grid
+
+- Source layout: `/Users/yusukeninomiya/Downloads/トップページ上の方の４つの写真.png`.
+- Source photos: `_P3A9154.jpg`, `IMG_9147.jpg`, `IMG_0096.jpg`, and `2C9A9680.jpg`, in that reading order.
+- The four supplied photos are optimized to WebP and arranged as an equal 2 × 2 grid with matching 16:9 cells and no inter-card gaps.
+- The complete image block remains centered inside the existing home story content width, matching the reference composition.
+
 final result: passed

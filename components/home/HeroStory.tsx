@@ -4,10 +4,10 @@ import FadeIn from '@/components/FadeIn';
 const VIDEO = '/videos/hero.mp4';
 
 const STORY_IMAGES = [
-  { src: '/images/renewal/about/safety.webp', alt: '苗を見守るイケベジの農作業' },
-  { src: '/images/renewal/brand/access-3.webp', alt: '佐渡の田んぼに集う人々' },
-  { src: '/images/renewal/brand/access-1.webp', alt: '佐渡の田んぼでの稲刈り' },
-  { src: '/images/renewal/brand/access-2.webp', alt: '収穫した稲を手にする参加者' },
+  { src: '/images/home/story/rice-seeds.webp', alt: '水に浮かぶ籾' },
+  { src: '/images/home/story/rice-seedlings.webp', alt: '苗箱に育つ稲の苗' },
+  { src: '/images/home/story/field-mowing.webp', alt: '佐渡の田んぼで草を刈る農家' },
+  { src: '/images/home/story/rice-harvest.webp', alt: '稲刈り機で収穫する農家' },
 ];
 
 export default function HeroStory() {
@@ -89,10 +89,10 @@ export default function HeroStory() {
 
           <FadeIn className="mt-24 md:mt-36">
             <div className="grid grid-cols-2 overflow-hidden">
-              {STORY_IMAGES.map((image, index) => (
-                <div key={image.src} className={`${index === 0 || index === 3 ? 'aspect-[5/4]' : 'aspect-[4/3]'} overflow-hidden bg-dim`}>
+              {STORY_IMAGES.map((image) => (
+                <div key={image.src} className="aspect-video overflow-hidden bg-dim">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={image.src} alt={image.alt} loading="lazy" className={`h-full w-full object-cover ${index === 1 ? 'object-[50%_35%]' : ''}`} />
+                  <img src={image.src} alt={image.alt} loading="lazy" className="h-full w-full object-cover" />
                 </div>
               ))}
             </div>
