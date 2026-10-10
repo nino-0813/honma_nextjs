@@ -56,4 +56,12 @@
 - The four supplied 3:2 photos are optimized to WebP and placed in an equal 2 × 2 grid without gaps.
 - Browser verification confirms the bamboo grove and rice planting photos on the first row, with bamboo rice and orchard photos on the second row, matching the supplied reference.
 
+## Pass 7 — mobile hero story sequence
+
+- Source layout: `/Users/yusukeninomiya/Desktop/スクリーンショット 2026-10-10 17.28.41.png`.
+- The full-screen video remains an independent first section; the following story begins on white with deliberate top spacing.
+- Below the mobile breakpoint, the story title and letter occupy the left column while the four supplied story photos form one continuous vertical strip on the right.
+- Each photo receives an increasing entrance delay and uses the existing upward reveal motion. The image strip stretches to the same endpoint as the letter and CTA, so the section closes as one composition.
+- The established desktop story and 2 × 2 photo layout remain unchanged.
+
 final result: passed
