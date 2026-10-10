@@ -2,10 +2,10 @@ import Link from 'next/link';
 import FadeIn from '@/components/FadeIn';
 
 const COMMUNITY_IMAGES = [
-  { src: '/images/renewal/activities/harvest-retreat.webp', alt: '田んぼに集うイケベジの仲間たち' },
-  { src: '/images/renewal/about/safety.webp', alt: '苗を育てる農作業' },
-  { src: '/images/renewal/about/delicious.webp', alt: 'お米の食味分析鑑定コンクール' },
-  { src: '/images/renewal/about/smiles.webp', alt: '佐渡の田んぼに集まった子どもたち' },
+  { src: '/images/home/community/bamboo-grove.webp', alt: '竹林で竹を見上げる農家' },
+  { src: '/images/home/community/rice-planting.webp', alt: '泥の中で苗を手にする田植え体験' },
+  { src: '/images/home/community/bamboo-rice.webp', alt: '竹筒にお米を入れる体験' },
+  { src: '/images/home/community/orchard.webp', alt: '果樹園で作業する人たち' },
 ];
 
 export default function SubscriptionCTA() {
@@ -25,8 +25,8 @@ export default function SubscriptionCTA() {
         </FadeIn>
         <FadeIn className="mt-16 md:mt-24">
           <div className="grid grid-cols-2 overflow-hidden">
-            {COMMUNITY_IMAGES.map((image, index) => (
-              <div key={image.src} className={`${index === 0 || index === 3 ? 'aspect-[5/4]' : 'aspect-[4/3]'} overflow-hidden bg-dim`}>
+            {COMMUNITY_IMAGES.map((image) => (
+              <div key={image.src} className="aspect-[3/2] overflow-hidden bg-dim">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={image.src} alt={image.alt} loading="lazy" className="h-full w-full object-cover" />
               </div>

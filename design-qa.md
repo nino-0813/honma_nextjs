@@ -49,4 +49,11 @@
 - The four supplied photos are optimized to WebP and arranged as an equal 2 × 2 grid with matching 16:9 cells and no inter-card gaps.
 - The complete image block remains centered inside the existing home story content width, matching the reference composition.
 
+## Pass 6 — home subscription photo grid
+
+- Source layout: `/Users/yusukeninomiya/Downloads/トップページ下の方の４つの写真.png`.
+- Source photos: `IMG_5617.jpg`, `IMG_9118.jpg`, `IMG_7643-2.jpg`, and `IMG_0772.jpg`, in that reading order.
+- The four supplied 3:2 photos are optimized to WebP and placed in an equal 2 × 2 grid without gaps.
+- Browser verification confirms the bamboo grove and rice planting photos on the first row, with bamboo rice and orchard photos on the second row, matching the supplied reference.
+
 final result: passed
