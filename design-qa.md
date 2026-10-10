@@ -64,4 +64,11 @@
 - Each photo receives an increasing entrance delay and uses the existing upward reveal motion. The image strip stretches to the same endpoint as the letter and CTA, so the section closes as one composition.
 - The established desktop story and 2 × 2 photo layout remain unchanged.
 
+## Pass 8 — unified vertical story sequence
+
+- Corrected the breakpoint interpretation: the vertical four-photo strip now applies to desktop as well as mobile.
+- Desktop browser verification shows the title and letter in the left column with all four photos stacked continuously in the right column.
+- The gallery is stretched by the same grid row as the complete letter and CTA, keeping both endpoints aligned.
+- The opening video remains a separate full-screen section with a generous white transition before the story composition.
+
 final result: passed

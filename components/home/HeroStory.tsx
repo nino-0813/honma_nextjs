@@ -27,20 +27,20 @@ export default function HeroStory() {
         </div>
       </section>
 
-      <section className="bg-white px-6 pb-24 pt-24 md:hidden">
-        <div className="mx-auto max-w-[560px]">
-          <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] items-stretch gap-5">
-            <div className="flex min-w-0 flex-col pt-16">
+      <section className="bg-white px-6 pb-24 pt-24 md:px-[10%] md:pb-44 md:pt-36 lg:pb-52 lg:pt-44">
+        <div className="mx-auto max-w-[1440px]">
+          <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] items-stretch gap-5 md:gap-16 lg:gap-24">
+            <div className="flex min-w-0 flex-col pt-16 md:pt-28 lg:pt-36">
               <FadeIn>
-                <h1 className="font-serif text-[22px] font-medium leading-[2.05] tracking-[0.18em] text-primary">
+                <h1 className="font-serif text-[22px] font-medium leading-[2.05] tracking-[0.18em] text-primary md:text-[34px] lg:text-[42px]">
                   きょうも<br />
                   しぜんと<br />
                   いいときを。
                 </h1>
               </FadeIn>
 
-              <FadeIn className="mt-28 font-serif text-[9px] font-medium leading-[2.15] tracking-[0.03em] text-[#24211d]">
-                <div className="space-y-7">
+              <FadeIn className="mt-28 font-serif text-[9px] font-medium leading-[2.15] tracking-[0.03em] text-[#24211d] md:mt-40 md:text-[13px] md:leading-[2.25] lg:mt-48 lg:text-[14px]">
+                <div className="space-y-7 md:space-y-10">
                   <div>
                     <p>拝啓</p>
                     <p>イケベジを知ってくれた<br />あなたへ</p>
@@ -66,14 +66,14 @@ export default function HeroStory() {
                   <p>「きょうも　しぜんと　いいときを。」</p>
                 </div>
 
-                <div className="mt-10 text-right">
+                <div className="mt-10 text-right md:mt-16">
                   <p>敬具</p>
                   <p>佐渡ヶ島より　愛を込めて</p>
                   <p>イケベジより</p>
                 </div>
 
-                <div className="mt-10 flex justify-end">
-                  <Link href="/about" className="inline-flex min-h-10 items-center rounded-full border border-gray-300 px-5 text-[9px] tracking-[0.08em] text-[#37332c] transition-colors hover:border-[#37332c] hover:bg-[#37332c] hover:text-white">
+                <div className="mt-10 flex justify-end md:mt-16">
+                  <Link href="/about" className="inline-flex min-h-10 items-center rounded-full border border-gray-300 px-5 text-[9px] tracking-[0.08em] text-[#37332c] transition-colors hover:border-[#37332c] hover:bg-[#37332c] hover:text-white md:min-h-11 md:px-7 md:text-xs">
                     詳しく知る →
                   </Link>
                 </div>
@@ -92,7 +92,7 @@ export default function HeroStory() {
         </div>
       </section>
 
-      <section className="hidden bg-white px-[10%] pb-28 pt-28 md:block md:pb-44 md:pt-40 lg:pb-52 lg:pt-48">
+      <section className="hidden bg-white px-[10%] pb-28 pt-28 md:pb-44 md:pt-40 lg:pb-52 lg:pt-48">
         <div className="mx-auto max-w-[1440px]">
           <FadeIn>
             <h1 className="font-serif text-[22px] font-medium leading-[2.05] tracking-[0.18em] text-primary md:text-[34px] lg:text-[42px]">
