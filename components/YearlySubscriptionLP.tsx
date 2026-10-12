@@ -51,15 +51,12 @@ export default function YearlySubscriptionLP() {
         </div>
 
         <div className="mx-auto mt-12 grid max-w-5xl gap-12 md:mt-16 md:grid-cols-3 md:gap-14">
-          {REASONS.map((reason, index) => (
+          {REASONS.map((reason) => (
             <div
               key={reason.title}
               className="flex flex-col items-center px-3 text-center"
             >
-              <span className="text-[10px] tracking-[0.24em] text-gray-400" aria-hidden="true">
-                {String(index + 1).padStart(2, '0')}
-              </span>
-              <h3 className="mt-5 font-serif text-xl leading-relaxed tracking-[0.06em] text-primary md:text-[22px]">
+              <h3 className="font-serif text-xl leading-relaxed tracking-[0.06em] text-primary md:text-[22px]">
                 {reason.title}
               </h3>
               <p className="mt-4 text-sm leading-[2] text-gray-600 md:text-[15px]">{reason.description}</p>
