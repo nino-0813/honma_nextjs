@@ -50,19 +50,19 @@ export default function YearlySubscriptionLP() {
           <span className="mx-auto mt-7 block h-px w-12 bg-primary/50" aria-hidden="true" />
         </div>
 
-        <div className="mt-12 grid gap-4 md:mt-16 md:grid-cols-3 md:gap-5">
+        <div className="mx-auto mt-12 grid max-w-5xl gap-12 md:mt-16 md:grid-cols-3 md:gap-14">
           {REASONS.map((reason, index) => (
             <div
               key={reason.title}
-              className="flex min-h-56 flex-col border border-gray-200 bg-[#fbfaf7] px-7 py-9 text-center md:min-h-64 md:px-10 md:py-11"
+              className="flex flex-col items-center px-3 text-center"
             >
               <span className="text-[10px] tracking-[0.24em] text-gray-400" aria-hidden="true">
                 {String(index + 1).padStart(2, '0')}
               </span>
-              <h3 className="mt-6 font-serif text-xl leading-relaxed tracking-[0.06em] text-primary md:text-[22px]">
+              <h3 className="mt-5 font-serif text-xl leading-relaxed tracking-[0.06em] text-primary md:text-[22px]">
                 {reason.title}
               </h3>
-              <p className="mt-5 text-sm leading-[2] text-gray-600 md:text-[15px]">{reason.description}</p>
+              <p className="mt-4 text-sm leading-[2] text-gray-600 md:text-[15px]">{reason.description}</p>
             </div>
           ))}
         </div>
