@@ -39,16 +39,36 @@ export default function YearlySubscriptionLP() {
         <Image src="/images/home/satoyama-toyota.webp" alt="佐渡の豊田集落の里山風景" fill priority sizes="(max-width: 1280px) 100vw, 1152px" className="object-cover" />
       </div>
 
-      <div className="mx-auto mt-16 grid max-w-6xl border-y border-gray-200 md:mt-24 md:grid-cols-3 md:divide-x md:divide-gray-200">
-        {REASONS.map((reason) => (
-          <div key={reason.title} className="flex min-h-44 flex-col justify-center px-6 py-10 text-center md:min-h-52 md:px-12">
-            <h2 className="font-serif text-xl tracking-[0.06em] text-primary md:text-2xl">{reason.title}</h2>
-            <p className="mt-4 text-sm leading-loose text-gray-600 md:text-base">{reason.description}</p>
-          </div>
-        ))}
+      <div className="mx-auto mt-20 max-w-6xl px-5 md:mt-28 md:px-0">
+        <div className="text-center text-primary">
+          <p className="font-serif text-sm leading-loose tracking-[0.08em] md:text-base">
+            定期便を大切にしてくださるお客様へ、
+          </p>
+          <h2 className="mt-2 font-serif text-2xl font-medium leading-relaxed tracking-[0.12em] md:text-[34px]">
+            精いっぱいの愛を込めて
+          </h2>
+          <span className="mx-auto mt-7 block h-px w-12 bg-primary/50" aria-hidden="true" />
+        </div>
+
+        <div className="mt-12 grid gap-4 md:mt-16 md:grid-cols-3 md:gap-5">
+          {REASONS.map((reason, index) => (
+            <div
+              key={reason.title}
+              className="flex min-h-56 flex-col border border-gray-200 bg-[#fbfaf7] px-7 py-9 text-center md:min-h-64 md:px-10 md:py-11"
+            >
+              <span className="text-[10px] tracking-[0.24em] text-gray-400" aria-hidden="true">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <h3 className="mt-6 font-serif text-xl leading-relaxed tracking-[0.06em] text-primary md:text-[22px]">
+                {reason.title}
+              </h3>
+              <p className="mt-5 text-sm leading-[2] text-gray-600 md:text-[15px]">{reason.description}</p>
+            </div>
+          ))}
+        </div>
       </div>
 
-      <nav aria-label="定期便についての詳細" className="mx-auto mt-16 flex max-w-5xl justify-center md:mt-24">
+      <nav aria-label="定期便についての詳細" className="mx-auto mt-14 flex max-w-5xl justify-center md:mt-20">
         <Link href="/subscription-guide" className="inline-flex min-h-11 items-center rounded-full border border-gray-300 px-7 text-sm text-primary transition-colors hover:border-primary hover:bg-primary hover:text-white">ご利用方法を詳しく見る →</Link>
       </nav>
 
