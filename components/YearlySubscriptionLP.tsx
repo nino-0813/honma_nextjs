@@ -18,10 +18,19 @@ export default function YearlySubscriptionLP() {
           <h1 className="mt-5 font-serif text-3xl font-semibold leading-[1.5] tracking-wide text-primary md:text-[44px]">
             4700人とつくるイケベジ定期便
           </h1>
-          <div className="mt-8 space-y-6 text-sm leading-[2] text-gray-600 md:text-base">
-            <p>イケベジは佐渡ヶ島と共にこれからも前に進み続けます。<br />その佐渡の中で、イケベジが生まれ継ないでいく集落が「豊田集落」</p>
-            <p>定期便は、リーズナブルに安定してお届けする仕組みであると共に、<br className="hidden md:block" />お客様とイケベジが一緒に歩んでいくための形です。</p>
-            <p>無意識の日常の一杯のご飯が、着実に日本の農業を変え、<br className="hidden md:block" />この「豊田集落」を繋いでいく一杯になります。</p>
+          <div className="mt-8 space-y-8 text-sm leading-[2] text-gray-600 md:text-base">
+            <p>
+              イケベジがお米をつくる佐渡・豊田集落には、<br />
+              東京ドーム約10個分の田んぼが広がっています。<br />
+              川から約4kmの水路で水を引き、<br />
+              地域の農家が力を合わせて、この風景と稲作を守ってきました。
+            </p>
+            <p>
+              時代が移り変わるなかで、<br />
+              この営みを食べる人と一緒に次へつないでいきたい。<br />
+              お米を食べることが、農家を増やしている実感につながるように。<br />
+              そんな思いで、この定期便を始めました。
+            </p>
           </div>
         </div>
       </div>
