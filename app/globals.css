@@ -99,13 +99,13 @@
 /* ------------------------------------------------------------------
    公開サイトのタイポグラフィ。
 
-   40代の方がスマホでも長文を負担なく読めるよう、
-   本文は 16px 未満にしない。デスクトップは 17px を基準とする。
+   関農園の本文設計（15px / 行間2.1 / 字間0.065em）を基準に、
+   スマホとデスクトップで読み心地を統一する。
    旧画面に残る 9〜13px の指定は、本文か補足の2段階に整理する。
    管理画面には適用しない。
    ------------------------------------------------------------------ */
 .public-site {
-  --site-type-body: 1rem;
+  --site-type-body: 0.9375rem;
   --site-type-caption: 0.875rem;
   --site-type-label: 0.9375rem;
   --site-leading-body: 2.05;
@@ -116,7 +116,7 @@
   font-size: var(--site-type-body);
   font-weight: 400;
   line-height: var(--site-leading-body);
-  letter-spacing: 0.025em;
+  letter-spacing: 0.065em;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
@@ -148,7 +148,7 @@
 }
 
 .public-site :where(p, li, dd) {
-  letter-spacing: 0.025em;
+  letter-spacing: 0.065em;
 }
 
 /* 本文に残っていた小さな任意値と Tailwind の小文字を共通寸法へ。 */
@@ -176,7 +176,7 @@
   font-size: var(--site-type-body);
   font-weight: 400;
   line-height: 2.1;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.065em;
 }
 
 /* 関農園の設計比率を参考に、本文は狭く、写真は一段広く見せる。 */
@@ -229,7 +229,7 @@
 
 @media (min-width: 768px) {
   .public-site {
-    --site-type-body: 1rem;
+    --site-type-body: 0.9375rem;
     --site-type-caption: 0.9375rem;
     --site-type-label: 1rem;
     --site-leading-body: 2.1;
