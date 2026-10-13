@@ -54,7 +54,7 @@ export default function HeroStory() {
 
       <section className="bg-white pb-32 pt-24 md:hidden">
         <FadeIn className="site-reading-text site-shell max-w-[430px] font-serif text-[#24211d]">
-          <div className="space-y-10">
+          <div className="space-y-4">
             <div>
               <p>拝啓</p>
               <p className="mt-1">
@@ -115,7 +115,7 @@ export default function HeroStory() {
               </FadeIn>
 
               <FadeIn className="site-reading-text mt-40 font-serif text-[#24211d] lg:mt-48">
-                <div className="space-y-10">
+                <div className="space-y-4">
                   <div>
                     <p>拝啓</p>
                     <p>イケベジを知ってくれた<br />あなたへ</p>
