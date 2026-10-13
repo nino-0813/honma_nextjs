@@ -54,6 +54,51 @@
 
 ---
 
+## Mobile menu drawer width QA
+
+**Source visual truth**
+- `/Users/yusukeninomiya/Desktop/スクリーンショット 2026-10-14 7.35.45.png`
+
+**Rendered implementation evidence**
+- Codex in-app browser capture of `http://localhost:3018/` at a `375 × 812px` CSS viewport.
+- State: homepage with the mobile navigation drawer open.
+- The drawer measured `187.5px` within a `375px` viewport (`50%`).
+
+**Full-view comparison evidence**
+- The white drawer now occupies exactly half of the mobile viewport instead of dominating most of the screen.
+- The darkened, blurred page remains visible across the other half, matching the requested compact treatment.
+- The close control, all navigation labels, separators, and social links remain contained without clipping.
+
+**Focused-region comparison evidence**
+- The drawer width and longest navigation label were checked at `375px`; no overflow or unwanted wrapping is visible.
+- A separate crop was unnecessary because the complete drawer fits in the viewport capture at readable scale.
+
+**Required fidelity surfaces**
+- Typography: existing Japanese serif size, weight, tracking, and single-line labels are unchanged.
+- Spacing/layout: drawer is `50vw`, with a `175px` minimum and `210px` maximum; the cart drawer retains its original width.
+- Colors/tokens: existing white panel, gray separators, and translucent backdrop are unchanged.
+- Image quality: no raster assets are introduced or modified.
+- Copy/content: all existing Japanese navigation items remain unchanged.
+
+**Primary interactions tested**
+- Opened the menu from the mobile header.
+- Confirmed the open transition reaches the right edge and the drawer remains fully usable.
+
+**Console errors checked**
+- No new runtime error was observed during the menu interaction.
+- Production build completed successfully.
+
+**Findings**
+- No actionable P0/P1/P2 findings remain for the requested drawer-width change.
+
+**Comparison history**
+1. Initial state — the menu panel was up to `350px` wide and visually oversized on a `375px` viewport.
+2. Post-fix state — the menu panel is `187.5px`, exactly half of the same viewport, with all labels fitting.
+
+**final result: passed**
+
+---
+
 ## Mobile letter typography QA
 
 **Source visual truth**

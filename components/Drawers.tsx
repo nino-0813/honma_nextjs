@@ -22,9 +22,17 @@ interface DrawerProps {
   children: React.ReactNode;
   title?: string;
   position?: 'left' | 'right';
+  panelClassName?: string;
 }
 
-const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, children, title, position = 'right' }) => {
+const Drawer: React.FC<DrawerProps> = ({
+  isOpen,
+  onClose,
+  children,
+  title,
+  position = 'right',
+  panelClassName = 'w-full max-w-[350px]',
+}) => {
   return (
     <>
       {/* Overlay */}
@@ -35,7 +43,7 @@ const Drawer: React.FC<DrawerProps> = ({ isOpen, onClose, children, title, posit
       
       {/* Content */}
       <div 
-        className={`fixed top-0 bottom-0 z-[70] w-full max-w-[350px] bg-white shadow-2xl transition-transform duration-[400ms] ease-in-out ${
+        className={`fixed top-0 bottom-0 z-[70] ${panelClassName} bg-white shadow-2xl transition-transform duration-[400ms] ease-in-out ${
           position === 'right' 
             ? (isOpen ? 'translate-x-0 right-0' : 'translate-x-full right-0')
             : (isOpen ? 'translate-x-0 left-0' : '-translate-x-full left-0')
@@ -316,7 +324,13 @@ export const MenuDrawer = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
   };
 
   return (
-    <Drawer isOpen={isOpen} onClose={onClose} title="" position="right">
+    <Drawer
+      isOpen={isOpen}
+      onClose={onClose}
+      title=""
+      position="right"
+      panelClassName="w-1/2 min-w-[175px] max-w-[210px]"
+    >
       <div className="flex flex-col px-6 py-8 gap-0">
         <nav className="flex flex-col text-sm font-medium tracking-wide text-gray-800">
           {/* スマホでは横並びナビが非表示になるため、主要項目もここに残す */}
