@@ -51,3 +51,22 @@
 - P3: image focal positions can be tuned per photograph later if the user prefers different crops.
 
 **final result: passed**
+
+---
+
+## Subscription introduction typography QA
+
+**Source visual truth**
+- `/Users/yusukeninomiya/Desktop/スクリーンショット 2026-10-14 7.09.16.png`
+
+**Rendered implementation evidence**
+- Codex in-app browser at `375 × 1400px`, `http://localhost:3018/`.
+
+**Measurements**
+- Every line starts at `30px`.
+- Every complete line ends at `345px` (`315px` text width).
+- Each paragraph's final line remains naturally left-aligned without stretched spacing.
+- Existing `0.065em` letter spacing and `line-break: strict` are preserved.
+- Desktop and unrelated sections retain their existing left alignment.
+
+**final result: passed**

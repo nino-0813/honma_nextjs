@@ -16,7 +16,7 @@ export default function SubscriptionCTA() {
           <div className="site-reading-column">
             <p className="mb-4 text-[10px] tracking-[0.24em] text-gray-500 md:text-xs">イケベジ定期便</p>
             <h2 className="font-serif text-[26px] font-semibold leading-[1.55] tracking-[0.08em] md:text-[42px] lg:text-[50px]">4700人とつくる<br className="md:hidden" />イケベジ定期便</h2>
-            <div className="site-reading-text mt-8 space-y-10 font-serif text-gray-600 md:mt-12">
+            <div className="site-reading-text subscription-reading-text mt-8 space-y-10 font-serif text-gray-600 md:mt-12">
               <p>
                 イケベジがお米をつくる佐渡・豊田集落には、東京ドーム約10個分の田んぼが広がっています。川から約4kmの水路で水を引き、
                 地域の農家が力を合わせて、この風景と稲作を守ってきました。
