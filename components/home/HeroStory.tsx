@@ -62,26 +62,26 @@ export default function HeroStory() {
                 あなたへ
               </p>
             </div>
-            <p>
+            <p className="mobile-justified-copy">
               佐渡ヶ島は、豊かな自然や文化が詰まった
               「日本の縮図」といわれる島です。
             </p>
             <div>
               <p>そして</p>
-              <p className="mt-3">
+              <p className="mobile-justified-copy mt-3">
                 トキとの共生を選び、全島の農家が立ち上がったこの島の歴史は、佐渡の未来を担う農家たちの胸を熱くする物語です。私たちもまた、
                 この歴史のバトンを受け継いでいます。
               </p>
             </div>
-            <p>
+            <p className="mobile-justified-copy">
               島の自然が魅せる美しさ、楽しさ、厳しさ、ワクワク感。その自然界の“イケてる”をもっと社会に伝え、還元していきたい。そんな思いから、わたしたち「イケベジ」は
               始まりました。
             </p>
-            <p>
+            <p className="mobile-justified-copy">
               自然から学び、豊かさを分かち合うことを通じて、しぜんと笑みがこぼれる社会への
               架け橋となります。
             </p>
-            <p>
+            <p className="mobile-justified-copy">
               なんでもない日常が、ちょっとでも
               “特別な時間（とき）”になりますように。
             </p>

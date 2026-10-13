@@ -199,7 +199,8 @@
 
 /* 定期便の導入文だけ、参考デザインに合わせて本文の左右端を整える。 */
 @media (max-width: 767px) {
-  .subscription-reading-text p {
+  .subscription-reading-text p,
+  .mobile-justified-copy {
     text-align: justify;
     text-align-last: left;
     text-justify: inter-character;

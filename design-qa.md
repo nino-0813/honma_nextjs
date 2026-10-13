@@ -54,6 +54,30 @@
 
 ---
 
+## Mobile letter typography QA
+
+**Source visual truth**
+- `/Users/yusukeninomiya/Desktop/スクリーンショット 2026-10-14 7.27.02.png`
+- Requested behavior follows the already approved subscription-introduction alignment.
+
+**Rendered implementation evidence**
+- Codex in-app browser at `375 × 1400px`, `http://localhost:3018/`.
+- State: mobile homepage, “拝啓” letter section fully visible.
+
+**Focused comparison evidence**
+- All five prose paragraphs start at `30px`.
+- Every complete line ends at `345px` (`315px` text width).
+- Paragraph-ending lines remain left-aligned and are not stretched.
+- “拝啓”, the addressee, “そして”, the closing phrase, and the signature remain naturally left-aligned.
+- Existing `0.065em` letter spacing and `line-break: strict` are preserved.
+
+**Findings**
+- No actionable P0/P1/P2 differences remain for the requested alignment treatment.
+
+**final result: passed**
+
+---
+
 ## Subscription introduction typography QA
 
 **Source visual truth**
