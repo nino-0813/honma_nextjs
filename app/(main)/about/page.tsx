@@ -256,8 +256,8 @@ export default function AboutPage() {
 
               <div className="mt-7 columns-1 gap-12 lg:columns-2">
                 <h4 className="mb-3 break-after-avoid text-sm font-semibold tracking-[0.1em]">田んぼでしか、エサをとれない鳥</h4>
-                <p className="mb-5 text-[13px] font-light leading-[2.05] tracking-[0.05em]">トキは、川や海ではなく、田んぼや湿地でドジョウやカエルなどの小さな生きものを食べて暮らす鳥です。いま湿地と呼べる場所の多くは田んぼであり、トキは人の営みと共に生きなければ、暮らしていくことができません。</p>
-                <p className="mb-5 text-[13px] font-light leading-[2.05] tracking-[0.05em]">明治時代からの乱獲に加え、農薬や化学肥料が広く使われるようになったことで、エサとなる生きものが田んぼから減り、トキは数を減らしていきました。</p>
+                <p className="mb-5 text-justify text-[13px] font-light leading-[2.05] tracking-[0.05em]">トキは、川や海ではなく、田んぼや湿地でドジョウやカエルなどの小さな生きものを食べて暮らす鳥です。いま湿地と呼べる場所の多くは田んぼであり、トキは人の営みと共に生きなければ、暮らしていくことができません。</p>
+                <p className="mb-5 text-justify text-[13px] font-light leading-[2.05] tracking-[0.05em]">明治時代からの乱獲に加え、農薬や化学肥料が広く使われるようになったことで、エサとなる生きものが田んぼから減り、トキは数を減らしていきました。</p>
 
                 <figure className="mb-5 break-inside-avoid">
                   <div className="aspect-[3/2] overflow-hidden"><img src="/images/about/stories/P3A9707.webp" alt="佐渡の田んぼと山並み" className="h-full w-full object-cover" /></div>
@@ -271,16 +271,16 @@ export default function AboutPage() {
                 </dl>
 
                 <h4 className="mb-3 break-after-avoid text-sm font-semibold tracking-[0.1em]">朱鷺と暮らす郷づくり認証制度</h4>
-                <p className="mb-5 text-[13px] font-light leading-[2.05] tracking-[0.05em]">トキを野生に定着させるには、まず田んぼに生きものが戻らなければなりません。そこで2008年に始まったのが「朱鷺と暮らす郷づくり認証制度」。イケベジでは通称「トキ認証」と呼んでいます。</p>
+                <p className="mb-5 text-justify text-[13px] font-light leading-[2.05] tracking-[0.05em]">トキを野生に定着させるには、まず田んぼに生きものが戻らなければなりません。そこで2008年に始まったのが「朱鷺と暮らす郷づくり認証制度」。イケベジでは通称「トキ認証」と呼んでいます。</p>
 
                 <div className="mb-5 break-inside-avoid border border-[#deded8] bg-white px-5 py-4">
                   <strong className="block text-xs tracking-[0.14em]">トキ認証の主な要件</strong>
                   <ul className="mt-3 list-disc space-y-1 pl-5 text-[11px] font-light leading-[1.9] md:text-xs"><li>生きものを育む農法を行うこと</li><li>農薬・化学肥料を5割以上減らすこと（ネオニコチノイド系農薬は使用不可）</li><li>あぜに除草剤を使わず、草刈りで管理すること</li><li>年2回、田んぼの生きもの調査を行うこと</li></ul>
                 </div>
 
-                <p className="mb-5 text-[13px] font-light leading-[2.05] tracking-[0.05em]">「生きものを育む農法」とは、たとえば田んぼの水を抜いたあとも水生生物が逃げ込める「江」を設けることや、冬のあいだも田んぼに水を張る「冬みず田んぼ」など。稲の育ちには直接関わらなくても、生きものを育むことを同時に叶える工夫です。</p>
-                <p className="mb-5 text-[13px] font-light leading-[2.05] tracking-[0.05em]">さらに認証米として販売するには、農産物検査で1等であること、味を大きく左右するタンパク質含有量が6.2％以下であることが求められます。安心と、おいしさ。その両方を満たしたお米だけが、トキ認証米として食卓に届きます。</p>
-                <p className="mb-5 text-[13px] font-light leading-[2.05] tracking-[0.05em]">制度が始まって10年目に行われたアンケートでは、「これからも認証米の栽培を続けない」と答えた農家はゼロでした。新たに関心がある取り組みとして最も多く挙がったのは、農薬も肥料も使わない「自然栽培による米づくり」です。</p>
+                <p className="mb-5 text-justify text-[13px] font-light leading-[2.05] tracking-[0.05em]">「生きものを育む農法」とは、たとえば田んぼの水を抜いたあとも水生生物が逃げ込める「江」を設けることや、冬のあいだも田んぼに水を張る「冬みず田んぼ」など。稲の育ちには直接関わらなくても、生きものを育むことを同時に叶える工夫です。</p>
+                <p className="mb-5 text-justify text-[13px] font-light leading-[2.05] tracking-[0.05em]">さらに認証米として販売するには、農産物検査で1等であること、味を大きく左右するタンパク質含有量が6.2％以下であることが求められます。安心と、おいしさ。その両方を満たしたお米だけが、トキ認証米として食卓に届きます。</p>
+                <p className="mb-5 text-justify text-[13px] font-light leading-[2.05] tracking-[0.05em]">制度が始まって10年目に行われたアンケートでは、「これからも認証米の栽培を続けない」と答えた農家はゼロでした。新たに関心がある取り組みとして最も多く挙がったのは、農薬も肥料も使わない「自然栽培による米づくり」です。</p>
                 <p className="mt-3 text-[10px] font-light leading-[1.8] tracking-[0.05em] text-gray-500">出典：佐渡市農業政策課／「朱鷺と暮らす郷づくり認証制度の評価レポート」新潟大学 豊田光世</p>
               </div>
             </article>
@@ -311,7 +311,7 @@ export default function AboutPage() {
                           {article.sections.slice(0, 3).map(([heading, body], sectionIndex) => (
                             <section key={heading} className={`pb-7 ${sectionIndex > 0 ? 'border-t border-[#deded8] pt-7' : ''}`}>
                               <h4 className="text-sm font-semibold tracking-[0.1em]">{heading}</h4>
-                              <p className="mt-3 text-[13px] font-light leading-[2.15] tracking-[0.05em]">{body}</p>
+                              <p className="mt-3 text-justify text-[13px] font-light leading-[2.15] tracking-[0.05em]">{body}</p>
                             </section>
                           ))}
                           <figure className="mt-1">
@@ -325,7 +325,7 @@ export default function AboutPage() {
                             {article.sections.slice(3).map(([heading, body]) => (
                               <section key={heading} className="border-t border-[#deded8] py-6 first:border-[#1c1d1d]">
                                 <h4 className="text-sm font-semibold tracking-[0.1em]">{heading}</h4>
-                                <p className="mt-3 text-[13px] font-light leading-[2.15] tracking-[0.05em]">{body}</p>
+                                <p className="mt-3 text-justify text-[13px] font-light leading-[2.15] tracking-[0.05em]">{body}</p>
                               </section>
                             ))}
                           </div>
@@ -349,7 +349,7 @@ export default function AboutPage() {
                           <blockquote className="-mt-16 ml-5 mr-5 bg-[#f1f1ed] px-6 py-7 font-serif text-[19px] leading-[1.8] tracking-[0.08em] md:ml-10 md:mr-0">自然と社会のあいだに立つ、<br />「通訳」でありたい。</blockquote>
                         </figure>
                         <div className="mt-10 grid gap-7 sm:grid-cols-2">
-                          {article.sections.slice(0, 2).map(([heading, body]) => <section key={heading}><h4 className="text-sm font-semibold tracking-[0.1em]">{heading}</h4><p className="mt-3 text-[13px] font-light leading-[2.1] tracking-[0.05em]">{body}</p></section>)}
+                          {article.sections.slice(0, 2).map(([heading, body]) => <section key={heading}><h4 className="text-sm font-semibold tracking-[0.1em]">{heading}</h4><p className="mt-3 text-justify text-[13px] font-light leading-[2.1] tracking-[0.05em]">{body}</p></section>)}
                         </div>
                       </div>
                       <div>
@@ -358,7 +358,7 @@ export default function AboutPage() {
                           {article.stats.map(([value, label]) => <div key={value} className="grid grid-cols-[4.5rem_1fr] gap-4 border-b border-[#deded8] py-5"><dt className="font-serif text-[18px]">{value}</dt><dd className="text-[12px] font-light leading-[1.9] tracking-[0.05em]">{label}</dd></div>)}
                         </dl>
                         <div className="mt-10 space-y-8">
-                          {article.sections.slice(2).map(([heading, body]) => <section key={heading}><h4 className="text-sm font-semibold tracking-[0.1em]">{heading}</h4><p className="mt-3 text-[13px] font-light leading-[2.15] tracking-[0.05em]">{body}</p></section>)}
+                          {article.sections.slice(2).map(([heading, body]) => <section key={heading}><h4 className="text-sm font-semibold tracking-[0.1em]">{heading}</h4><p className="mt-3 text-justify text-[13px] font-light leading-[2.15] tracking-[0.05em]">{body}</p></section>)}
                         </div>
                       </div>
                     </div>
@@ -375,10 +375,10 @@ export default function AboutPage() {
                       </div>
                       <div className="mt-10 grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:gap-12">
                         <figure><div className="aspect-[16/10] overflow-hidden"><img src={article.image} alt={article.imageAlt} loading="lazy" className="h-full w-full object-cover" /></div></figure>
-                        <div className="space-y-8">{article.sections.slice(0, 2).map(([heading, body]) => <section key={heading}><h4 className="text-sm font-semibold tracking-[0.1em]">{heading}</h4><p className="mt-3 text-[13px] font-light leading-[2.1] tracking-[0.05em]">{body}</p></section>)}</div>
+                        <div className="space-y-8">{article.sections.slice(0, 2).map(([heading, body]) => <section key={heading}><h4 className="text-sm font-semibold tracking-[0.1em]">{heading}</h4><p className="mt-3 text-justify text-[13px] font-light leading-[2.1] tracking-[0.05em]">{body}</p></section>)}</div>
                       </div>
                       <div className="mt-10 grid gap-8 border-t border-[#deded8] pt-8 md:grid-cols-2 md:gap-14">
-                        {article.sections.slice(2).map(([heading, body], productionIndex) => <section key={heading} className={productionIndex === 1 ? 'md:border-l md:border-[#deded8] md:pl-14' : ''}><span className="text-[9px] tracking-[0.2em] text-gray-400">工程 0{productionIndex + 1}</span><h4 className="mt-2 text-sm font-semibold tracking-[0.1em]">{heading}</h4><p className="mt-3 text-[13px] font-light leading-[2.15] tracking-[0.05em]">{body}</p></section>)}
+                        {article.sections.slice(2).map(([heading, body], productionIndex) => <section key={heading} className={productionIndex === 1 ? 'md:border-l md:border-[#deded8] md:pl-14' : ''}><span className="text-[9px] tracking-[0.2em] text-gray-400">工程 0{productionIndex + 1}</span><h4 className="mt-2 text-sm font-semibold tracking-[0.1em]">{heading}</h4><p className="mt-3 text-justify text-[13px] font-light leading-[2.15] tracking-[0.05em]">{body}</p></section>)}
                       </div>
                     </div>
                   )}
@@ -388,7 +388,7 @@ export default function AboutPage() {
                       <figure className="-mx-6 md:mx-0"><div className="aspect-[16/10] overflow-hidden md:aspect-[21/9]"><img src={article.image} alt={article.imageAlt} loading="lazy" className="h-full w-full object-cover" /></div></figure>
                       <div className="mx-auto mt-10 max-w-[720px]">
                         <blockquote className="text-center font-serif text-[20px] leading-[1.9] tracking-[0.1em] md:text-[24px]">「何かあったら、まず相談してみよう」<br />そう思ってもらえる田んぼへ。</blockquote>
-                        <div className="mt-10 space-y-8">{article.sections.map(([heading, body]) => <section key={heading} className="grid gap-3 border-t border-[#deded8] pt-7 md:grid-cols-[12rem_1fr] md:gap-8"><h4 className="text-sm font-semibold tracking-[0.1em]">{heading}</h4><p className="text-[13px] font-light leading-[2.15] tracking-[0.05em]">{body}</p></section>)}</div>
+                        <div className="mt-10 space-y-8">{article.sections.map(([heading, body]) => <section key={heading} className="grid gap-3 border-t border-[#deded8] pt-7 md:grid-cols-[12rem_1fr] md:gap-8"><h4 className="text-sm font-semibold tracking-[0.1em]">{heading}</h4><p className="text-justify text-[13px] font-light leading-[2.15] tracking-[0.05em]">{body}</p></section>)}</div>
                       </div>
                       <dl className="mt-12 grid gap-px bg-[#d8d8d2] border-y border-[#d8d8d2] sm:grid-cols-3">{article.stats.map(([value, label]) => <div key={value} className="bg-[#f1f1ed] px-5 py-6 text-center"><dt className="font-serif text-[28px]">{value}</dt><dd className="mt-2 text-[10px] tracking-[0.08em] text-gray-500">{label}</dd></div>)}</dl>
                     </div>
@@ -400,9 +400,9 @@ export default function AboutPage() {
                       <div className="mt-12">
                         {article.stats.map(([value, label], chapterIndex) => {
                           const section = article.sections[chapterIndex];
-                          return <section key={value} className="grid gap-5 border-t border-[#1c1d1d] py-8 md:grid-cols-[10rem_14rem_1fr] md:gap-8"><div><span className="text-[9px] tracking-[0.2em] text-gray-400">章 0{chapterIndex + 1}</span><p className="mt-1 font-serif text-[30px]">{value}</p><p className="text-[10px] tracking-[0.08em] text-gray-500">{label}</p></div><h4 className="text-[17px] font-semibold leading-[1.7] tracking-[0.1em]">{section[0]}</h4><p className="text-[13px] font-light leading-[2.15] tracking-[0.05em]">{section[1]}</p></section>;
+                          return <section key={value} className="grid gap-5 border-t border-[#1c1d1d] py-8 md:grid-cols-[10rem_14rem_1fr] md:gap-8"><div><span className="text-[9px] tracking-[0.2em] text-gray-400">章 0{chapterIndex + 1}</span><p className="mt-1 font-serif text-[30px]">{value}</p><p className="text-[10px] tracking-[0.08em] text-gray-500">{label}</p></div><h4 className="text-[17px] font-semibold leading-[1.7] tracking-[0.1em]">{section[0]}</h4><p className="text-justify text-[13px] font-light leading-[2.15] tracking-[0.05em]">{section[1]}</p></section>;
                         })}
-                        <section className="grid gap-5 border-y border-[#1c1d1d] py-8 md:grid-cols-[10rem_14rem_1fr] md:gap-8"><div className="text-[9px] tracking-[0.2em] text-gray-400">結び</div><h4 className="text-[17px] font-semibold leading-[1.7] tracking-[0.1em]">{article.sections[3][0]}</h4><p className="text-[13px] font-light leading-[2.15] tracking-[0.05em]">{article.sections[3][1]}</p></section>
+                        <section className="grid gap-5 border-y border-[#1c1d1d] py-8 md:grid-cols-[10rem_14rem_1fr] md:gap-8"><div className="text-[9px] tracking-[0.2em] text-gray-400">結び</div><h4 className="text-[17px] font-semibold leading-[1.7] tracking-[0.1em]">{article.sections[3][0]}</h4><p className="text-justify text-[13px] font-light leading-[2.15] tracking-[0.05em]">{article.sections[3][1]}</p></section>
                       </div>
                     </div>
                   )}
