@@ -18,15 +18,11 @@ export default function SubscriptionCTA() {
             <h2 className="font-serif text-[26px] font-semibold leading-[1.55] tracking-[0.08em] md:text-[42px] lg:text-[50px]">4700人とつくる<br className="md:hidden" />イケベジ定期便</h2>
             <div className="site-reading-text mt-8 space-y-10 font-serif text-gray-600 md:mt-12">
               <p>
-                イケベジがお米をつくる佐渡・豊田集落には、<br />
-                東京ドーム約10個分の田んぼが広がっています。<br />
-                川から約4kmの水路で水を引き、<br />
+                イケベジがお米をつくる佐渡・豊田集落には、東京ドーム約10個分の田んぼが広がっています。川から約4kmの水路で水を引き、
                 地域の農家が力を合わせて、この風景と稲作を守ってきました。
               </p>
               <p>
-                時代が移り変わるなかで、<br />
-                この営みを食べる人と一緒に次へつないでいきたい。<br />
-                お米を食べることが、農家を増やしている実感につながるように。<br />
+                時代が移り変わるなかで、この営みを食べる人と一緒に次へつないでいきたい。お米を食べることが、農家を増やしている実感につながるように。
                 そんな思いで、この定期便を始めました。
               </p>
             </div>
