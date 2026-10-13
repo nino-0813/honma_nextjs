@@ -435,10 +435,10 @@ export default function ProductDetailView({ product }: { product: Product }) {
 
   return (
     <div className="page-top-offset min-h-screen w-full overflow-x-clip bg-white pb-24 animate-fade-in">
-      <div className="mx-auto max-w-[1400px] px-6 md:px-12">
+      <div className="mx-auto max-w-[1760px] px-6 md:px-12">
         <div className="mb-12 md:mb-16"><ProductCategoryNav current="all" /></div>
 
-        <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(360px,5fr)] lg:gap-8 xl:gap-10">
+        <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-2 lg:gap-12 xl:gap-16">
           {/* 左の画像は固定。右の詳細を読み終えるまで残り、そのあと一緒に流れていく */}
           <div className="lg:self-start">
             {(() => {

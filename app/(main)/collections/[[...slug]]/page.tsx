@@ -192,13 +192,13 @@ export default function CollectionsPage() {
   return (
     <div className="page-top-offset min-h-screen w-full overflow-x-hidden bg-white pb-36">
       {!isLpView && (
-        <div className="sticky top-14 z-30 mb-28 bg-white/95 py-3 backdrop-blur-md md:top-16 md:mb-32">
-          <div className="mx-auto max-w-[1400px] px-6 md:px-12">
+        <div className="sticky top-14 z-30 mb-28 bg-white/95 py-3 backdrop-blur-md md:top-16 md:mb-48">
+          <div className="mx-auto max-w-[1760px] px-6 md:px-12">
             <ProductCategoryNav current={categoryNavKey} />
           </div>
         </div>
       )}
-      <div className="max-w-[1400px] mx-auto px-6 md:px-12">
+      <div className="mx-auto max-w-[1760px] px-6 md:px-12">
         {currentSubcategory === 'yearly' && !isLpView && (
           <div className="mb-12 text-center animate-fade-in md:mb-16">
             <p className="text-xs leading-relaxed text-gray-600 md:text-sm">
@@ -258,7 +258,7 @@ export default function CollectionsPage() {
         )}
 
         {!loading && !error && filteredProducts.length > 0 && (
-          <div className="grid grid-cols-2 gap-x-6 gap-y-16 sm:grid-cols-2 sm:gap-x-10 sm:gap-y-24 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-12">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-16 sm:grid-cols-2 sm:gap-x-10 md:gap-y-12 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-12">
             {filteredProducts.map((product, index) => {
               const soldOut = isProductSoldOut(product);
               const preorder = !soldOut && isProductPreorder(product); // 在庫切れ優先
@@ -351,7 +351,7 @@ export default function CollectionsPage() {
         )}
 
         {!loading && !error && showSubscriptionCta && (
-          <div className="mt-24 flex justify-center md:mt-36">
+          <div className="mt-24 flex justify-center md:mt-44">
             <Link
               href="/collections/rice/yearly?view=lp"
               className="inline-flex min-h-12 items-center justify-center rounded-full bg-primary px-10 py-3 text-sm font-medium tracking-wider text-white transition-colors duration-200 hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
