@@ -417,9 +417,9 @@ export default function ProductDetailView({ product }: { product: Product }) {
     <div className="page-top-offset min-h-screen w-full overflow-x-clip bg-white pb-24 animate-fade-in">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-[10px] text-gray-400 mb-8 md:mb-12 tracking-widest uppercase">
-          <Link href="/" className="hover:text-black transition-colors">Home</Link>
+          <Link href="/" className="hover:text-black transition-colors">ホーム</Link>
           <span className="mx-2">/</span>
-          <Link href="/collections" className="hover:text-black transition-colors">Collections</Link>
+          <Link href="/collections" className="hover:text-black transition-colors">商品一覧</Link>
           <span className="mx-2">/</span>
           <span className="text-black">{product.title}</span>
         </div>
@@ -861,7 +861,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                          </div>
                        )}
                        {isOutOfStock ? (
-                         <button disabled className="w-full py-4 text-sm tracking-widest uppercase bg-gray-200 text-gray-400 cursor-not-allowed">SOLD OUT</button>
+                         <button disabled className="w-full py-4 text-sm tracking-widest bg-gray-200 text-gray-400 cursor-not-allowed">売り切れ</button>
                        ) : (
                          <>
                            <LoadingButton
@@ -1060,7 +1060,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
 
         {allProducts.length > 0 && (
           <div className="mt-32 border-t border-gray-100 pt-16">
-            <h3 className="text-center text-lg font-serif tracking-[0.2em] mb-12">RECOMMEND</h3>
+            <h3 className="text-center text-lg font-serif tracking-[0.2em] mb-12">おすすめ商品</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {allProducts.filter(p => p.id !== product.id).slice(0, 4).map(rel => (
                  <Link key={rel.id} href={`/products/${rel.handle}`} className="group block">

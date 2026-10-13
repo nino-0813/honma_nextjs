@@ -920,7 +920,7 @@ const MyPage = () => {
         <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="mb-8 text-center">
             <h1 className="text-xl md:text-2xl font-serif tracking-[0.15em] font-normal mb-2">
-              <span className="md:hidden">MY PAGE</span>
+              <span className="md:hidden">マイページ</span>
               <span className="hidden md:inline">マイページ</span>
             </h1>
           </div>
@@ -937,7 +937,7 @@ const MyPage = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="mb-12">
           <h1 className="text-xl md:text-2xl font-serif tracking-[0.15em] font-normal mb-2">
-            <span className="md:hidden">MY PAGE</span>
+            <span className="md:hidden">マイページ</span>
             <span className="hidden md:inline">マイページ</span>
           </h1>
           <p className="text-sm text-gray-500">ご注文履歴とアカウント設定</p>
@@ -1407,7 +1407,7 @@ const MyPage = () => {
         {activeTab === 'miles' && (
           <div className="space-y-6 max-w-3xl">
             <div className="rounded-lg border border-amber-200 bg-gradient-to-br from-amber-50 to-amber-100 p-6">
-              <p className="text-xs text-amber-800 tracking-widest uppercase mb-2">Event Miles Balance</p>
+              <p className="text-xs text-amber-800 tracking-widest mb-2">イベントマイル残高</p>
               <p className="text-3xl font-serif font-bold text-amber-900">
                 {mileBalance.toLocaleString()} <span className="text-base font-medium">マイル</span>
               </p>

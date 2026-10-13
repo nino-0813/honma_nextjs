@@ -317,7 +317,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onAuthSuccess, initialEmail = '' })
           <div className="mb-6">
             <div className="flex items-center gap-3 mb-3">
               <h2 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">新規登録</h2>
-              <span className="text-xs font-semibold text-white bg-black px-3 py-1 rounded-full">NEW</span>
+              <span className="text-xs font-semibold text-white bg-black px-3 py-1 rounded-full">新着</span>
             </div>
             <p className="text-sm md:text-base text-gray-600">
               新規アカウントを作成して始めましょう

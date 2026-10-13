@@ -118,7 +118,7 @@ export default function AmbassadorPage() {
 
       <section className="pt-12 md:pt-16 pb-16 md:pb-24 bg-white relative overflow-hidden">
         <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-          <p className="text-xs font-bold tracking-[0.3em] text-gray-400 uppercase mb-4 md:mb-6">CONCEPT</p>
+          <p className="text-xs font-bold tracking-[0.3em] text-gray-400 mb-4 md:mb-6">思い</p>
           <div className="mb-12 md:mb-16">
             <h2 className="text-2xl md:text-4xl font-serif font-medium tracking-[0.15em] text-primary mb-5 md:mb-7">
               社会を共に創る
@@ -136,11 +136,11 @@ export default function AmbassadorPage() {
         </div>
       </section>
 
-      {/* OUR PROJECT セクション見出し */}
+      {/* 取り組みセクション見出し */}
       <section className="py-10 md:py-14 bg-secondary/30 relative w-full">
         <div className="w-full flex flex-col items-center justify-center px-6">
-          <p className="text-[11px] md:text-xs tracking-[0.3em] text-yuunagi-ink font-medium uppercase mb-3 text-center">JOIN US</p>
-          <h3 className="text-2xl md:text-4xl font-serif tracking-widest mb-4 text-center">OUR PROJECT</h3>
+          <p className="text-[11px] md:text-xs tracking-[0.3em] text-yuunagi-ink font-medium mb-3 text-center">一緒に参加する</p>
+          <h3 className="text-2xl md:text-4xl font-serif tracking-widest mb-4 text-center">取り組み</h3>
           <div className="w-12 h-px bg-yuunagi" />
         </div>
       </section>
@@ -161,7 +161,7 @@ export default function AmbassadorPage() {
                     alt="イケてるパートナーズ"
                   />
                   <p className="mt-3 md:mt-4 text-[10px] md:text-xs tracking-[0.3em] text-gray-500 uppercase">
-                    Partner Companies
+                    参加企業
                   </p>
                 </div>
 
@@ -207,7 +207,7 @@ export default function AmbassadorPage() {
             {/* テキスト */}
             <FadeInSection>
               <div className="md:pl-2">
-                <p className="text-[11px] md:text-xs tracking-[0.3em] text-yuunagi-ink font-medium uppercase mb-2">Project 01 — Ambassador</p>
+                <p className="text-[11px] md:text-xs tracking-[0.3em] text-yuunagi-ink font-medium mb-2">取り組み 01</p>
                 <h4 className="text-xl md:text-2xl font-serif font-semibold mb-2 leading-snug">
                   イケてるパートナーズ
                 </h4>
@@ -231,7 +231,7 @@ export default function AmbassadorPage() {
                 </ul>
                 {/* 1年の流れ */}
                 <div className="bg-stone-50 rounded-xl p-4 md:p-5 mb-5">
-                  <p className="text-[11px] md:text-xs tracking-[0.2em] text-gray-500 mb-3">YEAR-ROUND TIMELINE</p>
+                  <p className="text-[11px] md:text-xs tracking-[0.2em] text-gray-500 mb-3">一年間の流れ</p>
                   <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-xs md:text-sm text-gray-700">
                     <div className="flex items-center gap-2"><span className="text-yuunagi-ink font-medium">春</span><span>田植え</span></div>
                     <div className="flex items-center gap-2"><span className="text-yuunagi-ink font-medium">夏</span><span>生き物調査・草刈り</span></div>
@@ -261,7 +261,7 @@ export default function AmbassadorPage() {
             {/* テキスト（左） */}
             <FadeInSection>
               <div className="md:order-1 order-2">
-                <p className="text-[11px] md:text-xs tracking-[0.3em] text-yuunagi-ink font-medium uppercase mb-2">Project 02 — Biodiversity</p>
+                <p className="text-[11px] md:text-xs tracking-[0.3em] text-yuunagi-ink font-medium mb-2">取り組み 02</p>
                 <h4 className="text-xl md:text-2xl font-serif font-semibold mb-2 leading-snug">
                   佐渡Kids生きもの調査隊
                 </h4>
@@ -344,7 +344,7 @@ export default function AmbassadorPage() {
             {/* テキスト（右・読み込ませる文字幅） */}
             <FadeInSection className="md:col-span-5">
               <div className="md:pl-2">
-                <p className="text-[11px] md:text-xs tracking-[0.3em] text-yuunagi-ink font-medium uppercase mb-2">Project 03 — Crowdfunding</p>
+                <p className="text-[11px] md:text-xs tracking-[0.3em] text-yuunagi-ink font-medium mb-2">取り組み 03</p>
                 <h4 className="text-xl md:text-2xl font-serif font-semibold mb-2 leading-snug">
                   佐渡の小学生と世界一へ！
                 </h4>

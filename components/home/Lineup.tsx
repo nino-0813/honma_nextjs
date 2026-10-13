@@ -3,9 +3,9 @@ import CircleButton from './CircleButton';
 import FadeIn from '@/components/FadeIn';
 
 const TILES = [
-  { en: 'Rice', ja: 'お米', href: '/collections/rice', image: '/images/renewal/lineup/rice.webp' },
-  { en: 'Shiitake', ja: '原木しいたけ', href: '/collections/shiitake', image: '/images/renewal/lineup/shiitake.webp' },
-  { en: 'Others', ja: 'その他', href: '/collections/crescent', image: '/images/renewal/lineup/others.webp' },
+  { title: 'お米', href: '/collections/rice', image: '/images/renewal/lineup/rice.webp' },
+  { title: '原木しいたけ', href: '/collections/shiitake', image: '/images/renewal/lineup/shiitake.webp' },
+  { title: 'その他', href: '/collections/crescent', image: '/images/renewal/lineup/others.webp' },
 ];
 
 export default function Lineup() {
@@ -13,16 +13,15 @@ export default function Lineup() {
     <section id="products" className="bg-white px-5 pb-32 md:px-8 md:pb-48 lg:px-12">
       <ul className="mx-auto grid max-w-[1760px] grid-cols-2 gap-3 bg-white md:gap-5 lg:grid-cols-3 lg:gap-6">
         {TILES.map((tile, index) => (
-          <li key={tile.ja} className={index === 2 ? 'col-start-1 lg:col-start-auto' : ''}>
+          <li key={tile.title} className={index === 2 ? 'col-start-1 lg:col-start-auto' : ''}>
             <FadeIn delay={index * 70}>
-              <Link href={tile.href} aria-label={`${tile.ja}の商品を見る`} className="group block">
+              <Link href={tile.href} aria-label={`${tile.title}の商品を見る`} className="group block">
                 <span className="relative block aspect-square overflow-hidden bg-dim">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={tile.image} alt="" aria-hidden="true" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.025]" />
                   <span className="absolute inset-0 bg-black/25 transition-colors duration-300 group-hover:bg-black/35" />
                   <span className="absolute inset-0 flex flex-col items-center justify-center text-center text-white">
-                    <span className="font-serif text-lg tracking-[0.04em] drop-shadow-sm md:text-[28px] lg:text-[34px]">{tile.en}</span>
-                    <span className="mt-1 text-[9px] tracking-[0.18em] drop-shadow-sm md:mt-2 md:text-xs">{tile.ja}</span>
+                    <span className="font-serif text-lg tracking-[0.08em] drop-shadow-sm md:text-[28px] lg:text-[34px]">{tile.title}</span>
                     <span className="mt-3 scale-75 md:mt-6 md:scale-100"><CircleButton icon="arrow" variant="light" /></span>
                   </span>
                 </span>

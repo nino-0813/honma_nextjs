@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 // 会員専用ページ。検索結果に出す必要がないため noindex。
 export const metadata: Metadata = {
-  title: 'MY PAGE',
+  title: 'マイページ',
   robots: { index: false, follow: false },
 };
 

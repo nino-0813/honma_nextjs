@@ -33,7 +33,7 @@ const ParallaxSection = () => {
             
             {/* Main Heading */}
             <h2 className="text-xl font-serif font-medium tracking-[0.3em] text-primary text-center mb-4 leading-tight">
-              Farm to Social
+              農から社会へ
             </h2>
             
             {/* Description */}
@@ -80,8 +80,8 @@ const ParallaxSection = () => {
         </div>
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 flex justify-center lg:justify-end">
           <div className="bg-white/90 backdrop-blur-sm p-12 max-w-lg shadow-2xl">
-              <p className="text-sm font-bold tracking-widest mb-4 text-gray-500 uppercase">About Us</p>
-              <h2 className="text-4xl font-serif mb-6 text-primary tracking-[0.2em]">Farm to Social</h2>
+              <p className="text-sm font-bold tracking-widest mb-4 text-gray-500">イケベジについて</p>
+              <h2 className="text-4xl font-serif mb-6 text-primary tracking-[0.2em]">農から社会へ</h2>
               <p className="text-sm md:text-base font-medium md:font-normal leading-relaxed md:leading-relaxed text-gray-600 mb-8">
                 商品を生産して終わりではなく、農を<br />
                 起点に社会にとって意味のある存在で<br />

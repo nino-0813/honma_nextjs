@@ -9,7 +9,7 @@ type Props = { params: Promise<{ slug?: string[] }> };
  */
 const PAGE_META: Record<string, { title: string; description: string }> = {
   '': {
-    title: 'ALL ITEM｜商品一覧',
+    title: '商品一覧',
     description:
       '新潟県佐渡島のイケベジが育てた自然栽培米・無農薬玄米、焼き菓子などの商品一覧です。農薬・化学肥料に頼らず、島の有機資源だけで育てたお米をお届けします。',
   },
