@@ -54,6 +54,50 @@
 
 ---
 
+## Desktop product pages QA
+
+**Source visual truth**
+- `/Users/yusukeninomiya/Desktop/スクリーンショット 2026-10-14 7.44.40.png`
+- `/Users/yusukeninomiya/Desktop/スクリーンショット 2026-10-14 7.44.54.png`
+- `/Users/yusukeninomiya/Desktop/スクリーンショット 2026-10-14 7.45.04.png`
+- `/Users/yusukeninomiya/Desktop/スクリーンショット 2026-10-14 7.45.13.png`
+
+**Rendered implementation evidence**
+- Published collection and product-detail pages captured in the Codex in-app browser.
+- Desktop viewport: `2048 × 1152px` CSS.
+- Mobile regression viewport: `375 × 812px` CSS.
+
+**Full-view comparison evidence**
+- The desktop collection content now uses the same `1760px` maximum shell as the header, producing four wider product columns.
+- Desktop category pills gained horizontal breathing room without changing their mobile dimensions.
+- Desktop product-row spacing is reduced from `96px` to `48px`; the subscription CTA starts after a larger `176px` desktop gap.
+- Product detail is a balanced two-column layout: `800px / 800px`, separated by a fixed `64px` gap at the reference viewport.
+- Desktop product titles use a stable two-line rule: product/set/year on the first line, origin/cultivation on the second.
+
+**Focused-region comparison evidence**
+- Product-detail outer edges measured `192px` and `1856px`, giving equal outer margins.
+- The rendered document has no horizontal overflow at either tested viewport.
+- At `375px`, the purchase panel remains `327px` wide and the original mobile title renderer remains active.
+
+**Required fidelity surfaces**
+- Typography: existing fonts and weights are retained; only the desktop title line grouping and desktop size are normalized.
+- Spacing/layout: desktop shell, card rhythm, CTA gap, and detail columns follow the red annotations; mobile base classes are unchanged.
+- Colors/tokens: no color token changes.
+- Image quality: original product images remain in use with no generated substitutes.
+- Copy/content: all product and navigation copy is unchanged.
+
+**Comparison history**
+1. Initial desktop pass — P2: the product shell remained narrow and detail columns had an uneven ratio with a viewport-dependent gap.
+2. First revision — P2: widening the detail panel exposed an orphaned final character in the first product-title line and the collection top gap was over-expanded.
+3. Final revision — restored the approved collection top rhythm and added a desktop-only two-line title rule; post-fix captures show balanced columns and clean wrapping.
+
+**Findings**
+- No actionable P0/P1/P2 findings remain for the requested desktop-only changes.
+
+**final result: passed**
+
+---
+
 ## Mobile menu drawer width QA
 
 **Source visual truth**
