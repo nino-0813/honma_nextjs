@@ -10,13 +10,13 @@ const COMMUNITY_IMAGES = [
 
 export default function SubscriptionCTA() {
   return (
-    <section className="bg-white px-[10%] pb-32 text-primary md:pb-48">
-      <div className="mx-auto max-w-[1440px]">
+    <section className="bg-white pb-32 text-primary md:pb-48">
+      <div className="site-shell">
         <FadeIn>
-          <div className="max-w-[820px]">
+          <div className="site-reading-column">
             <p className="mb-4 text-[10px] tracking-[0.24em] text-gray-500 md:text-xs">イケベジ定期便</p>
             <h2 className="font-serif text-[26px] font-semibold leading-[1.55] tracking-[0.08em] md:text-[42px] lg:text-[50px]">4700人とつくる<br className="md:hidden" />イケベジ定期便</h2>
-            <div className="mt-8 space-y-8 font-serif text-[10px] leading-[2.25] tracking-[0.04em] text-gray-600 md:mt-12 md:text-[14px] md:leading-[2.35]">
+            <div className="site-reading-text mt-8 space-y-10 font-serif text-gray-600 md:mt-12">
               <p>
                 イケベジがお米をつくる佐渡・豊田集落には、<br />
                 東京ドーム約10個分の田んぼが広がっています。<br />

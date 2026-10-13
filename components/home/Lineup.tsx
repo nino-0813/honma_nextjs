@@ -10,8 +10,8 @@ const TILES = [
 
 export default function Lineup() {
   return (
-    <section id="products" className="bg-white px-6 pb-32 md:px-[10%] md:pb-48">
-      <ul className="mx-auto grid max-w-[1440px] grid-cols-2 gap-3 bg-white md:gap-5 lg:grid-cols-3 lg:gap-6">
+    <section id="products" className="bg-white pb-32 md:pb-48">
+      <ul className="site-shell grid grid-cols-2 gap-3 bg-white md:gap-5 lg:grid-cols-3 lg:gap-6">
         {TILES.map((tile, index) => (
           <li key={tile.title} className={index === 2 ? 'col-start-1 lg:col-start-auto' : ''}>
             <FadeIn delay={index * 70}>
@@ -30,7 +30,7 @@ export default function Lineup() {
           </li>
         ))}
       </ul>
-      <div className="mx-auto mt-6 flex max-w-[1440px] justify-start md:mt-8 md:justify-end">
+      <div className="site-shell mt-8 flex justify-start md:mt-10 md:justify-end">
         <Link href="/collections" className="inline-flex min-h-10 items-center rounded-full border border-gray-300 px-6 text-[10px] text-primary transition-colors hover:border-primary md:min-h-11 md:px-7 md:text-xs">
           商品一覧へ →
         </Link>

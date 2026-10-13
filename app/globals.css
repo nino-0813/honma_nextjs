@@ -108,8 +108,11 @@
   --site-type-body: 1rem;
   --site-type-caption: 0.875rem;
   --site-type-label: 0.9375rem;
-  --site-leading-body: 1.9;
+  --site-leading-body: 2.05;
   --site-leading-caption: 1.75;
+  --site-gutter: 1.875rem;
+  --site-content-width: 80rem;
+  --site-reading-width: 40rem;
   font-size: var(--site-type-body);
   font-weight: 400;
   line-height: var(--site-leading-body);
@@ -169,11 +172,21 @@
 }
 
 .site-reading-text {
-  max-width: 42rem;
+  max-width: var(--site-reading-width);
   font-size: var(--site-type-body);
   font-weight: 400;
-  line-height: 2;
-  letter-spacing: 0.025em;
+  line-height: 2.1;
+  letter-spacing: 0.04em;
+}
+
+/* 関農園の設計比率を参考に、本文は狭く、写真は一段広く見せる。 */
+.site-shell {
+  width: min(calc(100% - (var(--site-gutter) * 2)), var(--site-content-width));
+  margin-inline: auto;
+}
+
+.site-reading-column {
+  width: min(100%, var(--site-reading-width));
 }
 
 .site-display-copy {
@@ -191,9 +204,11 @@
 
 @media (min-width: 768px) {
   .public-site {
-    --site-type-body: 1.0625rem;
+    --site-type-body: 1rem;
     --site-type-caption: 0.9375rem;
     --site-type-label: 1rem;
+    --site-leading-body: 2.1;
+    --site-gutter: clamp(3.75rem, 7vw, 6.25rem);
   }
 
   .public-site :where(h1) {

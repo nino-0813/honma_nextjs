@@ -43,8 +43,8 @@ export default async function News() {
     .slice(0, ROW_COUNT);
 
   return (
-    <section className="bg-white px-6 pb-24 pt-20 md:px-[10%] md:pb-32 md:pt-32">
-      <div className="mx-auto max-w-[1440px]">
+    <section className="bg-white pb-24 pt-20 md:pb-32 md:pt-32">
+      <div className="site-shell">
         <div className="bg-secondary/40 px-5 py-8 md:px-10 md:py-14">
           <FadeIn>
             <ul>

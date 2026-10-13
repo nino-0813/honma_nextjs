@@ -27,8 +27,8 @@ export default function HeroStory() {
         </div>
       </section>
 
-      <section className="bg-white px-5 pb-20 pt-20 md:hidden">
-        <div className="mx-auto max-w-[430px]">
+      <section className="bg-white pb-24 pt-24 md:hidden">
+        <div className="site-shell max-w-[430px]">
           <div className="grid grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)] items-stretch gap-4">
             <div className="flex min-w-0 items-center">
               <FadeIn>
@@ -52,9 +52,9 @@ export default function HeroStory() {
         </div>
       </section>
 
-      <section className="bg-white px-5 pb-28 pt-20 md:hidden">
-        <FadeIn className="site-reading-text mx-auto max-w-[430px] font-serif text-[#24211d]">
-          <div className="space-y-8">
+      <section className="bg-white pb-32 pt-24 md:hidden">
+        <FadeIn className="site-reading-text site-shell max-w-[430px] font-serif text-[#24211d]">
+          <div className="space-y-10">
             <div>
               <p>拝啓</p>
               <p className="mt-1">
@@ -102,8 +102,8 @@ export default function HeroStory() {
         </FadeIn>
       </section>
 
-      <section className="hidden bg-white px-[10%] pb-44 pt-36 md:block lg:pb-52 lg:pt-44">
-        <div className="mx-auto max-w-[1440px]">
+      <section className="hidden bg-white pb-44 pt-36 md:block lg:pb-52 lg:pt-44">
+        <div className="site-shell">
           <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] items-stretch gap-16 lg:gap-24">
             <div className="flex min-w-0 flex-col pt-28 lg:pt-36">
               <FadeIn>
