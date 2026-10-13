@@ -50,12 +50,17 @@ const timeline = [
   ['2011', '「トキと共生する佐渡の里山」が、先進国で初めて世界農業遺産に認定'],
 ];
 
-const moreTopics = [
-  { kicker: '佐渡について ｜ 02', title: '豊田集落の歴史', status: '準備中', items: [] },
-  { kicker: 'イケベジについて', title: 'naco と、イケベジのあゆみ', status: '準備中', items: ['nacoの由来', 'スタッフ', '会社情報', 'イケベジ沿革'] },
-  { kicker: '生産について', title: 'お米と原木しいたけ', status: '順次公開', items: ['3品種と栽培方法', 'お米の研ぎ方・保管から出荷まで', 'アワード', '原木しいたけと農漁業循環栽培', '島内資源の循環'] },
-  { kicker: '体験について', title: '田んぼへの入り口', status: '準備中', items: ['田植え・稲刈り体験', 'TOKItoWA'] },
-  { kicker: '取り組みについて', title: '次の世代へつなぐ', status: '順次公開', items: ['佐渡Kids生きもの調査隊', 'クラウドファンディング', '4,700人の定期便'] },
+const detailPages = [
+  { src: '/images/about/detail-pages/page-02.jpg', alt: '佐渡について、山の水と三十六人の手 1ページ目' },
+  { src: '/images/about/detail-pages/page-03.jpg', alt: '佐渡について、山の水と三十六人の手 2ページ目' },
+  { src: '/images/about/detail-pages/page-04.jpg', alt: 'イケベジについて、駒沢の八百屋からふるさとの田んぼへ' },
+  { src: '/images/about/detail-pages/page-05.jpg', alt: 'イケベジについて、作り手が楽しむことと会社情報' },
+  { src: '/images/about/detail-pages/page-06.jpg', alt: '生産について、おいしさのその手前' },
+  { src: '/images/about/detail-pages/page-07.jpg', alt: '生産について、島の資源をめぐらせる' },
+  { src: '/images/about/detail-pages/page-08.jpg', alt: '生産について、原木しいたけのこと' },
+  { src: '/images/about/detail-pages/page-09.jpg', alt: '体験について、断らない田んぼ' },
+  { src: '/images/about/detail-pages/page-10.jpg', alt: '体験について、田んぼへの入り口' },
+  { src: '/images/about/detail-pages/page-11.jpg', alt: '取り組みについて、食べる人が農家を生む' },
 ];
 
 export default function AboutPage() {
@@ -219,13 +224,20 @@ export default function AboutPage() {
             </article>
           </FadeInSection>
 
-          <div className="mt-16">
-            {moreTopics.map((topic) => (
-              <FadeInSection key={topic.title} className="border-t border-[#1c1d1d] py-5">
-                <div className="flex items-baseline justify-between gap-4"><div><span className="block text-[10px] tracking-[0.2em] text-gray-500">{topic.kicker}</span><h3 className="mt-2 text-[17px] font-semibold tracking-[0.1em] md:text-lg">{topic.title}</h3></div><span className="shrink-0 text-[10px] tracking-[0.1em] text-[#9b5e3c]">{topic.status}</span></div>
-                {topic.items.length > 0 && <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-[11px] font-light tracking-[0.06em] text-gray-600 md:text-xs">{topic.items.map((item) => <li key={item}>{item}</li>)}</ul>}
-              </FadeInSection>
-            ))}
+          <div className="mt-20 border-t border-[#1c1d1d] pt-10 md:mt-24 md:pt-14">
+            <h3 className="sr-only">イケベジを詳しく知る 続き</h3>
+            <div className="mx-auto max-w-[940px] space-y-4 md:space-y-8">
+              {detailPages.map((page) => (
+                <figure key={page.src} className="overflow-hidden">
+                  <img
+                    src={page.src}
+                    alt={page.alt}
+                    loading="lazy"
+                    className="h-auto w-full mix-blend-multiply"
+                  />
+                </figure>
+              ))}
+            </div>
           </div>
         </div>
       </section>
