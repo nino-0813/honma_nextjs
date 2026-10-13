@@ -95,7 +95,7 @@ export default function HeroStory() {
           </div>
 
           <div className="mt-10 flex justify-start">
-            <Link href="/about" className="site-button-label inline-flex min-h-11 items-center rounded-full border border-gray-300 px-6 text-[#37332c] transition-colors hover:border-[#37332c] hover:bg-[#37332c] hover:text-white">
+            <Link href="/about" className="site-pill-link">
               詳しく知る →
             </Link>
           </div>
@@ -148,7 +148,7 @@ export default function HeroStory() {
                 </div>
 
                 <div className="mt-16 flex justify-end">
-                  <Link href="/about" className="site-button-label inline-flex min-h-11 items-center rounded-full border border-gray-300 px-7 text-[#37332c] transition-colors hover:border-[#37332c] hover:bg-[#37332c] hover:text-white">
+                  <Link href="/about" className="site-pill-link">
                     詳しく知る →
                   </Link>
                 </div>

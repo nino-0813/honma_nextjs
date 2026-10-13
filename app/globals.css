@@ -202,6 +202,31 @@
   line-height: 1.5;
 }
 
+/* トップページ内の主要な導線は、文言の長さが違っても同じ高さと余白にする。 */
+.site-pill-link {
+  display: inline-flex;
+  width: 7.5rem;
+  min-height: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgb(209 213 219);
+  border-radius: 9999px;
+  padding-inline: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--color-primary);
+  letter-spacing: 0.025em;
+  white-space: nowrap;
+  transition: border-color 180ms ease, background-color 180ms ease, color 180ms ease;
+}
+
+.site-pill-link:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary);
+  color: white;
+}
+
 @media (min-width: 768px) {
   .public-site {
     --site-type-body: 1rem;

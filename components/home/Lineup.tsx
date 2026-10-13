@@ -29,9 +29,14 @@ export default function Lineup() {
             </FadeIn>
           </li>
         ))}
+        <li className="flex aspect-square items-end justify-end lg:hidden">
+          <Link href="/collections" className="site-pill-link">
+            商品一覧へ →
+          </Link>
+        </li>
       </ul>
-      <div className="site-shell mt-8 flex justify-start md:mt-10 md:justify-end">
-        <Link href="/collections" className="inline-flex min-h-10 items-center rounded-full border border-gray-300 px-6 text-[10px] text-primary transition-colors hover:border-primary md:min-h-11 md:px-7 md:text-xs">
+      <div className="site-shell mt-10 hidden justify-end lg:flex">
+        <Link href="/collections" className="site-pill-link">
           商品一覧へ →
         </Link>
       </div>
