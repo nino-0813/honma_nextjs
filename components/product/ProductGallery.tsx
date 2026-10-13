@@ -20,10 +20,10 @@ export default function ProductGallery({
   if (images.length === 0) return null;
 
   return (
-    <div className="w-full flex flex-col-reverse lg:flex-row gap-4 lg:gap-5 items-start">
+    <div className="flex w-full flex-col-reverse items-start gap-4 lg:flex-row lg:items-stretch lg:gap-5">
       {/* サムネイル列 */}
       {images.length > 1 && (
-        <div className="w-full lg:w-20 flex lg:flex-col gap-2.5 overflow-x-auto lg:overflow-y-auto scrollbar-hide lg:max-h-[58vh] shrink-0">
+        <div className="scrollbar-hide flex w-full shrink-0 gap-2.5 overflow-x-auto lg:w-20 lg:flex-col lg:justify-between lg:overflow-hidden">
           {images.map((img, i) => (
             <button
               key={img + i}

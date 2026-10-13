@@ -11,16 +11,18 @@ export default function ProductFeatures({
   rows,
   alwaysOpenFirst = false,
   showTitle = true,
+  compactTop = false,
 }: {
   rows: { label: string; sub?: string; body: string; link?: { href: string; label: string } }[];
   alwaysOpenFirst?: boolean;
   showTitle?: boolean;
+  compactTop?: boolean;
 }) {
   const [open, setOpen] = useState<string | null>(rows[0]?.label ?? null);
   if (rows.length === 0) return null;
 
   return (
-    <section className="mt-24 md:mt-32 border-t border-gray-100 pt-16 md:pt-20">
+    <section className={compactTop ? 'mt-0' : 'mt-24 border-t border-gray-100 pt-16 md:mt-32 md:pt-20'}>
       <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8 lg:gap-16">
         {showTitle ? (
           <FadeIn>

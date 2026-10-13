@@ -85,7 +85,7 @@ export default async function StartSetPage() {
             ) : (
             <div id="purchase-panel">
               <h2 className="text-xl md:text-2xl font-medium text-primary leading-relaxed tracking-wide mb-6">
-                お試しセット
+                お米3種お試しセット
               </h2>
               <div className="-mt-4 mb-6 text-sm leading-relaxed text-gray-600">
                 <p>内容：イケベジのお米３種 ２合×３個</p>
@@ -172,6 +172,7 @@ export default async function StartSetPage() {
         />
         <ProductFeatures
           showTitle={false}
+          compactTop
           rows={[
             {
               label: '産地・栽培について',
@@ -194,7 +195,7 @@ export default async function StartSetPage() {
           ]}
         />
 
-        <div className="mt-20 md:mt-28 -mx-4 sm:-mx-6 lg:-mx-8">
+        <div className="-mx-4 mt-28 sm:-mx-6 md:mt-40 lg:-mx-8">
           <SubscriptionCTA />
         </div>
       </div>

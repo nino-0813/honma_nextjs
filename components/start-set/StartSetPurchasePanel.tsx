@@ -53,7 +53,7 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
       setStockError(result.message);
       return false;
     }
-    addToCart({ ...product, title: 'お試しセット' }, quantity, {
+    addToCart({ ...product, title: 'お米3種お試しセット' }, quantity, {
       variant: selectedVariant,
       finalPrice: calculatedPrice,
     });
@@ -68,7 +68,7 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
     <>
       <div id="purchase-panel">
         <h2 className="mb-2 text-2xl font-medium leading-relaxed tracking-wide text-primary md:text-3xl">
-          お試しセット
+          お米3種お試しセット
         </h2>
         <div className="mb-7 text-sm leading-relaxed text-gray-600">
           <p>内容：イケベジのお米３種 ２合×３個</p>
@@ -134,7 +134,7 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
 
       </div>
       <StickyPurchaseBar
-        title="お試しセット"
+        title="お米3種お試しセット"
         price={calculatedPrice}
         image={product.images?.[0] || product.image}
         quantity={quantity}

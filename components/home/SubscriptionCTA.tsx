@@ -32,7 +32,7 @@ export default function SubscriptionCTA() {
             </div>
           </div>
         </FadeIn>
-        <FadeIn className="mt-16 md:mt-24">
+        <FadeIn className="mt-8 md:mt-12">
           <div className="grid grid-cols-2 overflow-hidden">
             {COMMUNITY_IMAGES.map((image) => (
               <div key={image.src} className="aspect-[3/2] overflow-hidden bg-dim">
@@ -42,7 +42,7 @@ export default function SubscriptionCTA() {
             ))}
           </div>
         </FadeIn>
-        <div className="mt-20 text-center md:mt-32">
+        <div className="mt-8 text-center md:mt-12">
           <Link href="/collections/rice/yearly?view=lp" className="inline-flex min-h-11 items-center rounded-full border border-primary bg-white px-8 text-xs font-medium text-primary transition-colors hover:bg-primary hover:text-white md:min-h-12 md:px-10 md:text-sm">
             定期便をはじめる →
           </Link>
