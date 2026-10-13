@@ -58,10 +58,12 @@ const editorialArticles = [
     image: '/images/about/stories/P3A9707.webp',
     imageAlt: '海と山を望む豊田集落の田んぼ',
     sections: [
-      ['山から海まで、ひとつの集落', '豊田集落は、佐渡ヶ島の小佐渡の山あいにあります。海と里と山が、およそ2キロの範囲に収まっています。山で生まれた水が田んぼを通って海へ出ていくまでを、ひとつの集落の中で見渡せる場所です。'],
-      ['田んぼの隣の、能舞台', '集落の諏訪神社には能舞台があります。田んぼを守ってきた人たちが、能や鬼太鼓といった集落の文化も同じように受け継いできました。'],
-      ['水路を守るのは、広さより人の手', '豊田集落には約48ヘクタール、約300枚の田んぼがあります。水路の掃除やあぜの草刈り、冬の雪害への備えは、昔から集落みんなの仕事です。田んぼを支えているのは、草を刈り、泥をさらい、壊れたところを直す人の手の数です。'],
-      ['大きくしない、という選択', 'イケベジは田んぼを集めて大きくするのではなく、田んぼに関わる人を増やすことで、この集落の風景を次へ渡していきたいと考えています。'],
+      ['山から海まで、ひとつの集落', '豊田集落は、佐渡ヶ島の小佐渡の山あいにあります。海と里と山が、およそ2キロの範囲に収まり、山で生まれた水が田んぼを通って海へ出ていくまでを、ひとつの集落の中で見渡せる場所です。水の流れ、生きものの移動、季節ごとの人の仕事が、ひと続きの風景として残っています。'],
+      ['江戸時代から続く、細かな田んぼ', '集落の田んぼの約9割は江戸時代に拓かれたとされます。平らな土地だけでなく、斜面の地形に沿って小さな田んぼが重なり、およそ3分の1は急なあぜに囲まれています。機械で一気に整えることが難しい形だからこそ、人の手で守られてきた土地の記憶が、そのまま今の風景になっています。'],
+      ['山の水を、みんなで引く', '田んぼを潤すのは、山の中を通る長い用水路です。春には泥をさらい、落ち葉を取り除き、大雨のあとは崩れた場所がないかを見て回る。水は自然に届くのではなく、毎年繰り返される手入れによって初めて田んぼへ届きます。イケベジの米づくりも、この共同作業の上に成り立っています。'],
+      ['田んぼの隣の、能舞台', '集落の諏訪神社には能舞台があります。古い記録には1863年の奉納能が残り、現在の舞台につながる営みも長く受け継がれてきました。田んぼを守ってきた人たちは、能や鬼太鼓といった集落の文化も同じように守ってきました。農業は食べものをつくる仕事であると同時に、土地の時間を引き受ける仕事でもあります。'],
+      ['三十六人の現在地', '豊田集落には約48ヘクタール、約300枚の田んぼがあり、それを支える農家は36人です。その多くが長く田んぼを守ってきた世代で、担い手の減少はすぐ先の課題です。必要なのは、ひとりの農家が抱える面積を増やすことだけではなく、水路や草刈りを一緒に担う人を増やすことだと考えています。'],
+      ['大きくしない、という選択', 'イケベジは田んぼを集めて大きくするのではなく、兼業で関わる人、体験から通い始める人、お米を食べて支える人を増やすことで、この集落の風景を次へ渡したいと考えています。食べる人も、水路を守る人も、次の農家になり得る。豊田の小さな田んぼを残すことは、多様な関わり方を残すことでもあります。'],
     ],
     stats: [['約48ha', '豊田集落の田んぼ'], ['約300枚', '大小さまざまな田んぼ'], ['36人', '田んぼを守る農家']],
   },
@@ -243,7 +245,7 @@ export default function AboutPage() {
           </FadeInSection>
 
           <nav aria-label="章の一覧" className="mt-12 flex flex-wrap justify-center gap-x-7 gap-y-2 border-y border-[#d9d9d2] py-4 text-[11px] tracking-[0.12em] text-gray-500 md:text-xs">
-            <a href="#sado" className="text-[#1c1d1d]">佐渡について</a><span>イケベジについて</span><span>生産について</span><span>体験について</span><span>取り組みについて</span>
+            <a href="#sado" className="transition-colors hover:text-[#1c1d1d]">佐渡について</a><a href="#ikevege" className="transition-colors hover:text-[#1c1d1d]">イケベジについて</a><a href="#production" className="transition-colors hover:text-[#1c1d1d]">生産について</a><a href="#experience" className="transition-colors hover:text-[#1c1d1d]">体験について</a><a href="#initiatives" className="transition-colors hover:text-[#1c1d1d]">取り組みについて</a>
           </nav>
 
           <FadeInSection className="mt-14">
@@ -285,43 +287,125 @@ export default function AboutPage() {
           </FadeInSection>
 
           <div className="mt-20 space-y-20 md:mt-24 md:space-y-28">
-            {editorialArticles.map((article) => (
+            {editorialArticles.map((article, index) => (
               <FadeInSection key={article.title}>
-                <article className="border-t border-[#1c1d1d] pt-5">
+                <article id={index === 1 ? 'ikevege' : index === 2 ? 'production' : index === 3 ? 'experience' : index === 4 ? 'initiatives' : undefined} className="scroll-mt-32 border-t border-[#1c1d1d] pt-5">
                   <span className="text-[10px] tracking-[0.24em] text-gray-500">{article.kicker}</span>
                   <h3 className="mt-3 text-[22px] font-semibold leading-[1.65] tracking-[0.1em] md:text-[28px]">{article.title}</h3>
                   <p className="mt-3 border-b border-[#e5e5e0] pb-6 text-[13px] font-light leading-[2] tracking-[0.06em] text-gray-600 md:text-sm">{article.lead}</p>
 
-                  <div className="mt-7 grid gap-8 lg:grid-cols-2 lg:gap-12">
-                    <div>
-                      {article.sections.slice(0, 2).map(([heading, body]) => (
-                        <section key={heading} className="mb-7">
-                          <h4 className="text-sm font-semibold tracking-[0.1em]">{heading}</h4>
-                          <p className="mt-3 text-justify text-[13px] font-light leading-[2.05] tracking-[0.05em]">{body}</p>
-                        </section>
-                      ))}
-                      <figure className="mt-6">
-                        <div className="aspect-[3/2] overflow-hidden"><img src={article.image} alt={article.imageAlt} loading="lazy" className="h-full w-full object-cover" /></div>
-                      </figure>
-                    </div>
+                  {index === 0 && (
+                    <div className="mt-8">
+                      <div className="grid border-y border-[#b9b9b1] sm:grid-cols-5">
+                        {['山と森', '山の用水路', '斜面の田んぼ', '豊田集落', '海'].map((label, stage) => (
+                          <div key={label} className="relative border-b border-[#d8d8d1] px-3 py-4 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0">
+                            <span className="text-[9px] tracking-[0.18em] text-gray-400">0{stage + 1}</span>
+                            <p className="mt-1 text-xs font-medium tracking-[0.12em]">{label}</p>
+                          </div>
+                        ))}
+                      </div>
+                      <p className="mt-3 text-right text-[10px] tracking-[0.08em] text-gray-500">山で生まれた水が、田んぼと暮らしを通って海へ向かう</p>
 
-                    <div>
-                      {article.sections.slice(2).map(([heading, body]) => (
-                        <section key={heading} className="mb-7">
-                          <h4 className="text-sm font-semibold tracking-[0.1em]">{heading}</h4>
-                          <p className="mt-3 text-justify text-[13px] font-light leading-[2.05] tracking-[0.05em]">{body}</p>
-                        </section>
-                      ))}
-                      <dl className="mt-8 border-t border-[#1c1d1d]">
+                      <div className="mt-9 grid gap-x-12 gap-y-8 md:grid-cols-12">
+                        <div className="md:col-span-7">
+                          {article.sections.slice(0, 3).map(([heading, body], sectionIndex) => (
+                            <section key={heading} className={`pb-7 ${sectionIndex > 0 ? 'border-t border-[#deded8] pt-7' : ''}`}>
+                              <h4 className="text-sm font-semibold tracking-[0.1em]">{heading}</h4>
+                              <p className="mt-3 text-justify text-[13px] font-light leading-[2.15] tracking-[0.05em]">{body}</p>
+                            </section>
+                          ))}
+                          <figure className="mt-1">
+                            <div className="aspect-[16/10] overflow-hidden"><img src={article.image} alt={article.imageAlt} loading="lazy" className="h-full w-full object-cover" /></div>
+                            <figcaption className="mt-2 text-[10px] tracking-[0.08em] text-gray-500">山、田んぼ、集落、海が近い距離でつながる豊田の風景</figcaption>
+                          </figure>
+                        </div>
+                        <div className="md:col-span-5 md:pt-16">
+                          <blockquote className="border-l border-[#1c1d1d] pl-5 font-serif text-[19px] leading-[1.9] tracking-[0.08em]">田んぼの広さではなく、<br />関わる人の数で<br />風景を守っていく。</blockquote>
+                          <div className="mt-10">
+                            {article.sections.slice(3).map(([heading, body]) => (
+                              <section key={heading} className="border-t border-[#deded8] py-6 first:border-[#1c1d1d]">
+                                <h4 className="text-sm font-semibold tracking-[0.1em]">{heading}</h4>
+                                <p className="mt-3 text-justify text-[13px] font-light leading-[2.15] tracking-[0.05em]">{body}</p>
+                              </section>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      <dl className="mt-10 grid border-y border-[#1c1d1d] sm:grid-cols-3">
                         {article.stats.map(([value, label]) => (
-                          <div key={value} className="grid grid-cols-[7rem_1fr] items-baseline gap-4 border-b border-[#deded8] py-3">
-                            <dt className="font-serif text-[20px] tracking-[0.04em]">{value}</dt>
-                            <dd className="text-[11px] font-light leading-[1.8] tracking-[0.06em] text-gray-600">{label}</dd>
+                          <div key={value} className="border-b border-[#deded8] px-5 py-5 last:border-b-0 sm:border-b-0 sm:border-r sm:last:border-r-0">
+                            <dt className="font-serif text-[26px] tracking-[0.04em]">{value}</dt><dd className="mt-1 text-[10px] tracking-[0.08em] text-gray-500">{label}</dd>
                           </div>
                         ))}
                       </dl>
                     </div>
-                  </div>
+                  )}
+
+                  {index === 1 && (
+                    <div className="mt-9 grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+                      <div>
+                        <figure className="relative">
+                          <div className="aspect-[4/5] overflow-hidden"><img src={article.image} alt={article.imageAlt} loading="lazy" className="h-full w-full object-cover" /></div>
+                          <blockquote className="-mt-16 ml-5 mr-5 bg-[#f1f1ed] px-6 py-7 font-serif text-[19px] leading-[1.8] tracking-[0.08em] md:ml-10 md:mr-0">自然と社会のあいだに立つ、<br />「通訳」でありたい。</blockquote>
+                        </figure>
+                        <div className="mt-10 grid gap-7 sm:grid-cols-2">
+                          {article.sections.slice(0, 2).map(([heading, body]) => <section key={heading}><h4 className="text-sm font-semibold tracking-[0.1em]">{heading}</h4><p className="mt-3 text-justify text-[13px] font-light leading-[2.1] tracking-[0.05em]">{body}</p></section>)}
+                        </div>
+                      </div>
+                      <div>
+                        <h4 className="border-b border-[#1c1d1d] pb-3 text-xs tracking-[0.18em]">歩み</h4>
+                        <dl>
+                          {article.stats.map(([value, label]) => <div key={value} className="grid grid-cols-[4.5rem_1fr] gap-4 border-b border-[#deded8] py-5"><dt className="font-serif text-[18px]">{value}</dt><dd className="text-[12px] font-light leading-[1.9] tracking-[0.05em]">{label}</dd></div>)}
+                        </dl>
+                        <div className="mt-10 space-y-8">
+                          {article.sections.slice(2).map(([heading, body]) => <section key={heading}><h4 className="text-sm font-semibold tracking-[0.1em]">{heading}</h4><p className="mt-3 text-justify text-[13px] font-light leading-[2.15] tracking-[0.05em]">{body}</p></section>)}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {index === 2 && (
+                    <div className="mt-9">
+                      <div className="grid border-y border-[#1c1d1d] md:grid-cols-3">
+                        {article.stats.map(([value, label], varietyIndex) => (
+                          <div key={value} className="border-b border-[#deded8] px-5 py-6 last:border-b-0 md:border-b-0 md:border-r md:last:border-r-0">
+                            <span className="text-[9px] tracking-[0.2em] text-gray-400">品種 0{varietyIndex + 1}</span><h4 className="mt-2 font-serif text-[21px] tracking-[0.1em]">{value}</h4><p className="mt-2 text-[11px] tracking-[0.08em] text-gray-500">{label}</p>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-10 grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:gap-12">
+                        <figure><div className="aspect-[16/10] overflow-hidden"><img src={article.image} alt={article.imageAlt} loading="lazy" className="h-full w-full object-cover" /></div></figure>
+                        <div className="space-y-8">{article.sections.slice(0, 2).map(([heading, body]) => <section key={heading}><h4 className="text-sm font-semibold tracking-[0.1em]">{heading}</h4><p className="mt-3 text-justify text-[13px] font-light leading-[2.1] tracking-[0.05em]">{body}</p></section>)}</div>
+                      </div>
+                      <div className="mt-10 grid gap-8 border-t border-[#deded8] pt-8 md:grid-cols-2 md:gap-14">
+                        {article.sections.slice(2).map(([heading, body], productionIndex) => <section key={heading} className={productionIndex === 1 ? 'md:border-l md:border-[#deded8] md:pl-14' : ''}><span className="text-[9px] tracking-[0.2em] text-gray-400">工程 0{productionIndex + 1}</span><h4 className="mt-2 text-sm font-semibold tracking-[0.1em]">{heading}</h4><p className="mt-3 text-justify text-[13px] font-light leading-[2.15] tracking-[0.05em]">{body}</p></section>)}
+                      </div>
+                    </div>
+                  )}
+
+                  {index === 3 && (
+                    <div className="mt-9">
+                      <figure className="-mx-6 md:mx-0"><div className="aspect-[16/10] overflow-hidden md:aspect-[21/9]"><img src={article.image} alt={article.imageAlt} loading="lazy" className="h-full w-full object-cover" /></div></figure>
+                      <div className="mx-auto mt-10 max-w-[720px]">
+                        <blockquote className="text-center font-serif text-[20px] leading-[1.9] tracking-[0.1em] md:text-[24px]">「何かあったら、まず相談してみよう」<br />そう思ってもらえる田んぼへ。</blockquote>
+                        <div className="mt-10 space-y-8">{article.sections.map(([heading, body]) => <section key={heading} className="grid gap-3 border-t border-[#deded8] pt-7 md:grid-cols-[12rem_1fr] md:gap-8"><h4 className="text-sm font-semibold tracking-[0.1em]">{heading}</h4><p className="text-justify text-[13px] font-light leading-[2.15] tracking-[0.05em]">{body}</p></section>)}</div>
+                      </div>
+                      <dl className="mt-12 grid gap-px bg-[#d8d8d2] border-y border-[#d8d8d2] sm:grid-cols-3">{article.stats.map(([value, label]) => <div key={value} className="bg-[#f1f1ed] px-5 py-6 text-center"><dt className="font-serif text-[28px]">{value}</dt><dd className="mt-2 text-[10px] tracking-[0.08em] text-gray-500">{label}</dd></div>)}</dl>
+                    </div>
+                  )}
+
+                  {index === 4 && (
+                    <div className="mt-9">
+                      <figure className="grid gap-7 md:grid-cols-[0.7fr_1.3fr] md:items-end"><div className="aspect-[4/5] overflow-hidden"><img src={article.image} alt={article.imageAlt} loading="lazy" className="h-full w-full object-cover" /></div><blockquote className="border-y border-[#1c1d1d] py-8 font-serif text-[21px] leading-[1.9] tracking-[0.09em] md:text-[27px]">支えてもらった人が、<br />次は隣の誰かへ渡していく。<br />その循環を、田んぼから。</blockquote></figure>
+                      <div className="mt-12">
+                        {article.stats.map(([value, label], chapterIndex) => {
+                          const section = article.sections[chapterIndex];
+                          return <section key={value} className="grid gap-5 border-t border-[#1c1d1d] py-8 md:grid-cols-[10rem_14rem_1fr] md:gap-8"><div><span className="text-[9px] tracking-[0.2em] text-gray-400">章 0{chapterIndex + 1}</span><p className="mt-1 font-serif text-[30px]">{value}</p><p className="text-[10px] tracking-[0.08em] text-gray-500">{label}</p></div><h4 className="text-[17px] font-semibold leading-[1.7] tracking-[0.1em]">{section[0]}</h4><p className="text-justify text-[13px] font-light leading-[2.15] tracking-[0.05em]">{section[1]}</p></section>;
+                        })}
+                        <section className="grid gap-5 border-y border-[#1c1d1d] py-8 md:grid-cols-[10rem_14rem_1fr] md:gap-8"><div className="text-[9px] tracking-[0.2em] text-gray-400">結び</div><h4 className="text-[17px] font-semibold leading-[1.7] tracking-[0.1em]">{article.sections[3][0]}</h4><p className="text-justify text-[13px] font-light leading-[2.15] tracking-[0.05em]">{article.sections[3][1]}</p></section>
+                      </div>
+                    </div>
+                  )}
                 </article>
               </FadeInSection>
             ))}
