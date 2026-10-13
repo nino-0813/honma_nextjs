@@ -150,12 +150,11 @@
 .public-site :where(h1, h2, h3, h4, h5, h6, p, li, dd, dt, figcaption, blockquote) {
   letter-spacing: 0.065em;
   text-align: left;
+  text-justify: none;
   line-break: strict;
   word-break: normal;
   overflow-wrap: normal;
   font-feature-settings: "halt";
-  /* 対応ブラウザでは句読点を行末へ追い込み、前の文字を次行へ送らない。 */
-  hanging-punctuation: allow-end;
 }
 
 /* 本文に残っていた小さな任意値と Tailwind の小文字を共通寸法へ。 */
@@ -190,11 +189,11 @@
 /* 端末幅ごとに自然に折り返しつつ、追い込み優先の左揃えで整える。 */
 .site-reading-text :where(p, li) {
   text-align: left;
+  text-justify: none;
   line-break: strict;
   word-break: normal;
   overflow-wrap: normal;
   text-wrap: pretty;
-  hanging-punctuation: allow-end;
 }
 
 /* 関農園の設計比率を参考に、本文は狭く、写真は一段広く見せる。 */
