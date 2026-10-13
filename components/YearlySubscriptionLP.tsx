@@ -4,9 +4,18 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 const REASONS = [
-  { title: 'いつでも10%OFF', description: '通常価格よりいつでも10%OFFでお届けします。' },
-  { title: '瑞々しいお米を一年中', description: '専用の保冷庫で管理し、発送直前に精米します。' },
-  { title: '保存袋はご希望の方へ', description: 'お申し込み時に「希望する」を選ぶと、お米保存袋をお届けします。' },
+  {
+    title: ['いつでも', '10%OFF'],
+    description: '毎日のご飯だから、無理なく続けていただけるように。定期便は通常価格からいつでも10%OFFでお届けします。',
+  },
+  {
+    title: ['新米のような', 'みずみずしさ'],
+    description: '収穫したお米は専用の保冷庫で低温保管しています。発送直前に精米するので、新米に近いみずみずしさのまま一年中お届けできます。',
+  },
+  {
+    title: ['常温保存可能な', '保存袋をプレゼント'],
+    description: '湿気・酸素・紫外線を防ぐので、冷蔵庫に入れなくても、虫やカビを気にせず常温でおいしさを保てます。',
+  },
 ];
 
 export default function YearlySubscriptionLP() {
@@ -41,25 +50,24 @@ export default function YearlySubscriptionLP() {
 
       <div className="mx-auto mt-20 max-w-6xl px-5 md:mt-28 md:px-0">
         <div className="text-center text-primary">
-          <p className="font-serif text-sm leading-loose tracking-[0.08em] md:text-base">
-            定期便を大切にしてくださるお客様へ、
-          </p>
-          <h2 className="mt-2 font-serif text-2xl font-medium leading-relaxed tracking-[0.12em] md:text-[34px]">
-            精いっぱいの愛を込めて
+          <h2 className="whitespace-nowrap font-serif text-xs leading-loose tracking-[0.08em] md:text-base">
+            定期便を大切にしてくださるお客様へ、愛を込めて
           </h2>
           <span className="mx-auto mt-7 block h-px w-12 bg-primary/50" aria-hidden="true" />
         </div>
 
         <div className="mx-auto mt-12 grid max-w-5xl gap-12 md:mt-16 md:grid-cols-3 md:gap-14">
-          {REASONS.map((reason) => (
+          {REASONS.map((reason, index) => (
             <div
-              key={reason.title}
-              className="flex flex-col items-center px-3 text-center"
+              key={reason.title.join('-')}
+              className={`flex flex-col items-center px-3 text-center md:px-4 ${index > 0 ? 'md:relative md:before:absolute md:before:-left-7 md:before:top-5 md:before:h-28 md:before:w-px md:before:bg-gray-200' : ''}`}
             >
               <h3 className="font-serif text-xl leading-relaxed tracking-[0.06em] text-primary md:text-[22px]">
-                {reason.title}
+                {reason.title.map((line) => (
+                  <span key={line} className="block">{line}</span>
+                ))}
               </h3>
-              <p className="mt-4 text-sm leading-[2] text-gray-600 md:text-[15px]">{reason.description}</p>
+              <p className="mt-5 text-sm leading-[2] text-gray-600 md:text-[15px]">{reason.description}</p>
             </div>
           ))}
         </div>
