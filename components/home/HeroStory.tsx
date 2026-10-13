@@ -32,7 +32,7 @@ export default function HeroStory() {
           <div className="grid grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)] items-stretch gap-4">
             <div className="flex min-w-0 items-center">
               <FadeIn>
-                <h1 className="site-display-copy font-serif text-primary">
+                <h1 className="site-display-copy whitespace-nowrap font-serif text-primary">
                   きょうも<br />
                   しぜんと<br />
                   いいときを。
@@ -107,7 +107,7 @@ export default function HeroStory() {
           <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] items-stretch gap-16 lg:gap-24">
             <div className="flex min-w-0 flex-col pt-28 lg:pt-36">
               <FadeIn>
-                <h1 className="site-display-copy font-serif text-primary">
+                <h1 className="site-display-copy whitespace-nowrap font-serif text-primary">
                   きょうも<br />
                   しぜんと<br />
                   いいときを。
