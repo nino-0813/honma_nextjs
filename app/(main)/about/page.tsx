@@ -50,17 +50,77 @@ const timeline = [
   ['2011', '「トキと共生する佐渡の里山」が、先進国で初めて世界農業遺産に認定'],
 ];
 
-const detailPages = [
-  { src: '/images/about/detail-pages/page-02.jpg', alt: '佐渡について、山の水と三十六人の手 1ページ目' },
-  { src: '/images/about/detail-pages/page-03.jpg', alt: '佐渡について、山の水と三十六人の手 2ページ目' },
-  { src: '/images/about/detail-pages/page-04.jpg', alt: 'イケベジについて、駒沢の八百屋からふるさとの田んぼへ' },
-  { src: '/images/about/detail-pages/page-05.jpg', alt: 'イケベジについて、作り手が楽しむことと会社情報' },
-  { src: '/images/about/detail-pages/page-06.jpg', alt: '生産について、おいしさのその手前' },
-  { src: '/images/about/detail-pages/page-07.jpg', alt: '生産について、島の資源をめぐらせる' },
-  { src: '/images/about/detail-pages/page-08.jpg', alt: '生産について、原木しいたけのこと' },
-  { src: '/images/about/detail-pages/page-09.jpg', alt: '体験について、断らない田んぼ' },
-  { src: '/images/about/detail-pages/page-10.jpg', alt: '体験について、田んぼへの入り口' },
-  { src: '/images/about/detail-pages/page-11.jpg', alt: '取り組みについて、食べる人が農家を生む' },
+const editorialArticles = [
+  {
+    kicker: '佐渡について ｜ 02',
+    title: '山の水と、三十六人の手',
+    lead: 'イケベジが田んぼをつくる豊田集落は、山と海にはさまれた小さな農村です。田んぼの多くは江戸時代に拓かれ、それからずっと、山の水を引く水路を集落のみんなで守ってきました。',
+    image: '/images/about/stories/P3A9707.webp',
+    imageAlt: '海と山を望む豊田集落の田んぼ',
+    sections: [
+      ['山から海まで、ひとつの集落', '豊田集落は、佐渡ヶ島の小佐渡の山あいにあります。海と里と山が、およそ2キロの範囲に収まっています。山で生まれた水が田んぼを通って海へ出ていくまでを、ひとつの集落の中で見渡せる場所です。'],
+      ['田んぼの隣の、能舞台', '集落の諏訪神社には能舞台があります。田んぼを守ってきた人たちが、能や鬼太鼓といった集落の文化も同じように受け継いできました。'],
+      ['水路を守るのは、広さより人の手', '豊田集落には約48ヘクタール、約300枚の田んぼがあります。水路の掃除やあぜの草刈り、冬の雪害への備えは、昔から集落みんなの仕事です。田んぼを支えているのは、草を刈り、泥をさらい、壊れたところを直す人の手の数です。'],
+      ['大きくしない、という選択', 'イケベジは田んぼを集めて大きくするのではなく、田んぼに関わる人を増やすことで、この集落の風景を次へ渡していきたいと考えています。'],
+    ],
+    stats: [['約48ha', '豊田集落の田んぼ'], ['約300枚', '大小さまざまな田んぼ'], ['36人', '田んぼを守る農家']],
+  },
+  {
+    kicker: 'イケベジについて',
+    title: '駒沢の八百屋から、ふるさとの田んぼへ',
+    lead: 'イケベジは、株式会社nacoの農業の仕事です。自然と社会のあいだに立つ「通訳」でありたい。その思いを胸に、佐渡の兼業農家に生まれた一人が、東京の八百屋を経て、ふるさとの田んぼへ戻りました。',
+    image: '/images/about/stories/P3A0011.jpg',
+    imageAlt: '田んぼに立つイケベジの作り手',
+    sections: [
+      ['島を出て、見えたもの', '18歳まで佐渡の野山を走り回って育ちました。大学で島を出て東京で暮らし、初めて自分が育った場所を考えるようになります。自然の在り方や豊かさを、社会に伝わる言葉に訳す会社をつくりたい。nacoは、その思いから始まりました。'],
+      ['説明いらずの「安心」', '駒沢の八百屋で佐渡のお米を並べると、お客さまから「佐渡のお米って、安心安全だよね」と言われました。その安心は、トキのために田んぼを変えてきた島の人たちが、長い時間をかけて積み上げてきたものです。'],
+      ['専業の理由は、田んぼの景色', '兼業農家の息子だった代表が専業農家になった理由は、豊田の田んぼの景色を子どもたちの代に残したいと思ったから。収量よりも、その年の田んぼが育てた味を大切にしています。'],
+      ['作り手が楽しむ', '資源や環境と同じように、人もまた持続可能であること。作り手が自分らしく楽しめているかどうかは、その何よりの指標だと考えています。'],
+    ],
+    stats: [['1992', '佐渡・豊田集落に生まれる'], ['2021', '佐渡で米づくりを始める'], ['2025', '原木しいたけの栽培を始める']],
+  },
+  {
+    kicker: '生産について',
+    title: 'おいしさの、その手前',
+    lead: 'おいしいことは大前提。そのうえで、そこへ至る道のりまで胸を張れるものでありたい。農薬や除草剤、化学肥料に頼らず、土づくりはできる限り島の資源で行います。',
+    image: '/images/renewal/about/delicious.webp',
+    imageAlt: '実りを迎えた稲穂',
+    sections: [
+      ['三つの品種と栽培方法', '従来コシヒカリは自然栽培、亀の尾は竹チップの堆肥、にこまるは酒粕と牡蠣殻を土へ返して育てています。それぞれの品種と田んぼに合う方法を選びます。'],
+      ['その年の味を、そのままに', '肥料を入れない田んぼでは、天気や水の具合がそのまま味に出ます。今年の田んぼがつくった今年の味。その違いも含めて楽しんでもらいたいと考えています。'],
+      ['精米は、注文のあとで', '収穫したお米は一年中5℃以下で保管し、1.9ミリ以上の大きな粒だけを選びます。注文を受けてから精米し、できたてのお米を届けます。'],
+      ['島の資源をめぐらせる', '酒蔵から出る酒粕、加茂湖の牡蠣殻、手入れされなくなった竹林の竹、役目を終えたしいたけの原木。島の中で捨てられてきたものを、田んぼの土へ戻します。'],
+    ],
+    stats: [['コシヒカリ', '自然栽培'], ['亀の尾', '竹堆肥'], ['にこまる', '牡蠣殻・酒粕']],
+  },
+  {
+    kicker: '体験について',
+    title: '断らない田んぼ',
+    lead: '農業や自然が、特別なものではなく、すぐそばにあるものであってほしい。「何かあったら、まずイケベジに相談してみよう」。そう思ってもらえる田んぼであり続けます。',
+    image: '/images/about/hero/about_hero_taue_92.webp',
+    imageAlt: '田植えを体験する人たち',
+    sections: [
+      ['依頼はまず断らない', '田植えや稲刈りは、農家にとって忙しい時期です。同時に、体験する人にとっては忘れられない時間でもあります。だからイケベジでは、繁忙期でも依頼に応えられる体制を整えてきました。'],
+      ['入口は、相手の目線で', '保育園の食育、中学生の職場体験、島外企業の研修、親子リトリートまで。相手の目的に合わせ、佐渡の山と海のつながりを体験できる入口を用意しています。'],
+      ['田んぼへの入り口', '受け入れる相手は、島の子どもから旅行者、企業までさまざまです。その人の目線で「楽しい」「面白い」と思える体験をつくります。'],
+      ['学びが続いていく場所', '一度の体験で終わらず、また田んぼへ来たくなる関係を育てること。それがイケベジの体験づくりです。'],
+    ],
+    stats: [['約700人', '1年間に田んぼを訪れる人'], ['40人', '佐渡Kids生きもの調査隊'], ['10種類以上', '体験の入り口']],
+  },
+  {
+    kicker: '取り組みについて',
+    title: '食べる人が、農家を生む',
+    lead: '子どもたちが「ここに生まれてよかった」と思える島を、次の世代へ。そのためにイケベジが続けている、三つの取り組みです。',
+    image: '/images/renewal/brand/access-1.webp',
+    imageAlt: '稲刈りに参加する人たち',
+    sections: [
+      ['佐渡Kids生きもの調査隊', '2008年から続く、島の小学生による田んぼの生きもの調査です。調査隊の卒業生は、いまコーチとして次の子どもたちを田んぼへ連れています。'],
+      ['受け取ったバトンを、両隣へ', 'クラウドファンディングでは149人から支援をいただきました。支えてもらった人が、次は隣の誰かへ渡していく。そういう循環を育てます。'],
+      ['集めるより、関わる人を', '田んぼを集めて大きくするのではなく、兼業で田んぼに関わる人を増やす。その入口として、お米を届ける定期便や田んぼの体験を続けています。'],
+      ['次の世代へつなぐ', 'トキのために変わってきた田んぼに、島の資源をめぐらせる工夫を重ねていく。まずは豊田の田んぼから、毎日のごはんを届け続けます。'],
+    ],
+    stats: [['40人', '生きもの調査隊の小学生'], ['149人', '支援してくれた人'], ['4,700人', '目指す定期便利用者']],
+  },
 ];
 
 export default function AboutPage() {
@@ -224,20 +284,47 @@ export default function AboutPage() {
             </article>
           </FadeInSection>
 
-          <div className="mt-20 border-t border-[#1c1d1d] pt-10 md:mt-24 md:pt-14">
-            <h3 className="sr-only">イケベジを詳しく知る 続き</h3>
-            <div className="mx-auto max-w-[940px] space-y-4 md:space-y-8">
-              {detailPages.map((page) => (
-                <figure key={page.src} className="overflow-hidden">
-                  <img
-                    src={page.src}
-                    alt={page.alt}
-                    loading="lazy"
-                    className="h-auto w-full mix-blend-multiply"
-                  />
-                </figure>
-              ))}
-            </div>
+          <div className="mt-20 space-y-20 md:mt-24 md:space-y-28">
+            {editorialArticles.map((article) => (
+              <FadeInSection key={article.title}>
+                <article className="border-t border-[#1c1d1d] pt-5">
+                  <span className="text-[10px] tracking-[0.24em] text-gray-500">{article.kicker}</span>
+                  <h3 className="mt-3 text-[22px] font-semibold leading-[1.65] tracking-[0.1em] md:text-[28px]">{article.title}</h3>
+                  <p className="mt-3 border-b border-[#e5e5e0] pb-6 text-[13px] font-light leading-[2] tracking-[0.06em] text-gray-600 md:text-sm">{article.lead}</p>
+
+                  <div className="mt-7 grid gap-8 lg:grid-cols-2 lg:gap-12">
+                    <div>
+                      {article.sections.slice(0, 2).map(([heading, body]) => (
+                        <section key={heading} className="mb-7">
+                          <h4 className="text-sm font-semibold tracking-[0.1em]">{heading}</h4>
+                          <p className="mt-3 text-justify text-[13px] font-light leading-[2.05] tracking-[0.05em]">{body}</p>
+                        </section>
+                      ))}
+                      <figure className="mt-6">
+                        <div className="aspect-[3/2] overflow-hidden"><img src={article.image} alt={article.imageAlt} loading="lazy" className="h-full w-full object-cover" /></div>
+                      </figure>
+                    </div>
+
+                    <div>
+                      {article.sections.slice(2).map(([heading, body]) => (
+                        <section key={heading} className="mb-7">
+                          <h4 className="text-sm font-semibold tracking-[0.1em]">{heading}</h4>
+                          <p className="mt-3 text-justify text-[13px] font-light leading-[2.05] tracking-[0.05em]">{body}</p>
+                        </section>
+                      ))}
+                      <dl className="mt-8 border-t border-[#1c1d1d]">
+                        {article.stats.map(([value, label]) => (
+                          <div key={value} className="grid grid-cols-[7rem_1fr] items-baseline gap-4 border-b border-[#deded8] py-3">
+                            <dt className="font-serif text-[20px] tracking-[0.04em]">{value}</dt>
+                            <dd className="text-[11px] font-light leading-[1.8] tracking-[0.06em] text-gray-600">{label}</dd>
+                          </div>
+                        ))}
+                      </dl>
+                    </div>
+                  </div>
+                </article>
+              </FadeInSection>
+            ))}
           </div>
         </div>
       </section>
