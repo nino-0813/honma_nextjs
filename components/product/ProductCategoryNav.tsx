@@ -56,7 +56,7 @@ export default function ProductCategoryNav({ current }: { current: ProductCatego
         <CategoryItems items={MAIN_ITEMS} activeKey={mainActiveKey} />
       </div>
       {isRiceCategory && (
-        <div className="mt-4 overflow-x-auto px-6 scrollbar-hide md:px-12">
+        <div className="mt-6 overflow-x-auto px-6 pb-1 scrollbar-hide md:px-12">
           <div className="flex min-w-max items-center justify-center gap-5 text-[11px] tracking-[0.08em] text-gray-500">
             <span className="text-[10px] text-gray-400">お米の品種</span>
             <span className="h-3 w-px bg-gray-300" aria-hidden="true" />

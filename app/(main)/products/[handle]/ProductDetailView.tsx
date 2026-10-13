@@ -24,6 +24,26 @@ import {
 
 type PurchaseType = 'one_time' | 'subscription';
 
+function getProductTitleLines(title: string): string[] {
+  const explicitLines = title.split(/\n+/).map((line) => line.trim()).filter(Boolean);
+  if (explicitLines.length > 1) return explicitLines.slice(0, 3);
+
+  const normalized = title.replace(/\s+/g, ' ').trim();
+  const yearMatch = normalized.match(/令和\s*\d+年産/);
+  if (yearMatch?.index !== undefined) {
+    const beforeYear = normalized.slice(0, yearMatch.index).trim();
+    const afterYear = normalized.slice(yearMatch.index + yearMatch[0].length).trim();
+    return [beforeYear, yearMatch[0].replace(/\s+/g, ''), afterYear].filter(Boolean);
+  }
+
+  const originMatch = normalized.match(/\s+(新潟県佐渡産|佐渡産)/);
+  if (originMatch?.index !== undefined) {
+    return [normalized.slice(0, originMatch.index).trim(), normalized.slice(originMatch.index).trim()].filter(Boolean);
+  }
+
+  return [normalized];
+}
+
 export default function ProductDetailView({ product }: { product: Product }) {
   const { products: allProducts } = useProducts();
   const [selectedImage, setSelectedImage] = useState(0);
@@ -415,20 +435,12 @@ export default function ProductDetailView({ product }: { product: Product }) {
 
   return (
     <div className="page-top-offset min-h-screen w-full overflow-x-clip bg-white pb-24 animate-fade-in">
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-[10px] text-gray-400 mb-8 md:mb-12 tracking-widest uppercase">
-          <Link href="/" className="hover:text-black transition-colors">ホーム</Link>
-          <span className="mx-2">/</span>
-          <Link href="/collections" className="hover:text-black transition-colors">商品一覧</Link>
-          <span className="mx-2">/</span>
-          <span className="text-black">{product.title}</span>
-        </div>
-
+      <div className="mx-auto max-w-[1400px] px-6 md:px-12">
         <div className="mb-12 md:mb-16"><ProductCategoryNav current="all" /></div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+        <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(360px,5fr)] lg:gap-8 xl:gap-10">
           {/* 左の画像は固定。右の詳細を読み終えるまで残り、そのあと一緒に流れていく */}
-          <div className="lg:col-span-7 lg:self-start">
+          <div className="lg:self-start">
             {(() => {
               const gallery = product.images && product.images.length > 0
                 ? product.images
@@ -445,9 +457,13 @@ export default function ProductDetailView({ product }: { product: Product }) {
             })()}
           </div>
 
-          <div className="lg:col-span-5">
+          <div>
             <div id="purchase-panel">
-              <h1 className="text-xl md:text-2xl font-medium text-primary leading-relaxed tracking-wide mb-3">{product.title}</h1>
+              <h1 className="mb-3 text-xl font-medium leading-[1.65] tracking-wide text-primary md:text-2xl">
+                {getProductTitleLines(product.title).map((line, index) => (
+                  <span key={`${index}-${line}`} className="block">{line}</span>
+                ))}
+              </h1>
 
               <div className="mb-8 border-b border-gray-100 pb-8">
                 {subscriptionEnabled && purchaseType === 'subscription' && subscriptionDiscountPercent > 0 ? (

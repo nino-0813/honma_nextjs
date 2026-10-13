@@ -192,7 +192,7 @@ export default function CollectionsPage() {
   return (
     <div className="page-top-offset min-h-screen w-full overflow-x-hidden bg-white pb-36">
       {!isLpView && (
-        <div className="sticky top-14 z-30 mb-20 bg-white/95 py-3 backdrop-blur-md md:top-16 md:mb-24">
+        <div className="sticky top-14 z-30 mb-28 bg-white/95 py-3 backdrop-blur-md md:top-16 md:mb-32">
           <div className="mx-auto max-w-[1400px] px-6 md:px-12">
             <ProductCategoryNav current={categoryNavKey} />
           </div>
@@ -286,7 +286,7 @@ export default function CollectionsPage() {
                   </div>
                 </div>
                 <div className="flex flex-1 flex-col gap-2 text-left">
-                  <h2 className="min-h-[5.7em] text-primary transition-colors group-hover:text-gray-600">
+                  <h2 className="min-h-[4.8em] text-primary transition-colors group-hover:text-gray-600">
                     <span className="block text-[12px] font-semibold leading-relaxed">{titleParts.primary}</span>
                     {titleParts.secondary && <span className="mt-1 block text-[13px] font-medium leading-[1.8] line-clamp-2">{titleParts.secondary}</span>}
                   </h2>
@@ -323,7 +323,7 @@ export default function CollectionsPage() {
                     })()}
                     {soldOut && (
                       <span className="text-[10px] font-bold tracking-widest uppercase text-red-600 border border-red-600 px-2 py-0.5">
-                        Sold Out
+                        売り切れ
                       </span>
                     )}
                     {preorder && (
@@ -351,7 +351,7 @@ export default function CollectionsPage() {
         )}
 
         {!loading && !error && showSubscriptionCta && (
-          <div className="mt-20 flex justify-center md:mt-28">
+          <div className="mt-24 flex justify-center md:mt-36">
             <Link
               href="/collections/rice/yearly?view=lp"
               className="inline-flex min-h-12 items-center justify-center rounded-full bg-primary px-10 py-3 text-sm font-medium tracking-wider text-white transition-colors duration-200 hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
