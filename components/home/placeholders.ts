@@ -9,7 +9,7 @@
  */
 
 /** 仮データにバッジを出すか。素材が揃ったら false にする */
-export const SHOW_PLACEHOLDER_BADGE = true;
+export const SHOW_PLACEHOLDER_BADGE = false;
 
 export type TopicCard = {
   title: string;
