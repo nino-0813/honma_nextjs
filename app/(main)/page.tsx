@@ -33,7 +33,7 @@ export const revalidate = 300;
  */
 export default function HomePage() {
   return (
-    <div className="animate-fade-in overflow-x-clip w-full">
+    <div className="home-page animate-fade-in w-full overflow-x-clip">
       <AnnouncementPopup />
 
       {/* 1. トップ動画から手紙へつながるブランドストーリー */}
