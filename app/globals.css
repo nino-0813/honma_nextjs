@@ -96,6 +96,133 @@
   }
 }
 
+/* ------------------------------------------------------------------
+   公開サイトのタイポグラフィ。
+
+   40代の方がスマホでも長文を負担なく読めるよう、
+   本文は 16px 未満にしない。デスクトップは 17px を基準とする。
+   旧画面に残る 9〜13px の指定は、本文か補足の2段階に整理する。
+   管理画面には適用しない。
+   ------------------------------------------------------------------ */
+.public-site {
+  --site-type-body: 1rem;
+  --site-type-caption: 0.875rem;
+  --site-type-label: 0.9375rem;
+  --site-leading-body: 1.9;
+  --site-leading-caption: 1.75;
+  font-size: var(--site-type-body);
+  font-weight: 400;
+  line-height: var(--site-leading-body);
+  letter-spacing: 0.025em;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+.public-site :where(h1, h2, h3, h4) {
+  font-weight: 600;
+  color: var(--color-primary);
+  letter-spacing: 0.055em;
+}
+
+.public-site :where(h1) {
+  font-size: 2rem;
+  line-height: 1.5;
+}
+
+.public-site :where(h2) {
+  font-size: 1.625rem;
+  line-height: 1.55;
+}
+
+.public-site :where(h3) {
+  font-size: 1.375rem;
+  line-height: 1.6;
+}
+
+.public-site :where(h4) {
+  font-size: 1.125rem;
+  line-height: 1.65;
+}
+
+.public-site :where(p, li, dd) {
+  letter-spacing: 0.025em;
+}
+
+/* 本文に残っていた小さな任意値と Tailwind の小文字を共通寸法へ。 */
+.public-site :where(.text-\[12px\], .text-\[13px\], .text-sm, .text-base) {
+  font-size: var(--site-type-body);
+  line-height: var(--site-leading-body);
+}
+
+.public-site :where(.text-\[9px\], .text-\[10px\], .text-\[11px\], .text-xs) {
+  font-size: var(--site-type-caption);
+  line-height: var(--site-leading-caption);
+}
+
+/* 明朝体の light は画面上で細すぎるため、本文は通常の太さを下限にする。 */
+.public-site .font-light {
+  font-weight: 400;
+}
+
+.public-site :where(button, a) {
+  letter-spacing: 0.055em;
+}
+
+.site-reading-text {
+  max-width: 42rem;
+  font-size: var(--site-type-body);
+  font-weight: 400;
+  line-height: 2;
+  letter-spacing: 0.025em;
+}
+
+.site-display-copy {
+  font-size: 1.625rem;
+  font-weight: 600;
+  line-height: 1.85;
+  letter-spacing: 0.08em;
+}
+
+.site-button-label {
+  font-size: var(--site-type-label);
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+@media (min-width: 768px) {
+  .public-site {
+    --site-type-body: 1.0625rem;
+    --site-type-caption: 0.9375rem;
+    --site-type-label: 1rem;
+  }
+
+  .public-site :where(h1) {
+    font-size: 3rem;
+    line-height: 1.4;
+  }
+
+  .public-site :where(h2) {
+    font-size: 2.5rem;
+    line-height: 1.45;
+  }
+
+  .public-site :where(h3) {
+    font-size: 1.75rem;
+    line-height: 1.55;
+  }
+
+  .public-site :where(h4) {
+    font-size: 1.375rem;
+    line-height: 1.6;
+  }
+
+  .site-display-copy {
+    font-size: 2.625rem;
+    line-height: 1.75;
+    letter-spacing: 0.1em;
+  }
+}
+
 
 /* ------------------------------------------------------------------
    キーボード操作時のフォーカス表示。

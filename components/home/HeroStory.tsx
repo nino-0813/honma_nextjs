@@ -32,7 +32,7 @@ export default function HeroStory() {
           <div className="grid grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)] items-stretch gap-4">
             <div className="flex min-w-0 items-center">
               <FadeIn>
-                <h1 className="font-serif text-[20px] font-medium leading-[2.05] tracking-[0.12em] text-primary">
+                <h1 className="site-display-copy font-serif text-primary">
                   きょうも<br />
                   しぜんと<br />
                   いいときを。
@@ -53,7 +53,7 @@ export default function HeroStory() {
       </section>
 
       <section className="bg-white px-5 pb-28 pt-20 md:hidden">
-        <FadeIn className="mx-auto max-w-[430px] font-serif text-[12px] font-medium leading-[2.3] tracking-[0.025em] text-[#24211d]">
+        <FadeIn className="site-reading-text mx-auto max-w-[430px] font-serif text-[#24211d]">
           <div className="space-y-8">
             <div>
               <p>拝啓</p>
@@ -63,32 +63,26 @@ export default function HeroStory() {
               </p>
             </div>
             <p>
-              佐渡ヶ島は、豊かな自然や文化が詰まった<br />
+              佐渡ヶ島は、豊かな自然や文化が詰まった
               「日本の縮図」といわれる島です。
             </p>
             <div>
               <p>そして</p>
               <p className="mt-3">
-                トキとの共生を選び、全島の農家が立ち上がった<br />
-                この島の歴史は、佐渡の未来を担う農家たちの<br />
-                胸を熱くする物語です。私たちもまた、<br />
+                トキとの共生を選び、全島の農家が立ち上がったこの島の歴史は、佐渡の未来を担う農家たちの胸を熱くする物語です。私たちもまた、
                 この歴史のバトンを受け継いでいます。
               </p>
             </div>
             <p>
-              島の自然が魅せる美しさ、楽しさ、厳しさ、<br />
-              ワクワク感。その自然界の“イケてる”を<br />
-              もっと社会に伝え、還元していきたい。<br />
-              そんな思いから、わたしたち「イケベジ」は<br />
+              島の自然が魅せる美しさ、楽しさ、厳しさ、ワクワク感。その自然界の“イケてる”をもっと社会に伝え、還元していきたい。そんな思いから、わたしたち「イケベジ」は
               始まりました。
             </p>
             <p>
-              自然から学び、豊かさを分かち合うことを通じて、<br />
-              しぜんと笑みがこぼれる社会への<br />
+              自然から学び、豊かさを分かち合うことを通じて、しぜんと笑みがこぼれる社会への
               架け橋となります。
             </p>
             <p>
-              なんでもない日常が、ちょっとでも<br />
+              なんでもない日常が、ちょっとでも
               “特別な時間（とき）”になりますように。
             </p>
             <p>「きょうも　しぜんと　いいときを。」</p>
@@ -101,7 +95,7 @@ export default function HeroStory() {
           </div>
 
           <div className="mt-10 flex justify-start">
-            <Link href="/about" className="inline-flex min-h-10 items-center rounded-full border border-gray-300 px-5 text-[10px] tracking-[0.08em] text-[#37332c] transition-colors hover:border-[#37332c] hover:bg-[#37332c] hover:text-white">
+            <Link href="/about" className="site-button-label inline-flex min-h-11 items-center rounded-full border border-gray-300 px-6 text-[#37332c] transition-colors hover:border-[#37332c] hover:bg-[#37332c] hover:text-white">
               詳しく知る →
             </Link>
           </div>
@@ -113,14 +107,14 @@ export default function HeroStory() {
           <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] items-stretch gap-16 lg:gap-24">
             <div className="flex min-w-0 flex-col pt-28 lg:pt-36">
               <FadeIn>
-                <h1 className="font-serif text-[34px] font-medium leading-[2.05] tracking-[0.18em] text-primary lg:text-[42px]">
+                <h1 className="site-display-copy font-serif text-primary">
                   きょうも<br />
                   しぜんと<br />
                   いいときを。
                 </h1>
               </FadeIn>
 
-              <FadeIn className="mt-40 font-serif text-[13px] font-medium leading-[2.25] tracking-[0.03em] text-[#24211d] lg:mt-48 lg:text-[14px]">
+              <FadeIn className="site-reading-text mt-40 font-serif text-[#24211d] lg:mt-48">
                 <div className="space-y-10">
                   <div>
                     <p>拝啓</p>
@@ -154,7 +148,7 @@ export default function HeroStory() {
                 </div>
 
                 <div className="mt-16 flex justify-end">
-                  <Link href="/about" className="inline-flex min-h-11 items-center rounded-full border border-gray-300 px-7 text-xs tracking-[0.08em] text-[#37332c] transition-colors hover:border-[#37332c] hover:bg-[#37332c] hover:text-white">
+                  <Link href="/about" className="site-button-label inline-flex min-h-11 items-center rounded-full border border-gray-300 px-7 text-[#37332c] transition-colors hover:border-[#37332c] hover:bg-[#37332c] hover:text-white">
                     詳しく知る →
                   </Link>
                 </div>

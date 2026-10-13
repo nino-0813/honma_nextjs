@@ -114,7 +114,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <CartProvider onCartOpen={() => setIsCartOpen(true)} onMenuOpen={() => setIsMenuOpen(true)}>
-      <div className="min-h-screen bg-white flex flex-col font-serif font-medium tracking-widest text-primary selection:bg-black selection:text-white overflow-x-clip w-full">
+      <div className="public-site min-h-screen w-full overflow-x-clip bg-white flex flex-col font-serif font-normal tracking-normal text-primary selection:bg-black selection:text-white">
         <MainLayoutInner
           isCartOpen={isCartOpen}
           onCloseCart={() => setIsCartOpen(false)}
