@@ -11,7 +11,7 @@ export default function ProductGuide({
   if (!description) return null;
 
   return (
-    <div id="product-detail" className="mt-20 md:mt-28">
+    <div id="product-detail" className="mt-20 md:mt-24">
       <ProductFeatures rows={[{ label: '商品の説明', body: description }]} />
     </div>
   );

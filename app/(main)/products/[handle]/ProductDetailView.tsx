@@ -445,7 +445,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
   };
 
   return (
-    <div className="page-top-offset min-h-screen w-full overflow-x-clip bg-white pb-24 animate-fade-in">
+    <div className="page-top-offset min-h-screen w-full overflow-x-clip bg-white pb-24 md:pb-40 animate-fade-in">
       <div className="mx-auto max-w-[1760px] px-6 md:px-12">
         <div className="mb-12 md:mb-16"><ProductCategoryNav current="all" /></div>
 
@@ -924,15 +924,15 @@ export default function ProductDetailView({ product }: { product: Product }) {
                  })()}
               </div>
 
-              <div className="border-t border-gray-200 mt-8">
+              <div className="mt-8 border-t border-gray-200 lg:mt-12 lg:space-y-8 lg:border-t-0">
                 <Link
                   href="/legal#shipping"
-                  className="flex min-h-14 items-center justify-between border-b border-gray-200 py-4 transition-colors hover:text-hekishoku focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hekishoku focus-visible:ring-inset"
+                  className="flex min-h-14 items-center justify-between border-b border-gray-200 py-4 transition-colors hover:text-hekishoku focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hekishoku focus-visible:ring-inset lg:min-h-0 lg:border-b-0 lg:py-0"
                 >
                     <span className="text-sm font-medium tracking-wider">送料について</span>
                     <span aria-hidden="true">→</span>
                 </Link>
-                <div className="py-4 border-b border-gray-200">
+                <div className="border-b border-gray-200 py-4 lg:border-b-0 lg:py-0">
                   <div className="flex justify-between items-center cursor-pointer py-2" onClick={() => toggleAccordion('inquiry')}>
                     <span className="text-sm font-medium tracking-wider">この商品について問い合わせる</span>
                     <IconChevronDown className={`w-4 h-4 transition-transform duration-300 ${activeAccordion === 'inquiry' ? 'rotate-180' : ''}`} />
@@ -1088,12 +1088,12 @@ export default function ProductDetailView({ product }: { product: Product }) {
         <ProductStory />
 
         {/* 定期便の案内（トップと同じパネルを流用） */}
-        <div className="mt-20 md:mt-28 -mx-4 sm:-mx-6 lg:-mx-8">
+        <div className="mt-20 md:mt-24 -mx-4 sm:-mx-6 lg:-mx-8">
           <SubscriptionCTA />
         </div>
 
         {allProducts.length > 0 && (
-          <div className="mt-32 border-t border-gray-100 pt-16">
+          <div className="mt-32 border-t border-gray-100 pt-16 md:mt-24 md:border-t-0 md:pt-0">
             <h3 className="text-center text-lg font-serif tracking-[0.2em] mb-12">おすすめ商品</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {allProducts.filter(p => p.id !== product.id).slice(0, 4).map(rel => (

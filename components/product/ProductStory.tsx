@@ -15,14 +15,14 @@ export default function ProductStory() {
   const [openFaq, setOpenFaq] = useState<string | null>(null);
 
   return (
-    <section className="mt-20 md:mt-28">
+    <section className="mt-20 md:mt-24">
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[220px_1fr] lg:gap-20">
         <h2 className="text-xl font-serif font-semibold tracking-wider text-primary md:text-2xl">よくある質問</h2>
-        <ul className="border-t border-gray-200">
+        <ul className="border-t border-gray-200 lg:border-t-0 lg:space-y-8">
           {FAQ_ITEMS.map((item) => {
             const isOpen = openFaq === item.q;
             return (
-              <li key={item.q} className="border-b border-gray-200">
+              <li key={item.q} className="border-b border-gray-200 lg:border-b-0">
                 <button
                   type="button"
                   onClick={() => setOpenFaq(isOpen ? null : item.q)}

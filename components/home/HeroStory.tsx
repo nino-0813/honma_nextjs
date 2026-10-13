@@ -102,10 +102,10 @@ export default function HeroStory() {
         </FadeIn>
       </section>
 
-      <section className="hidden bg-white pb-44 pt-36 md:block lg:pb-52 lg:pt-44">
+      <section className="hidden bg-white pb-24 pt-20 md:block lg:pb-28 lg:pt-24">
         <div className="site-shell">
-          <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] items-stretch gap-16 lg:gap-24">
-            <div className="flex min-w-0 flex-col pt-28 lg:pt-36">
+          <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] items-stretch gap-20 lg:gap-32">
+            <div className="flex min-w-0 flex-col pt-14 lg:pt-16">
               <FadeIn>
                 <h1 className="site-display-copy whitespace-nowrap font-serif text-primary">
                   きょうも<br />

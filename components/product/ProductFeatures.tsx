@@ -22,7 +22,7 @@ export default function ProductFeatures({
   if (rows.length === 0) return null;
 
   return (
-    <section className={compactTop ? 'mt-0' : 'mt-24 border-t border-gray-100 pt-16 md:mt-32 md:pt-20'}>
+    <section className={compactTop ? 'mt-0' : 'mt-24 border-t border-gray-100 pt-16 md:mt-24 md:border-t-0 md:pt-0'}>
       <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8 lg:gap-16">
         {showTitle ? (
           <FadeIn>
@@ -32,10 +32,10 @@ export default function ProductFeatures({
           </FadeIn>
         ) : <div aria-hidden="true" />}
 
-        <ul className="border-t border-gray-200">
+        <ul className="border-t border-gray-200 lg:border-t-0">
           {rows.map((r, index) => {
             if (alwaysOpenFirst && index === 0) return (
-              <li key={r.label} className="border-b border-gray-200">
+              <li key={r.label} className="border-b border-gray-200 lg:border-b-0">
                 <div className="py-5 md:py-6"><span className="block text-sm font-medium text-primary md:text-base">{r.label}</span></div>
                 <div className="pb-6 text-[13px] leading-loose text-gray-600 md:text-sm">
                   <p className="whitespace-pre-wrap">{r.body}</p>
@@ -45,7 +45,7 @@ export default function ProductFeatures({
             );
             const isOpen = open === r.label;
             return (
-              <li key={r.label} className="border-b border-gray-200">
+              <li key={r.label} className="border-b border-gray-200 lg:border-b-0">
                 <button
                   type="button"
                   onClick={() => setOpen(isOpen ? null : r.label)}

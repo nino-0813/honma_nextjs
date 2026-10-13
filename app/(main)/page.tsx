@@ -43,7 +43,7 @@ export default function HomePage() {
       <Lineup />
 
       {/* 4. 定期便 */}
-      <SubscriptionCTA />
+      <SubscriptionCTA desktopSplit />
 
       {/* 5. お知らせ */}
       <News />
