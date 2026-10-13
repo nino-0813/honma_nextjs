@@ -54,6 +54,30 @@
 
 ---
 
+## Desktop rhythm and split-layout QA
+
+**Source visual truth**
+- `/Users/yusukeninomiya/Desktop/スクリーンショット 2026-10-14 7.46.17.png` through `/Users/yusukeninomiya/Desktop/スクリーンショット 2026-10-14 7.47.57.png`
+
+**Published implementation evidence**
+- Stable Vercel preview inspected after deployment.
+- Desktop accessibility snapshot confirms the letter and subscription sections each contain one text column, one CTA, and four ordered images.
+- Production build completed successfully with type checking and all 53 static pages generated.
+
+**Required fidelity surfaces**
+- Homepage desktop: reduced the video-to-story gap, increased the text/image gutter, and changed only the homepage subscription panel to the same left-copy/right-four-image composition.
+- Product desktop: removed decorative divider lines at large breakpoints and replaced them with a three-level spacing rhythm; the existing clean title wrapping and breadcrumb removal remain intact.
+- Recommendation area: reduced the oversized leading gap and increased page-bottom breathing room before the footer.
+- Buttons: all homepage pill CTAs continue to use the shared `1px` border token.
+- Mobile: the original mobile blocks and base spacing classes are unchanged; all new layout behavior is gated at `md`/`lg` breakpoints.
+
+**Findings**
+- No actionable P0/P1/P2 implementation findings remain for the requested desktop-only changes.
+
+**final result: passed**
+
+---
+
 ## Desktop product pages QA
 
 **Source visual truth**
