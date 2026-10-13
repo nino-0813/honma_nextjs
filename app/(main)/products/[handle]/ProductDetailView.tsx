@@ -44,6 +44,17 @@ function getProductTitleLines(title: string): string[] {
   return [normalized];
 }
 
+function getDesktopProductTitleLines(title: string): string[] {
+  const normalized = title.replace(/\s+/g, ' ').trim();
+  const yearMatch = normalized.match(/令和\s*\d+年産/);
+  if (yearMatch?.index !== undefined) {
+    const beforeYear = normalized.slice(0, yearMatch.index).trim();
+    const afterYear = normalized.slice(yearMatch.index + yearMatch[0].length).trim();
+    return [`${beforeYear} ${yearMatch[0].replace(/\s+/g, '')}`.trim(), afterYear].filter(Boolean);
+  }
+  return getProductTitleLines(title);
+}
+
 export default function ProductDetailView({ product }: { product: Product }) {
   const { products: allProducts } = useProducts();
   const [selectedImage, setSelectedImage] = useState(0);
@@ -459,10 +470,17 @@ export default function ProductDetailView({ product }: { product: Product }) {
 
           <div>
             <div id="purchase-panel">
-              <h1 className="mb-3 text-xl font-medium leading-[1.65] tracking-wide text-primary md:text-2xl">
-                {getProductTitleLines(product.title).map((line, index) => (
-                  <span key={`${index}-${line}`} className="block">{line}</span>
-                ))}
+              <h1 className="mb-3 text-xl font-medium leading-[1.65] tracking-wide text-primary md:text-2xl lg:!text-[28px]">
+                <span className="lg:hidden">
+                  {getProductTitleLines(product.title).map((line, index) => (
+                    <span key={`${index}-${line}`} className="block">{line}</span>
+                  ))}
+                </span>
+                <span className="hidden lg:block">
+                  {getDesktopProductTitleLines(product.title).map((line, index) => (
+                    <span key={`${index}-${line}`} className="block">{line}</span>
+                  ))}
+                </span>
               </h1>
 
               <div className="mb-8 border-b border-gray-100 pb-8">

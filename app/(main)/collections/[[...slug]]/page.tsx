@@ -192,7 +192,7 @@ export default function CollectionsPage() {
   return (
     <div className="page-top-offset min-h-screen w-full overflow-x-hidden bg-white pb-36">
       {!isLpView && (
-        <div className="sticky top-14 z-30 mb-28 bg-white/95 py-3 backdrop-blur-md md:top-16 md:mb-48">
+        <div className="sticky top-14 z-30 mb-28 bg-white/95 py-3 backdrop-blur-md md:top-16 md:mb-32">
           <div className="mx-auto max-w-[1760px] px-6 md:px-12">
             <ProductCategoryNav current={categoryNavKey} />
           </div>
