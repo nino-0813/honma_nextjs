@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
 
 type FadeInSectionProps = {
@@ -58,82 +58,7 @@ const moreTopics = [
   { kicker: '取り組みについて', title: '次の世代へつなぐ', status: '順次公開', items: ['佐渡Kids生きもの調査隊', 'クラウドファンディング', '4,700人の定期便'] },
 ];
 
-const detailTabs = [
-  {
-    id: 'sado',
-    label: '佐渡について',
-    eyebrow: '佐渡について ｜ 02',
-    title: '山の水と、三十六人の手',
-    lead: 'イケベジが田んぼをつくる豊田集落は、山と海にはさまれた小さな農村です。江戸時代から続く田んぼと水路を、集落のみんなで守ってきました。',
-    image: '/images/about/stories/P3A9707.webp',
-    imageAlt: '海と山を望む佐渡の田んぼ',
-    facts: [['約48ha', '豊田集落の田んぼ'], ['約300枚', '大小さまざまな田んぼ'], ['36人', '田んぼを守る農家']],
-    columns: [
-      ['山から海まで、ひとつの集落', '豊田集落は佐渡ヶ島の小佐渡の山あいにあり、海と里と山がおよそ2キロの範囲に収まっています。山で生まれた水が田んぼを通って海へ出ていくまでを、ひとつの集落の中で見渡せる場所です。'],
-      ['水路を守るのは、人の手', '山の水を引く水路の掃除や、あぜの草刈り、冬の雪害への備えは、昔から集落みんなの仕事でした。イケベジは田んぼを集めて大きくするのではなく、田んぼに関わる人を増やすことで、この風景を次へ渡したいと考えています。'],
-    ],
-  },
-  {
-    id: 'ikevege',
-    label: 'イケベジについて',
-    eyebrow: 'イケベジについて',
-    title: '駒沢の八百屋から、ふるさとの田んぼへ',
-    lead: 'イケベジは、株式会社nacoの農業の仕事です。自然と社会のあいだに立つ「通訳」でありたい。その思いを胸に、佐渡の兼業農家に生まれた一人が、ふるさとの田んぼへ戻りました。',
-    image: '/images/about/stories/P3A0011.jpg',
-    imageAlt: '田んぼで働くイケベジの作り手',
-    facts: [['1992', '佐渡・豊田集落に生まれる'], ['2021', '佐渡で米づくりを始める'], ['2025', '原木しいたけの栽培を始める']],
-    columns: [
-      ['島を出て、見えたもの', '18歳で佐渡を出て東京で暮らし、初めて自分が育った場所を見つめ直しました。自然の在り方や豊かさを、社会に伝わる言葉に訳す会社をつくりたい。その思いがnacoの出発点です。'],
-      ['専業の理由は、田んぼの景色', '兼業農家の息子だった代表が専業農家になった理由は、豊田の田んぼの景色を子どもたちの代に残したいと思ったから。収量よりも、その年の田んぼが育てた味を大切にしています。'],
-    ],
-  },
-  {
-    id: 'production',
-    label: '生産について',
-    eyebrow: '生産について',
-    title: 'おいしさの、その手前',
-    lead: 'おいしいことは大前提。そのうえで、そこへ至る道のりまで胸を張れるものでありたい。農薬や除草剤、化学肥料に頼らず、土づくりはできる限り島の資源で行います。',
-    image: '/images/renewal/about/delicious.webp',
-    imageAlt: '稲穂が実る田んぼ',
-    facts: [['コシヒカリ', '自然栽培'], ['亀の尾', '竹堆肥'], ['にこまる', '牡蠣殻・酒粕']],
-    columns: [
-      ['その年の味を、そのままに', '肥料を入れない田んぼでは、天気や水の具合がそのまま味に出ます。今年の田んぼがつくった今年の味。その違いも含めて楽しんでもらいたいと考えています。'],
-      ['精米は、注文のあとで', '収穫したお米は一年中5℃以下で保管し、大きな粒だけを選びます。注文を受けてから精米し、できたてのお米を届けます。'],
-    ],
-  },
-  {
-    id: 'experience',
-    label: '体験について',
-    eyebrow: '体験について',
-    title: '断らない田んぼ',
-    lead: '農業や自然が、特別なものではなく、すぐそばにあるものであってほしい。「何かあったら、まずイケベジに相談してみよう」。そう思ってもらえる田んぼであり続けます。',
-    image: '/images/about/hero/about_hero_taue_92.webp',
-    imageAlt: '田植えを体験する人たち',
-    facts: [['約700人', '1年間に田んぼを訪れる人'], ['40人', '佐渡Kids生きもの調査隊'], ['10種類以上', '用意している体験の入口']],
-    columns: [
-      ['入口は、相手の目線で', '田植えや稲刈り、保育園の食育、中学生の職場体験、企業研修まで。相手の目的に合わせ、佐渡の山と海のつながりを体験できる入口を用意しています。'],
-      ['田んぼへの入り口', '農家にとっては忙しい時期でも、体験する人にとっては忘れられない時間になります。依頼はまず断らない。そこから、自然と暮らしが再びつながっていきます。'],
-    ],
-  },
-  {
-    id: 'initiatives',
-    label: '取り組みについて',
-    eyebrow: '取り組みについて',
-    title: '食べる人が、農家を生む',
-    lead: '子どもたちが「ここに生まれてよかった」と思える島を、次の世代へ。食べる人と田んぼの関係を育てる、三つの取り組みを続けています。',
-    image: '/images/renewal/brand/access-1.webp',
-    imageAlt: '稲刈りに参加する人たち',
-    facts: [['40人', '生きもの調査隊の小学生'], ['149人', 'クラウドファンディングの支援者'], ['4,700人', '目指す定期便利用者']],
-    columns: [
-      ['受け取ったバトンを、両隣へ', '佐渡Kids生きもの調査隊では、かつて参加した子どもが今はコーチとして次の世代を田んぼへ連れています。支えてもらった人が、次は誰かへ渡していく循環を育てます。'],
-      ['集めるより、関わる人を', '田んぼを集めて大きくするのではなく、兼業で田んぼに関わる人を増やす。その入口として、お米を届ける定期便や、田んぼの体験を続けています。'],
-    ],
-  },
-] as const;
-
 export default function AboutPage() {
-  const [activeDetailTab, setActiveDetailTab] = useState<(typeof detailTabs)[number]['id']>('sado');
-  const activeDetail = detailTabs.find((tab) => tab.id === activeDetailTab) ?? detailTabs[0];
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -245,47 +170,7 @@ export default function AboutPage() {
         </FadeInSection>
       </section>
 
-      <section className="border-t border-[#d8d8d2] bg-[#f4f4f0] px-4 py-24 md:px-6 md:py-28">
-        <div className="mx-auto max-w-[1120px]">
-          <FadeInSection className="text-center">
-            <h2 className="text-[24px] font-medium tracking-[0.2em] md:text-[30px]">イケベジを詳しく知る</h2>
-            <p className="mt-5 text-[13px] font-light leading-[2.1] tracking-[0.08em] text-gray-600">新潟県・佐渡ヶ島の田んぼから。<br />イケベジが日々向き合っていることを、ここから詳しくお伝えします。</p>
-          </FadeInSection>
-
-          <div role="tablist" aria-label="イケベジを詳しく知る" className="mt-12 flex overflow-x-auto border-y border-[#d3d3cc] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:justify-center">
-            {detailTabs.map((tab) => {
-              const selected = activeDetailTab === tab.id;
-              return (
-                <button key={tab.id} id={`detail-tab-${tab.id}`} type="button" role="tab" aria-selected={selected} aria-controls={`detail-panel-${tab.id}`} tabIndex={selected ? 0 : -1} onClick={() => setActiveDetailTab(tab.id)} className={`relative min-h-12 shrink-0 cursor-pointer px-5 py-4 text-[12px] tracking-[0.1em] transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#1c1d1d] md:px-7 ${selected ? 'font-medium text-[#1c1d1d]' : 'text-gray-500 hover:text-[#1c1d1d]'}`}>
-                  {tab.label}
-                  {selected && <span aria-hidden="true" className="absolute inset-x-5 bottom-0 h-px bg-[#1c1d1d]" />}
-                </button>
-              );
-            })}
-          </div>
-
-          <article key={activeDetail.id} id={`detail-panel-${activeDetail.id}`} role="tabpanel" aria-labelledby={`detail-tab-${activeDetail.id}`} tabIndex={0} className="mt-14 border-t border-[#1c1d1d] pt-5 outline-none motion-safe:animate-[fadeIn_240ms_ease-out]">
-            <p className="text-[10px] tracking-[0.22em] text-gray-500">{activeDetail.eyebrow}</p>
-            <h3 className="mt-3 text-[24px] font-semibold leading-[1.6] tracking-[0.08em] md:text-[31px]">{activeDetail.title}</h3>
-            <p className="mt-4 max-w-[900px] border-b border-[#dfdfd9] pb-7 text-[13px] font-light leading-[2.05] tracking-[0.05em] text-gray-600 md:text-sm">{activeDetail.lead}</p>
-
-            <div className="mt-8 grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:gap-12">
-              <figure>
-                <div className="aspect-[16/10] overflow-hidden bg-[#e5e5df]"><img src={activeDetail.image} alt={activeDetail.imageAlt} className="h-full w-full object-cover" /></div>
-              </figure>
-              <dl className="grid content-start border-t border-[#1c1d1d]">
-                {activeDetail.facts.map(([number, label]) => <div key={number} className="grid grid-cols-[7.5rem_1fr] items-baseline gap-4 border-b border-[#d9d9d2] py-4"><dt className="font-serif text-[25px] tracking-[0.02em] md:text-[30px]">{number}</dt><dd className="text-[11px] font-light leading-[1.8] tracking-[0.08em] text-gray-600 md:text-xs">{label}</dd></div>)}
-              </dl>
-            </div>
-
-            <div className="mt-10 grid gap-9 md:grid-cols-2 md:gap-12">
-              {activeDetail.columns.map(([heading, body]) => <section key={heading}><h4 className="text-[15px] font-semibold tracking-[0.1em]">{heading}</h4><p className="mt-4 text-justify text-[13px] font-light leading-[2.1] tracking-[0.05em] text-gray-600">{body}</p></section>)}
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <section className="hidden border-t border-[#d8d8d2] bg-[#f1f1ed] px-6 py-24 md:py-28">
+      <section className="border-t border-[#d8d8d2] bg-[#f1f1ed] px-6 py-24 md:py-28">
         <div className="mx-auto max-w-[1120px]">
           <FadeInSection className="text-center">
             <h2 className="text-[24px] font-medium tracking-[0.2em] md:text-[30px]">イケベジを詳しく知る</h2>
