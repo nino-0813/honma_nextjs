@@ -27,20 +27,101 @@ export default function HeroStory() {
         </div>
       </section>
 
-      <section className="bg-white px-6 pb-24 pt-24 md:px-[10%] md:pb-44 md:pt-36 lg:pb-52 lg:pt-44">
-        <div className="mx-auto max-w-[1440px]">
-          <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] items-stretch gap-5 md:gap-16 lg:gap-24">
-            <div className="flex min-w-0 flex-col pt-16 md:pt-28 lg:pt-36">
+      <section className="bg-white px-5 pb-20 pt-20 md:hidden">
+        <div className="mx-auto max-w-[430px]">
+          <div className="grid grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)] items-stretch gap-4">
+            <div className="flex min-w-0 items-center">
               <FadeIn>
-                <h1 className="font-serif text-[22px] font-medium leading-[2.05] tracking-[0.18em] text-primary md:text-[34px] lg:text-[42px]">
+                <h1 className="font-serif text-[20px] font-medium leading-[2.05] tracking-[0.12em] text-primary">
+                  きょうも<br />
+                  しぜんと<br />
+                  いいときを。
+                </h1>
+              </FadeIn>
+            </div>
+
+            <FadeIn className="grid h-[520px] min-h-0 grid-rows-4 overflow-hidden">
+              {STORY_IMAGES.map((image, index) => (
+                <div key={image.src} className="min-h-0 overflow-hidden bg-dim">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={image.src} alt={image.alt} loading={index < 2 ? 'eager' : 'lazy'} className="h-full w-full object-cover" />
+                </div>
+              ))}
+            </FadeIn>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white px-5 pb-28 pt-20 md:hidden">
+        <FadeIn className="mx-auto max-w-[430px] font-serif text-[12px] font-medium leading-[2.3] tracking-[0.025em] text-[#24211d]">
+          <div className="space-y-8">
+            <div>
+              <p>拝啓</p>
+              <p className="mt-1">
+                イケベジを知ってくれた<br />
+                あなたへ
+              </p>
+            </div>
+            <p>
+              佐渡ヶ島は、豊かな自然や文化が詰まった<br />
+              「日本の縮図」といわれる島です。
+            </p>
+            <div>
+              <p>そして</p>
+              <p className="mt-3">
+                トキとの共生を選び、全島の農家が立ち上がった<br />
+                この島の歴史は、佐渡の未来を担う農家たちの<br />
+                胸を熱くする物語です。私たちもまた、<br />
+                この歴史のバトンを受け継いでいます。
+              </p>
+            </div>
+            <p>
+              島の自然が魅せる美しさ、楽しさ、厳しさ、<br />
+              ワクワク感。その自然界の“イケてる”を<br />
+              もっと社会に伝え、還元していきたい。<br />
+              そんな思いから、わたしたち「イケベジ」は<br />
+              始まりました。
+            </p>
+            <p>
+              自然から学び、豊かさを分かち合うことを通じて、<br />
+              しぜんと笑みがこぼれる社会への<br />
+              架け橋となります。
+            </p>
+            <p>
+              なんでもない日常が、ちょっとでも<br />
+              “特別な時間（とき）”になりますように。
+            </p>
+            <p>「きょうも　しぜんと　いいときを。」</p>
+          </div>
+
+          <div className="mt-12 text-left">
+            <p>敬具</p>
+            <p>佐渡ヶ島より　愛を込めて</p>
+            <p>イケベジより</p>
+          </div>
+
+          <div className="mt-10 flex justify-start">
+            <Link href="/about" className="inline-flex min-h-10 items-center rounded-full border border-gray-300 px-5 text-[10px] tracking-[0.08em] text-[#37332c] transition-colors hover:border-[#37332c] hover:bg-[#37332c] hover:text-white">
+              詳しく知る →
+            </Link>
+          </div>
+        </FadeIn>
+      </section>
+
+      <section className="hidden bg-white px-[10%] pb-44 pt-36 md:block lg:pb-52 lg:pt-44">
+        <div className="mx-auto max-w-[1440px]">
+          <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] items-stretch gap-16 lg:gap-24">
+            <div className="flex min-w-0 flex-col pt-28 lg:pt-36">
+              <FadeIn>
+                <h1 className="font-serif text-[34px] font-medium leading-[2.05] tracking-[0.18em] text-primary lg:text-[42px]">
                   きょうも<br />
                   しぜんと<br />
                   いいときを。
                 </h1>
               </FadeIn>
 
-              <FadeIn className="mt-28 font-serif text-[9px] font-medium leading-[2.15] tracking-[0.03em] text-[#24211d] md:mt-40 md:text-[13px] md:leading-[2.25] lg:mt-48 lg:text-[14px]">
-                <div className="space-y-7 md:space-y-10">
+              <FadeIn className="mt-40 font-serif text-[13px] font-medium leading-[2.25] tracking-[0.03em] text-[#24211d] lg:mt-48 lg:text-[14px]">
+                <div className="space-y-10">
                   <div>
                     <p>拝啓</p>
                     <p>イケベジを知ってくれた<br />あなたへ</p>
@@ -66,14 +147,14 @@ export default function HeroStory() {
                   <p>「きょうも　しぜんと　いいときを。」</p>
                 </div>
 
-                <div className="mt-10 text-right md:mt-16">
+                <div className="mt-16 text-right">
                   <p>敬具</p>
                   <p>佐渡ヶ島より　愛を込めて</p>
                   <p>イケベジより</p>
                 </div>
 
-                <div className="mt-10 flex justify-end md:mt-16">
-                  <Link href="/about" className="inline-flex min-h-10 items-center rounded-full border border-gray-300 px-5 text-[9px] tracking-[0.08em] text-[#37332c] transition-colors hover:border-[#37332c] hover:bg-[#37332c] hover:text-white md:min-h-11 md:px-7 md:text-xs">
+                <div className="mt-16 flex justify-end">
+                  <Link href="/about" className="inline-flex min-h-11 items-center rounded-full border border-gray-300 px-7 text-xs tracking-[0.08em] text-[#37332c] transition-colors hover:border-[#37332c] hover:bg-[#37332c] hover:text-white">
                     詳しく知る →
                   </Link>
                 </div>
@@ -92,78 +173,6 @@ export default function HeroStory() {
         </div>
       </section>
 
-      <section className="hidden bg-white px-[10%] pb-28 pt-28 md:pb-44 md:pt-40 lg:pb-52 lg:pt-48">
-        <div className="mx-auto max-w-[1440px]">
-          <FadeIn>
-            <h1 className="font-serif text-[22px] font-medium leading-[2.05] tracking-[0.18em] text-primary md:text-[34px] lg:text-[42px]">
-              きょうも<br />
-              しぜんと<br />
-              いいときを。
-            </h1>
-          </FadeIn>
-
-          <div className="mx-auto mt-28 max-w-[780px] font-serif text-[11px] font-medium leading-[2.25] tracking-[0.06em] text-[#24211d] md:mt-44 md:text-[14px] md:leading-[2.35] lg:mt-52 lg:text-[15px]">
-            <FadeIn>
-              <div className="space-y-8 md:space-y-11">
-                <div>
-                  <p>拝啓</p>
-                  <p>イケベジを知ってくれた　あなたへ</p>
-                </div>
-                <p>
-                  佐渡ヶ島は<br />
-                  豊かな自然や文化が詰まった「日本の縮図」といわれる島です。
-                </p>
-                <div>
-                  <p>そして</p>
-                  <p className="text-[#24211d]">
-                    トキとの共生を選び 全島の農家が立ち上がったという この島の歴史は<br />
-                    佐渡の未来を担う農家たちの胸を熱くする物語であり<br />
-                    私たちもまた この歴史のバトンを受け継いでいます。
-                  </p>
-                </div>
-                <p>
-                  島の自然が魅せる美しさ、楽しさ、厳しさ、ワクワク感<br />
-                  その自然界の “イケてる” をもっと社会に伝え還元していきたい<br />
-                  という思いから わたしたち「イケベジ」は始まったのです。
-                </p>
-                <p>
-                  自然から学び、豊かさを分かち合うことを通じて<br />
-                  しぜんと笑みがこぼれるような社会への架け橋となり
-                </p>
-                <p>
-                  なんでもない日常がちょっとでも<br />
-                  “特別な時間（とき）” を感じられますように。という意味を込めて
-                </p>
-                <p>「きょうも　しぜんと　いいときを。」</p>
-              </div>
-              <div className="mt-14 text-right md:mt-20">
-                <p>敬具</p>
-                <p>佐渡ヶ島より　愛を込めて</p>
-                <p>イケベジより</p>
-              </div>
-            </FadeIn>
-          </div>
-
-          <FadeIn className="mx-auto mt-16 max-w-[780px] md:mt-24">
-            <div className="flex justify-end">
-              <Link href="/about" className="inline-flex min-h-10 items-center rounded-full border border-gray-300 px-6 text-[10px] tracking-[0.08em] text-[#37332c] transition-colors hover:border-[#37332c] hover:bg-[#37332c] hover:text-white md:min-h-11 md:px-7 md:text-xs">
-                詳しく知る →
-              </Link>
-            </div>
-          </FadeIn>
-
-          <FadeIn className="mt-24 md:mt-36">
-            <div className="grid grid-cols-2 overflow-hidden">
-              {STORY_IMAGES.map((image) => (
-                <div key={image.src} className="aspect-video overflow-hidden bg-dim">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={image.src} alt={image.alt} loading="lazy" className="h-full w-full object-cover" />
-                </div>
-              ))}
-            </div>
-          </FadeIn>
-        </div>
-      </section>
     </>
   );
 }

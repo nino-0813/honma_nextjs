@@ -1,37 +1,53 @@
-# Design QA
+## Mobile homepage design QA
 
-- Source visual truth: `/Users/yusukeninomiya/Desktop/スクリーンショット 2026-10-13 20.27.17.png`, `/Users/yusukeninomiya/Desktop/スクリーンショット 2026-10-13 20.27.25.png`, and `/Users/yusukeninomiya/Downloads/イケベジを詳しく知る_試作.pdf`
-- Implementation: `https://honma-nextjs-git-feature-frontend-re-e0ca1d-nino-0813s-projects.vercel.app/about`
-- Viewport: desktop, 1280 CSS px wide, device scale factor 1
-- State: published `/about` page, full-page capture
-- Source dimensions: screenshots 2868x1620 and 2506x1288; PDF A4 pages 595.92x842.88 pt
-- Implementation evidence: browser-rendered full-page capture at the deployed URL
+**Source visual truth**
+- `/Users/yusukeninomiya/Desktop/スクリーンショット 2026-10-13 23.52.34.png`
+- Source pixels: `862 × 1424`.
+- The user's latest written clarification overrides the source for the story split: the first mobile section contains the three-line statement and all four images within the former two-image height; the following section is full-width text only.
 
-## Full-view comparison
+**Rendered implementation evidence**
+- Story section: `/tmp/ikevege-mobile-qa/mobile-story-revised.png`
+- Letter section: `/tmp/ikevege-mobile-qa/mobile-letter-revised.png`
+- Combined visual comparison: `/tmp/ikevege-mobile-qa/mobile-story-comparison-final.png`
+- Viewport: `390 × 844` CSS px, device scale factor `1`.
+- Implementation pixels: `390 × 844` per screenshot.
+- Normalization: source was proportionally reduced to `390px` wide and padded to `390 × 844` before the side-by-side comparison.
+- State: homepage, mobile breakpoint, story section below the opening video; notice modal dismissed.
 
-The existing introduction, chapter navigation, and 「佐渡について ｜ 01」 remain unchanged. The PDF pages begin directly beneath that article in source order, use the same centered editorial measure, off-white ground, black rules, Japanese serif hierarchy, and photographic layout. Page rasterization preserves the PDF's diagrams, multi-column composition, photographs, captions, and numerical treatments without reflow defects.
+**Full-view comparison evidence**
+- The implementation preserves the reference's clean two-column composition, left-aligned Japanese statement, white background, and narrow right-side image treatment.
+- The four requested images now occupy one compact `520px`-high column—the same approximate area previously occupied by two portrait images—and are visible together.
+- The letter starts in a separate white section after scrolling and uses the available content width without imagery.
 
-## Focused-region comparison
+**Focused-region comparison evidence**
+- The combined comparison was reviewed for statement wrapping, column balance, image crops, and outer gutters.
+- The letter screenshot was reviewed separately because it is intentionally split into a new section under the user's latest direction and therefore has no one-to-one region in the original reference.
 
-The section transition from the existing article to 「佐渡について ｜ 02」 was inspected in the deployed full-page capture. Width, centering, rule weight, and background blending align with the reference section. No separate focused crop was needed because the rendered full-page capture showed the complete transition at readable scale.
+**Required fidelity surfaces**
+- Typography: Japanese serif styling, three intentional statement lines, left alignment, and readable mobile body leading are consistent. The final statement line does not wrap.
+- Spacing/layout: `20px` mobile gutters, a compact four-image column, and a separate full-width letter section provide the requested hierarchy. Desktop remains a separate `md` layout.
+- Colors/tokens: white canvas and existing primary text colors are retained without new decorative colors.
+- Image quality: the four supplied production images are used directly with cover crops; no placeholder or CSS-drawn substitute is used.
+- Copy/content: all supplied Japanese story copy is present; mobile line breaks were deliberately set for the `390px` reading width.
 
-## Findings
+**Comparison history**
+1. Initial pass — P2: the final statement line wrapped and the letter shared the image column, making the first section too long. Fixed the statement sizing/wrapping.
+2. Clarified pass — P1: the user specified that all four images must fit into the previous two-image height and that the letter must become a separate text-only section. Rebuilt mobile into two sections and reduced the image stack to `520px`.
+3. Post-fix pass — P2: per-image entrance animation temporarily left the lower two image slots blank. Changed the four images to enter as one group; all four now appear together.
 
-- No actionable P0, P1, or P2 differences remain for the requested desktop reproduction.
-- P3: PDF-derived pages are rasterized to preserve complex composition; very small text is less accessible than native HTML when heavily zoomed out on narrow screens.
+**Primary interactions tested**
+- Scrolled from the opening video into the compact visual section.
+- Continued scrolling into the separate letter section.
+- Confirmed the “詳しく知る” link is present and keyboard/assistive-tree discoverable.
 
-## Comparison history
+**Console errors checked**
+- A fresh verification tab reported no browser console errors.
+- Production build completed successfully.
 
-- Initial implementation: the PDF page backgrounds appeared as discrete white sheets.
-- Fix: applied blend treatment and matched the page measure to the existing editorial section.
-- Post-fix evidence: deployed full-page capture shows a continuous off-white editorial section with no visible white page boxes or horizontal overflow.
+**Findings**
+- No actionable P0/P1/P2 findings remain for the requested mobile story layout.
 
-## Implementation checklist
+**Follow-up polish**
+- P3: image focal positions can be tuned per photograph later if the user prefers different crops.
 
-- [x] Preserve the existing 「佐渡について ｜ 01」 article.
-- [x] Add PDF pages 02-11 in source order.
-- [x] Preserve diagrams, photos, captions, tables, and multi-column layouts.
-- [x] Verify desktop alignment and section continuity in the browser.
-- [x] Confirm successful production build and deployment.
-
-final result: passed
+**final result: passed**

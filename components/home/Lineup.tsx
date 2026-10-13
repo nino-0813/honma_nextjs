@@ -30,7 +30,7 @@ export default function Lineup() {
           </li>
         ))}
       </ul>
-      <div className="mx-auto mt-6 flex max-w-[1440px] justify-end md:mt-8">
+      <div className="mx-auto mt-6 flex max-w-[1440px] justify-start md:mt-8 md:justify-end">
         <Link href="/collections" className="inline-flex min-h-10 items-center rounded-full border border-gray-300 px-6 text-[10px] text-primary transition-colors hover:border-primary md:min-h-11 md:px-7 md:text-xs">
           商品一覧へ →
         </Link>

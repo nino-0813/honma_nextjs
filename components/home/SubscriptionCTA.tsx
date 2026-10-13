@@ -42,7 +42,7 @@ export default function SubscriptionCTA() {
             ))}
           </div>
         </FadeIn>
-        <div className="mt-8 text-center md:mt-12">
+        <div className="mt-8 text-left md:mt-12 md:text-center">
           <Link href="/collections/rice/yearly?view=lp" className="inline-flex min-h-11 items-center rounded-full border border-primary bg-white px-8 text-xs font-medium text-primary transition-colors hover:bg-primary hover:text-white md:min-h-12 md:px-10 md:text-sm">
             定期便をはじめる →
           </Link>

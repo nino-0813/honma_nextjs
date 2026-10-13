@@ -73,7 +73,7 @@ export default async function News() {
               ))}
             </ul>
           </FadeIn>
-          <div className="mt-8 flex justify-end md:mt-10">
+          <div className="mt-8 flex justify-start md:mt-10 md:justify-end">
             <Link
               href="/blog"
               className="inline-flex min-h-11 items-center gap-2 rounded-full border border-gray-400 bg-white px-5 py-2.5 text-xs text-primary transition-colors hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
