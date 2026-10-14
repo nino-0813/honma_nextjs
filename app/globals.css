@@ -275,6 +275,12 @@
     color: #212529;
   }
 
+  /* トップページは最初のストーリーから最下部まで、少し広い共通枠で端を揃える。 */
+  .home-page {
+    --site-gutter: clamp(2.5rem, 4vw, 4rem);
+    --site-content-width: 88rem;
+  }
+
   /* 関農園の基準値：主要見出し 26px、本文 15px、文字色 #212529。 */
   .public-site :where(h1, h2, h3) {
     font-size: 1.625rem !important;
