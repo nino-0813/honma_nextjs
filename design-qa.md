@@ -66,11 +66,12 @@
 - Production build completed successfully, including linting, type checking, and generation of all 53 static pages.
 
 **Required fidelity surfaces**
-- Desktop primary `h1` and `h2` headings now share the `26px` reference size.
+- Desktop public-page `h1`, `h2`, and section-level `h3` headings now share the `26px` reference size.
 - Desktop reading copy, list copy, and descriptive copy now share `15px`, regular weight, `2.1` line height, and `#212529`.
 - Former `text-gray-600` and `text-gray-700` reading copy is normalized to the same dark text color.
 - Captions and dates remain a smaller supporting tier instead of being incorrectly enlarged.
 - All changes are contained in the desktop breakpoint; mobile typography is unchanged.
+- The shared `.public-site` wrapper applies this system across all customer-facing routes, including the top page, イケベジとは, 商品一覧・商品詳細, 定期便, FAQ, ブログ, and legal pages.
 
 **Findings**
 - No actionable P0/P1/P2 differences remain for the requested typography normalization.

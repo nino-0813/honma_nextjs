@@ -276,14 +276,8 @@
   }
 
   /* 関農園の基準値：主要見出し 26px、本文 15px、文字色 #212529。 */
-  .public-site :where(h1, h2) {
+  .public-site :where(h1, h2, h3) {
     font-size: 1.625rem !important;
-    line-height: 1.8;
-    color: #212529;
-  }
-
-  .public-site :where(h3) {
-    font-size: 1.25rem !important;
     line-height: 1.8;
     color: #212529;
   }
