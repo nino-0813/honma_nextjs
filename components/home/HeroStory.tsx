@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import FadeIn from '@/components/FadeIn';
 
-const VIDEO = '/videos/hero.mp4';
+const DESKTOP_VIDEO = '/videos/hero.mp4';
+const MOBILE_VIDEO = '/videos/hero-mobile.mp4';
 
 const STORY_IMAGES = [
   { src: '/images/home/story/rice-seeds.webp', alt: '水に浮かぶ籾' },
@@ -16,14 +17,16 @@ export default function HeroStory() {
       <section className="bg-white">
         <div className="w-full">
           <video
-            src={VIDEO}
             autoPlay
             muted
             loop
             playsInline
             preload="metadata"
             className="block h-[100svh] w-full object-cover object-center"
-          />
+          >
+            <source media="(max-width: 767px)" src={MOBILE_VIDEO} type="video/mp4" />
+            <source src={DESKTOP_VIDEO} type="video/mp4" />
+          </video>
         </div>
       </section>
 
