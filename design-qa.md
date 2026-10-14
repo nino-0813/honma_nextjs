@@ -54,6 +54,31 @@
 
 ---
 
+## Desktop typography normalization QA
+
+**Source visual truth**
+- `/Users/yusukeninomiya/Desktop/スクリーンショット 2026-10-14 13.45.22.png`
+- `/Users/yusukeninomiya/Desktop/スクリーンショット 2026-10-14 13.45.35.png`
+- Reference measurements: section heading `26px`, body copy `15px`, text color `#212529`.
+
+**Rendered implementation evidence**
+- Local desktop capture of `/about` in the Codex in-app browser after the shared typography update.
+- Production build completed successfully, including linting, type checking, and generation of all 53 static pages.
+
+**Required fidelity surfaces**
+- Desktop primary `h1` and `h2` headings now share the `26px` reference size.
+- Desktop reading copy, list copy, and descriptive copy now share `15px`, regular weight, `2.1` line height, and `#212529`.
+- Former `text-gray-600` and `text-gray-700` reading copy is normalized to the same dark text color.
+- Captions and dates remain a smaller supporting tier instead of being incorrectly enlarged.
+- All changes are contained in the desktop breakpoint; mobile typography is unchanged.
+
+**Findings**
+- No actionable P0/P1/P2 differences remain for the requested typography normalization.
+
+**final result: passed**
+
+---
+
 ## Desktop rhythm and split-layout QA
 
 **Source visual truth**

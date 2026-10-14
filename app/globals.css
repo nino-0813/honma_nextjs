@@ -267,36 +267,47 @@
 @media (min-width: 768px) {
   .public-site {
     --site-type-body: 0.9375rem;
-    --site-type-caption: 0.9375rem;
-    --site-type-label: 1rem;
+    --site-type-caption: 0.875rem;
+    --site-type-label: 0.9375rem;
     --site-leading-body: 2.1;
     --site-gutter: clamp(3.75rem, 7vw, 6.25rem);
+    --color-primary: #212529;
+    color: #212529;
   }
 
-  .public-site :where(h1) {
-    font-size: 3rem;
-    line-height: 1.4;
-  }
-
-  .public-site :where(h2) {
-    font-size: 2.5rem;
-    line-height: 1.45;
+  /* 関農園の基準値：主要見出し 26px、本文 15px、文字色 #212529。 */
+  .public-site :where(h1, h2) {
+    font-size: 1.625rem !important;
+    line-height: 1.8;
+    color: #212529;
   }
 
   .public-site :where(h3) {
-    font-size: 1.75rem;
-    line-height: 1.55;
+    font-size: 1.25rem !important;
+    line-height: 1.8;
+    color: #212529;
   }
 
   .public-site :where(h4) {
-    font-size: 1.375rem;
-    line-height: 1.6;
+    font-size: 0.9375rem !important;
+    line-height: 2.1;
+    color: #212529;
+  }
+
+  .public-site :where(p, li, dd, blockquote),
+  .public-site .site-reading-text,
+  .public-site .text-gray-600,
+  .public-site .text-gray-700 {
+    font-size: 0.9375rem;
+    font-weight: 400;
+    line-height: 2.1;
+    color: #212529;
   }
 
   .site-display-copy {
-    font-size: 2.625rem;
-    line-height: 1.75;
-    letter-spacing: 0.1em;
+    font-size: 1.625rem;
+    line-height: 1.8;
+    letter-spacing: 0.065em;
   }
 }
 
