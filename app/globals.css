@@ -303,6 +303,10 @@
     line-height: 1.8;
     letter-spacing: 0.065em;
   }
+
+  .public-site .home-story-display-copy {
+    font-size: 3.25rem !important;
+  }
 }
 
 

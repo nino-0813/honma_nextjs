@@ -117,7 +117,7 @@ export default function HeroStory() {
           <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] items-stretch gap-20 lg:gap-32">
             <div className="flex min-w-0 flex-col pt-14 lg:pt-16">
               <FadeIn>
-                <h1 className="site-display-copy whitespace-nowrap font-serif text-primary">
+                <h1 className="home-story-display-copy site-display-copy whitespace-nowrap font-serif text-primary">
                   きょうも<br />
                   しぜんと<br />
                   いいときを。
