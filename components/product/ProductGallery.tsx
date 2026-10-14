@@ -20,17 +20,17 @@ export default function ProductGallery({
   if (images.length === 0) return null;
 
   return (
-    <div className="grid w-full grid-cols-1 gap-4 lg:grid-cols-[5rem_minmax(0,1fr)] lg:grid-rows-1 lg:gap-5">
+    <div className="relative grid w-full grid-cols-1 gap-4 lg:block">
       {/* サムネイル列 */}
       {images.length > 1 && (
-        <div className="scrollbar-hide order-2 flex w-full gap-2.5 overflow-x-auto lg:order-1 lg:grid lg:h-full lg:w-20 lg:auto-rows-fr lg:grid-cols-1 lg:overflow-hidden">
+        <div className="scrollbar-hide order-2 flex w-full gap-2.5 overflow-x-auto lg:absolute lg:inset-y-0 lg:left-0 lg:w-20 lg:flex-col lg:overflow-x-hidden lg:overflow-y-auto">
           {images.map((img, i) => (
             <button
               key={img + i}
               type="button"
               onClick={() => setActive(i)}
               aria-label={`画像${i + 1}を表示`}
-              className={`relative aspect-square w-16 shrink-0 overflow-hidden border transition-all duration-300 lg:h-full lg:w-full lg:aspect-auto ${
+              className={`relative aspect-square w-16 shrink-0 overflow-hidden border transition-all duration-300 lg:h-20 lg:w-20 ${
                 active === i ? 'border-hekishoku opacity-100' : 'border-transparent opacity-55 hover:opacity-100'
               }`}
             >
@@ -42,7 +42,7 @@ export default function ProductGallery({
       )}
 
       {/* 選択中の画像だけを大きく表示する */}
-      <div className="order-1 w-full min-w-0 lg:order-2">
+      <div className="order-1 w-full min-w-0 lg:ml-[6.25rem] lg:w-auto">
         <div className="relative">
           <div className="aspect-square overflow-hidden bg-dim">
             {/* eslint-disable-next-line @next/next/no-img-element */}
