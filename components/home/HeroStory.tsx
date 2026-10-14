@@ -17,16 +17,23 @@ export default function HeroStory() {
       <section className="bg-white">
         <div className="w-full">
           <video
+            src={MOBILE_VIDEO}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            className="block h-[100svh] w-full object-cover object-center md:hidden"
+          />
+          <video
+            src={DESKTOP_VIDEO}
             autoPlay
             muted
             loop
             playsInline
             preload="metadata"
-            className="block h-[100svh] w-full object-cover object-center"
-          >
-            <source media="(max-width: 767px)" src={MOBILE_VIDEO} type="video/mp4" />
-            <source src={DESKTOP_VIDEO} type="video/mp4" />
-          </video>
+            className="hidden h-[100svh] w-full object-cover object-center md:block"
+          />
         </div>
       </section>
 
