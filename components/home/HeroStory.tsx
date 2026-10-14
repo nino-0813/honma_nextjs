@@ -2,7 +2,7 @@ import Link from 'next/link';
 import FadeIn from '@/components/FadeIn';
 
 const DESKTOP_VIDEO = '/videos/hero.mp4';
-const MOBILE_VIDEO = '/videos/hero-mobile.mp4';
+const MOBILE_VIDEO = '/videos/hero-mobile-v2.mp4';
 
 const STORY_IMAGES = [
   { src: '/images/home/story/rice-seeds.webp', alt: '水に浮かぶ籾' },
