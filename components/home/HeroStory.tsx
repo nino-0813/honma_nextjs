@@ -114,7 +114,7 @@ export default function HeroStory() {
 
       <section className="hidden bg-white pb-24 pt-20 md:block lg:pb-28 lg:pt-24">
         <div className="site-shell">
-          <div className="grid grid-cols-2 items-stretch gap-12 lg:grid-cols-[minmax(0,40rem)_minmax(0,1fr)] lg:gap-20">
+          <div className="grid grid-cols-2 items-stretch gap-20 lg:gap-32">
             <div className="flex min-w-0 flex-col pt-14 lg:pt-16">
               <FadeIn>
                 <h1 className="home-story-display-copy site-display-copy whitespace-nowrap font-serif text-primary">
