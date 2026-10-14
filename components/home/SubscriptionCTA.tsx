@@ -47,7 +47,7 @@ export default function SubscriptionCTA({ desktopSplit = false }: { desktopSplit
 
       {desktopSplit ? (
         <div className="site-shell hidden md:block">
-          <div className="grid grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] items-stretch gap-20 lg:gap-32">
+          <div className="grid grid-cols-2 items-stretch gap-20 lg:gap-32">
             <div className="flex min-w-0 flex-col justify-center">
               <FadeIn>
                 <div className="site-reading-column">
