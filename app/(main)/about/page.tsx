@@ -37,7 +37,6 @@ const FadeInSection = ({ children, className = '' }: FadeInSectionProps) => {
 
 const goodTimes = [
   { src: '/images/renewal/lineup/rice.webp', alt: '炊きたてのごはん', label: '食卓のいいとき' },
-  { src: '/images/about/stories/about_story_taue_123.webp', alt: '田植えをする人たち', label: '田んぼのいいとき' },
   { src: '/images/about/stories/P3A9707.webp', alt: '佐渡の田んぼと山並み', label: '島のいいとき' },
 ];
 
@@ -149,12 +148,12 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="px-6 py-20 text-center md:py-28">
-        <FadeInSection className="mx-auto max-w-[680px]">
+      <section className="px-4 py-20 md:px-6 md:py-28">
+        <FadeInSection className="mx-auto max-w-[1120px] text-left">
           <h2 className="text-[25px] font-medium leading-[1.9] tracking-[0.14em] md:text-[34px]">
             子どもたちが<br />「ここに生まれてよかった」と<br />思える社会を。
           </h2>
-          <div className="mt-10 space-y-5 text-[13px] font-light leading-[2.15] tracking-[0.08em] text-gray-600 md:mt-12 md:text-sm">
+          <div className="mt-10 max-w-[680px] space-y-5 text-[13px] font-light leading-[2.15] tracking-[0.08em] text-gray-600 md:mt-12 md:text-sm">
             <p>自然界では、多様な命が、無理なく、<br />あるがままに響き合い、めぐり続けている。<br />その在り方を、私たちは“イケてる”と呼んでいます。</p>
             <p>そんな“イケてる”社会を小さな島の集落から、一歩ずつ。</p>
           </div>
@@ -163,16 +162,16 @@ export default function AboutPage() {
 
       <section className="bg-[#f7f6f0] px-4 py-24 md:px-6 md:py-28">
         <FadeInSection className="mx-auto max-w-[1120px]">
-          <h2 className="text-center text-[24px] font-medium tracking-[0.2em] md:text-[32px]">きょうも しぜんと いいときを。</h2>
-          <div className="mx-auto mt-12 max-w-[720px] space-y-7 text-center text-[13px] font-light leading-[2.3] tracking-[0.09em] text-gray-600 md:text-sm">
+          <h2 className="text-left text-[24px] font-medium tracking-[0.2em] md:text-[32px]">きょうも しぜんと いいときを。</h2>
+          <div className="mt-12 max-w-[720px] space-y-7 text-left text-[13px] font-light leading-[2.3] tracking-[0.09em] text-gray-600 md:text-sm">
             <p>「しぜんと」には、自然と向き合うこと、そして気負わず自然体でいること。そのふたつの意味を込めています。</p>
             <p>イケベジが届けたいのは、特別な日のごちそうではなく、毎日のなかにある、ささやかな「いいとき」です。</p>
           </div>
 
-          <div className="mt-14 grid grid-cols-2 gap-3 md:mt-16 md:grid-cols-3">
-            {goodTimes.map((item, index) => (
-              <figure key={item.label} className={index === 2 ? 'col-span-2 md:col-span-1' : ''}>
-                <div className={`${index === 2 ? 'aspect-video md:aspect-[4/5]' : 'aspect-[4/5]'} overflow-hidden bg-[#e2e3db]`}>
+          <div className="mt-14 grid grid-cols-2 gap-3 md:mt-16">
+            {goodTimes.map((item) => (
+              <figure key={item.label}>
+                <div className="aspect-[4/5] overflow-hidden bg-[#e2e3db]">
                   <img src={item.src} alt={item.alt} className="h-full w-full object-cover" />
                 </div>
                 <figcaption className="mt-3 text-center text-[11px] tracking-[0.14em] text-gray-500">{item.label}</figcaption>
@@ -180,13 +179,16 @@ export default function AboutPage() {
             ))}
           </div>
 
-          <div className="mx-auto mt-14 max-w-[680px] space-y-7 text-center text-[13px] font-light leading-[2.3] tracking-[0.09em] text-gray-600 md:mt-16 md:text-sm">
+          <div className="mt-14 max-w-[680px] space-y-7 text-left text-[13px] font-light leading-[2.3] tracking-[0.09em] text-gray-600 md:mt-16 md:text-sm">
             <p>ひと粒のお米の向こうには、<br />山から流れてくる水や、田んぼに集う生きもの、<br />トキが舞う空と、長い年月をかけて受け継がれてきた田んぼがあります。</p>
             <p>あなたの「いいとき」は、自然が重ねてきた時間とつながっている。<br />ありのままのあなたで、<br />きょうも、しぜんと。</p>
           </div>
           <div className="mt-14 text-center md:mt-16">
             <p className="text-[19px] leading-relaxed tracking-[0.07em] md:text-[26px]">毎日のごはんに、佐渡の田んぼをひとつ。</p>
             <Link href="/collections" className="mt-7 inline-block border-b border-[#1c1d1d] pb-1 text-[13px] tracking-[0.1em] transition-opacity hover:opacity-60">商品一覧を見る　→</Link>
+          </div>
+          <div className="mt-14 aspect-video overflow-hidden md:mt-16">
+            <img src="/images/about/closing/good-times-collage.webp" alt="イケベジと地域の人たちが自然の中で過ごす様子" className="h-full w-full object-cover" />
           </div>
         </FadeInSection>
       </section>
