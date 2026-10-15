@@ -36,11 +36,20 @@ const FARMING_TERMS = ['農薬・化学肥料不使用栽培', '無農薬無化�
 
 function getProductTitleParts(title: string) {
   const matched = title.match(/^【([^】]+)】\s*(.*)$/);
-  if (!matched) return { primary: title, secondary: '' };
+  if (!matched) return { primary: title, secondary: '', tertiary: '' };
   const [, name, remainder] = matched;
   const farming = FARMING_TERMS.find((term) => remainder.includes(term));
-  const secondary = farming ? remainder.replace(farming, '').replace(/\s{2,}/g, ' ').trim() : remainder.trim();
-  return { primary: farming ? `${name} ／ ${farming}` : name, secondary };
+  if (!farming) return { primary: name, secondary: '', tertiary: remainder.trim() };
+
+  const amount = remainder.match(/(?:\d+(?:\.\d+)?\s*kg|\d+合(?:\s*[×xX]\s*\d+個)?)/i)?.[0] ?? '';
+  const year = remainder.match(/令和\s*\d+年(?:度|産)?/)?.[0]
+    ?.replace(/\s/g, '')
+    .replace(/年産$/, '年度')
+    .replace(/年$/, '年度') ?? '';
+  const origin = remainder.includes('新潟県佐渡産') ? '新潟県佐渡産' : '';
+  const tertiary = [amount.replace(/\s+/g, ''), year, origin].filter(Boolean).join(' ');
+
+  return { primary: name, secondary: farming, tertiary };
 }
 
 const CATEGORY_INTROS: Record<string, { image: string; alt: string; lead: string; details: string[] }> = {
@@ -286,9 +295,10 @@ export default function CollectionsPage() {
                   </div>
                 </div>
                 <div className="flex min-w-0 w-full flex-1 flex-col gap-2 px-2 text-left">
-                  <h2 className="min-h-[4.8em] max-w-full overflow-hidden text-primary transition-colors group-hover:text-gray-600">
+                  <h2 className="min-h-[5.8em] max-w-full overflow-hidden text-primary transition-colors group-hover:text-gray-600">
                     <span className="block max-w-full break-words text-[12px] font-semibold leading-relaxed">{titleParts.primary}</span>
-                    {titleParts.secondary && <span className="mt-1 block max-w-full break-words text-[13px] font-medium leading-[1.8] line-clamp-2">{titleParts.secondary}</span>}
+                    {titleParts.secondary && <span className="mt-1 block max-w-full break-words text-[12px] font-medium leading-relaxed">{titleParts.secondary}</span>}
+                    {titleParts.tertiary && <span className="mt-1 block max-w-full break-words text-[12px] font-medium leading-relaxed">{titleParts.tertiary}</span>}
                   </h2>
                   <p className="flex flex-wrap items-center justify-start gap-2 font-serif text-sm tracking-wide text-gray-900">
                     {(() => {

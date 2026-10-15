@@ -177,7 +177,7 @@ export default function HeroStory() {
             </FadeIn>
 
             <div className="relative col-start-2 row-start-2 mt-8 min-h-0 overflow-hidden lg:mt-10">
-              <div className="absolute inset-0 grid min-h-0 grid-rows-4 overflow-hidden">
+              <div className="absolute inset-y-0 right-0 grid w-2/3 min-h-0 grid-rows-4 overflow-hidden">
                 {STORY_IMAGES.map((image, index) => (
                   <FadeIn key={image.src} delay={140 + index * 110} className="min-h-0 overflow-hidden bg-dim">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
