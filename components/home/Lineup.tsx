@@ -5,7 +5,7 @@ import FadeIn from '@/components/FadeIn';
 const TILES = [
   { title: 'お米', href: '/collections/rice', image: '/images/renewal/lineup/rice.webp' },
   { title: '原木しいたけ', href: '/collections/shiitake', image: '/images/renewal/lineup/shiitake.webp' },
-  { title: 'その他', href: '/collections/crescent', image: '/images/renewal/lineup/others.webp' },
+  { title: 'その他', href: '/collections/crescent', image: '/images/crescentmoon/589F7B72-C537-4904-A9AD-55F5EDFF1A71.jpg' },
 ];
 
 export default function Lineup() {
