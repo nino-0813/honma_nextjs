@@ -258,7 +258,7 @@ export default function CollectionsPage() {
         )}
 
         {!loading && !error && filteredProducts.length > 0 && (
-          <div className="grid grid-cols-2 gap-x-6 gap-y-16 sm:grid-cols-2 sm:gap-x-10 md:gap-y-12 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-12">
+          <div className={`grid grid-cols-2 gap-x-6 gap-y-16 sm:grid-cols-2 sm:gap-x-10 md:gap-y-12 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-12 ${isLpView ? 'md:mx-auto md:max-w-6xl' : ''}`}>
             {filteredProducts.map((product, index) => {
               const soldOut = isProductSoldOut(product);
               const preorder = !soldOut && isProductPreorder(product); // 在庫切れ優先
