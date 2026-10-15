@@ -351,7 +351,7 @@ export default function CollectionsPage() {
         )}
 
         {!loading && !error && showSubscriptionCta && (
-          <div className="mt-24 flex justify-center md:mt-44">
+          <div className="mb-12 mt-32 flex justify-center md:mt-56">
             <Link
               href="/collections/rice/yearly?view=lp"
               className="inline-flex min-h-12 items-center justify-center rounded-full bg-primary px-10 py-3 text-sm font-medium tracking-wider text-white transition-colors duration-200 hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
