@@ -285,10 +285,10 @@ export default function CollectionsPage() {
                     />
                   </div>
                 </div>
-                <div className="flex flex-1 flex-col gap-2 text-left">
-                  <h2 className="min-h-[4.8em] text-primary transition-colors group-hover:text-gray-600">
-                    <span className="block text-[12px] font-semibold leading-relaxed">{titleParts.primary}</span>
-                    {titleParts.secondary && <span className="mt-1 block text-[13px] font-medium leading-[1.8] line-clamp-2">{titleParts.secondary}</span>}
+                <div className="flex min-w-0 w-full flex-1 flex-col gap-2 px-2 text-left">
+                  <h2 className="min-h-[4.8em] max-w-full overflow-hidden text-primary transition-colors group-hover:text-gray-600">
+                    <span className="block max-w-full break-words text-[12px] font-semibold leading-relaxed">{titleParts.primary}</span>
+                    {titleParts.secondary && <span className="mt-1 block max-w-full break-words text-[13px] font-medium leading-[1.8] line-clamp-2">{titleParts.secondary}</span>}
                   </h2>
                   <p className="flex flex-wrap items-center justify-start gap-2 font-serif text-sm tracking-wide text-gray-900">
                     {(() => {
