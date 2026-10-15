@@ -91,7 +91,7 @@ export default function SubscriptionCTA({ desktopSplit = false }: { desktopSplit
         </div>
       ) : (
         <div className="site-shell hidden md:block">
-          <FadeIn className="ml-auto w-1/2">
+          <FadeIn className="mr-auto w-1/2">
             <div className="site-reading-column">
               <p className="mb-4 text-xs tracking-[0.24em] text-gray-500">イケベジ定期便</p>
               <div className="site-reading-text subscription-reading-text mt-8 space-y-10 text-left font-serif text-gray-600">
