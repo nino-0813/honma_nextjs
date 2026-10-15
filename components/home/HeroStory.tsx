@@ -136,15 +136,15 @@ export default function HeroStory() {
 
       <section className="hidden bg-white pb-24 md:block lg:pb-28">
         <div className="site-shell">
-          <div className="grid grid-cols-2 items-stretch gap-20 lg:gap-32">
-            <div className="min-w-0">
-              <FadeIn className="site-reading-text font-serif text-[#24211d]">
-                <div className="space-y-8 lg:space-y-10">
-                  <div>
-                    <p>拝啓</p>
-                    <p>イケベジを知ってくれた</p>
-                    <p>あなたへ</p>
-                  </div>
+          <div className="grid grid-cols-2 items-stretch gap-x-20 lg:gap-x-32">
+            <FadeIn className="site-reading-text col-start-1 row-start-1 min-w-0 font-serif text-[#24211d]">
+              <p>拝啓</p>
+              <p>イケベジを知ってくれた</p>
+              <p>あなたへ</p>
+            </FadeIn>
+
+            <FadeIn className="site-reading-text col-start-1 row-start-2 mt-8 min-w-0 font-serif text-[#24211d] lg:mt-10">
+              <div className="space-y-8 lg:space-y-10">
                   <div>
                     <p>佐渡ヶ島は</p>
                     <p>豊かな自然や文化が詰まった</p>
@@ -173,23 +173,10 @@ export default function HeroStory() {
                     <p>という意味を込めて</p>
                   </div>
                   <p>「きょうも　しぜんと　いいときを。」</p>
-                </div>
+              </div>
+            </FadeIn>
 
-                <div className="mt-16 text-right">
-                  <p>敬具</p>
-                  <p>佐渡ヶ島より　愛を込めて</p>
-                  <p>イケベジより</p>
-                </div>
-
-                <div className="mt-16 flex justify-end">
-                  <Link href="/about" className="site-pill-link">
-                    詳しく知る →
-                  </Link>
-                </div>
-              </FadeIn>
-            </div>
-
-            <div className="grid min-h-0 grid-rows-4 overflow-hidden">
+            <div className="col-start-2 row-start-2 mt-8 grid min-h-0 grid-rows-4 overflow-hidden lg:mt-10">
               {STORY_IMAGES.map((image, index) => (
                 <FadeIn key={image.src} delay={140 + index * 110} className="min-h-0 overflow-hidden bg-dim">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -197,6 +184,20 @@ export default function HeroStory() {
                 </FadeIn>
               ))}
             </div>
+
+            <FadeIn className="site-reading-text col-start-1 row-start-3 mt-16 min-w-0 font-serif text-[#24211d]">
+              <div className="text-right">
+                <p>敬具</p>
+                <p>佐渡ヶ島より　愛を込めて</p>
+                <p>イケベジより</p>
+              </div>
+
+              <div className="mt-16 flex justify-end">
+                <Link href="/about" className="site-pill-link">
+                  詳しく知る →
+                </Link>
+              </div>
+            </FadeIn>
           </div>
         </div>
       </section>
