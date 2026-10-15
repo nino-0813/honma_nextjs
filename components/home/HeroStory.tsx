@@ -188,16 +188,18 @@ export default function HeroStory() {
             </div>
 
             <FadeIn className="site-reading-text col-start-1 row-start-3 mt-16 min-w-0 font-serif text-[#24211d]">
-              <div className="text-right">
-                <p>敬具</p>
-                <p>佐渡ヶ島より　愛を込めて</p>
-                <p>イケベジより</p>
-              </div>
+              <div className="ml-auto w-fit max-w-full">
+                <div>
+                  <p>敬具</p>
+                  <p>佐渡ヶ島より　愛を込めて</p>
+                  <p>イケベジより</p>
+                </div>
 
-              <div className="mt-16 flex justify-end">
-                <Link href="/about" className="site-pill-link">
-                  詳しく知る →
-                </Link>
+                <div className="mt-16 flex justify-end">
+                  <Link href="/about" className="site-pill-link">
+                    詳しく知る →
+                  </Link>
+                </div>
               </div>
             </FadeIn>
           </div>
