@@ -176,13 +176,15 @@ export default function HeroStory() {
               </div>
             </FadeIn>
 
-            <div className="col-start-2 row-start-2 mt-8 grid min-h-0 grid-rows-4 overflow-hidden lg:mt-10">
-              {STORY_IMAGES.map((image, index) => (
-                <FadeIn key={image.src} delay={140 + index * 110} className="min-h-0 overflow-hidden bg-dim">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={image.src} alt={image.alt} loading="lazy" className="h-full w-full object-cover" />
-                </FadeIn>
-              ))}
+            <div className="relative col-start-2 row-start-2 mt-8 min-h-0 overflow-hidden lg:mt-10">
+              <div className="absolute inset-0 grid min-h-0 grid-rows-4 overflow-hidden">
+                {STORY_IMAGES.map((image, index) => (
+                  <FadeIn key={image.src} delay={140 + index * 110} className="min-h-0 overflow-hidden bg-dim">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={image.src} alt={image.alt} loading="lazy" className="h-full w-full object-cover" />
+                  </FadeIn>
+                ))}
+              </div>
             </div>
 
             <FadeIn className="site-reading-text col-start-1 row-start-3 mt-16 min-w-0 font-serif text-[#24211d]">
