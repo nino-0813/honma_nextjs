@@ -124,7 +124,7 @@ export default function HeroStory() {
         </div>
       </section>
 
-      <section className="hidden bg-white pb-24 pt-24 md:block lg:pb-28 lg:pt-32">
+      <section className="hidden bg-white pb-24 md:block lg:pb-28">
         <div className="site-shell">
           <div className="grid grid-cols-2 items-stretch gap-20 lg:gap-32">
             <div className="min-w-0">
