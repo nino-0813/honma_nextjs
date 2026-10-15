@@ -114,17 +114,17 @@ export default function HeroStory() {
 
       <section className="hidden bg-white pb-24 pt-20 md:block lg:pb-28 lg:pt-24">
         <div className="site-shell">
-          <div className="grid grid-cols-2 items-stretch gap-20 lg:gap-32">
-            <div className="flex min-w-0 flex-col pt-14 lg:pt-16">
-              <FadeIn>
-                <h1 className="home-story-display-copy site-display-copy whitespace-nowrap font-serif text-primary">
-                  きょうも<br />
-                  しぜんと<br />
-                  いいときを。
-                </h1>
-              </FadeIn>
+          <FadeIn className="pt-14 lg:pt-16">
+            <h1 className="home-story-display-copy site-display-copy whitespace-nowrap font-serif text-primary">
+              きょうも<br />
+              しぜんと<br />
+              いいときを。
+            </h1>
+          </FadeIn>
 
-              <FadeIn className="site-reading-text mt-40 font-serif text-[#24211d] lg:mt-48">
+          <div className="mt-40 grid grid-cols-2 items-stretch gap-20 lg:mt-48 lg:gap-32">
+            <div className="min-w-0">
+              <FadeIn className="site-reading-text font-serif text-[#24211d]">
                 <div className="space-y-4">
                   <div>
                     <p>拝啓</p>
