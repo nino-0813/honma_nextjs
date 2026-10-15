@@ -79,14 +79,16 @@ export default function SubscriptionCTA({ desktopSplit = false }: { desktopSplit
               </div>
             </div>
 
-            <FadeIn className="grid min-h-0 grid-rows-4 overflow-hidden">
-              {COMMUNITY_IMAGES.map((image) => (
-                <div key={image.src} className="min-h-0 overflow-hidden bg-dim">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={image.src} alt={image.alt} loading="lazy" className="h-full w-full object-cover" />
-                </div>
-              ))}
-            </FadeIn>
+            <div className="relative min-h-0 overflow-hidden">
+              <FadeIn className="absolute inset-y-0 right-0 grid w-2/3 min-h-0 grid-rows-4 overflow-hidden">
+                {COMMUNITY_IMAGES.map((image) => (
+                  <div key={image.src} className="min-h-0 overflow-hidden bg-dim">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={image.src} alt={image.alt} loading="lazy" className="h-full w-full object-cover" />
+                  </div>
+                ))}
+              </FadeIn>
+            </div>
           </div>
         </div>
       ) : (

@@ -35,11 +35,6 @@ const FadeInSection = ({ children, className = '' }: FadeInSectionProps) => {
   );
 };
 
-const goodTimes = [
-  { src: '/images/renewal/lineup/rice.webp', alt: '炊きたてのごはん', label: '食卓のいいとき' },
-  { src: '/images/about/stories/P3A9707.webp', alt: '佐渡の田んぼと山並み', label: '島のいいとき' },
-];
-
 const timeline = [
   ['1970', '本州最後のトキ「能里」を石川県で捕獲し、佐渡へ移送'],
   ['1981', '佐渡に残っていた野生下最後の5羽をすべて捕獲'],
@@ -166,17 +161,6 @@ export default function AboutPage() {
           <div className="mt-12 max-w-[720px] space-y-7 text-left text-[13px] font-light leading-[2.3] tracking-[0.09em] text-gray-600 md:text-sm">
             <p>「しぜんと」には、自然と向き合うこと、そして気負わず自然体でいること。そのふたつの意味を込めています。</p>
             <p>イケベジが届けたいのは、特別な日のごちそうではなく、毎日のなかにある、ささやかな「いいとき」です。</p>
-          </div>
-
-          <div className="mt-14 grid grid-cols-2 gap-3 md:mt-16">
-            {goodTimes.map((item) => (
-              <figure key={item.label}>
-                <div className="aspect-[4/5] overflow-hidden bg-[#e2e3db]">
-                  <img src={item.src} alt={item.alt} className="h-full w-full object-cover" />
-                </div>
-                <figcaption className="mt-3 text-center text-[11px] tracking-[0.14em] text-gray-500">{item.label}</figcaption>
-              </figure>
-            ))}
           </div>
 
           <div className="mt-14 max-w-[680px] space-y-7 text-left text-[13px] font-light leading-[2.3] tracking-[0.09em] text-gray-600 md:mt-16 md:text-sm">

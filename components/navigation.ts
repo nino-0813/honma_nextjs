@@ -30,8 +30,6 @@ export const PRIMARY_NAV: NavItem[] = [
 
 /** ハンバーガーの中だけに置く項目 */
 export const SECONDARY_NAV: NavItem[] = [
-  { label: 'ブログ', href: '/blog' },
-  { label: '取り組み', href: '/join-us' },
   { label: 'よくあるご質問', href: '/faq' },
   { label: 'お問い合わせ', href: '/contact' },
 ];
