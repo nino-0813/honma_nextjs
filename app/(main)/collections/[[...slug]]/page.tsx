@@ -57,7 +57,7 @@ const CATEGORY_INTROS: Record<string, { image: string; alt: string; lead: string
     details: ['品種改良がされていなく、コシヒカリの祖先に当たる「亀の尾」。手作りの竹堆肥を使用し微生物たくさんの土壌で育まれた、上品で軽やかな食味をお楽しみください。'],
   },
   nikomaru: {
-    image: '/images/renewal/lineup/rice.webp',
+    image: '/images/home/collections/collection_nikomaru.png',
     alt: 'にこまるのお米',
     lead: '大粒で、冷めても弾む。',
     details: ['三品種のなかで最も粒が大きく、ふっくらした弾力が続きます。', 'お弁当や丼ものにも合わせやすい、頼もしいお米です。'],
@@ -209,12 +209,12 @@ export default function CollectionsPage() {
 
         {categoryIntro && (
           <section className="mb-20 grid items-center gap-8 md:mb-28 md:grid-cols-2 md:gap-16">
-            <div className="aspect-[16/10] overflow-hidden bg-gray-100">
+            <div className="aspect-[800/394] overflow-hidden bg-gray-100">
               <img
                 src={categoryIntro.image}
                 alt={categoryIntro.alt}
                 loading="lazy"
-                className="h-full w-full object-cover"
+                className="h-full w-full object-contain"
               />
             </div>
             <div className="space-y-5 text-gray-600">
