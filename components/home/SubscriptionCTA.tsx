@@ -2,10 +2,10 @@ import Link from 'next/link';
 import FadeIn from '@/components/FadeIn';
 
 const COMMUNITY_IMAGES = [
-  { src: '/images/home/community/bamboo-grove.webp', alt: '竹林で竹を見上げる農家' },
-  { src: '/images/home/community/rice-planting.webp', alt: '泥の中で苗を手にする田植え体験' },
-  { src: '/images/home/community/bamboo-rice.webp', alt: '竹筒にお米を入れる体験' },
-  { src: '/images/home/community/orchard.webp', alt: '果樹園で作業する人たち' },
+  { src: '/images/home/community-v2/sado-rice-fields.webp', alt: '佐渡の海と山を望む田園風景' },
+  { src: '/images/home/community-v2/harvest-road.webp', alt: '収穫期の田んぼで農作業をする人たち' },
+  { src: '/images/home/community-v2/family-rice-field.webp', alt: '佐渡の田んぼを歩く親子' },
+  { src: '/images/home/community-v2/wild-berries.webp', alt: '野いちごを摘む親子の手' },
 ];
 
 export default function SubscriptionCTA({ desktopSplit = false }: { desktopSplit?: boolean }) {
