@@ -7,7 +7,7 @@ const MOBILE_VIDEO = '/videos/hero-mobile-v2.mp4';
 const STORY_IMAGES = [
   { src: '/images/home/story/rice-seeds.webp', alt: '水に浮かぶ籾' },
   { src: '/images/home/story/rice-seedlings.webp', alt: '苗箱に育つ稲の苗' },
-  { src: '/images/home/story/field-mowing.webp', alt: '佐渡の田んぼで草を刈る農家' },
+  { src: '/images/home/story/toki-flight.webp', alt: '佐渡の田んぼの上を飛ぶ朱鷺' },
   { src: '/images/home/story/rice-harvest.webp', alt: '稲刈り機で収穫する農家' },
 ];
 
