@@ -70,7 +70,7 @@ export default function HeroStory() {
               <p>イケベジを知ってくれた</p>
               <p>あなたへ</p>
             </div>
-            <div>
+            <div className="!mt-[calc(3rem+4.2em)]">
               <p>佐渡ヶ島は</p>
               <p>豊かな自然や文化が詰まった</p>
               <p>「日本の縮図」といわれる島です。</p>
