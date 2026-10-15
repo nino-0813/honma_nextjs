@@ -64,37 +64,39 @@ export default function HeroStory() {
 
       <section className="bg-white pb-32 pt-24 md:hidden">
         <FadeIn className="site-reading-text site-shell max-w-[430px] font-serif text-[#24211d]">
-          <div className="space-y-4">
+          <div className="space-y-8">
             <div>
               <p>拝啓</p>
-              <p className="mt-1">
-                イケベジを知ってくれた<br />
-                あなたへ
-              </p>
+              <p>イケベジを知ってくれた</p>
+              <p>あなたへ</p>
             </div>
-            <p className="mobile-justified-copy">
-              佐渡ヶ島は、豊かな自然や文化が詰まった
-              「日本の縮図」といわれる島です。
-            </p>
             <div>
-              <p>そして</p>
-              <p className="mobile-justified-copy mt-3">
-                トキとの共生を選び、全島の農家が立ち上がったこの島の歴史は、佐渡の未来を担う農家たちの胸を熱くする物語です。私たちもまた、
-                この歴史のバトンを受け継いでいます。
-              </p>
+              <p>佐渡ヶ島は</p>
+              <p>豊かな自然や文化が詰まった</p>
+              <p>「日本の縮図」といわれる島です。</p>
             </div>
-            <p className="mobile-justified-copy">
-              島の自然が魅せる美しさ、楽しさ、厳しさ、ワクワク感。その自然界の“イケてる”をもっと社会に伝え、還元していきたい。そんな思いから、わたしたち「イケベジ」は
-              始まりました。
-            </p>
-            <p className="mobile-justified-copy">
-              自然から学び、豊かさを分かち合うことを通じて、しぜんと笑みがこぼれる社会への
-              架け橋となります。
-            </p>
-            <p className="mobile-justified-copy">
-              なんでもない日常が、ちょっとでも
-              “特別な時間（とき）”になりますように。
-            </p>
+            <div>
+              <p>そして トキとの共生を選び</p>
+              <p>全島の農家が立ち上がったという この島の歴史は</p>
+              <p>佐渡の未来を担う農家たちの胸を熱くする物語であり</p>
+              <p>私たちもまた この歴史のバトンを受け継いでいます。</p>
+            </div>
+            <div>
+              <p>島の自然が魅せる美しさ、楽しさ、厳しさ、ワクワク感</p>
+              <p>その自然界の ”イケてる” を</p>
+              <p>もっと社会に伝え還元していきたいという思いから</p>
+              <p>わたしたち「イケベジ」は始まったのです。</p>
+            </div>
+            <div>
+              <p>自然から学び</p>
+              <p>豊かさを分かち合うことを通じて</p>
+              <p>しぜんと笑みがこぼれるような社会への架け橋となり</p>
+            </div>
+            <div>
+              <p>なんでもない日常がちょっとでも</p>
+              <p>“特別な時間（とき）” を感じられますように。</p>
+              <p>という意味を込めて</p>
+            </div>
             <p>「きょうも　しぜんと　いいときを。」</p>
           </div>
 
