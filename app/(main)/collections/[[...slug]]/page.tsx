@@ -193,12 +193,12 @@ export default function CollectionsPage() {
     <div className="page-top-offset min-h-screen w-full overflow-x-hidden bg-white pb-36">
       {!isLpView && (
         <div className="sticky top-14 z-30 mb-28 bg-white/95 py-3 backdrop-blur-md md:top-16 md:mb-32">
-          <div className="mx-auto max-w-[1760px] px-6 md:px-12">
+          <div className="mx-auto max-w-[1160px] px-6 md:px-0">
             <ProductCategoryNav current={categoryNavKey} />
           </div>
         </div>
       )}
-      <div className="mx-auto max-w-[1760px] px-6 md:px-12">
+      <div className="mx-auto max-w-[1160px] px-6 md:px-0">
         {currentSubcategory === 'yearly' && !isLpView && (
           <div className="mb-12 text-center animate-fade-in md:mb-16">
             <p className="text-xs leading-relaxed text-gray-600 md:text-sm">

@@ -64,7 +64,7 @@ export default async function StartSetPage() {
         </p>
       </section>
 
-      <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1160px] px-4 sm:px-6 lg:px-0">
         <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-16">
           {/* 左: 画像は固定 */}
           <div className="lg:sticky lg:top-24 lg:col-span-7 lg:self-start">

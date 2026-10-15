@@ -446,7 +446,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
 
   return (
     <div className="page-top-offset min-h-screen w-full overflow-x-clip bg-white pb-24 md:pb-40 animate-fade-in">
-      <div className="mx-auto max-w-[1760px] px-6 md:px-12">
+      <div className="mx-auto max-w-[1160px] px-6 md:px-0">
         <div className="mb-12 md:mb-16"><ProductCategoryNav current="all" /></div>
 
         <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-2 lg:gap-12 xl:gap-16">
