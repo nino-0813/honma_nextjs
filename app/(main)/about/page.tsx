@@ -165,9 +165,8 @@ export default function AboutPage() {
         <FadeInSection className="mx-auto max-w-[1120px]">
           <h2 className="text-center text-[24px] font-medium tracking-[0.2em] md:text-[32px]">きょうも しぜんと いいときを。</h2>
           <div className="mx-auto mt-12 max-w-[720px] space-y-7 text-center text-[13px] font-light leading-[2.3] tracking-[0.09em] text-gray-600 md:text-sm">
-            <p>「しぜんと」には、自然と向き合うことと、気負わず自然体でいること。<br />ふたつの意味を込めています。</p>
-            <p>炊きたてのごはんを囲む食卓も、泥だらけになって笑う田植えも、田んぼで汗を流す作り手の時間も。自然がそばにあると、何気ない一日が少しだけ豊かになる。</p>
-            <p className="font-medium text-[#1c1d1d]">そんな時間を増やすことが、イケベジの届けたい「いいとき」です。</p>
+            <p>「しぜんと」には、自然と向き合うこと、そして気負わず自然体でいること。そのふたつの意味を込めています。</p>
+            <p>イケベジが届けたいのは、特別な日のごちそうではなく、毎日のなかにある、ささやかな「いいとき」です。</p>
           </div>
 
           <div className="mt-14 grid grid-cols-2 gap-3 md:mt-16 md:grid-cols-3">
@@ -183,61 +182,12 @@ export default function AboutPage() {
 
           <div className="mx-auto mt-14 max-w-[680px] space-y-7 text-center text-[13px] font-light leading-[2.3] tracking-[0.09em] text-gray-600 md:mt-16 md:text-sm">
             <p>ひと粒のお米の向こうには、<br />山から流れてくる水や、田んぼに集う生きもの、<br />トキが舞う空と、長い年月をかけて受け継がれてきた田んぼがあります。</p>
-            <p>人の「いいとき」は、自然が重ねてきた長い時間とつながっている。<br />無理なく、ありのままに。<br />きょうも、しぜんと。</p>
+            <p>あなたの「いいとき」は、自然が重ねてきた時間とつながっている。<br />ありのままのあなたで、<br />きょうも、しぜんと。</p>
           </div>
-        </FadeInSection>
-      </section>
-
-      <section className="px-6 py-24 md:py-28">
-        <div className="mx-auto max-w-[1120px]">
-          <FadeInSection className="mb-4 text-center md:mb-8">
-            <h2 className="text-[25px] font-medium tracking-[0.16em] md:text-[34px]">3つの姿勢</h2>
-          </FadeInSection>
-
-          <FadeInSection className="grid items-center gap-8 py-12 md:grid-cols-2 md:gap-16 md:py-16">
-            <div className="aspect-[4/3] overflow-hidden"><img src="/images/renewal/brand/access-1.webp" alt="稲刈りを体験する人たち" className="h-full w-full object-cover" /></div>
-            <div>
-              <h3 className="text-[21px] font-medium leading-relaxed tracking-[0.13em] md:text-[26px]">農へのアクセスを良好にする</h3>
-              <div className="mt-7 space-y-5 text-[13px] font-light leading-[2.1] tracking-[0.06em] text-gray-600 md:text-sm">
-                <p>農業や自然が、特別なものではなく、すぐそばにあるものであってほしい。兼業農家の家に生まれ、手伝いのなかで自然と田んぼに触れてきた原体験が、その思いの出発点です。</p>
-                <p>近年、農家の減少により、島の子どもたちですら、自然が「身近にはあるものの、生活とは切り離された存在」となりつつあります。</p>
-                <p>そこで、稲刈りや田植えなど体験価値の高い繁忙期にも依頼に応える体制を整え、保育園の食育から中学生の職場体験、企業の研修まで受け入れてきました。</p>
-                <p>「何かあったら、まずイケベジに相談してみよう」。そう思ってもらえる体験と学びの窓口で在り続けることが、農家だからこそできる社会への貢献だと考えています。</p>
-              </div>
-            </div>
-          </FadeInSection>
-
-          <FadeInSection className="grid items-center gap-8 py-12 md:grid-cols-2 md:gap-16 md:py-16">
-            <div className="md:order-2"><div className="aspect-[4/3] overflow-hidden"><img src="/images/about/stories/IMG_8832.webp" alt="苗を見守る作り手" className="h-full w-full object-cover" /></div></div>
-            <div className="md:order-1">
-              <h3 className="text-[21px] font-medium leading-relaxed tracking-[0.13em] md:text-[26px]">道のりまで、おいしく</h3>
-              <div className="mt-7 space-y-5 text-[13px] font-light leading-[2.1] tracking-[0.06em] text-gray-600 md:text-sm">
-                <p>おいしいことは、大前提。そのうえで、そこへ至る道のりまで、胸を張れるものでありたいと考えています。</p>
-                <p>農薬や除草剤、化学肥料に頼らず、土づくりはできる限り島の資源で。酒蔵から出る酒粕、牡蠣の養殖で出る殻、手入れされなくなった竹林の竹。これまで捨てられてきたものが、田んぼの土へと還っていきます。</p>
-                <p>正解のない取り組みだからこそ、毎年が実験です。うまくいかない年も含めて、挑戦を重ねてきた道のりが、次のおいしさをつくっています。</p>
-              </div>
-            </div>
-          </FadeInSection>
-
-          <FadeInSection className="grid items-center gap-8 py-12 md:grid-cols-2 md:gap-16 md:py-16">
-            <div className="aspect-[4/3] overflow-hidden"><img src="/images/about/stories/P3A0011.jpg" alt="田んぼで笑うイケベジの作り手" className="h-full w-full object-cover object-center" /></div>
-            <div>
-              <h3 className="text-[21px] font-medium leading-relaxed tracking-[0.13em] md:text-[26px]">作り手が楽しむ</h3>
-              <div className="mt-7 space-y-5 text-[13px] font-light leading-[2.1] tracking-[0.06em] text-gray-600 md:text-sm">
-                <p>イケベジの田んぼでは、いつもスタッフのルカの大きな歌声が響いています。</p>
-                <p>作物は、作り手の状態を鏡のように映し出すもの。だからこそ、田んぼではまず「自分らしく楽しむこと」を第一に心がけています。</p>
-                <p>資源や環境と同じように、人もまた持続可能であること。作り手が楽しめているかどうかは、その何よりの指標だと考えています。</p>
-                <p>「農家になりたい」ではなく、「イケベジのようにありたい」。そう思う大人や子どもが、一人でも増えていくことを願っています。</p>
-              </div>
-            </div>
-          </FadeInSection>
-        </div>
-      </section>
-
-      <section className="px-6 pb-24 pt-6 text-center md:pb-28">
-        <FadeInSection>
-          <p className="text-[19px] leading-relaxed tracking-[0.07em] md:text-[26px]">毎日のごはんに、佐渡の田んぼをひとつ。</p>
-          <Link href="/collections" className="mt-7 inline-block border-b border-[#1c1d1d] pb-1 text-[13px] tracking-[0.1em] transition-opacity hover:opacity-60">商品一覧を見る　→</Link>
+          <div className="mt-14 text-center md:mt-16">
+            <p className="text-[19px] leading-relaxed tracking-[0.07em] md:text-[26px]">毎日のごはんに、佐渡の田んぼをひとつ。</p>
+            <Link href="/collections" className="mt-7 inline-block border-b border-[#1c1d1d] pb-1 text-[13px] tracking-[0.1em] transition-opacity hover:opacity-60">商品一覧を見る　→</Link>
+          </div>
         </FadeInSection>
       </section>
 
@@ -264,7 +214,7 @@ export default function AboutPage() {
                 <p className="mb-5 text-justify text-[13px] font-light leading-[2.05] tracking-[0.05em]">明治時代からの乱獲に加え、農薬や化学肥料が広く使われるようになったことで、エサとなる生きものが田んぼから減り、トキは数を減らしていきました。</p>
 
                 <figure className="mb-5 break-inside-avoid">
-                  <div className="aspect-[3/2] overflow-hidden"><img src="/images/about/stories/P3A9707.webp" alt="佐渡の田んぼと山並み" className="h-full w-full object-cover" /></div>
+                  <div className="aspect-[3/2] overflow-hidden"><img src="/images/home/story/toki-flight.webp" alt="佐渡の田んぼの上を飛ぶ朱鷺" className="h-full w-full object-cover" /></div>
                   <figcaption className="mt-2 text-[10px] leading-relaxed tracking-[0.08em] text-gray-500">人と自然の営みが重なる、佐渡の田んぼ</figcaption>
                 </figure>
 

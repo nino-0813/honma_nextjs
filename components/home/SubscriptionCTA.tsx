@@ -91,14 +91,21 @@ export default function SubscriptionCTA({ desktopSplit = false }: { desktopSplit
         </div>
       ) : (
         <div className="site-shell hidden md:block">
-          <FadeIn className="mr-auto w-1/2">
-            <div className="site-reading-column">
-              <p className="mb-4 text-xs tracking-[0.24em] text-gray-500">イケベジ定期便</p>
-              <div className="site-reading-text subscription-reading-text mt-8 space-y-10 text-left font-serif text-gray-600">
+          <div className="grid grid-cols-[280px_1fr] gap-16">
+            <FadeIn>
+              <p className="font-serif text-xl font-semibold tracking-wider text-primary md:text-2xl">イケベジ定期便</p>
+            </FadeIn>
+            <FadeIn>
+              <div className="site-reading-text subscription-reading-text space-y-10 text-left font-serif text-gray-600">
                 <SubscriptionCopy />
               </div>
-            </div>
-          </FadeIn>
+              <div className="mt-12 text-left">
+                <Link href="/collections/rice/yearly?view=lp" className="site-pill-link">
+                  定期便を始める →
+                </Link>
+              </div>
+            </FadeIn>
+          </div>
           <FadeIn className="mt-12">
             <div className="grid grid-cols-2 overflow-hidden">
               {COMMUNITY_IMAGES.map((image) => (
@@ -109,11 +116,6 @@ export default function SubscriptionCTA({ desktopSplit = false }: { desktopSplit
               ))}
             </div>
           </FadeIn>
-          <div className="mt-12 text-center">
-            <Link href="/collections/rice/yearly?view=lp" className="site-pill-link">
-              定期便を始める →
-            </Link>
-          </div>
         </div>
       )}
     </section>
