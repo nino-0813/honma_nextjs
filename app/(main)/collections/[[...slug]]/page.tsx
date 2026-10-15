@@ -295,7 +295,7 @@ export default function CollectionsPage() {
                   </div>
                 </div>
                 <div className="flex min-w-0 w-full flex-1 flex-col gap-2 px-2 text-left">
-                  <h2 className="min-h-[5.8em] max-w-full overflow-hidden text-primary transition-colors group-hover:text-gray-600">
+                  <h2 className="max-w-full overflow-hidden text-primary transition-colors group-hover:text-gray-600">
                     <span className="block max-w-full break-words text-[12px] font-semibold leading-relaxed">{titleParts.primary}</span>
                     {titleParts.secondary && <span className="mt-1 block max-w-full break-words text-[12px] font-medium leading-relaxed">{titleParts.secondary}</span>}
                     {titleParts.tertiary && <span className="mt-1 block max-w-full break-words text-[12px] font-medium leading-relaxed">{titleParts.tertiary}</span>}

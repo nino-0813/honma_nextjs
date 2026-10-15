@@ -1,0 +1,577 @@
+<style>
+:host{display:block;color:#1c1d1d;font-family:"Noto Serif JP","Times New Roman",YuMincho,"Yu Mincho","Hiragino Mincho ProN",serif}
+
+/* Layout: 新サイト01と同じ書体・罫線の語彙で、記事ごとに組版を変える。
+   01=サイト現行の2段組み／02=断面図の帯＋2段組み／イケベジ=年の柱＋3つの姿勢／生産=3品種の並列＋資源の詰め組み／体験=写真2枚の組み＋2段組み／取り組み=大きな数字の章 */
+:host{
+  --ink:#1c1d1d; --body:#4a5260; --muted:#6b7280; --rule:#e5e5e0; --frame:#deded8;
+  --paper:#ffffff; --wash:#f6f6f2; --wash2:#eef1ec; --note:#b45309; --note-bg:#fff7ea;
+  --serif:"Noto Serif JP","Times New Roman",YuMincho,"Yu Mincho","Hiragino Mincho ProN",serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--serif);font-weight:500;letter-spacing:.1em}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:20px;padding-block:40px 96px}
+a{color:inherit}
+article{border-top:1px solid var(--ink);padding-top:20px;scroll-margin-top:24px}
+article+article{margin-top:120px}
+@media (min-width:760px){article+article{margin-top:180px}}
+article{padding-top:28px}
+h3{margin:4px 0 0;font-size:22px;font-weight:600;line-height:1.65;letter-spacing:.1em;text-wrap:balance}
+.lead{margin:12px 0 0;padding-bottom:4px;font-size:13px;font-weight:300;line-height:2;letter-spacing:.06em;color:var(--muted)}
+h4{margin:0 0 12px;break-after:avoid;font-size:14px;font-weight:600;letter-spacing:.1em;line-height:1.6;text-wrap:balance}
+p{margin:0 0 20px;text-align:justify;font-size:13px;font-weight:300;line-height:2.05;letter-spacing:.05em;color:var(--body)}
+figure{margin:0 0 20px;break-inside:avoid}
+figure svg{display:block;width:100%;height:auto}
+.pic{display:block;width:100%;max-width:100%;height:auto;object-fit:cover;aspect-ratio:3/2;background:var(--wash)}
+.pic.tall{aspect-ratio:3/4}.pic.sq{aspect-ratio:1/1}.pic.wide{aspect-ratio:16/9}
+.ph{aspect-ratio:1/1;max-width:100%;background:var(--wash);border:1px dashed var(--frame);display:grid;place-items:center;text-align:center;padding:12px;font-size:10px;font-weight:300;line-height:1.9;color:var(--muted);letter-spacing:.08em}
+figcaption{margin-top:8px;font-size:10px;line-height:1.6;letter-spacing:.08em;color:var(--muted)}
+figcaption b{display:block;font-size:11px;font-weight:600;letter-spacing:.1em;color:var(--ink)}
+figcaption .fn{display:block;margin-top:2px;font-size:9px;font-weight:300;letter-spacing:.04em;color:var(--muted);word-break:break-all}
+.dense figcaption.cap b{color:#fff}
+dl.tl{margin:0 0 24px;break-inside:avoid;border-top:1px solid var(--ink)}
+dl.tl div{display:grid;grid-template-columns:4.6rem 1fr;gap:12px;border-bottom:1px solid var(--rule);padding:8px 0;font-size:11px;font-weight:300;line-height:1.8}
+dt{font-weight:600;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+dd{margin:0}
+.logos{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 6px}
+.logos div{border:1px solid var(--frame);background:#fff;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;padding:6px}
+.logos img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.logos-note{font-size:10px;color:var(--muted);text-align:center;letter-spacing:.1em}
+.checks{list-style:none;padding:0;margin:14px 0 20px}
+.checks li{position:relative;padding-left:22px;font-size:13px;line-height:1.8}
+.checks li+li{margin-top:8px}
+.checks li::before{content:"✓";position:absolute;left:0;top:0;font-weight:600}
+.season{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;margin-top:12px;font-size:12px}
+.season b{margin-right:8px}
+.box{margin:0 0 20px;break-inside:avoid;border:1px solid var(--frame);padding:16px 20px}
+.box strong{display:block;font-size:12px;letter-spacing:.14em}
+.box ul{margin:12px 0 0;padding-left:20px;font-size:11px;font-weight:300;line-height:1.9}
+.box li+li{margin-top:4px}
+.pull{margin:4px 0 24px;break-inside:avoid;padding:0;font-size:15px;font-weight:500;line-height:1.95;letter-spacing:.08em;color:var(--ink);text-align:left}
+.chk{background:var(--note-bg);color:var(--note);font-size:.82em;font-weight:500;padding:0 4px;letter-spacing:.04em}
+.src{margin-top:12px;font-size:10px;font-weight:300;line-height:1.8;letter-spacing:.05em;color:var(--muted)}
+.cols{margin-top:28px;columns:1;column-gap:48px}
+.cols>h4:not(:first-child){margin-top:12px}
+.memo{margin-top:24px;background:var(--note-bg);padding:12px 16px;font-size:11px;font-weight:300;line-height:1.9;color:var(--note)}
+.memo strong{font-weight:600}
+.label{display:block;font-size:10px;letter-spacing:.24em;color:var(--muted)}
+.two{display:grid;grid-template-columns:1fr;gap:28px;margin-top:28px}
+.two>*{min-width:0}
+
+/* 01（サイト現行の要件ボックス） */
+.req{margin:0 0 20px;break-inside:avoid;border:1px solid var(--frame);padding:16px 20px}
+.req strong{display:block;font-size:12px;letter-spacing:.14em}
+.req ul{margin:12px 0 0;padding-left:20px;font-size:11px;font-weight:300;line-height:1.9}
+
+/* 02 断面図の帯 */
+.band{margin:28px 0 0;background:var(--wash)}
+
+/* イケベジ */
+.split{display:grid;grid-template-columns:1fr;gap:32px;margin-top:28px}
+.split>*{min-width:0}
+.quote{margin:0 0 24px;font-size:18px;font-weight:500;line-height:2;letter-spacing:.1em;color:var(--ink);text-align:left;text-wrap:balance}
+.quote small{display:block;margin-top:12px;font-size:10px;letter-spacing:.2em;color:var(--muted)}
+.rail{border-left:1px solid var(--ink);margin:12px 0 0;padding:0}
+.rail li{list-style:none;position:relative;padding:0 0 22px 22px}
+.rail li::before{content:"";position:absolute;left:-4px;top:.55em;width:7px;height:7px;background:var(--paper);border:1px solid var(--ink);border-radius:50%}
+.rail .y{display:block;font-size:20px;font-weight:600;letter-spacing:.06em;font-variant-numeric:tabular-nums;line-height:1.4}
+.rail p{margin:4px 0 0}
+.stances{margin-top:48px}
+.stances>h4{font-size:18px;margin-bottom:6px}
+.stances>.intro{color:var(--muted)}
+.sgrid{display:grid;grid-template-columns:1fr;gap:28px;margin-top:20px}
+.sgrid>div{min-width:0}
+.sgrid h5{margin:14px 0 10px;font-size:16px;font-weight:600;letter-spacing:.12em;line-height:1.6}
+.sgrid p{font-size:12.5px}
+.staff{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:8px;max-width:440px}
+.staff>div{min-width:0}
+.staff b{display:block;margin-top:6px;font-size:11px;font-weight:600;letter-spacing:.1em}
+.staff span{display:block;font-size:10px;font-weight:300;color:var(--muted)}
+
+/* 生産 */
+.trio{display:grid;grid-template-columns:1fr;gap:0;margin:28px 0 8px}
+.trio>div{min-width:0;padding:16px 0}
+.trio .name{font-size:20px;font-weight:600;letter-spacing:.14em}
+.trio .tag{display:inline-block;margin-top:6px;font-size:10px;letter-spacing:.14em;border:1px solid var(--ink);padding:1px 8px}
+.trio dl{margin:14px 0 12px;font-size:11px;font-weight:300;line-height:1.8}
+.trio dl{border-top:1px solid var(--rule)}
+.trio dl div{display:grid;grid-template-columns:3.6rem 1fr;gap:8px;padding:6px 0;border-bottom:1px solid var(--rule)}
+.trio p{margin:0;font-size:12px}
+.steps{margin:0 0 24px;padding:0}
+.steps li{list-style:none;padding:12px 0;border-bottom:1px dotted var(--frame)}
+.steps li:first-child{border-top:1px dotted var(--frame)}
+.steps li>div{min-width:0}
+.steps b{display:block;font-size:12px;font-weight:600;letter-spacing:.1em}
+.steps span{display:block;margin-top:4px;font-size:11px;font-weight:300;line-height:1.85;color:var(--body)}
+.award{display:grid;grid-template-columns:1fr;border:1px solid var(--ink);margin:0 0 24px}
+.award>div{padding:16px 20px;min-width:0}
+.award>div+div{border-top:1px solid var(--ink)}
+.award .yr{font-size:10px;letter-spacing:.2em;color:var(--muted)}
+.award b{display:block;margin-top:4px;font-size:14px;font-weight:600;letter-spacing:.1em;line-height:1.7}
+.award span{display:block;margin-top:4px;font-size:11px;font-weight:300;color:var(--body);line-height:1.8}
+.sub{margin-top:40px;background:var(--wash2);padding:24px 20px}
+.sub h4{font-size:18px}
+/* 資源の詰め組み */
+.dense{display:grid;grid-template-columns:1fr;gap:4px;margin:14px 0 16px;align-items:stretch}
+.dense>*{min-width:0;margin:0}
+.dense .dg{background:#fff;display:flex;align-items:center}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.tiles figure{margin:0;position:relative;min-width:0}
+.dense img{display:block;width:100%;aspect-ratio:4/3;height:auto;object-fit:cover}
+.dense .cap{position:absolute;left:0;bottom:0;background:rgba(28,29,29,.78);color:#fff;font-size:10px;letter-spacing:.1em;line-height:1.5;padding:4px 8px}
+.dense .cap b{display:block;font-size:12px;font-weight:600}
+.sub .cols{margin-top:8px}
+
+/* 体験 */
+.lone{margin:28px 0 0;max-width:640px}
+.stat{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:end;margin:4px 0 12px;break-inside:avoid}
+.stat .n{font-size:44px;font-weight:600;line-height:1;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.stat .n small{font-size:14px;margin-left:4px}
+.stat .l{font-size:12px;font-weight:300;line-height:1.8;color:var(--body)}
+.bar{display:flex;height:10px;border:1px solid var(--ink);margin:0 0 6px;break-inside:avoid}
+.bar i{display:block;height:100%}
+.bar i:first-child{background:var(--ink)}
+.barlab{display:flex;justify-content:space-between;gap:8px;font-size:10px;font-weight:300;color:var(--muted);letter-spacing:.06em;margin-bottom:24px;flex-wrap:wrap;break-inside:avoid}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 24px;padding:0;break-inside:avoid}
+.chips li{list-style:none;font-size:11px;font-weight:400;letter-spacing:.1em;border:1px solid var(--frame);padding:3px 10px}
+.aside{margin:0 0 24px;padding:0;break-inside:avoid}
+.aside p{margin:6px 0 0;font-size:12px}
+
+/* 取り組み */
+.chap{display:grid;grid-template-columns:1fr;gap:20px;padding:32px 0}
+.chap .side .pic{margin-top:20px;aspect-ratio:4/3}
+.chap>*{min-width:0}
+.big{font-size:80px;font-weight:600;line-height:1;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.big small{font-size:18px;font-weight:500;margin-left:6px;letter-spacing:.1em}
+.big.mid{font-size:44px;margin-top:18px}
+.big.mid small{font-size:15px}
+.cap2{margin-top:12px;font-size:14px;font-weight:500;color:var(--ink);line-height:1.85;letter-spacing:.08em}
+.cap2 span{display:block;margin-top:4px;font-size:12px;font-weight:300;color:var(--body)}
+.chap h4{font-size:17px}
+.chap .pic{margin-bottom:20px}
+.closing p{font-size:14px;color:var(--ink);line-height:2.1;text-align:left}
+
+@media (min-width:760px){
+  .trio{grid-template-columns:repeat(3,1fr);gap:32px}
+  .award{grid-template-columns:1fr 1fr}
+  .award>div+div{border-top:0;border-left:1px solid var(--ink)}
+  .chap{grid-template-columns:17rem 1fr;gap:44px}
+  .two{grid-template-columns:1fr 1fr;gap:48px}
+  .sgrid{grid-template-columns:repeat(3,1fr);gap:28px}
+  .dense{grid-template-columns:1fr 1fr}
+}
+@media (min-width:1024px){
+  h3{font-size:28px} .lead{font-size:14px}
+  .cols{columns:2}
+  dl.tl div,.box ul,.req ul{font-size:12px}
+  .split{grid-template-columns:20rem 1fr;gap:56px}
+  .sub{padding:28px 28px}
+  .sub .cols{columns:2}
+}
+@media (prefers-reduced-motion:no-preference){ html{scroll-behavior:smooth} }
+
+.wrap{max-width:none;margin:0;padding:0 0 48px;background:transparent}
+article{scroll-margin-top:110px}
+.memo,.chk,.fn{display:none!important}
+</style>
+<div class="wrap">
+
+<!-- ============ 01 トキと暮らす島で（サイト現行レイアウト） ============ -->
+<article id="sado">
+  <h3>トキと暮らす島で、お米をつくるということ</h3>
+  <p class="lead">一度は日本の空から姿を消したトキ。その最後の一羽がいたのが、佐渡ヶ島でした。いま佐渡の田んぼのお米は、トキの暮らしと切り離せないものになっています。</p>
+  <div class="cols">
+    <h4>田んぼでしか、エサをとれない鳥</h4>
+    <p>トキは、川や海ではなく、田んぼや湿地でドジョウやカエルなどの小さな生きものを食べて暮らす鳥です。いま湿地と呼べる場所の多くは田んぼであり、トキは人の営みと共に生きなければ、暮らしていくことができません。</p>
+    <p>明治時代からの乱獲に加え、農薬や化学肥料が広く使われるようになったことで、エサとなる生きものが田んぼから減り、トキは数を減らしていきました。</p>
+    <p>佐渡も、例外ではありませんでした。島の田んぼにも農薬や化学肥料が広まり、少ない手間でたくさんのお米がとれるようになって、農家の暮らしは豊かになっていきます。その発展の一方で、田んぼからはトキのエサとなる生きものが姿を消していきました。</p>
+    <figure><img class="pic" src="/about-editorial/assets/editorial-01.jpg" alt="佐渡の田んぼと山並み" loading="lazy"><figcaption><b>人と自然の営みが重なる、佐渡の田んぼ</b></figcaption></figure>
+    <dl class="tl">
+      <div><dt>1970</dt><dd>本州最後のトキ「能里」を石川県で捕獲し、佐渡へ移送</dd></div>
+      <div><dt>1981</dt><dd>佐渡に残っていた野生下最後の5羽をすべて捕獲</dd></div>
+      <div><dt>1999</dt><dd>中国から贈られたペア「友友・洋洋」による人工繁殖に初めて成功</dd></div>
+      <div><dt>2003</dt><dd>日本産最後のトキ「キン」が36歳で死亡</dd></div>
+      <div><dt>2008</dt><dd>佐渡で第1回の放鳥。野生復帰の取り組みが本格的に始まる</dd></div>
+      <div><dt>2011</dt><dd>「トキと共生する佐渡の里山」が、先進国で初めて世界農業遺産に認定</dd></div>
+      <div><dt>2024</dt><dd>野生下のトキが576羽に（2024年末時点）</dd></div>
+      <div><dt>2026</dt><dd>石川県能登で、本州初の放鳥。56年ぶりに本州の空にトキが戻る</dd></div>
+    </dl>
+    <h4>朱鷺と暮らす郷づくり認証制度</h4>
+    <p>トキを野生に定着させるには、まず田んぼに生きものが戻らなければなりません。そこで2008年に始まったのが「朱鷺と暮らす郷づくり認証制度」。佐渡島では通称「朱鷺認証」と呼ばれています。</p>
+    <div class="req"><strong>朱鷺認証の主な要件</strong><ul>
+      <li>生きものを育む農法を行うこと</li>
+      <li>農薬・化学肥料を5割以上減らすこと（ネオニコチノイド系農薬は使用不可）</li>
+      <li>あぜに除草剤を使わず、草刈りで管理すること</li>
+      <li>年2回、田んぼの生きもの調査を行うこと</li></ul></div>
+    <p>「生きものを育む農法」とは、たとえば田んぼの水を抜いたあとも水生生物が逃げ込める「江」を設けることや、冬のあいだも田んぼに水を張る「冬みず田んぼ」など。稲の育ちには直接関わらなくても、生きものを育むことを同時に叶える工夫です。</p>
+    <p>さらに、コシヒカリを主食用の認証米として販売するには、農産物検査で1等であること（農薬・化学肥料を使わずに育てたお米を除く）、味を大きく左右するタンパク質含有量が6.2％以下であることが求められます。安心と、おいしさ。その両方を大切にする仕組みが、佐渡のお米を支えています。</p>
+    <p>制度が始まって10年目に行われたアンケートでは、「これからも認証米の栽培を続けない」と答えた農家はゼロでした。新たに関心がある取り組みとして最も多く挙がったのは、農薬も肥料も使わない「自然栽培による米づくり」です。</p>
+    <h4>放鳥から、田んぼの空にトキが戻るまで</h4>
+    <p>2008年の第1回放鳥から放鳥が重ねられ、トキは少しずつ佐渡の空に戻ってきました。生きものを育む田んぼが島に広がっていくなかで、野生のトキは数を増やし、2024年末には576羽になりました。いまでは、田んぼでエサをついばむ姿が、佐渡の日常の風景になっています。</p>
+    <p>2026年5月には、石川県能登で本州初の放鳥が行われ、56年ぶりに本州の空にもトキが戻りました。能登は、本州で最後までトキが生き残っていた場所です。かつて本州最後のトキを佐渡へ送り出した地で、再びトキが飛び立ったことになります。</p>
+    <p>その放鳥を見届けたのが、石川でトキの保護に半世紀以上関わってきた村本義雄さん（101歳）です。田んぼに身を沈めてトキの親子を撮影し、トキのために中国へ22回も渡った方です。僕も村本さんにお会いし、お話をうかがいました。「大人たちは一度、トキを絶滅させてしまった」。村本さんはいま、生きもの全体を守ることの大切さを、子どもたちに伝えたいと話しています。</p>
+    <figure><img class="pic" src="/about-editorial/assets/editorial-02.jpg" alt="村本義雄さんと本間涼" loading="lazy" style="aspect-ratio:16/9"><figcaption><b>石川でトキを見つめてきた村本義雄さんと</b></figcaption></figure>
+    <p>村本さんのように、トキへの情熱を持ち続け、最後まで諦めなかった人たちが、佐渡の外にもいました。その人たちがいたからこそ、いま佐渡にトキがいる。僕たちは、そのことを忘れてはいけないと思っています。</p>
+    <p>その思いを、島の子どもたちにつないでいく場があります。朱鷺認証が始まった2008年から続く「佐渡Kids生きもの調査隊」です。島の小学生およそ40人が、1枚の田んぼを1年かけて世話しながら、そこにいる生きものの移り変わりを調べます。</p>
+    <p>2026年からは、イケベジがこのプログラムを引き継ぎました。酒粕を投げ入れる土づくり、手植えから機械までを使った田植え、無人の除草機を使った草とりまで、いまの田んぼのやり方をそのまま子どもたちと一緒にやっています。講師を務めるのは、調査隊OBの上之山篤人くん。中学3年生のときに生きもの調査の仕事を立ち上げ、いまは島の内外で生きもの調査を教えています。田んぼで生きものを数えた子どもが、次の子どもたちを田んぼへ連れていく。トキと暮らす島の米づくりは、そうやって次の世代へ渡っていきます。</p>
+    <p class="src">出典：佐渡市農業政策課／「朱鷺と暮らす郷づくり認証制度の評価レポート」新潟大学 豊田光世／<a href="https://www.city.sado.niigata.jp/uploaded/attachment/33645.pdf">佐渡市「朱鷺と暮らす郷づくり認証制度 参考資料」</a>／<a href="https://www.hot-ishikawa.jp/blog/detail_755.html">ほっと石川旅ねっと「半世紀越しの願い・・・村本義雄さんが語る朱鷺と能登」（2026年6月24日）</a>／<a href="https://www.city.sado.niigata.jp/uploaded/attachment/53996.pdf">佐渡市「佐渡市登録商標『朱鷺と暮らす郷』の使用に関する要綱」（令和7年9月1日施行）</a></p>
+  </div>
+  
+</article>
+
+<!-- ============ 02 豊田集落の歴史 ============ -->
+<article id="toyoda">
+  <h3>豊田集落の田んぼと、守ってきた人たち</h3>
+  <p class="lead">イケベジが田んぼをつくる豊田集落は、山と海にはさまれた小さな農村です。田んぼの多くは江戸時代に拓かれ、それからずっと、山の水を引く水路を集落のみんなで守ってきました。この集落の田んぼが、いまの僕たちの米づくりの足場です。</p>
+
+
+  <div class="cols">
+    <figure><img class="pic" src="/about-editorial/assets/editorial-03.jpg" alt="夕暮れの田植え。水を張った田んぼの先に海" loading="lazy" style="aspect-ratio:16/9"><figcaption><b>夕暮れの田植え。水を張った田んぼの先に海</b></figcaption></figure>
+    <p>豊田集落は、海と里と山が、およそ2キロの範囲に収まっています。山で生まれた水が田んぼを通って海へ出ていくまでを、ひとつの集落の中で見渡せる場所です。</p>
+    <p>集落の田んぼのおよそ9割は、江戸時代につくられたものです。山の斜面を少しずつ切り拓いてつくったので、一枚一枚は小さく、形もそろっていません。平らな広い田んぼに比べると、作業には非効率なことが多いのも確かです。</p>
+
+
+    <h4>戦後の農地改革と、集落の暮らし</h4>
+    <p>戦後の農地改革で、豊田でも田んぼを耕す人が自分の田んぼを持てるようになりました。</p>
+    <p>昭和のころの豊田の田んぼは、いわゆる昔ながらのやり方でした。家で牛を飼い、田おこしや代かきは牛に引かせて行う。牛小屋から出る牛糞は、田んぼの肥料として土に返していました。</p>
+    <p>これは豊田に限った話ではありません。機械が入る前の日本の稲作は、どこでも家畜と人の手が頼りでした。牛や馬で田をおこし、苗は枠で目印をつけて一株ずつ手で植え、稲は鎌で刈って束ねる。1960年ごろの稲作には、10アールあたり約174時間がかかっていたとされています。それが2021年には、機械化によって約21時間にまで減りました。</p>
+    <p>豊田にも、やがて機械や農薬、化学肥料が入ってきて、斜面の小さな田んぼでも、少ない手間でお米がとれるようになっていきます。</p>
+    <p>それでも、山から水を引き、あぜを守る仕事は、機械に置きかえられませんでした。水路の掃除の日には、いまもそれぞれの家から人が出てきます。豊田の田んぼは、田んぼを自分のものとして持つ一人ひとりが、水路を通じてつながることで続いてきました。</p>
+
+    <h4>4kmの用水路を守る農家</h4>
+    <figure><img class="pic tall" src="/about-editorial/assets/editorial-04.jpg" alt="山を流れる沢の水" loading="lazy"><figcaption><b>山を流れる沢の水</b></figcaption></figure>
+    <p>豊田集落には、およそ48ヘクタール、東京ドーム10個分ほどの田んぼがあります。枚数にすると約300枚。そのうち3分の1は急な斜面にあり、高さ1メートルを超えるあぜも珍しくありません。</p>
+    <p>山の水は、大川から山の中を約4キロの用水路を通って、ようやく集落の最初の田んぼにたどり着きます。落ち葉や土砂がたまれば、水はすぐに止まってしまいます。だから水路の掃除や、あぜの草刈り、冬の雪害への備えは、昔から集落みんなの仕事でした。</p>
+    <div class="box"><strong>豊田集落のいま（令和8年現在）</strong><ul>
+      <li>田んぼ：約48ha、約300枚</li><li>急傾斜のあぜ：全体の約3分の1</li><li>用水路：大川から約4km（大半が山の中）</li><li>田んぼを守る農家：36人（田んぼ1枚の人も含む）</li><li>そのうち70代以上：28人</li></ul></div>
+    <p class="pull">10年後、この水路に出てくる手は、8人ほどになっているかもしれません。</p>
+    <p>農林水産省のデータでは、用水路を管理する人が10人を下回ると、管理の力は急に落ちていくとされています。草を刈り、泥をさらい、壊れたところを直す、人の手の数が、4キロの水路を支えています。</p>
+
+    <h4>兼業農家のかたちを残していく</h4>
+    <p>農家が減るなら、田んぼをまとめて大きくすればいい。平野の田んぼなら、それが正解なのだと思います。けれど、斜面の小さな田んぼはまとめても効率が上がりにくく、一つの経営体が300枚を引き受ければ、水路の掃除に出てくる人はかえって減ってしまいます。</p>
+    <p>豊田に合っているのは、ふだんは別の仕事をしながら、朝や週末に田んぼへ出る兼業農家のかたちです。何枚かずつを、たくさんの人が持つ。僕自身も、この集落の兼業農家の家に生まれました。イケベジは、田んぼを集めるのではなく、田んぼに関わる人を増やすことで、この集落の風景を次へ渡していきたいと考えています。</p>
+    <p class="src">出典：<a href="https://www.maff.go.jp/j/heya/kodomo_sodan/0206/12.html">農林水産省「お米づくりに必要な機械は何ですか。」</a>／<a href="https://www.city.sendai.jp/izumi-kuse/izumiku/shokai/profile/shashinkan/dai6kai.html">仙台市泉区「泉なつかし写真館 第6回 農家」</a>／イケベジ 佐渡DMO視察受け入れ記録（2026年10月6日）／イケベジ 事業説明資料（2026年9月）</p>
+  </div>
+  
+</article>
+
+<!-- ============ イケベジについて ============ -->
+<article id="ikevege">
+  <h3>駒沢の八百屋から、ふるさとの田んぼへ</h3>
+  <p class="lead">イケベジは、株式会社nacoの農業の仕事です。nacoという名前には、自然と社会のあいだに立つ「通訳」でありたいという思いを込めました。佐渡の兼業農家に生まれた一人が、東京の八百屋を経て、ふるさとの田んぼに戻るまでのあゆみです。</p>
+
+  <div class="split">
+    <div>
+      <p class="quote">都会の景色も、人の考え方も、組織の在り方も、もっと自然から学べることがあるんじゃないか。<small>nacoを始めたときの問い</small></p>
+      <figure><img class="pic tall" src="/about-editorial/assets/editorial-05.jpg" alt="子どもたちを抱えて田んぼに立つ、代表の本間涼" loading="lazy" style="object-position:55% 50%"><figcaption><b>代表の本間涼。子どもたちと、田んぼで</b></figcaption></figure>
+    </div>
+    <div>
+      <h4>島を出て、見えたもの</h4>
+      <p>18歳まで、佐渡の野山を走り回って育ちました。島を出て、東京の街で暮らしてみて初めて、自分が育った場所のことを考えるようになります。都会の物理的な景色にも、人の考え方にも、組織の在り方にも、自然から学べることがもっとあるのではないか。そう感じたのが、会社を始めたきっかけです。</p>
+      <p>自然の在り方や豊かさを、社会に伝わる言葉に訳す。そんな「通訳」のような会社をつくりたいと考え、nature connector という言葉を自分でつくりました。nacoは、その頭文字です。</p>
+      <p>イケベジの「イケてる」も、ただかっこいいという意味ではありません。多様な命が、あるがままに響き合い、めぐり続けている。僕たちは、その自然界の在り方を「イケてる」と呼んでいます。</p>
+      <span class="label" style="margin-top:28px">あゆみ</span>
+      <ul class="rail">
+        <li><span class="y">はじまり</span><p>佐渡・豊田集落の兼業農家に生まれる。手伝いのなかで、自然と田んぼに触れて育つ。</p></li>
+        <li><span class="y">2021</span><p>東京・駒沢に自然栽培の八百屋「The Gallery IKEVEGE」を開き、青山ファーマーズマーケットにも出店。イケベジの「ベジ」はここから。同じ年、佐渡で米づくりを始める。</p></li>
+        <li><span class="y">2025</span><p>原木しいたけの栽培を始める。米・食味分析鑑定コンクール 国際総合部門で金賞、「世界最高米」の原料米に認定。</p></li>
+        <li><span class="y">2026</span><p>初めてのクラウドファンディングで149人から支援を受け、無人の水田除草機を導入。佐渡Kids生きもの調査隊を引き継ぐ。</p></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="two">
+    <div>
+      <h4>説明いらずの「安心」</h4>
+      <p>駒沢の八百屋で佐渡のお米を並べていると、こちらが何も話していないのに、お客さんから「佐渡のお米って、安心安全だよね」と言われました。島で生まれ育ったのに、自分のふるさとが外からそう見られていることを、そのとき初めて知りました。</p>
+      <p>その安心は、トキのために田んぼを変えてきた島の先人たちが、長い時間をかけて積み上げてきたものです。僕たちは、それを島の財産だと思っています。</p>
+      <p>だからこそ、受け継いだものをしっかり活かしながら、いまの時代に合わせてアップデートして、次の世代へつないでいきたい。八百屋の店先でのあの一言から、そう思うようになりました。</p>
+    </div>
+  </div>
+
+  <section class="stances" aria-labelledby="stances">
+    <h4 id="stances">イケベジが田んぼで、そして田んぼの外で大切にしていること</h4>
+    <div class="sgrid">
+      <div>
+        <img class="pic" src="/about-editorial/assets/editorial-06.jpg" alt="田植えリトリート。植える前の田んぼに目印の線を引く" loading="lazy">
+        <h5>1. 農へのアクセスを良好にする</h5>
+        <p>農業や自然が、特別なものではなく、すぐそばにあるものであってほしい。兼業農家の家に生まれ、手伝いのなかで自然と田んぼに触れてきた原体験が、その思いの出発点です。</p>
+        <p>近年、農家の減少により、島の子どもたちですら、自然が「身近にはあるものの、生活とは切り離された存在」となりつつあります。</p>
+        <p>そこで、稲刈りや田植えなど体験価値の高い繁忙期にも依頼に応える体制を整え、保育園の食育から中学生の職場体験、企業の研修まで受け入れてきました。</p>
+        <p>「何かあったら、まずイケベジに相談してみよう」。そう思ってもらえる体験と学びの窓口で在り続けることが、農家だからこそできる社会への貢献だと考えています。</p>
+      </div>
+      <div>
+        <img class="pic" src="/about-editorial/assets/editorial-07.jpg" alt="田んぼに入れる、島の酒蔵の酒粕" loading="lazy">
+        <h5>2. 道のりまで、おいしく</h5>
+        <p>おいしいことは、大前提。そのうえで、そこへ至る道のりまで、胸を張れるものでありたいと考えています。</p>
+        <p>農薬や除草剤、化学肥料に頼らず、土づくりはできる限り島の資源で。酒蔵から出る酒粕、牡蠣の養殖で出る殻、手入れされなくなった竹林の竹。これまで捨てられてきたものが、田んぼの土へと還っていきます。</p>
+        <p>正解のない取り組みだからこそ、毎年が実験です。うまくいかない年も含めて、挑戦を重ねてきた道のりが、次のおいしさをつくっています。</p>
+      </div>
+      <div>
+        <img class="pic" src="/about-editorial/assets/editorial-08.jpg" alt="本間涼とルカ。海の見える田んぼで" loading="lazy" style="object-position:50% 40%">
+        <h5>3. 作り手が楽しむ</h5>
+        <p>イケベジの田んぼでは、いつもスタッフのルカの大きな歌声が響いています。</p>
+        <p>作物は、作り手の状態を鏡のように映し出すもの。だからこそ、田んぼではまず「自分らしく楽しむこと」を第一に心がけています。</p>
+        <p>資源や環境と同じように、人もまた持続可能であること。作り手が楽しめているかどうかは、その何よりの指標だと考えています。</p>
+        <p>「農家になりたい」ではなく、「イケベジのようにありたい」。そう思う大人や子どもが、一人でも増えていくことを願っています。</p>
+      </div>
+    </div>
+  </section>
+
+  <div style="margin-top:32px">
+    <span class="label">スタッフ</span>
+    <div class="staff">
+      <div><div class="ph">写真（追加予定）</div><b>本間 涼（りょう）</b><span>プレイングマネージャー</span><span>1992年生まれ、天パ</span></div>
+      <div><div class="ph">写真（追加予定）</div><b>荒井 瑠伽（るか）</b><span>生産責任者</span><span>1995年生まれ、農家歌手</span></div>
+      <div><div class="ph">写真（追加予定）</div><b>合田 将晃（ごうだ）</b><span>プロ事務員</span><span>1996年生まれ、よく嗋る事務員</span></div>
+      <div><div class="ph">写真（追加予定）</div><b>嘉向 徹（とおるさん）</b><span>プロ助っ人</span><span>1990年生まれ、<a href="https://note.com/toru_shigoto">とおるの仕事</a></span></div>
+    </div>
+    <p style="font-size:11px;margin-top:12px">「らしさ」を大切に、「やってみたいことはなんでもやる」メンバーです。ほかにも、たくさんの援農チームに支えられています。</p>
+    <p class="src">出典：<a href="https://note.com/ikevege/n/nc147200d345a">note「ー イケベジについて ー 2025.8」（2025年8月16日）</a></p>
+  </div>
+  <div class="box" style="margin-top:24px"><strong>会社情報</strong><ul>
+    <li>運営：株式会社naco（nature connector）</li><li>代表：本間 涼</li><li>所在地：新潟県佐渡市</li><li>事業：農業事業「イケベジ」／人材育成事業「TOKItoWA」</li><li>設立：</li></ul></div>
+</article>
+
+<!-- ============ 生産について ============ -->
+<article id="seisan">
+  <h3>おいしさの、その手前</h3>
+  <p class="lead">従来コシヒカリ、亀の尾、にこまる。3つのお米と、原木しいたけをつくっています。どれも、肥料や農薬に頼らず、土をつくるところから。お米ごとに、その育て方の違いを見てください。</p>
+
+  <div class="trio">
+    <div>
+      <span class="name">従来コシヒカリ</span><br><span class="tag">自然栽培</span>
+      <dl><div><dt>肥料</dt><dd>入れない（自然栽培）</dd></div><div><dt>農薬</dt><dd>使わない</dd></div><div><dt>特徴</dt><dd>集落の最上流の田んぼで育つ</dd></div></dl>
+      <p>新潟県のコシヒカリのうち、約3%しかつくられていない「従来コシヒカリ」。山の水を集落でいちばん最初に受ける田んぼで、何も足さずに育てています。イケベジの顔になるお米です。</p>
+    </div>
+    <div>
+      <span class="name">亀の尾</span><br><span class="tag">竹堆肥</span>
+      <dl><div><dt>肥料</dt><dd>竹チップの堆肥</dd></div><div><dt>農薬</dt><dd>使わない</dd></div><div><dt>特徴</dt><dd>明治時代の原種に近い品種。背が高く、あっさりした味</dd></div></dl>
+      <p>品種改良がされていない、原種に近いお米です。背が高く、栄養を入れすぎると倒れてしまうので、手入れされなくなった竹林の竹を堆肥にして使っています。あっさりとした、お米そのものの味がします。</p>
+    </div>
+    <div>
+      <span class="name">にこまる</span><br><span class="tag">牡蠣殻・酒粕</span>
+      <dl><div><dt>肥料</dt><dd>酒粕・牡蠣殻など</dd></div><div><dt>農薬</dt><dd>使わない</dd></div><div><dt>特徴</dt><dd>暑さに強い平成生まれの品種。2025年に食味コンクールで金賞</dd></div></dl>
+      <p>平成生まれの、西日本の品種です。暑い夏が続くなかで、ご縁があってつくり始めました。島の酒蔵から出る酒粕と、牡蠣の養殖で出る殻を土に返して育てています。</p>
+    </div>
+  </div>
+
+  <div class="two">
+    <div>
+      <figure><img class="pic wide" src="/about-editorial/assets/editorial-09.jpg" alt="穂を伸ばす亀の尾" loading="lazy"><figcaption><b>穂を伸ばす亀の尾</b></figcaption></figure>
+      <h4>その年の味を、そのままに</h4>
+      <p>肥料を入れない田んぼでは、その年の天候が、そのまま味に出ます。僕たちは、それを無理にそろえようとはしていません。今年の田んぼがつくった、今年の味。その違いも含めて楽しんでもらえたらと思っています。</p>
+      <p>竹の堆肥は、小さな穴がたくさんあいていて、微生物のすみかになります。微生物が生まれては死んでいくなかで、土の中に栄養が生まれていく。何かを足すというより、生きものが働ける場所をつくる、という感覚に近いのかもしれません。</p>
+      <div class="award">
+        <div><span class="yr">2025</span><b>米・食味分析鑑定コンクール<br>国際総合部門 金賞</b><span>品種：にこまる。国際大会で最多得票。</span></div>
+        <div><span class="yr">2025</span><b>「世界最高米」<br>原料米に認定</b><span>品種：にこまる</span></div>
+      </div>
+      <p>受賞はうれしい出来事でした。ただ、その理由を土づくりだけに求めるのは違うと思っています。海に囲まれた佐渡の気候と、ゆっくり実っていく長い時間。島の条件が、このお米をおいしくしてくれた部分も大きいはずです。</p>
+    </div>
+    <div>
+      <figure><img class="pic wide" src="/about-editorial/assets/editorial-10.jpg" alt="稲刈りの初日。黄金色の田んぼにコンバインが入る" loading="lazy"><figcaption><b>稲刈りの初日。黄金色の田んぼにコンバインが入る</b></figcaption></figure>
+      <h4>精米は、注文のあとで</h4>
+      <ol class="steps">
+        <li><div><b>一年中、5℃以下で保管</b><span>収穫したお米は保冷庫に入れ、季節を問わず5℃以下で管理しています。</span></div></li>
+        <li><div><b>大きな粒だけを選ぶ</b><span>LL網というふるいで、1.9mm以上の大粒だけを選びます。JAの規格（1.85mm）よりも、少しだけ厳しい基準です。</span></div></li>
+        <li><div><b>注文を受けてから精米</b><span>ご注文が入ってから精米し、そのまま発送します。精米したてのお米が届きます。</span></div></li>
+      </ol>
+      <p>ふるいから落ちた小さな粒も、捨てるわけではありません。おせんべいなどの原料として使われていきます。新潟におせんべいの会社が多いのは、こうしたお米を生かしてきた歴史があるからです。</p>
+    </div>
+  </div>
+
+  <section class="sub" aria-labelledby="junkan">
+    <h4 id="junkan">島の廃棄物を、田んぼの土へ</h4>
+    <div class="dense">
+      <figure class="dg">
+        <svg viewBox="0 0 440 236" role="img" aria-label="イケベジの資源循環図。中心の田んぼに、酒粕、牡蠣殻、竹チップ、廃ほだ木、もみ殻と米ぬかが集まる。">
+          <rect width="440" height="236" fill="#ffffff"/>
+          <circle cx="220" cy="118" r="44" fill="#eef1ec" stroke="#1c1d1d" stroke-width="1"/>
+          <text x="220" y="116" text-anchor="middle" font-family="Noto Serif JP, serif" font-size="14" font-weight="600" fill="#1c1d1d" letter-spacing="2">田んぼ</text>
+          <text x="220" y="133" text-anchor="middle" font-family="Noto Serif JP, serif" font-size="9" fill="#6b7280" letter-spacing="1">土づくり</text>
+          <g stroke="#1c1d1d" stroke-width=".9" fill="none"><path d="M120 50 L184 92"/><path d="M320 50 L256 92"/><path d="M118 186 L180 140"/><path d="M322 186 L260 140"/><path d="M220 206 L220 164"/></g>
+          <g fill="#1c1d1d"><path d="M184 92 l-8 -1 l4 -6 z"/><path d="M256 92 l4 -7 l4 6 z"/><path d="M180 140 l-5 6 l-3 -7 z"/><path d="M260 140 l8 -1 l-4 6 z"/><path d="M220 164 l-4 7 l8 0 z"/></g>
+          <g font-family="Noto Serif JP, serif" fill="#1c1d1d">
+            <text x="14" y="28" font-size="13" font-weight="600" letter-spacing="1.5">酒粕</text><text x="14" y="44" font-size="9.5" fill="#4a5260">島内5つの酒蔵 年100t以上</text>
+            <text x="300" y="28" font-size="13" font-weight="600" letter-spacing="1.5">牡蠣殻</text><text x="300" y="44" font-size="9.5" fill="#4a5260">加茂湖の養殖 年約200t</text>
+            <text x="14" y="200" font-size="13" font-weight="600" letter-spacing="1.5">竹チップ</text><text x="14" y="216" font-size="9.5" fill="#4a5260">手入れされなくなった竹林</text>
+            <text x="300" y="200" font-size="13" font-weight="600" letter-spacing="1.5">廃ほだ木</text><text x="300" y="216" font-size="9.5" fill="#4a5260">しいたけを育て終えた木</text>
+            <text x="220" y="226" text-anchor="middle" font-size="12" font-weight="600" letter-spacing="1.5">もみ殻・米ぬか</text>
+          </g>
+        </svg>
+      </figure>
+      <div class="tiles">
+      <figure><img src="/about-editorial/assets/editorial-11.jpg" alt="酒粕" loading="lazy"><figcaption class="cap"><b>酒粕</b>微生物の多い肥料に</figcaption></figure>
+      <figure><img src="/about-editorial/assets/editorial-12.jpg" alt="加茂湖の牡蠣小屋" loading="lazy"><figcaption class="cap"><b>牡蠣殻</b>土を整える資材に</figcaption></figure>
+      <figure><img src="/about-editorial/assets/editorial-13.jpg" alt="竹林" loading="lazy"><figcaption class="cap"><b>竹</b>チップにして堆肥に</figcaption></figure>
+      <figure><img src="/about-editorial/assets/editorial-14.jpg" alt="しいたけが育つ原木" loading="lazy"><figcaption class="cap"><b>ほだ木</b>使い終えたら土へ</figcaption></figure>
+      </div>
+    </div>
+    <div class="cols">
+      <p>佐渡の加茂湖では牡蠣の養殖が盛んで、毎年およそ200トンの牡蠣殻が出ます。それらは産業廃棄物として扱われ、殻を砕く機械は壊れたまま、十数年ものあいだ山積みになっています。島の5つの酒蔵から出る酒粕も、年に100トンを超え、お金と燃料をかけて燃やされてきました。</p>
+      <p>何かを犠牲にしながら、人の暮らしが回っている。僕たちの言葉でいえば、それは「イケてない」状態です。</p>
+      <p>イケベジでは、牡蠣殻を年に約5トン、田んぼの土を整える資材として使っています。酒粕は、微生物をたくさん含んだ肥料になります。漁業の側だけで抱えてきた課題を、農業の側から引き受けられないか。佐渡市と一緒に、農福連携で牡蠣殻を砕く仕組みづくりも始めています。</p>
+    </div>
+  </section>
+
+  <section class="sub" aria-labelledby="shiitake" style="background:var(--wash)">
+    <h4 id="shiitake">牡蠣と稲を育てる、ひとつの山</h4>
+    <div class="two" style="margin-top:16px">
+      <div>
+        <figure><img class="pic" src="/about-editorial/assets/editorial-15.jpg" alt="杉林の中に並ぶ、原木しいたけのほだ木" loading="lazy"><figcaption><b>杉林の中に並ぶ、原木しいたけのほだ木</b></figcaption></figure>
+        <p>佐渡は、かつて乾しいたけの一大産地でした。島で約1,000世帯がしいたけをつくっていた時代もあったといいます。いまは約40世帯、生産量は約5トンにまで減っています。</p>
+        <p>島の暮らしのなかには、炭や薪をとるための雑木林がありました。木を伐り、使い、また育てる山の営みがあったからこそ、ナタで木に傷をつけて菌を呼び込む昔ながらの栽培から、原木しいたけはこの島に根づいていったのだと聞いています。</p>
+        <h4 style="font-size:14px;margin-top:8px">続けてきた人から、受け取ったもの</h4>
+        <p>イケベジが原木しいたけを始めたのは、2025年です。きっかけは、長くしいたけをつくってきた島の農家さんから、そのしいたけづくりを譲り受けたことでした。</p>
+        <p>菌を打つ時期、ほだ木の組み方、水のやり方、収穫のタイミング。引き継ぐにあたって、その方から一つひとつ教えてもらいながら、育て方を覚えてきました。つくる人が減っていくなかで、受け取ったものを途切れさせずに次へ渡していきたいと思っています。</p>
+      </div>
+      <div>
+        <figure><img class="pic" src="/about-editorial/assets/editorial-16.jpg" alt="原木から育ったしいたけを摘む手" loading="lazy" style="aspect-ratio:4/3"><figcaption><b>原木から育ったしいたけ</b></figcaption></figure>
+        <p>イケベジの原木しいたけは、牡蠣漁師の友人と一緒に育てています。もともと森林組合で働いていた彼が山の木を伐り、僕たちが菌を打って、収穫まで面倒を見ます。菌を打ってから収穫まで、およそ2年。日陰をつくる針葉樹と、原木になる広葉樹、その両方がある山が必要です。</p>
+        <p>田んぼは、山から流れてくる水に支えられています。海の牡蠣も、山から流れ出る栄養で育つ植物プランクトンを食べて大きくなります。農家と漁師が一緒に山へ入る理由は、そこにあります。</p>
+        <div class="box"><strong>原木しいたけのこと</strong><ul>
+          <li>原木しいたけは、国内で生産されるしいたけの約5%</li>
+          <li>干して、水でゆっくり戻すと、うまみ成分のグアニル酸が増える</li>
+          <li>昆布のグルタミン酸と合わせると、うまみが何倍にもなる</li>
+          <li>ほだ場は5年ほどで場所を回し、使い終えた木はチップにして土へ返す</li></ul></div>
+      </div>
+    </div>
+  </section>
+  <p class="src">出典：<a href="https://www.pref.niigata.lg.jp/sec/sado_nourinsuisan/hoshisiitake-hinpyoukai.html">新潟県佐渡地域振興局「佐渡産乾しいたけ品評会」</a>／<a href="https://www.city.sado.niigata.jp/uploaded/attachment/59215.pdf">佐渡市「第4次佐渡市地産地消推進計画アクションプラン」</a>／イケベジ 佐渡DMO視察受け入れ記録（2026年10月6日）／イケベジ 事業説明資料（2026年9月）</p>
+</article>
+
+<!-- ============ 体験について ============ -->
+<article id="taiken">
+  <h3>断らない田んぼ</h3>
+  <p class="lead">保育園の子どもから、島の外の企業や経営者まで、たくさんの人がイケベジの田んぼを訪れます。田植えも、稲刈りも、生きもの調査も、田んぼへの入口はいつも開けておきたいと考えています。</p>
+
+
+  <div class="cols">
+    <figure><img class="pic" src="/about-editorial/assets/editorial-17.jpg" alt="苗を手に、田んぼへ入る子ども" loading="lazy"><figcaption><b>苗を手に、田んぼへ入る</b></figcaption></figure>
+    <h4>暮らしの中から、田んぼが遠のいた</h4>
+    <p>僕が子どものころ、田んぼは家の手伝いで当たり前に入る場所でした。島に戻ってきて驚いたのは、佐渡の子どもたちでも、田んぼや自然に触れる機会がずいぶん減っていたことです。兼業農家が減れば、家の田んぼを手伝う子どもも減っていきます。</p>
+    <p>むしろ都会の家庭のほうが、子どもに自然の体験をさせていることもあります。だったら、田んぼに入る入口を、農家の側からつくればいい。イケベジの体験の受け入れは、そこから始まりました。</p>
+
+    <h4>面白い時期は、忙しい時期</h4>
+    <p>田植えや稲刈りは、体験としていちばん面白い時期です。同時に、農家にとってはいちばん忙しい時期でもあります。だからイケベジでは、繁忙期にも依頼に応えられる体制を、最初から経営に組み込んできました。依頼は、まず断らない。そこから始めています。</p>
+    <h4>田んぼの外へ、こちらから出かけていく</h4>
+    <p>田んぼで待っているだけではありません。保育園に出かけていって、園児たちと一緒に畑をつくり、野菜を育てることもあります。種をまき、水をやり、とれた野菜をみんなで食べる。給食にイケベジのお米や野菜を使ってもらっている園もあります。</p>
+    <p>仲間と一緒に、お米とトキの紙芝居もつくりました。田んぼに集まるカエルやドジョウ、ミミズのこと。農薬を使わない元気な土に、いろんな仲間がやってくること。その紙芝居を持って、島の保育園を回っています。2025年の秋には、佐渡市の保育園の食育教室でも、イケベジが沢根・姫津・たかちの保育園を担当しました。</p>
+    <figure><img class="pic" src="/about-editorial/assets/editorial-18.jpg" alt="泥の田んぼで遊ぶ子どもたち" loading="lazy" style="aspect-ratio:3/2;object-position:50% 70%"><figcaption><b>泥の感触も、田んぼの体験</b></figcaption></figure>
+    <h4>入口は、相手の目線で</h4>
+    <p>田んぼに迎える相手も、本当にさまざまです。保育園の子どもたち、中学生の職場体験、島外の企業の研修。2026年10月には、佐渡DMOの招きで欧米から訪れた旅行関係者を迎え、しいたけの出汁を味わいながら、田んぼと山と海のつながりを話しました。どの相手にも、その人の目線で「楽しい」「面白い」と思える入口を用意するようにしています。</p>
+    <ul class="chips" aria-label="主な受け入れ"><li>田植え体験</li><li>稲刈り体験</li><li>生きもの調査</li><li>保育園の食育</li><li>保育園の畑づくり</li><li>紙芝居</li><li>職場体験</li><li>出向授業</li><li>視察</li><li>企業研修</li><li>親子リトリート</li></ul>
+    <div class="aside">
+      <h4>イケベジと並行して、人が育つ場もつくっています</h4>
+      <p>体験の受け入れは、イケベジと並行して運営している「TOKItoWA（トキトワ）」という取り組みにもつながっています。森・里・海がコンパクトにまとまった佐渡で、自然の体験を軸に人が育つ場をつくる取り組みです。学生や企業の研修、親子のリトリート、経営者のワーケーションを行っています。名前には、朱鷺（TOKI）が永遠（toWA）に生き続ける社会を、という願いを込めました。</p>
+    </div>
+  </div>
+</article>
+
+<!-- ============ 取り組みについて ============ -->
+<article id="torikumi">
+  <h3>食べる人が、農家を生む</h3>
+  <p class="lead">子どもたちが「ここに生まれてよかった」と思える島を、次の世代へ。そのためにイケベジが続けている取り組みです。</p>
+
+  <section class="chap" aria-labelledby="partners">
+    <div class="side">
+      <p class="cap2">参加企業</p>
+      <div class="logos">
+        <div><img src="/about-editorial/assets/editorial-19.png" alt="ClearHome" loading="lazy"></div>
+        <div><img src="/about-editorial/assets/editorial-20.png" alt="BLUE ADVANCE" loading="lazy"></div>
+        <div><img src="/about-editorial/assets/editorial-21.png" alt="KOU 耕 PRIVATE MAISON" loading="lazy"></div>
+        <div><img src="/about-editorial/assets/editorial-22.png" alt="NOAH ORDER SUIT TOKYO" loading="lazy"></div>
+        <div><img src="/about-editorial/assets/editorial-23.png" alt="キムチの家" loading="lazy"></div>
+        <div><img src="/about-editorial/assets/editorial-24.png" alt="SHINWA style" loading="lazy"></div>
+        <div><img src="/about-editorial/assets/editorial-25.png" alt="HPP -Human Perfect Position-" loading="lazy"></div>
+      </div>
+      <p class="logos-note">※ 順不同・敬称略</p>
+    </div>
+    <div>
+      <h4 id="partners">イケてるパートナーズ</h4>
+      <p>1年を通して佐渡の田んぼとつながる、企業向けの「イケベジ版オーナー制度」です。</p>
+      <ul class="checks">
+        <li>田植え／生き物調査／稲刈り／新嘗祭への招待</li>
+        <li>収穫できたお米を、用途に合わせて社内配布・贈答・自宅用に</li>
+        <li>公式HPへ企業ロゴを掲載／オリジナル米袋プランも選択可</li>
+        <li>TOKItoWAの研修・リトリート・ワーケーション特別割引</li>
+      </ul>
+      <div class="box"><strong>一年間の流れ</strong>
+        <div class="season"><span><b>春</b>田植え</span><span><b>夏</b>生き物調査・草刈り</span><span><b>秋</b>稲刈り・収穫体験</span><span><b>冬</b>新嘗祭・新米お届け</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chap" aria-labelledby="visit">
+    <div class="side">
+      <div class="big">700<small>人</small></div>
+      <p class="cap2">1年間に、イケベジの田んぼを訪れる人<span>島内の保育園・小中高生など約600人、島外の研修・リトリート約100人</span></p>
+    </div>
+    <div>
+      <h4 id="visit">田んぼに来る人を、増やしていく</h4>
+      <div class="bar" role="img" aria-label="内訳：島内の子どもたちなど約600人、島外からの研修やリトリート約100人"><i style="width:85.7%"></i><i style="width:14.3%"></i></div>
+      <div class="barlab"><span>島内の保育園・小中高生など 約600人</span><span>島外の研修・リトリート 約100人</span></div>
+      <p>田植えも、稲刈りも、生きもの調査も、一度田んぼに入った人は、お米の見え方が少し変わります。食べる人のなかに、田んぼのことを知っている人が増えていく。それも、農家を支える力のひとつだと思っています。</p>
+    </div>
+  </section>
+
+  <section class="chap" aria-labelledby="cf">
+    <div class="side">
+      <div class="big">149<small>人</small></div>
+      <p class="cap2">クラウドファンディングで支えてくれた人<span>2026年1月27日〜3月31日</span></p>
+      <div class="big mid">4,358,749<small>円</small></div>
+      <p class="cap2">集まった支援の総額</p>
+      <figure><img class="pic" src="/about-editorial/assets/editorial-26.jpg" alt="おにぎりを手にした子ども" loading="lazy"><figcaption><b>田んぼでとれたお米のおにぎり</b></figcaption></figure>
+    </div>
+    <div>
+      <h4 id="cf">佐渡の小学生と世界一へ</h4>
+      <figure><img class="pic" src="/about-editorial/assets/editorial-27.jpg" alt="クラウドファンディング「子どもが農家を夢見る島」のページ。支援総額4,358,749円、支援者149人" loading="lazy" style="aspect-ratio:auto;object-fit:contain;background:#fff;border:1px solid var(--frame)"><figcaption><b>クラウドファンディング「子どもが農家を夢見る島 たった一羽のトキがもたらしたもの」</b></figcaption></figure>
+      <p>佐渡の小学生たちが「農家になりたい」と言える島を目指して。佐渡で1学年およそ200人の子どものうち、1割の20人が「農家になりたい」と言える島にしたい、というのが僕たちの目標です。</p>
+      <p>そのために、スマート農業の技術と佐渡の栽培技術を掛け合わせ、地域の子どもたちと「世界一のお米づくり」に挑戦しています。目指すのは、米・食味分析鑑定コンクールの小学生部門での金賞です。</p>
+      <p>2026年の春には、スマート農機を導入するためのクラウドファンディングに挑戦し、149名の方々から4,358,749円ものご支援をいただくことができました。心より感謝申し上げます。</p>
+      <p>導入したのは、無人の水田除草機「ミズニゴール」です。人の手で草をとっていた時間が、年間で約280時間あきます。その時間を、子どもたちと田んぼで向き合うことに使います。苗をまっすぐ植えなければいけない、という制約もなくなり、子どもたちの田植えはずっと自由になりました。</p>
+    </div>
+  </section>
+
+  <section class="chap" aria-labelledby="kids">
+    <div class="side">
+      <div class="big">40<small>人</small></div>
+      <p class="cap2">佐渡Kids生きもの調査隊<span>1枚の田んぼを1年かけて世話する、島の小学生の数</span></p>
+      <figure><img class="pic" src="/about-editorial/assets/editorial-28.jpg" alt="竹の器でごはんを炊く子どもたち" loading="lazy"><figcaption><b>調査隊の子どもたち。竹でごはんを炊く</b></figcaption></figure>
+      <img src="/about-editorial/assets/editorial-29.png" alt="佐渡Kids生きもの調査隊 ロゴ" loading="lazy" style="display:block;width:120px;margin:12px auto 0">
+    </div>
+    <div>
+      <h4 id="kids">佐渡Kids生きもの調査隊</h4>
+      <p>佐渡の田んぼで、子どもたちが「環境や生きものにやさしい米づくり」と「田んぼの生きもの調査」を1年かけて体験するプログラムです。田んぼはお米を育てる場所であると同時に、たくさんの生きものが育まれる場所。その気づきを、実体験から学んでいます。</p>
+      <ul class="checks">
+        <li>佐渡島内の小学1〜6年生の定員40名</li>
+        <li>2026年度で19年目を迎える、佐渡の環境学習を支えるプログラム</li>
+        <li>首都圏でのお米の販売や活動報告</li>
+      </ul>
+      <p>子どもたちと向き合う時間が生まれたことで、2026年、イケベジはこの調査隊を引き継ぎました。講師は調査隊OBの上之山篤人くんが務めています。プログラムのことは、「トキと暮らす島で、お米をつくるということ」でも紹介しています。</p>
+    </div>
+  </section>
+
+  <section class="chap" aria-labelledby="teiki">
+    <div class="side">
+      <div class="big">4,700<small>人</small></div>
+      <p class="cap2">4,700人の定期便<span>豊田集落の田んぼを、定期便で一緒に支える人の目標</span></p>
+      <figure><img class="pic" src="/about-editorial/assets/editorial-30.jpg" alt="田んぼのそばでおにぎりを食べる子どもたち" loading="lazy"><figcaption><b>田植えのあとの、おにぎり</b></figcaption></figure>
+    </div>
+    <div>
+      <h4 id="teiki">集めるより、関わる人を</h4>
+      <p>いまの仕組みでは、食べる人が増えるほど価格に押されて、農家のほうが苦しくなっていきます。食べれば食べるほど、農家がいなくなっていく。僕たちは、その向きを逆にしたいと考えています。</p>
+      <p>豊田集落を残すために選んだのは、田んぼを集めて大きくすることではなく、兼業で田んぼに関わる人を増やすことでした。そのためには、農協以外にも、お米を届ける先が要ります。イケベジのお米の定期便が、その受け皿です。いずれは、食べる人が田んぼの一年を一緒に引き受けるCSA（地域支援型農業）へ育てていきたいと思っています。</p>
+      <p class="pull">時代の移り変わりとともに、この営みを食べる人と一緒に次へつないでいくため、この定期便をスタートさせました。</p>
+      <p>全国には、豊田のような農業集落が13万以上あります。13万の集落には、13万通りの答えがあるはずです。まずは豊田で、4,700人のみなさんと一緒に、その一つをつくってみたいと思っています。</p>
+    </div>
+  </section>
+
+  <div class="closing" style="margin-top:36px">
+    <p>トキのために変わってきた田んぼに、島の資源をめぐらせる工夫を重ねていく。<br>まずは豊田の田んぼから、毎日のごはんを届け続けます。</p>
+  </div>
+  <p class="src">出典：イケベジ 事業説明資料（2026年9月）／イケベジ クラウドファンディング本文（2026年1月）／イケベジ 定期便紹介の録音（2026年10月12日）</p>
+</article>
+
+</div>
