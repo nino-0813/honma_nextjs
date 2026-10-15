@@ -483,7 +483,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 </span>
               </h1>
 
-              <div className="mb-8 border-b border-gray-100 pb-8">
+              <div className="mb-8 pb-8">
                 {subscriptionEnabled && purchaseType === 'subscription' && subscriptionDiscountPercent > 0 ? (
                   <div className="flex items-baseline gap-3 mb-1">
                     <span className="text-xl md:text-2xl font-serif text-primary">¥{subscriptionPrice.toLocaleString()}</span>
