@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 import FadeIn from '@/components/FadeIn';
 
 /**
@@ -13,7 +14,7 @@ export default function ProductFeatures({
   showTitle = true,
   compactTop = false,
 }: {
-  rows: { label: string; sub?: string; body: string; link?: { href: string; label: string } }[];
+  rows: { label: string; sub?: string; body: ReactNode; link?: { href: string; label: string } }[];
   alwaysOpenFirst?: boolean;
   showTitle?: boolean;
   compactTop?: boolean;
@@ -25,7 +26,7 @@ export default function ProductFeatures({
     <section className={compactTop ? 'mt-0' : 'mt-24 border-t border-gray-100 pt-16 md:mt-24 md:border-t-0 md:pt-0'}>
       <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8 lg:gap-16">
         {showTitle ? (
-          <FadeIn>
+          <FadeIn className="pt-5 md:pt-6">
             <p className="text-xl font-serif font-semibold tracking-wider text-primary md:text-2xl">
               商品詳細
             </p>
@@ -38,7 +39,7 @@ export default function ProductFeatures({
               <li key={r.label} className="border-b border-gray-200 lg:border-b-0">
                 <div className="py-5 md:py-6"><span className="block text-sm font-medium text-primary md:text-base">{r.label}</span></div>
                 <div className="pb-6 text-[13px] leading-loose text-gray-600 md:text-sm">
-                  <p className="whitespace-pre-wrap">{r.body}</p>
+                  {typeof r.body === 'string' ? <p className="whitespace-pre-wrap">{r.body}</p> : r.body}
                   {r.link && <a href={r.link.href} className="mt-5 inline-flex border-b border-primary pb-0.5 font-medium text-primary transition-opacity hover:opacity-60">{r.link.label}</a>}
                 </div>
               </li>
@@ -66,7 +67,7 @@ export default function ProductFeatures({
                 <div className={`accordion-body ${isOpen ? 'is-open' : ''}`}>
                   <div>
                     <div className="pb-6 text-[13px] md:text-sm leading-loose text-gray-600">
-                      <p className="whitespace-pre-wrap">{r.body}</p>
+                      {typeof r.body === 'string' ? <p className="whitespace-pre-wrap">{r.body}</p> : r.body}
                       {r.link && <a href={r.link.href} className="mt-5 inline-flex border-b border-primary pb-0.5 font-medium text-primary transition-opacity hover:opacity-60">{r.link.label}</a>}
                     </div>
                   </div>

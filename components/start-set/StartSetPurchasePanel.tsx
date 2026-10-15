@@ -53,7 +53,7 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
       setStockError(result.message);
       return false;
     }
-    addToCart({ ...product, title: 'お米3種お試しセット' }, quantity, {
+    addToCart({ ...product, title: '３品種お試しセット' }, quantity, {
       variant: selectedVariant,
       finalPrice: calculatedPrice,
     });
@@ -68,10 +68,10 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
     <>
       <div id="purchase-panel">
         <h2 className="mb-2 text-2xl font-medium leading-relaxed tracking-wide text-primary md:text-3xl">
-          お米3種お試しセット
+          ３品種お試しセット
         </h2>
         <div className="mb-7 text-sm leading-relaxed text-gray-600">
-          <p>内容：イケベジのお米３種 ２合×３個</p>
+          <p>内容：2合×3個</p>
           <ul className="mt-3 space-y-1 text-[11px] tracking-[0.06em] text-gray-500">
             <li>従来コシヒカリ</li>
             <li>亀の尾</li>
@@ -81,7 +81,7 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
 
         <div className="mb-6 border border-gray-200 bg-white p-5 md:p-6">
           <div className="flex flex-wrap items-center gap-2 mb-2">
-            <span className="rounded-full bg-primary px-3 py-1 text-[10px] font-medium tracking-wide text-white">
+            <span className={`rounded-full px-3 py-1 text-[10px] font-medium tracking-wide text-white ${isFirstPurchase ? 'bg-[#e87538]' : 'bg-primary'}`}>
               {isFirstPurchase ? '初回 送料無料＆10%OFF' : '2回目以降 送料無料'}
             </span>
           </div>
@@ -96,7 +96,6 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
               ¥{calculatedPrice.toLocaleString()}<span className="ml-1 text-xs text-gray-500">（税込）</span>
             </p>
           )}
-          <p className="mt-1 text-[11px] text-gray-500">送料無料</p>
         </div>
 
         <fieldset className="mb-6">
@@ -117,7 +116,6 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
               );
             })}
           </div>
-          <p className="mt-2 text-[11px] leading-relaxed text-gray-500">コシヒカリ・亀の尾・にこまるの3品種すべてが、選択した精米方法になります。</p>
         </fieldset>
 
         {stockError && <p role="alert" className="mb-4 text-sm text-red-600">{stockError}</p>}
@@ -134,7 +132,7 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
 
       </div>
       <StickyPurchaseBar
-        title="お米3種お試しセット"
+        title="３品種お試しセット"
         price={calculatedPrice}
         image={product.images?.[0] || product.image}
         quantity={quantity}

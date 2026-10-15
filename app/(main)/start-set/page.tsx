@@ -59,8 +59,9 @@ export default async function StartSetPage() {
           お試しセット
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-[13px] leading-loose text-gray-600 md:text-sm">
-          佐渡で同じように育てても、甘みも、香りも、食感も違う。<br className="hidden md:block" />
-          一膳ずつ味わいながら、あなたの「好き」を見つけるお試しセットです。
+          <span className="block">明治から続く「亀の尾」、昭和に生まれた「従来コシヒカリ」、平成に誕生した「にこまる」。</span>
+          <span className="block">同じ佐渡の田んぼでも、品種ごとに土づくりや育て方を変えて、試行錯誤を重ねてきました。</span>
+          <span className="block">甘みも、香りも、食感も違う3つのお米から、あなたの「好き」を見つけてください。</span>
         </p>
       </section>
 
@@ -85,16 +86,16 @@ export default async function StartSetPage() {
             ) : (
             <div id="purchase-panel">
               <h2 className="text-xl md:text-2xl font-medium text-primary leading-relaxed tracking-wide mb-6">
-                お米3種お試しセット
+                ３品種お試しセット
               </h2>
               <div className="-mt-4 mb-6 text-sm leading-relaxed text-gray-600">
-                <p>内容：イケベジのお米３種 ２合×３個</p>
+                <p>内容：2合×3個</p>
                 <ul className="mt-3 space-y-1 text-[11px] tracking-[0.06em] text-gray-500"><li>従来コシヒカリ</li><li>亀の尾</li><li>にこまる</li></ul>
               </div>
 
               <div className="border border-gray-200 bg-white p-4 md:p-5 mb-6">
                 <div className="flex flex-wrap items-center gap-2 mb-2">
-                  <span className="rounded-full bg-primary px-3 py-1 text-[10px] font-medium text-white">初回 送料無料＆10%OFF</span>
+                  <span className="rounded-full bg-[#e87538] px-3 py-1 text-[10px] font-medium text-white">初回 送料無料＆10%OFF</span>
                   <span className="text-xs text-gray-500 line-through tabular-nums">¥{LIST_PRICE.toLocaleString()}</span>
                 </div>
                 <p className="text-3xl font-serif font-semibold text-primary tabular-nums">
@@ -145,7 +146,7 @@ export default async function StartSetPage() {
           </div>
         </div>
 
-        <section className="mt-20 grid overflow-hidden bg-hekishoku text-white md:mt-28 lg:grid-cols-2">
+        <section className="mb-48 mt-40 grid overflow-hidden bg-hekishoku text-white md:mb-48 md:mt-56 lg:grid-cols-2">
           <div className="min-h-[320px] lg:min-h-[480px]"><img src="/images/about/hero/retreat_2025_56.webp" alt="佐渡の田んぼで過ごす家族" loading="lazy" className="h-full w-full object-cover" /></div>
           <div className="flex flex-col justify-center p-8 md:p-12 lg:p-16">
             <h2 className="font-serif text-xl font-semibold leading-relaxed tracking-wider !text-white md:text-3xl">おいしさだけじゃない、<br />イケベジが届けたいこと</h2>
@@ -159,14 +160,14 @@ export default async function StartSetPage() {
           rows={[
             {
               label: 'セット内容',
-              body:
-                '従来コシヒカリ・亀の尾・にこまるの3品種をお届けします。\n精米方法は玄米または白米からお選びいただけます。\n\n' +
-                '・従来コシヒカリ（自然栽培）\n' +
-                '肥料も農薬も一切使わない「自然栽培」で育てた、イケベジの定番品種。余計なものを加えず、お米が本来持つ生命力に寄り添う「引き算の物づくり」を実践することで、野生味あふれる甘みと豊かな風味をそのまま引き出しています。イケベジの田んぼの中でも、山から流れ出る川から一番に入水できる田んぼから連なる、たった8枚の限られた田んぼでのみ栽培しています。田んぼの位置まで究極にこだわり抜いた、至高のお米です。\n\n' +
-                '・にこまる（無農薬無化学肥料）\n' +
-                '本来は西日本で多く栽培される品種を、佐渡の地であえて育てているのが「にこまる」です。佐渡の銘酒から出る酒粕と、豊かな海が育む牡蠣殻を肥料として活用し、地域で行き場を失っていた資源を土に還しながら育てました。大粒で贅沢な食感と豊かな甘みが持ち味で、第27回米・食味分析鑑定コンクール国際大会の国際総合部門にて金賞（最多得票）を受賞。世界最高米の原料にも選出されました。\n\n' +
-                '・亀の尾（無農薬無化学肥料）\n' +
-                'コシヒカリやササニシキなど、いまの人気品種の祖先にあたる希少な在来品種「亀の尾」。あっさりとした素朴な味で、もち米系統が入らないお米本来の味を楽しめます。高アミロース米にあたり、通常の品種よりも消化がゆっくりで、身体に優しい逸品です。佐渡で使われなくなった竹を細かくチップにして堆肥化し、田んぼに混ぜ込むことで、多孔質な竹が土壌微生物のすみかとなり、時間をかけてゆっくりと栄養が届く土づくりを実践しています。',
+              body: (
+                <div className="space-y-6">
+                  <p>従来コシヒカリ・亀の尾・にこまるの3品種をお届けします。<br />精米方法は玄米または白米からお選びいただけます。</p>
+                  <div className="space-y-3"><Link href="/collections/rice/koshihikari" className="font-medium text-primary underline underline-offset-4">従来コシヒカリ（自然栽培）</Link><p>肥料も農薬も使わない「自然栽培」で育てた、イケベジの定番品種です。余計なものを加えず、お米が本来持つ生命力に寄り添うことで、コシヒカリの甘みを邪魔しない、すっきりとした味わいと豊かな風味を引き出しています。冷めてもおいしいのも特徴です。<br />育てているのは、山から流れる川の水がいちばん最初に入る田んぼから連なる、わずか8枚だけ。ほかの田んぼを通る前の、澄んだ水で育ったお米です。</p></div>
+                  <div className="space-y-3"><Link href="/collections/rice/nikomaru" className="font-medium text-primary underline underline-offset-4">にこまる（無農薬無化学肥料）</Link><p>本来は西日本で多く栽培される品種「にこまる」。冷涼で秋の長い海洋性気候が特徴の佐渡で育てることで、この島でしか表現できない味わいが生まれました。<br />佐渡の銘酒から出る酒粕と、豊かな湖が育む牡蠣殻を肥料として活用し、地域で行き場を失っていた資源を土に還しながら育てています。大粒で贅沢な食感と豊かな甘みが持ち味で、第27回米・食味分析鑑定コンクール国際大会の国際総合部門にて金賞（最多得票）を受賞。「世界最高米」の原料米にも選ばれました。</p></div>
+                  <div className="space-y-3"><Link href="/collections/rice/kamenoo" className="font-medium text-primary underline underline-offset-4">亀の尾（無農薬無化学肥料）</Link><p>明治時代に生まれ、コシヒカリやササニシキなど、現代の人気品種の祖先にあたる希少な品種「亀の尾」。粘りの強い現代のお米とは違う、さらりとした食感と、あっさりとした素朴な味わいが楽しめます。アミロースを多く含むお米で、一般的な品種に比べて、ゆっくりと消化されるといわれています。<br />田んぼには、佐渡で使われなくなった竹をチップにして堆肥化したものを混ぜ込んでいます。多孔質な竹が土の微生物のすみかとなり、時間をかけてゆっくりと栄養が届く土づくりを実践しています。</p></div>
+                </div>
+              ),
             },
           ]}
         />
@@ -180,8 +181,7 @@ export default async function StartSetPage() {
                 '新潟県佐渡・豊田集落。すべての圃場で農薬・化学肥料を使わずに栽培しています。\n佐渡市が定める「生き物を育む農法」をすべての圃場で実施しています。\n※今後JAS有機認証を取得予定',
             },
             {
-              label: 'お届けについて',
-              sub: '発送 / 送料',
+              label: 'お届けについて（発送/送料）',
               body:
                 'ご注文から5日以内に発送いたします。\nお届け日の指定は承っておりません。\n送料は地域とサイズにより異なります。\n\n詳細は特定商取引法に基づく表記をご確認ください。',
               link: { href: '/legal#shipping', label: '送料の価格表を見る →' },

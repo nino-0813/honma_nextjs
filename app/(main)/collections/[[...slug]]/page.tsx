@@ -294,7 +294,7 @@ export default function CollectionsPage() {
                     />
                   </div>
                 </div>
-                <div className="flex min-w-0 w-full flex-1 flex-col gap-2 px-2 text-left">
+                <div className="flex min-w-0 w-full flex-1 flex-col gap-2 text-left">
                   <h2 className="min-h-[5.8em] max-w-full overflow-hidden text-primary transition-colors group-hover:text-gray-600">
                     <span className="block max-w-full break-words text-[12px] font-semibold leading-relaxed">{titleParts.primary}</span>
                     {titleParts.secondary && <span className="mt-1 block max-w-full break-words text-[12px] font-medium leading-relaxed">{titleParts.secondary}</span>}
@@ -364,7 +364,7 @@ export default function CollectionsPage() {
           <div className="mb-12 mt-32 flex justify-center md:mt-56">
             <Link
               href="/collections/rice/yearly?view=lp"
-              className="inline-flex min-h-12 items-center justify-center rounded-full bg-primary px-10 py-3 text-sm font-medium tracking-wider text-white transition-colors duration-200 hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              className="inline-flex min-h-12 items-center justify-center rounded-full bg-primary px-14 py-3 text-sm font-medium tracking-wider text-white transition-colors duration-200 hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 md:px-16"
             >
               定期便を始める
             </Link>

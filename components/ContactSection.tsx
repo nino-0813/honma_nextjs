@@ -142,7 +142,7 @@ const ContactSection = () => {
           </div>
           
           <div className="flex flex-col gap-2">
-             <label htmlFor="phone" className="text-sm font-serif">お電話番号</label>
+             <label htmlFor="phone" className="text-sm font-serif">電話番号</label>
              <input 
                type="tel" 
                id="phone" 

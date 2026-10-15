@@ -292,25 +292,6 @@ export const CartDrawer = ({ isOpen, onClose, cartItems, onRemove, onUpdateQuant
 
 export const MenuDrawer = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      if (!supabase) return;
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsLoggedIn(!!session);
-    };
-
-    checkAuth();
-
-    if (supabase) {
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-        setIsLoggedIn(!!session);
-      });
-
-      return () => subscription.unsubscribe();
-    }
-  }, []);
 
   const navigate = (href: string) => {
     router.push(href);
@@ -361,7 +342,7 @@ export const MenuDrawer = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
           ))}
 
           <button onClick={handleLoginClick} className="text-left border-b border-gray-100 py-4 hover:text-gray-500 transition-colors block w-full">
-            {isLoggedIn ? 'マイページ' : 'ログイン'}
+            マイページ
           </button>
         </nav>
 

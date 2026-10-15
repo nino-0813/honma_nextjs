@@ -68,7 +68,6 @@ export default function FAQPage() {
           <p className="text-[13px] font-medium text-primary mb-3">
             よくあるご質問
           </p>
-          <h1 className="text-2xl md:text-3xl font-serif tracking-widest text-primary mb-4">お困りのことはありませんか</h1>
           <div className="w-12 h-px bg-primary" />
         </div>
         <div className="space-y-12">
@@ -103,7 +102,7 @@ export default function FAQPage() {
         </div>
         <div className="mt-16 pt-8 border-t border-gray-200 text-center">
           <p className="text-sm text-gray-500 mb-4">上記で解決しない場合は、お気軽にお問い合わせください。</p>
-          <a href="mailto:info@ikevege.com" className="inline-block text-primary hover:text-gray-600 transition-colors text-sm">
+          <a href="/contact" className="inline-block text-primary hover:text-gray-600 transition-colors text-sm">
             info@ikevege.com
           </a>
         </div>

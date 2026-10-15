@@ -12,11 +12,7 @@ export default function ContactPage() {
     <div className="page-top-offset w-full overflow-x-hidden bg-white animate-fade-in">
       <div className="pt-16 md:pt-24 pb-12">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-[13px] font-medium text-primary mb-3">
-            お問い合わせ
-          </p>
-          <h1 className="text-xl md:text-2xl font-serif tracking-[0.15em] font-normal text-primary">お気軽にご相談ください</h1>
-          <p className="text-xs text-gray-500 mt-2 tracking-wider">お問い合わせ</p>
+          <h1 className="text-xl md:text-2xl font-serif tracking-[0.15em] font-normal text-primary">お問い合わせ</h1>
         </div>
       </div>
       <ContactSection />

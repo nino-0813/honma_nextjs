@@ -135,7 +135,12 @@ export default function AboutPage() {
       <header className="px-6 pb-14 pt-16 text-center md:pb-20 md:pt-24">
         <p className="text-[11px] tracking-[0.24em] text-gray-500">自然の“イケてる”を、暮らしのそばへ。</p>
         <h1 className="mt-5 font-serif text-[26px] font-medium leading-[1.8] tracking-[0.13em] md:text-[38px]">農を通じて、<br className="md:hidden" />人と自然のいい関係をつくる。</h1>
-        <p className="mx-auto mt-6 max-w-[620px] text-[12px] leading-[2.1] tracking-[0.08em] text-gray-600 md:text-sm">イケベジは佐渡の田んぼから、おいしい作物と、自然に触れる体験を届けるチームです。</p>
+        <div className="mx-auto mt-6 max-w-[760px] space-y-2 text-[12px] leading-[2.1] tracking-[0.08em] text-gray-600 md:text-sm">
+          <p>イケベジは、新潟県・佐渡ヶ島を拠点に活動する農業ブランドです。</p>
+          <p>農薬や化学肥料に頼らず、酒粕や牡蠣殻、竹など島の資源を土に還しながら、お米と原木しいたけを育てています。</p>
+          <p>その作物を届けること。田んぼをひらき、体験や学びの場をつくること。</p>
+          <p>イケベジは、農を起点に、自然の在り方を社会へと伝える「通訳」で在り続けます。</p>
+        </div>
       </header>
 
       <section className="mx-auto w-full max-w-[1120px] px-4 md:px-6">
@@ -151,8 +156,7 @@ export default function AboutPage() {
           </h2>
           <div className="mt-10 space-y-5 text-[13px] font-light leading-[2.15] tracking-[0.08em] text-gray-600 md:mt-12 md:text-sm">
             <p>自然界では、多様な命が、無理なく、<br />あるがままに響き合い、めぐり続けている。<br />その在り方を、私たちは“イケてる”と呼んでいます。</p>
-            <p>お米を育てて届けること。<br />田んぼをひらき、体験や学びの場をつくること。</p>
-            <p>イケベジは、農を起点に、<br />自然の在り方を社会へと伝える<br />「通訳」で在り続けます。</p>
+            <p>そんな“イケてる”社会を小さな島の集落から、一歩ずつ。</p>
           </div>
         </FadeInSection>
       </section>

@@ -5,16 +5,16 @@ import Link from 'next/link';
 
 const REASONS = [
   {
-    title: ['いつでも', '10%OFF'],
-    description: '毎日のご飯だから、無理なく続けていただけるように。定期便は通常価格からいつでも10%OFFでお届けします。',
+    title: ['一年を通して', '10%OFF'],
+    description: '特別な日のごちそうではなく、毎日の一杯でありたいから。定期便は無理なく続けていただけるよう、通常価格から毎回10%OFFでお届けします。',
   },
   {
     title: ['新米のような', 'みずみずしさ'],
     description: '収穫したお米は専用の保冷庫で低温保管しています。発送直前に精米するので、新米に近いみずみずしさのまま一年中お届けできます。',
   },
   {
-    title: ['常温保存可能な', '保存袋をプレゼント'],
-    description: '湿気・酸素・紫外線を防ぐので、冷蔵庫に入れなくても、虫やカビを気にせず常温でおいしさを保てます。',
+    title: ['お米を常温で守る', '保存袋をプレゼント'],
+    description: '湿気・酸素・紫外線を防ぐ専用袋なので、冷蔵庫に入れなくても、虫やカビの心配を抑えながら常温でおいしさを保てます。',
   },
 ];
 
@@ -23,22 +23,19 @@ export default function YearlySubscriptionLP() {
     <section className="mb-12 md:mb-20">
       <div className="flex min-h-[58svh] items-center justify-center px-4 py-16 md:min-h-[64svh]">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="text-xs font-medium tracking-[0.16em] text-primary md:text-sm">イケベジ定期便</p>
-          <h1 className="mt-5 font-serif text-3xl font-semibold leading-[1.5] tracking-wide text-primary md:text-[44px]">
+          <h1 className="font-serif text-3xl font-semibold leading-[1.5] tracking-wide text-primary md:text-[44px]">
             4700人とつくるイケベジ定期便
           </h1>
           <div className="mt-8 space-y-8 text-sm leading-[2] text-gray-600 md:text-base">
             <p>
-              イケベジがお米をつくる佐渡・豊田集落には、<br />
-              東京ドーム約10個分の田んぼが広がっています。<br />
-              川から約4kmの水路で水を引き、<br />
-              地域の農家が力を合わせて、この風景と稲作を守ってきました。
+              イケベジが活動する豊田集落は、日本海に向かってゆるやかに下る傾斜地にあります。そこには東京ドーム約10個分の田んぼが広がり、水田と海に沈む夕日は私たちの宝です。
             </p>
             <p>
-              時代が移り変わるなかで、<br />
-              この営みを食べる人と一緒に次へつないでいきたい。<br />
-              お米を食べることが、農家を増やしている実感につながるように。<br />
-              そんな思いで、この定期便を始めました。
+              この田んぼを潤し続けてきたのは、江戸時代に山を縫うように拓かれた約4kmの用水路です。<br />
+              先人たちがさまざまな努力を重ねて里山を形づくり、集落の人たちが代々丁寧に手入れを続けてきたからこそ、いまも豊田の風景は残っています。
+            </p>
+            <p>
+              この厳しい時代だからこそ、その営みを食べる人と一緒に次の世代へつないでいきたい。お米を食べることが、農家を増やしている実感につながるように。そんな想いで、この定期便を始めました。
             </p>
           </div>
         </div>
@@ -51,9 +48,8 @@ export default function YearlySubscriptionLP() {
       <div className="mx-auto mt-20 max-w-6xl px-5 md:mt-28 md:px-0">
         <div className="text-center text-primary">
           <h2 className="whitespace-nowrap font-serif text-xs leading-loose tracking-[0.08em] md:text-base">
-            定期便を大切にしてくださるお客様へ、愛を込めて
+            定期便を大切にしてくださるお客様へ、愛を込めて。
           </h2>
-          <span className="mx-auto mt-7 block h-px w-12 bg-primary/50" aria-hidden="true" />
         </div>
 
         <div className="mx-auto mt-12 grid max-w-5xl gap-12 md:mt-16 md:grid-cols-3 md:gap-14">
@@ -78,7 +74,7 @@ export default function YearlySubscriptionLP() {
       </nav>
 
       <div id="ikevege-subscription" className="mt-24 scroll-mt-28 border-t border-gray-100 pt-20 text-center md:mt-32 md:pt-28">
-        <h2 className="mx-auto max-w-5xl font-serif text-lg font-medium leading-loose tracking-[0.06em] text-primary md:text-[22px] lg:whitespace-nowrap lg:text-[26px]">田んぼから食卓までのあいだに、できることを一つずつ積み重ねてお届けします。</h2>
+        <h2 className="mx-auto max-w-5xl font-serif text-lg font-medium leading-loose tracking-[0.06em] text-primary md:text-[22px] lg:whitespace-nowrap lg:text-[26px]">できることを一つずつ積み重ねてお届けします。</h2>
       </div>
     </section>
   );

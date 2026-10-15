@@ -34,7 +34,7 @@ export default function SubscriptionCTA({ desktopSplit = false }: { desktopSplit
         <FadeIn>
           <div className="site-reading-column">
             <p className="mb-4 text-[10px] tracking-[0.24em] text-gray-500 md:text-xs">イケベジ定期便</p>
-            <h2 className="font-serif text-[26px] font-semibold leading-[1.55] tracking-[0.08em] md:text-[42px] lg:text-[50px]">4700人とつくる<br className="md:hidden" />イケベジ定期便</h2>
+            {desktopSplit && <h2 className="font-serif text-[26px] font-semibold leading-[1.55] tracking-[0.08em] md:text-[42px] lg:text-[50px]">4700人とつくる<br className="md:hidden" />イケベジ定期便</h2>}
             <div className="site-reading-text subscription-reading-text mt-8 space-y-10 font-serif text-gray-600 md:mt-12">
               <SubscriptionCopy />
             </div>
@@ -91,11 +91,10 @@ export default function SubscriptionCTA({ desktopSplit = false }: { desktopSplit
         </div>
       ) : (
         <div className="site-shell hidden md:block">
-          <FadeIn>
+          <FadeIn className="ml-auto w-1/2">
             <div className="site-reading-column">
               <p className="mb-4 text-xs tracking-[0.24em] text-gray-500">イケベジ定期便</p>
-              <h2 className="font-serif text-[42px] font-semibold leading-[1.55] tracking-[0.08em] lg:text-[50px]">4700人とつくるイケベジ定期便</h2>
-              <div className="site-reading-text subscription-reading-text mt-12 space-y-10 font-serif text-gray-600">
+              <div className="site-reading-text subscription-reading-text mt-8 space-y-10 text-left font-serif text-gray-600">
                 <SubscriptionCopy />
               </div>
             </div>
