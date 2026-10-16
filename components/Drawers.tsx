@@ -137,8 +137,8 @@ export const CartDrawer = ({ isOpen, onClose, cartItems, onRemove, onUpdateQuant
               const isSubscription = item.purchaseType === 'subscription' && item.subscriptionInterval;
               const itemKey = cartItemKey(item);
               return (
-              <div key={itemKey} className="flex gap-4 pb-4 border-b border-gray-100 last:border-b-0">
-                <Link href={`/products/${item.product.handle}`} onClick={onClose} className="flex-shrink-0 aspect-square w-20 bg-gray-100 rounded overflow-hidden block">
+              <div key={itemKey} className="flex items-start gap-3 border-b border-gray-100 pb-4 last:border-b-0">
+                <Link href={`/products/${item.product.handle}`} onClick={onClose} className="block h-20 w-20 flex-none self-start overflow-hidden rounded bg-gray-100">
                   <FadeInImage
                     src={item.product.images && item.product.images.length > 0 ? item.product.images[0] : (item.product.image || '')}
                     alt={item.product.title}
@@ -147,9 +147,9 @@ export const CartDrawer = ({ isOpen, onClose, cartItems, onRemove, onUpdateQuant
                 </Link>
                 <div className="flex-1 min-w-0">
                   <Link href={`/products/${item.product.handle}`} onClick={onClose}>
-                    <h3 className="text-sm font-medium text-gray-900 mb-1 line-clamp-2 hover:text-primary transition-colors">
+                    <p className="mb-1 line-clamp-2 !text-[13px] font-medium !leading-[1.5] text-gray-900 transition-colors hover:text-primary">
                       {item.product.title}
-                    </h3>
+                    </p>
                   </Link>
                   {item.variant && (
                     <p className="text-xs text-gray-500 mb-1">
