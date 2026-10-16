@@ -47,7 +47,7 @@ export default function YearlySubscriptionLP() {
 
       <div className="mx-auto mt-20 max-w-6xl px-5 md:mt-28 md:px-0">
         <div className="text-center text-primary">
-          <h2 className="whitespace-nowrap font-serif text-xs leading-loose tracking-[0.08em] md:text-base">
+          <h2 className="mx-auto max-w-[18rem] text-center font-serif text-xs leading-loose tracking-[0.08em] md:max-w-none md:whitespace-nowrap md:text-base">
             定期便を大切にしてくださるお客様へ、愛を込めて。
           </h2>
         </div>
