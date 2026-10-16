@@ -65,6 +65,13 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
   const calculatedPrice = isFirstPurchase ? Math.round(basePrice * 0.9) : basePrice;
 
   const selectedVariant = `${millingMethod}3個セット（コシヒカリ・亀の尾・にこまる）`;
+  const millingVariation = product.variants_config?.find((type) =>
+    type.options.some((option) => option.value === millingMethod)
+  );
+  const millingOption = millingVariation?.options.find((option) => option.value === millingMethod);
+  const selectedOptions = millingVariation && millingOption
+    ? { [millingVariation.id]: millingOption.id }
+    : {};
 
   const soldOut = isProductSoldOut(product);
   const now = Date.now();
@@ -83,7 +90,7 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
     if (disabled) return false;
     setStockError('');
     const existing = cartItems.find((item) => item.product.id === product.id && item.variant === selectedVariant);
-    const result = checkStockAvailability(product, {}, quantity, existing?.quantity || 0);
+    const result = checkStockAvailability(product, selectedOptions, quantity, existing?.quantity || 0);
     if (!result.available) {
       setStockError(result.message);
       return false;
@@ -96,6 +103,7 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
     }, quantity, {
       variant: selectedVariant,
       finalPrice: calculatedPrice,
+      selectedOptions,
     });
     return true;
   };
