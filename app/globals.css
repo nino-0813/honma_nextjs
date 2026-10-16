@@ -127,19 +127,9 @@
   letter-spacing: 0.055em;
 }
 
-.public-site :where(h1) {
-  font-size: 2rem;
-  line-height: 1.5;
-}
-
-.public-site :where(h2) {
+.public-site :where(h1, h2, h3) {
   font-size: 1.625rem;
-  line-height: 1.55;
-}
-
-.public-site :where(h3) {
-  font-size: 1.375rem;
-  line-height: 1.6;
+  line-height: 1.8;
 }
 
 .public-site :where(h4) {
@@ -147,7 +137,9 @@
   line-height: 1.65;
 }
 
-.public-site :where(p, li, dd) {
+.public-site :where(p, li, dd, blockquote) {
+  font-size: var(--site-type-body);
+  line-height: var(--site-leading-body);
   letter-spacing: 0.065em;
 }
 
