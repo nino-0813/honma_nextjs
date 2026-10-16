@@ -94,6 +94,4 @@ export const LEARN_MORE_CARDS: {
 /** ニュース：記事が足りないときに埋める仮の行 */
 export const PLACEHOLDER_NEWS = [
   { date: '2026-08-20', title: '令和8年産 新米の予約受付を開始しました', href: '/collections/rice', isPlaceholder: true },
-  { date: '2026-07-30', title: '佐渡Kids生きもの調査隊 第19期の参加者を募集します', href: '/join-us', isPlaceholder: true },
-  { date: '2026-06-15', title: 'スマート農機導入のクラウドファンディングが目標を達成しました', href: '/join-us', isPlaceholder: true },
 ];
