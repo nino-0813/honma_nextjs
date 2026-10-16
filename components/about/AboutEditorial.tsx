@@ -40,7 +40,7 @@ export default function AboutEditorial() {
   };
 
   return (
-    <section className="border-t border-[#d8d8d2] bg-[#f1f1ed] px-4 py-24 md:px-6 md:py-28">
+    <section className="about-editorial-preserve border-t border-[#d8d8d2] bg-[#f1f1ed] px-4 py-24 md:px-6 md:py-28">
       <div className="mx-auto max-w-[1120px]">
         <div className="text-center">
           <h2 className="text-[24px] font-medium tracking-[0.2em] md:text-[30px]">イケベジを詳しく知る</h2>

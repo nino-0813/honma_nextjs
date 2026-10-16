@@ -179,6 +179,23 @@
   font-weight: 400;
 }
 
+/*
+ * 公開サイトの見出し・本文は純黒で統一する。
+ * ロゴは画像のため対象外。「イケベジを詳しく知る」は既存の編集デザインを維持する。
+ */
+.public-site :where(h1, h2, h3, h4, h5, h6):not(.about-editorial-preserve *),
+.public-site :where(
+  .text-primary,
+  .text-gray-400,
+  .text-gray-500,
+  .text-gray-600,
+  .text-gray-700,
+  .text-gray-800,
+  .text-gray-900
+):not(.about-editorial-preserve *) {
+  color: #000 !important;
+}
+
 .public-site :where(button, a) {
   letter-spacing: 0.055em;
 }
