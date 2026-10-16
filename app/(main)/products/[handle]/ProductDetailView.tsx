@@ -865,7 +865,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                            className="w-full py-4 text-sm font-semibold tracking-widest bg-yuunagi text-white hover:bg-yuunagi-ink transition-colors"
                          >
                            {purchaseType === 'subscription'
-                             ? `定期購入（${SUBSCRIPTION_INTERVAL_LABELS[subscriptionInterval]}）をカートに追加`
+                             ? '定期購入をカートに追加する'
                              : 'カートに追加'}
                          </LoadingButton>
                          {stockError && (
@@ -924,7 +924,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                              <div className="flex items-center justify-center w-full">
                                <span>
                                  {purchaseType === 'subscription'
-                                   ? `定期購入（${SUBSCRIPTION_INTERVAL_LABELS[subscriptionInterval]}）をカートに追加する`
+                                   ? '定期購入をカートに追加する'
                                    : 'カートに追加する'}
                                </span>
                                <span className="absolute right-4 text-lg transition-transform duration-300 group-hover:translate-x-1">→</span>
