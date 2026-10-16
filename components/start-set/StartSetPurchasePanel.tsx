@@ -25,7 +25,9 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
       if (!accessToken) {
         if (active) {
           setIsLoggedIn(false);
-          setIsFirstPurchase(false);
+          // 未ログインのお客様には初回特典の内容を案内し、
+          // ログイン後に購入履歴を確認して最終確定する。
+          setIsFirstPurchase(true);
           setEligibilityLoading(false);
         }
         return;
@@ -120,11 +122,9 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
         </h2>
         <div className="mb-7 text-sm leading-relaxed text-gray-600">
           <p>内容：2合×3個</p>
-          <ul className="mt-3 space-y-1 text-[11px] tracking-[0.06em] text-gray-500">
-            <li>従来コシヒカリ</li>
-            <li>亀の尾</li>
-            <li>にこまる</li>
-          </ul>
+          <p className="mt-3 whitespace-nowrap text-[10px] tracking-[0.04em] text-gray-500 md:text-[11px] md:tracking-[0.06em]">
+            従来コシヒカリ ／ 亀の尾 ／ にこまる
+          </p>
         </div>
 
         <div className="mb-6 border border-gray-200 bg-white p-5 md:p-6">

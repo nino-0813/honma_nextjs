@@ -58,17 +58,11 @@ export default async function StartSetPage() {
         <h1 className="mx-auto max-w-4xl font-serif text-[28px] font-semibold leading-[1.5] tracking-[0.08em] text-primary md:text-4xl lg:text-[40px]">
           お試しセット
         </h1>
-        {product?.description ? (
-          <p className="mx-auto mt-5 max-w-2xl whitespace-pre-line text-[13px] leading-loose text-gray-600 md:text-sm">
-            {product.description}
-          </p>
-        ) : (
-          <p className="mx-auto mt-5 max-w-2xl text-[13px] leading-loose text-gray-600 md:text-sm">
-            <span className="block">明治から続く「亀の尾」、昭和に生まれた「従来コシヒカリ」、平成に誕生した「にこまる」。</span>
-            <span className="block">同じ佐渡の田んぼでも、品種ごとに土づくりや育て方を変えて、試行錯誤を重ねてきました。</span>
-            <span className="block">甘みも、香りも、食感も違う3つのお米から、あなたの「好き」を見つけてください。</span>
-          </p>
-        )}
+        <p className="mx-auto mt-5 max-w-2xl text-[13px] leading-loose text-gray-600 md:text-sm">
+          <span className="block">明治から続く「亀の尾」、昭和に生まれた「従来コシヒカリ」、平成に誕生した「にこまる」。</span>
+          <span className="block">同じ佐渡の田んぼでも、品種ごとに土づくりや育て方を変えて、試行錯誤を重ねてきました。</span>
+          <span className="block">甘みも、香りも、食感も違う3つのお米から、あなたの「好き」を見つけてください。</span>
+        </p>
       </section>
 
       <div className="mx-auto max-w-[1160px] px-4 sm:px-6 lg:px-0">
@@ -96,7 +90,9 @@ export default async function StartSetPage() {
               </h2>
               <div className="-mt-4 mb-6 text-sm leading-relaxed text-gray-600">
                 <p>内容：2合×3個</p>
-                <ul className="mt-3 space-y-1 text-[11px] tracking-[0.06em] text-gray-500"><li>従来コシヒカリ</li><li>亀の尾</li><li>にこまる</li></ul>
+                <p className="mt-3 whitespace-nowrap text-[10px] tracking-[0.04em] text-gray-500 md:text-[11px] md:tracking-[0.06em]">
+                  従来コシヒカリ ／ 亀の尾 ／ にこまる
+                </p>
               </div>
 
               <div className="border border-gray-200 bg-white p-4 md:p-5 mb-6">

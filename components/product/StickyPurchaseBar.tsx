@@ -93,24 +93,24 @@ export default function StickyPurchaseBar({
       }`}
     >
       <div className="mx-auto max-w-[1100px] px-3 pb-3 md:px-4 md:pb-4">
-        <div className="flex items-center gap-3 md:gap-4 rounded-full bg-white/95 backdrop-blur shadow-[0_6px_28px_-8px_rgba(0,0,0,0.28)] border border-gray-200 pl-3 pr-3 py-2.5">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 rounded-[28px] border border-gray-200 bg-white/95 px-4 py-3 shadow-[0_6px_28px_-8px_rgba(0,0,0,0.28)] backdrop-blur md:flex md:gap-4 md:rounded-full md:px-3 md:py-2.5">
           {image && (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img src={image} alt="" aria-hidden="true" className="hidden sm:block w-11 h-11 rounded-full object-cover shrink-0" />
           )}
 
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-[11px] md:text-[13px] text-primary">{title}</p>
-            <p className="text-[13px] md:text-sm text-primary tabular-nums">
-              ¥{price.toLocaleString()}
-              <span className="text-[10px] text-gray-400 ml-1">税込</span>
-              {note && <span className="ml-2 text-[10px] text-yuunagi-ink">{note}</span>}
+          <div className="col-span-2 min-w-0 md:col-span-1 md:flex-1">
+            <p className="truncate text-[12px] text-primary md:text-[13px]">{title}</p>
+            <p className="mt-0.5 flex items-baseline gap-2 whitespace-nowrap text-[14px] tabular-nums text-primary md:mt-0 md:text-sm">
+              <span>¥{price.toLocaleString()}</span>
+              <span className="text-[10px] text-gray-400">税込</span>
+              {note && <span className="text-[10px] text-yuunagi-ink">{note}</span>}
             </p>
           </div>
 
           {/* 数量。操作手段が渡されているときだけ出す */}
           {interactive && (
-          <div className="flex items-center gap-1 shrink-0 rounded-full border border-gray-200 px-1 py-0.5">
+          <div className="flex shrink-0 items-center gap-1 justify-self-start rounded-full border border-gray-200 px-1 py-0.5">
             <button
               type="button"
               onClick={() => onQuantityChange?.(Math.max(1, qty - 1))}
@@ -147,7 +147,7 @@ export default function StickyPurchaseBar({
             type="button"
             onClick={handleAdd}
             disabled={isDisabled || busy}
-            className="shrink-0 rounded-full bg-yuunagi px-5 md:px-9 py-3 text-xs md:text-sm font-medium text-white hover:bg-yuunagi-ink transition-colors disabled:opacity-40 disabled:hover:bg-yuunagi"
+            className="shrink-0 justify-self-end whitespace-nowrap rounded-full bg-yuunagi px-6 py-3 text-xs font-medium text-white transition-colors hover:bg-yuunagi-ink disabled:opacity-40 disabled:hover:bg-yuunagi md:px-9 md:text-sm"
           >
             {isDisabled ? (disabledLabel ?? 'カートに入れる') : busy ? '処理中…' : 'カートに入れる'}
           </button>

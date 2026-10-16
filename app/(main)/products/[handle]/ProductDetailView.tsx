@@ -24,11 +24,33 @@ import {
 
 type PurchaseType = 'one_time' | 'subscription';
 
+const FARMING_TERMS = ['農薬・化学肥料不使用栽培', '無農薬無化学肥料', '自然栽培'];
+
 function getProductTitleLines(title: string): string[] {
   const explicitLines = title.split(/\n+/).map((line) => line.trim()).filter(Boolean);
+  const normalized = title.replace(/\s+/g, ' ').trim();
+  const structuredMatch = normalized.match(/^【([^】]+)】\s*(.*)$/);
+  if (structuredMatch) {
+    const [, variety, remainder] = structuredMatch;
+    const farming = FARMING_TERMS.find((term) => remainder.includes(term)) ?? '';
+    const amount = remainder.match(/(?:\d+(?:\.\d+)?\s*kg|\d+合(?:\s*[×xX]\s*\d+個)?)/i)?.[0]
+      ?.replace(/\s+/g, '') ?? '';
+    const year = remainder.match(/令和\s*\d+年(?:度|産)?/)?.[0]
+      ?.replace(/\s/g, '')
+      .replace(/年産$/, '年度')
+      .replace(/年$/, '年度') ?? '';
+    const origin = remainder.includes('新潟県佐渡産')
+      ? '新潟県佐渡産'
+      : remainder.includes('佐渡産')
+        ? '佐渡産'
+        : '';
+    const details = [amount, year, origin].filter(Boolean).join(' ');
+
+    return [variety, farming, details].filter(Boolean);
+  }
+
   if (explicitLines.length > 1) return explicitLines.slice(0, 3);
 
-  const normalized = title.replace(/\s+/g, ' ').trim();
   const yearMatch = normalized.match(/令和\s*\d+年産/);
   if (yearMatch?.index !== undefined) {
     const beforeYear = normalized.slice(0, yearMatch.index).trim();
@@ -45,13 +67,7 @@ function getProductTitleLines(title: string): string[] {
 }
 
 function getDesktopProductTitleLines(title: string): string[] {
-  const normalized = title.replace(/\s+/g, ' ').trim();
-  const yearMatch = normalized.match(/令和\s*\d+年産/);
-  if (yearMatch?.index !== undefined) {
-    const beforeYear = normalized.slice(0, yearMatch.index).trim();
-    const afterYear = normalized.slice(yearMatch.index + yearMatch[0].length).trim();
-    return [`${beforeYear} ${yearMatch[0].replace(/\s+/g, '')}`.trim(), afterYear].filter(Boolean);
-  }
+  // 商品名の情報順は画面幅にかかわらず統一する。
   return getProductTitleLines(title);
 }
 
@@ -470,7 +486,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
 
           <div>
             <div id="purchase-panel">
-              <h1 className="mb-3 text-xl font-medium leading-[1.65] tracking-wide text-primary md:text-2xl lg:!text-[28px]">
+              <h1 className="mb-3 text-[20px] font-medium leading-[1.65] tracking-wide text-primary md:text-2xl lg:!text-[28px]">
                 <span className="lg:hidden">
                   {getProductTitleLines(product.title).map((line, index) => (
                     <span key={`${index}-${line}`} className="block">{line}</span>

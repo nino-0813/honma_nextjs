@@ -54,6 +54,97 @@
 
 ---
 
+## Mobile start-set variety line QA
+
+**Source visual truth**
+- `/Users/yusukeninomiya/Desktop/スクリーンショット 2026-10-17 5.46.11.png`
+
+**Rendered implementation evidence**
+- Codex in-app browser capture at `http://127.0.0.1:3018/start-set?qa=2#purchase-panel`.
+- Viewport: mobile browser surface at `493 × 877px`, device scale factor `1`.
+- State: start-set purchase panel, fallback product state.
+- Implementation capture: emitted directly from the in-app browser in the current task; the browser capture is not file-backed.
+
+**Full-view comparison evidence**
+- “従来コシヒカリ ／ 亀の尾 ／ にこまる” appears on one uninterrupted line beneath the set quantity.
+- The price card, availability notice, CTA buttons, and three product cards retain their existing alignment and width.
+
+**Focused region comparison evidence**
+- The purchase panel was captured at readable scale with the complete variety line visible, so a separate crop was unnecessary.
+
+**Required fidelity surfaces**
+- Typography: mobile text uses `10px` with restrained tracking; desktop retains `11px` sizing.
+- Spacing/layout: the previous three-row list is replaced by one `nowrap` line without changing the surrounding panel spacing.
+- Colors/tokens: the existing gray secondary-text color is preserved.
+- Image quality: no image assets were changed.
+- Copy/content: wording and requested full-width slash separators match the supplied instruction exactly.
+
+**Findings**
+- No actionable P0/P1/P2 findings remain for the requested one-line mobile display.
+
+**Comparison history**
+1. Initial state — the three varieties appeared on separate rows.
+2. Post-fix state — all three varieties fit on one line at the target mobile width.
+
+**final result: passed**
+
+---
+
+## Mobile subscription label and start-set intro QA
+
+**Source visual truth**
+- `/Users/yusukeninomiya/Desktop/スクリーンショット 2026-10-17 5.43.34.png`
+- `/Users/yusukeninomiya/Desktop/スクリーンショット 2026-10-17 5.43.53.png`
+
+**Rendered implementation evidence**
+- Codex in-app browser capture, `http://127.0.0.1:3018/` and `http://127.0.0.1:3018/start-set?qa=1`.
+- Viewport: mobile browser surface at `493 × 877px`, device scale factor `1`.
+- State: homepage subscription introduction and start-set page introduction.
+- Implementation capture: emitted directly from the in-app browser in the current task; the browser capture is not file-backed.
+
+**Full-view comparison evidence**
+- The small eyebrow label above “4700人とつくる イケベジ定期便” is absent from the mobile homepage and the desktop split layout uses the same component change.
+- The start-set introduction now shows the same fixed three-part explanation at every breakpoint instead of rendering the long product-admin description on mobile.
+- The product image begins immediately after the compact introduction, restoring the intended content density.
+
+**Focused region comparison evidence**
+- A separate crop was unnecessary because both requested regions were fully visible and readable in the in-app browser captures.
+
+**Required fidelity surfaces**
+- Typography: the existing Japanese serif hierarchy, sizes, tracking, and line height remain unchanged.
+- Spacing/layout: removing the eyebrow closes only its occupied row; the title and body retain their existing spacing. The start-set intro retains the shared desktop width and alignment rules.
+- Colors/tokens: no color or token changes were introduced.
+- Image quality: existing product imagery and crops are unchanged.
+- Copy/content: the unwanted eyebrow is removed, and the mobile-only long description is replaced by the approved shared three-part copy.
+
+**Primary interactions tested**
+- Loaded the homepage and the start-set route in the mobile in-app browser.
+- Confirmed header navigation remains visible and the start-set page continues into its product image and purchase content.
+
+**Console errors checked**
+- No new runtime error was observed while loading either route.
+- Production build and type checks completed successfully.
+
+**Findings**
+- No actionable P0/P1/P2 findings remain for the two requested mobile changes.
+
+**Comparison history**
+1. Initial state — the subscription eyebrow remained visible and the start-set intro could render the long administration description.
+2. Post-fix state — the eyebrow is removed and both breakpoints use the concise shared introduction.
+
+**final result: passed**
+
+---
+
+## Mobile subscription label color QA
+
+- Target: Mobile subscription introduction shown in the supplied screenshot.
+- Change: Changed only the small `イケベジ定期便` label from gray to the site's primary black text color.
+- Scope: Mobile block only; desktop typography and the surrounding copy remain unchanged.
+
+**final result: passed**
+---
+
 ## Desktop typography normalization QA
 
 **Source visual truth**
@@ -231,5 +322,16 @@
 - Each paragraph's final line remains naturally left-aligned without stretched spacing.
 - Existing `0.065em` letter spacing and `line-break: strict` are preserved.
 - Desktop and unrelated sections retain their existing left alignment.
+
+**final result: passed**
+
+---
+
+## Mobile announcement popup heading QA
+
+- Target: Mobile announcement popup heading shown in the supplied screenshot.
+- Change: Reduced the mobile heading size and removed inherited wide letter spacing while preserving the desktop typography.
+- Verification: Checked the popup in the mobile in-app browser after navigating to the product-section trigger.
+- Result: The full heading fits on one line; body copy, both CTAs, close control, and snooze checkbox remain aligned and usable.
 
 **final result: passed**

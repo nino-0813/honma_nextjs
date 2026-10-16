@@ -5,6 +5,12 @@ import FadeIn from '@/components/FadeIn';
 
 const ROW_COUNT = 5;
 
+const HIDDEN_HOME_NEWS_TITLES = new Set([
+  '佐渡Kids生きもの調査隊 第19期の参加者を募集します',
+  'スマート農機導入のクラウドファンディングが目標を達成しました',
+  'ー イケベジについて ー 2025.8',
+]);
+
 type Row = { date: string; title: string; href: string; label?: string; isPlaceholder?: boolean };
 
 function formatDate(value: string) {
@@ -31,11 +37,13 @@ export default async function News() {
       .order('published_at', { ascending: false })
       .limit(ROW_COUNT);
 
-    rows = (data ?? []).map((a) => ({
-      date: (a.published_at as string) || (a.created_at as string),
-      title: a.title as string,
-      href: `/blog/${a.id}`,
-    }));
+    rows = (data ?? [])
+      .filter((a) => !HIDDEN_HOME_NEWS_TITLES.has(a.title as string))
+      .map((a) => ({
+        date: (a.published_at as string) || (a.created_at as string),
+        title: a.title as string,
+        href: `/blog/${a.id}`,
+      }));
   }
 
   rows = [...rows, ...PLACEHOLDER_NEWS]

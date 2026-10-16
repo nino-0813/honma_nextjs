@@ -38,7 +38,7 @@ export default function ProductFeatures({
             if (alwaysOpenFirst && index === 0) return (
               <li key={r.label} className="border-b border-gray-200 lg:border-b-0">
                 <div className="py-5 md:py-6"><span className="block text-sm font-medium text-primary md:text-base">{r.label}</span></div>
-                <div className="pb-6 text-[13px] leading-loose text-gray-600 md:text-sm">
+                <div className="pb-6 font-serif text-[15px] leading-loose text-gray-600 md:text-sm">
                   {typeof r.body === 'string' ? <p className="whitespace-pre-wrap">{r.body}</p> : r.body}
                   {r.link && <a href={r.link.href} className="mt-5 inline-flex border-b border-primary pb-0.5 font-medium text-primary transition-opacity hover:opacity-60">{r.link.label}</a>}
                 </div>
@@ -66,7 +66,7 @@ export default function ProductFeatures({
                 </button>
                 <div className={`accordion-body ${isOpen ? 'is-open' : ''}`}>
                   <div>
-                    <div className="pb-6 text-[13px] md:text-sm leading-loose text-gray-600">
+                    <div className="pb-6 font-serif text-[15px] leading-loose text-gray-600 md:text-sm">
                       {typeof r.body === 'string' ? <p className="whitespace-pre-wrap">{r.body}</p> : r.body}
                       {r.link && <a href={r.link.href} className="mt-5 inline-flex border-b border-primary pb-0.5 font-medium text-primary transition-opacity hover:opacity-60">{r.link.label}</a>}
                     </div>

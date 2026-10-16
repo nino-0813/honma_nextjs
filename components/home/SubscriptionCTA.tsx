@@ -33,14 +33,13 @@ export default function SubscriptionCTA({ desktopSplit = false }: { desktopSplit
       <div className="site-shell md:hidden">
         <FadeIn>
           <div className="site-reading-column">
-            <p className="mb-4 text-[10px] tracking-[0.24em] text-gray-500 md:text-xs">イケベジ定期便</p>
             {desktopSplit && <h2 className="font-serif text-[26px] font-semibold leading-[1.55] tracking-[0.08em] md:text-[42px] lg:text-[50px]">4700人とつくる<br className="md:hidden" />イケベジ定期便</h2>}
             <div className="site-reading-text subscription-reading-text mt-8 space-y-10 font-serif text-gray-600 md:mt-12">
               <SubscriptionCopy />
             </div>
           </div>
         </FadeIn>
-        <FadeIn className="mt-8 md:mt-12">
+        <FadeIn className="mx-2 mt-8 md:mt-12">
           <div className="grid grid-cols-2 overflow-hidden">
             {COMMUNITY_IMAGES.map((image) => (
               <div key={image.src} className="aspect-[3/2] overflow-hidden bg-dim">
@@ -50,7 +49,7 @@ export default function SubscriptionCTA({ desktopSplit = false }: { desktopSplit
             ))}
           </div>
         </FadeIn>
-        <div className="mt-8 text-left md:mt-12 md:text-center">
+        <div className="mx-2 mt-8 text-left md:mt-12 md:text-center">
           <Link href="/collections/rice/yearly?view=lp" className="site-pill-link">
             定期便を始める →
           </Link>
@@ -63,7 +62,6 @@ export default function SubscriptionCTA({ desktopSplit = false }: { desktopSplit
             <div className="flex min-w-0 flex-col justify-center">
               <FadeIn>
                 <div className="site-reading-column">
-                  <p className="mb-4 text-xs tracking-[0.24em] text-gray-500">イケベジ定期便</p>
                   <h2 className="font-serif text-[42px] font-semibold leading-[1.55] tracking-[0.08em] lg:text-[50px]">
                     4700人とつくる<br />イケベジ定期便
                   </h2>
