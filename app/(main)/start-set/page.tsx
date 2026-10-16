@@ -6,6 +6,7 @@ import SubscriptionCTA from '@/components/home/SubscriptionCTA';
 import { SHOW_PLACEHOLDER_BADGE } from '@/components/home/placeholders';
 import { getProductByHandle, getPublishedProductByHandle } from '@/lib/supabase';
 import StartSetPurchasePanel from '@/components/start-set/StartSetPurchasePanel';
+import RiceGuideModal from '@/components/start-set/RiceGuideModal';
 
 export const metadata: Metadata = {
   title: 'お試しセット',
@@ -173,6 +174,9 @@ export default async function StartSetPage() {
             },
           ]}
         />
+        <div className="mt-8 flex justify-center">
+          <RiceGuideModal />
+        </div>
         <ProductFeatures
           showTitle={false}
           compactTop
