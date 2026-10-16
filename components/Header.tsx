@@ -95,7 +95,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
                 <Link
                   key={item.label}
                   href={item.href}
-                  className={`site-button-label whitespace-nowrap border-b pb-1 transition-colors ${
+                  className={`site-button-label inline-flex h-9 items-center whitespace-nowrap border-b transition-colors ${
                     active
                       ? onHero ? 'border-white text-white' : 'border-primary text-primary'
                       : onHero ? 'border-transparent text-white hover:border-white hover:text-white/80' : 'border-transparent text-gray-600 hover:border-primary hover:text-primary'
