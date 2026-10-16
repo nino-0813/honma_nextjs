@@ -352,7 +352,7 @@ export default function CollectionsPage() {
         )}
 
         {!loading && !error && isLpView && (
-          <div className="mt-16 flex justify-center border-t border-gray-100 pt-12 md:mt-24 md:pt-16">
+          <div className="mt-16 flex justify-center pt-12 md:mt-24 md:border-t md:border-gray-100 md:pt-16">
             <Link
               href="/subscription-faq"
               className="inline-flex min-h-11 items-center rounded-full border border-gray-300 px-7 text-sm text-primary transition-colors hover:border-primary hover:bg-primary hover:text-white"
