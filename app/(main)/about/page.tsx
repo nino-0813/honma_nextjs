@@ -88,11 +88,11 @@ export default function AboutPage() {
               </div>
             </div>
 
-            <div className="order-3 mx-auto mt-14 w-full max-w-[640px] overflow-hidden md:order-2 md:col-start-2 md:row-start-1 md:mt-0 md:max-w-[460px]">
+            <div className="order-2 mx-auto mt-14 w-full max-w-[640px] overflow-hidden md:col-start-2 md:row-start-1 md:mt-0 md:max-w-[460px]">
               <img src="/images/about/closing/good-times-collage-2x8.png" alt="イケベジと地域の人たちが自然の中で過ごす様子" className="block h-auto w-full" />
             </div>
 
-            <div className="order-2 mt-14 text-center md:order-3 md:col-span-2 md:mt-20">
+            <div className="order-3 mt-14 text-center md:col-span-2 md:mt-20">
               <p className="text-[19px] leading-relaxed tracking-[0.07em] md:text-[26px]">毎日のごはんに、佐渡の田んぼをひとつ。</p>
               <Link href="/collections" className="mt-7 inline-block border-b border-[#1c1d1d] pb-1 text-[13px] tracking-[0.1em] transition-opacity hover:opacity-60">商品一覧を見る　→</Link>
             </div>
