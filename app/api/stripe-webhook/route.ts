@@ -719,17 +719,17 @@ export async function POST(request: Request) {
         }
       }
       const bankOrderNumber = order.order_number || generateOrderNumber();
+      const paymentDueAt = order.payment_due_at || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
       await supabaseAdmin.from('orders').update({
         order_number: bankOrderNumber,
         payment_method: 'bank_transfer', payment_status: 'pending', order_status: 'pending',
+        payment_due_at: paymentDueAt,
         updated_at: new Date().toISOString(),
       }).eq('id', order.id);
 
       if (!isDuplicateEvent) {
         const instructionsUrl = pi.next_action?.display_bank_transfer_instructions?.hosted_instructions_url || '';
-        const dueDate = order.payment_due_at
-          ? new Date(order.payment_due_at)
-          : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        const dueDate = new Date(paymentDueAt);
         try {
           await sendOrderConfirmationEmail(supabaseAdmin, order, bankOrderNumber, {
             customerTemplateId: BANK_TRANSFER_ORDER_TEMPLATE_ID,
@@ -834,6 +834,21 @@ export async function POST(request: Request) {
 
       if (Number(order.total) !== amountReceived) {
         console.error('Amount mismatch', { orderTotal: order.total, amountReceived, paymentIntentId });
+        const mismatchNote = `[webhook] amount_mismatch: order.total=${order.total}, pi.amount_received=${amountReceived}`;
+        await supabaseAdmin
+          .from('orders')
+          .update({
+            notes: `${order.notes ? `${order.notes}\n` : ''}${mismatchNote}`,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', order.id);
+        // 金額不一致の注文は支払済みにせず、在庫減算・発送処理も行わない。
+        return NextResponse.json({
+          received: true,
+          warning: 'amount_mismatch',
+          payment_intent_id: paymentIntentId,
+          manual_review_required: true,
+        });
       }
 
       const wasPaid = order.payment_status === 'paid';
@@ -843,10 +858,7 @@ export async function POST(request: Request) {
 
       const nextOrderNumber = order.order_number || generateOrderNumber();
       const nowIso = new Date().toISOString();
-      const nextNotes =
-        Number(order.total) !== amountReceived
-          ? `${(order as any).notes ? String((order as any).notes) + '\n' : ''}[webhook] amount_mismatch: order.total=${order.total}, pi.amount_received=${amountReceived}`
-          : (order as any).notes;
+      const nextNotes = (order as any).notes;
 
       const { error: updErr } = await supabaseAdmin
         .from('orders')

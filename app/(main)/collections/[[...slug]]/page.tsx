@@ -184,6 +184,8 @@ export default function CollectionsPage() {
               ? 'crescent'
               : currentCategory === 'チケット'
                 ? 'ticket'
+                : currentCategory === 'その他'
+                  ? 'other'
                 : currentCategory === 'お米'
                   ? 'rice'
               : 'all';
@@ -275,11 +277,11 @@ export default function CollectionsPage() {
               return (
               <Link
                 key={product.id}
-                href={
-                  isLpView
+                href={product.handle === 'start-set'
+                  ? '/start-set'
+                  : isLpView
                     ? `/products/${product.handle || product.id}?type=subscription`
-                    : `/products/${product.handle || product.id}`
-                }
+                    : `/products/${product.handle || product.id}`}
                 className="group block opacity-0 animate-fade-in-up"
                 style={{ animationDelay: `${index * 60}ms` }}
               >

@@ -37,7 +37,9 @@ const CATEGORIES = [
     { value: '年間契約', label: '年間契約' },
     { value: 'スタートセット', label: 'お試しセット' },
   ] },
+  { id: '原木しいたけ', name: '原木しいたけ', subcategories: [] },
   { id: 'Crescentmoon', name: 'Crescentmoon', subcategories: [] },
+  { id: 'チケット', name: 'チケット', subcategories: [] },
   { id: 'その他', name: 'その他', subcategories: [] },
 ];
 

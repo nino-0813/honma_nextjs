@@ -78,16 +78,17 @@ export default function LegalPage() {
             <dl className="space-y-3 text-sm md:text-base leading-relaxed">
               <div className="flex flex-col md:flex-row">
                 <dt className="font-medium text-gray-900 w-40 flex-shrink-0 mb-1 md:mb-0">支払方法</dt>
-                <dd className="text-gray-700">クレジットカードによる決済がご利用いただけます。</dd>
+                <dd className="text-gray-700">クレジットカード・銀行振込による決済がご利用いただけます。<br />※定期便商品はクレジットカードに限りご利用いただけます。</dd>
               </div>
               <div className="flex flex-col md:flex-row">
                 <dt className="font-medium text-gray-900 w-40 flex-shrink-0 mb-1 md:mb-0">支払時期</dt>
-                <dd className="text-gray-700">商品注文確定時にお支払いが確定いたします。</dd>
+                <dd className="text-gray-700">クレジットカードの場合は商品注文確定時に、銀行振込の場合はお振込後決済システム「Stripe」にてお振込確認後お支払いが確定いたします。</dd>
+              </div>
+              <div className="flex flex-col md:flex-row">
+                <dt className="font-medium text-gray-900 w-40 flex-shrink-0 mb-1 md:mb-0">支払期限</dt>
+                <dd className="text-gray-700">銀行振込に限り、原則注文の7日後までとなっております。お支払い期限を過ぎると注文内容は自動的にキャンセルとなります。</dd>
               </div>
             </dl>
-            <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-              <p className="text-sm text-gray-600">※現在、クレジットカード以外の決済方法については対応しておりません。</p>
-            </div>
           </section>
           <section className="space-y-4">
             <h2 className="text-xl md:text-2xl font-serif tracking-widest text-primary mt-12 mb-6">商品のお届け時期</h2>

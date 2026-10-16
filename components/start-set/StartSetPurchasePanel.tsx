@@ -3,7 +3,7 @@
 import { useContext, useEffect, useState } from 'react';
 import type { Product } from '@/types';
 import { CartContext } from '@/providers/CartProvider';
-import { checkStockAvailability, getOrders, supabase } from '@/lib/supabase';
+import { checkStockAvailability, supabase } from '@/lib/supabase';
 import { isProductSoldOut } from '@/lib/productStatus';
 import StickyPurchaseBar from '@/components/product/StickyPurchaseBar';
 
@@ -13,20 +13,50 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
   const { addToCart, openCart, cartItems } = useContext(CartContext);
   const [quantity, setQuantity] = useState(1);
   const [stockError, setStockError] = useState('');
-  const [isFirstPurchase, setIsFirstPurchase] = useState(true);
+  const [isFirstPurchase, setIsFirstPurchase] = useState(false);
+  const [eligibilityLoading, setEligibilityLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [millingMethod, setMillingMethod] = useState<MillingMethod>('白米');
 
   useEffect(() => {
     let active = true;
-    const checkHistory = async () => {
-      const { data } = await supabase?.auth.getUser() ?? { data: { user: null } };
-      if (!data.user) return;
-      const orders = await getOrders(data.user.id);
-      const boughtStartSet = orders.some((order) => order.order_items?.some((item) => item.product_id === product.id || item.product?.handle === 'start-set'));
-      if (active) setIsFirstPurchase(!boughtStartSet);
+    const checkHistory = async (accessToken?: string) => {
+      setEligibilityLoading(true);
+      if (!accessToken) {
+        if (active) {
+          setIsLoggedIn(false);
+          setIsFirstPurchase(false);
+          setEligibilityLoading(false);
+        }
+        return;
+      }
+      setIsLoggedIn(true);
+      try {
+        const response = await fetch('/api/start-set-eligibility', {
+          headers: { Authorization: `Bearer ${accessToken}` },
+          cache: 'no-store',
+        });
+        const result = await response.json();
+        if (active) setIsFirstPurchase(response.ok && result.eligible === true);
+      } catch {
+        if (active) setIsFirstPurchase(false);
+      } finally {
+        if (active) setEligibilityLoading(false);
+      }
     };
-    void checkHistory();
-    return () => { active = false; };
+
+    const loadCurrentUser = async () => {
+      const { data } = await supabase?.auth.getSession() ?? { data: { session: null } };
+      await checkHistory(data.session?.access_token);
+    };
+    void loadCurrentUser();
+    const { data: authListener } = supabase?.auth.onAuthStateChange((_event, session) => {
+      void checkHistory(session?.access_token);
+    }) ?? { data: { subscription: null } };
+    return () => {
+      active = false;
+      authListener.subscription?.unsubscribe();
+    };
   }, [product.id]);
 
   useEffect(() => { setQuantity(1); }, [isFirstPurchase]);
@@ -45,6 +75,11 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
   const disabled = soldOut || outsideSalesPeriod;
 
   const addSelectionToCart = () => {
+    if (eligibilityLoading) return false;
+    if (!isLoggedIn) {
+      window.location.href = '/account';
+      return false;
+    }
     if (disabled) return false;
     setStockError('');
     const existing = cartItems.find((item) => item.product.id === product.id && item.variant === selectedVariant);
@@ -53,7 +88,12 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
       setStockError(result.message);
       return false;
     }
-    addToCart({ ...product, title: '３品種お試しセット' }, quantity, {
+    addToCart({
+      ...product,
+      title: '３品種お試しセット',
+      // 基本のヤマト60サイズ送料は維持し、特典対象者のみ送料0円にする。
+      isFreeShipping: isFirstPurchase,
+    }, quantity, {
       variant: selectedVariant,
       finalPrice: calculatedPrice,
     });
@@ -82,7 +122,11 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
         <div className="mb-6 border border-gray-200 bg-white p-5 md:p-6">
           <div className="flex flex-wrap items-center gap-2 mb-2">
             <span className={`rounded-full px-3 py-1 text-[10px] font-medium tracking-wide text-white ${isFirstPurchase ? 'bg-[#e87538]' : 'bg-primary'}`}>
-              {isFirstPurchase ? '初回 送料無料＆10%OFF' : '2回目以降 送料無料'}
+              {eligibilityLoading
+                ? '特典の対象を確認中'
+                : isFirstPurchase
+                  ? '初回 送料無料＆10%OFF'
+                  : '通常価格・通常送料'}
             </span>
           </div>
           {isFirstPurchase ? (
@@ -95,6 +139,9 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
             <p className="font-serif text-3xl font-semibold text-primary tabular-nums">
               ¥{calculatedPrice.toLocaleString()}<span className="ml-1 text-xs text-gray-500">（税込）</span>
             </p>
+          )}
+          {!eligibilityLoading && !isLoggedIn && (
+            <p className="mt-3 text-[11px] leading-relaxed text-gray-500">初回購入特典は、ログイン後に購入履歴を確認して自動適用します。</p>
           )}
         </div>
 
@@ -125,8 +172,8 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
             <span className="w-8 text-center text-sm tabular-nums">{quantity}</span>
             <button type="button" aria-label="数量を1つ増やす" disabled onClick={() => setQuantity(1)} className="h-10 w-10 disabled:opacity-30">＋</button>
           </div>
-          <button type="button" disabled={disabled} onClick={handleAdd} className="min-h-12 flex-1 cursor-pointer rounded-full bg-primary px-6 text-sm font-medium text-white transition-colors duration-200 hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40">
-            {soldOut ? '売り切れ' : outsideSalesPeriod ? '販売期間外' : 'カートに入れる'}
+          <button type="button" disabled={disabled || eligibilityLoading} onClick={handleAdd} className="min-h-12 flex-1 cursor-pointer rounded-full bg-primary px-6 text-sm font-medium text-white transition-colors duration-200 hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40">
+            {soldOut ? '売り切れ' : outsideSalesPeriod ? '販売期間外' : eligibilityLoading ? '購入条件を確認中' : !isLoggedIn ? 'ログインして特典を確認' : 'カートに入れる'}
           </button>
         </div>
 
@@ -138,8 +185,8 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
         quantity={quantity}
         onQuantityChange={(next) => setQuantity(Math.max(1, next))}
         onAddToCart={addSelectionToCart}
-        disabled={disabled}
-        disabledLabel={soldOut ? '売り切れ' : '販売期間外'}
+        disabled={disabled || eligibilityLoading}
+        disabledLabel={soldOut ? '売り切れ' : outsideSalesPeriod ? '販売期間外' : '購入条件を確認中'}
       />
     </>
   );

@@ -1450,6 +1450,8 @@ const Checkout = () => {
       try {
         creatingPaymentIntentRef.current = true;
         setPaymentInitError(null);
+        const { data: sessionData } = await supabase!.auth.getSession();
+        const authAccessToken = sessionData.session?.access_token;
 
         // リロードやReactの再実行でも同じチェックアウトには同じキーを使い、
         // Stripe側でPaymentIntentの多重作成を防止する。
@@ -1550,6 +1552,14 @@ const Checkout = () => {
               name: `${formData.lastName ?? ''} ${formData.firstName ?? ''}`.trim(),
               phone: formData.phone || undefined,
               idempotency_key: idempotencyKey,
+              auth_access_token: authAccessToken,
+              items: cartItems.map((item) => ({
+                product_id: item.product.id,
+                handle: item.product.handle,
+                unit_price: item.finalPrice ?? item.product.price,
+                quantity: item.quantity,
+                free_shipping: Boolean(item.product.isFreeShipping),
+              })),
               metadata: {
                 itemCount: String(cartItems.length),
                 subtotal: String(subtotal),
