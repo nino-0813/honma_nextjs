@@ -48,7 +48,7 @@ export default function YearlySubscriptionLP() {
 
       <div className="mx-auto mt-20 max-w-6xl px-5 md:mt-28 md:px-0">
         <div className="text-center text-primary">
-          <h2 className="mx-auto whitespace-nowrap text-center font-serif !text-[26px] leading-loose tracking-[-0.06em] md:max-w-none md:!text-base md:tracking-[0.08em]">
+          <h2 className="mx-auto max-w-[18rem] text-center font-serif !text-[26px] leading-loose tracking-[0.08em] md:max-w-none md:whitespace-nowrap md:!text-base">
             定期便を大切にしてくださるお客様へ、愛を込めて。
           </h2>
         </div>
@@ -59,9 +59,9 @@ export default function YearlySubscriptionLP() {
               key={reason.title.join('-')}
               className={`flex flex-col items-center px-3 text-center md:px-4 ${index > 0 ? 'md:relative md:before:absolute md:before:-left-7 md:before:top-5 md:before:h-28 md:before:w-px md:before:bg-gray-200' : ''}`}
             >
-              <h3 className="whitespace-nowrap font-serif !text-[26px] leading-relaxed tracking-[-0.06em] text-primary md:whitespace-normal md:!text-[22px] md:tracking-[0.06em]">
+              <h3 className="font-serif !text-[26px] leading-relaxed tracking-[0.06em] text-primary md:!text-[22px]">
                 {reason.title.map((line) => (
-                  <span key={line} className="inline md:block">{line}</span>
+                  <span key={line} className="block">{line}</span>
                 ))}
               </h3>
               <p className="mt-5 text-sm leading-[2] text-gray-600 md:text-[15px]">{reason.description}</p>
@@ -75,7 +75,7 @@ export default function YearlySubscriptionLP() {
       </nav>
 
       <div id="ikevege-subscription" className="mt-24 scroll-mt-28 pt-20 text-center md:mt-32 md:border-t md:border-gray-100 md:pt-28">
-        <h2 className="mx-auto max-w-5xl whitespace-nowrap font-serif !text-[26px] font-medium leading-loose tracking-[-0.06em] text-primary md:whitespace-normal md:!text-[22px] md:tracking-[0.06em] lg:whitespace-nowrap lg:!text-[26px]">できることを一つずつ積み重ねてお届けします。</h2>
+        <h2 className="mx-auto max-w-5xl font-serif !text-[26px] font-medium leading-loose tracking-[0.06em] text-primary md:!text-[22px] lg:whitespace-nowrap lg:!text-[26px]">できることを一つずつ積み重ねてお届けします。</h2>
       </div>
     </section>
   );
