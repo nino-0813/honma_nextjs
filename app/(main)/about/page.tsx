@@ -74,22 +74,28 @@ export default function AboutPage() {
 
       <section className="bg-[#f7f6f0] px-4 py-24 md:px-6 md:py-28">
         <FadeInSection className="mx-auto max-w-[1120px]">
-          <h2 className="text-left text-[24px] font-medium tracking-[0.2em] md:text-[32px]">きょうも しぜんと いいときを。</h2>
-          <div className="mt-12 max-w-[720px] space-y-7 text-left text-[13px] font-light leading-[2.3] tracking-[0.09em] text-gray-600 md:text-sm">
-            <p>「しぜんと」には、自然と向き合うこと、そして気負わず自然体でいること。そのふたつの意味を込めています。</p>
-            <p>イケベジが届けたいのは、特別な日のごちそうではなく、毎日のなかにある、ささやかな「いいとき」です。</p>
-          </div>
+          <div className="grid md:grid-cols-[minmax(0,1fr)_minmax(320px,0.82fr)] md:items-center md:gap-20">
+            <div className="order-1 min-w-0">
+              <h2 className="text-left text-[24px] font-medium tracking-[0.2em] md:text-[32px]">きょうも しぜんと いいときを。</h2>
+              <div className="mt-12 max-w-[720px] space-y-7 text-left text-[13px] font-light leading-[2.3] tracking-[0.09em] text-gray-600 md:text-sm">
+                <p>「しぜんと」には、自然と向き合うこと、そして気負わず自然体でいること。そのふたつの意味を込めています。</p>
+                <p>イケベジが届けたいのは、特別な日のごちそうではなく、毎日のなかにある、ささやかな「いいとき」です。</p>
+              </div>
 
-          <div className="mt-14 max-w-[680px] space-y-7 text-left text-[13px] font-light leading-[2.3] tracking-[0.09em] text-gray-600 md:mt-16 md:text-sm">
-            <p>ひと粒のお米の向こうには、<br />山から流れてくる水や、田んぼに集う生きもの、<br />トキが舞う空と、長い年月をかけて受け継がれてきた田んぼがあります。</p>
-            <p>あなたの「いいとき」は、自然が重ねてきた時間とつながっている。<br />ありのままのあなたで、<br />きょうも、しぜんと。</p>
-          </div>
-          <div className="mt-14 text-center md:mt-16">
-            <p className="text-[19px] leading-relaxed tracking-[0.07em] md:text-[26px]">毎日のごはんに、佐渡の田んぼをひとつ。</p>
-            <Link href="/collections" className="mt-7 inline-block border-b border-[#1c1d1d] pb-1 text-[13px] tracking-[0.1em] transition-opacity hover:opacity-60">商品一覧を見る　→</Link>
-          </div>
-          <div className="mx-auto mt-14 w-full max-w-[640px] overflow-hidden md:mt-16">
-            <img src="/images/about/closing/good-times-collage-2x8.png" alt="イケベジと地域の人たちが自然の中で過ごす様子" className="block h-auto w-full" />
+              <div className="mt-14 max-w-[680px] space-y-7 text-left text-[13px] font-light leading-[2.3] tracking-[0.09em] text-gray-600 md:mt-16 md:text-sm">
+                <p>ひと粒のお米の向こうには、<br />山から流れてくる水や、田んぼに集う生きもの、<br />トキが舞う空と、長い年月をかけて受け継がれてきた田んぼがあります。</p>
+                <p>あなたの「いいとき」は、自然が重ねてきた時間とつながっている。<br />ありのままのあなたで、<br />きょうも、しぜんと。</p>
+              </div>
+            </div>
+
+            <div className="order-3 mx-auto mt-14 w-full max-w-[640px] overflow-hidden md:order-2 md:col-start-2 md:row-start-1 md:mt-0 md:max-w-[460px]">
+              <img src="/images/about/closing/good-times-collage-2x8.png" alt="イケベジと地域の人たちが自然の中で過ごす様子" className="block h-auto w-full" />
+            </div>
+
+            <div className="order-2 mt-14 text-center md:order-3 md:col-span-2 md:mt-20">
+              <p className="text-[19px] leading-relaxed tracking-[0.07em] md:text-[26px]">毎日のごはんに、佐渡の田んぼをひとつ。</p>
+              <Link href="/collections" className="mt-7 inline-block border-b border-[#1c1d1d] pb-1 text-[13px] tracking-[0.1em] transition-opacity hover:opacity-60">商品一覧を見る　→</Link>
+            </div>
           </div>
         </FadeInSection>
       </section>
