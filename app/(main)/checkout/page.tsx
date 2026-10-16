@@ -1486,6 +1486,39 @@ const Checkout = () => {
         }
         paymentIdempotencyKeyRef.current = idempotencyKey;
 
+        // リロードやReactの再実行でも同じチェックアウトには同じキーを使い、
+        // Stripe側でPaymentIntentの多重作成を防止する。
+        const checkoutSignature = JSON.stringify({
+          type: subscriptionCartInfo.isSubscriptionCart ? 'subscription' : 'single',
+          interval: subscriptionCartInfo.interval || null,
+          email: formData.email.trim().toLowerCase(),
+          total,
+          items: cartItems.map((item) => ({
+            id: item.product.id,
+            quantity: item.quantity,
+            price: item.finalPrice ?? item.product.price,
+            variant: item.variant || null,
+            selectedOptions: item.selectedOptions || null,
+          })),
+        });
+        const storageKey = 'ikevege_active_checkout_payment';
+        let idempotencyKey = '';
+        try {
+          const saved = JSON.parse(sessionStorage.getItem(storageKey) || 'null');
+          if (saved?.signature === checkoutSignature && typeof saved?.key === 'string') {
+            idempotencyKey = saved.key;
+          }
+        } catch {
+          // 壊れた一時データは新しいキーで置き換える。
+        }
+        if (!idempotencyKey) {
+          idempotencyKey = typeof crypto?.randomUUID === 'function'
+            ? crypto.randomUUID().replace(/-/g, '')
+            : `${Date.now()}_${Math.random().toString(36).slice(2)}`;
+          sessionStorage.setItem(storageKey, JSON.stringify({ signature: checkoutSignature, key: idempotencyKey }));
+        }
+        paymentIdempotencyKeyRef.current = idempotencyKey;
+
         if (subscriptionCartInfo.isSubscriptionCart && subscriptionCartInfo.interval) {
           // 定期購入カート: Subscription を作成
           const items = subscriptionCartInfo.subscriptionItems.map((it) => ({
