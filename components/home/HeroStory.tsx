@@ -109,9 +109,9 @@ export default function HeroStory() {
           </div>
 
           <div className="mt-12 w-fit max-w-full text-left">
-            <p className="text-right">敬具</p>
+            <p className="!text-right">敬具</p>
             <p>佐渡ヶ島より　愛を込めて</p>
-            <p className="text-right">イケベジより</p>
+            <p className="!text-right">イケベジより</p>
           </div>
 
           <div className="mt-10 flex justify-start">
@@ -190,9 +190,9 @@ export default function HeroStory() {
             <FadeIn className="site-reading-text col-start-1 row-start-3 mt-16 min-w-0 font-serif text-[#24211d]">
               <div className="ml-auto w-fit max-w-full">
                 <div>
-                  <p className="text-right">敬具</p>
+                  <p className="!text-right">敬具</p>
                   <p>佐渡ヶ島より　愛を込めて</p>
-                  <p className="text-right">イケベジより</p>
+                  <p className="!text-right">イケベジより</p>
                 </div>
 
                 <div className="mt-16 flex justify-end">
