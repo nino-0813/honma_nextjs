@@ -505,7 +505,6 @@ export default function ProductDetailView({ product }: { product: Product }) {
                     <span className="text-xl md:text-2xl font-serif text-primary">¥{subscriptionPrice.toLocaleString()}</span>
                     <span className="text-xs text-gray-500">／1回のお届け</span>
                     <span className="text-sm text-gray-400 line-through">¥{calculatedPrice.toLocaleString()}</span>
-                    <span className="text-xs bg-red-50 text-red-600 px-2 py-0.5 rounded">定期 {subscriptionDiscountPercent}%OFF</span>
                   </div>
                 ) : (
                   <span className="text-xl md:text-2xl font-serif text-primary block mb-1">¥{calculatedPrice.toLocaleString()}</span>
@@ -714,17 +713,20 @@ export default function ProductDetailView({ product }: { product: Product }) {
                       <span className="text-sm font-medium text-primary">定期購入</span>
                     </span>
                     <span className="text-right text-sm text-primary tabular-nums">
-                      ¥{subscriptionPrice.toLocaleString()}
-                      <span className="block text-[10px] text-gray-500">1回のお届け分</span>
+                      <span className="flex items-center justify-end gap-2">
+                        {subscriptionDiscountPercent > 0 && (
+                          <span className="rounded bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600">
+                            定期 {subscriptionDiscountPercent}%OFF
+                          </span>
+                        )}
+                        <span>¥{subscriptionPrice.toLocaleString()}</span>
+                      </span>
                     </span>
                   </span>
 
                   <span className="mt-4 block border-t border-gray-100 pt-4">
                     <ul className="flex flex-col gap-2.5">
                       {[
-                        subscriptionDiscountPercent > 0
-                          ? `いつでも${subscriptionDiscountPercent}%OFF でお届けします`
-                          : 'お届けのたびにお得な価格で',
                         'お届けに合わせて出荷直前に精米します',
                         'お米が余りそうな月はスキップできます',
                         'お届けの間隔はマイページからいつでも変更できます',
@@ -782,15 +784,6 @@ export default function ProductDetailView({ product }: { product: Product }) {
                               )}
                             </span>
                             <span className="text-sm text-primary">{SUBSCRIPTION_INTERVAL_LABELS[interval]}</span>
-                          </div>
-                          <div className="flex items-baseline gap-2">
-                            {subscriptionDiscountPercent > 0 && (
-                              <span className="text-xs text-gray-400 line-through">¥{calculatedPrice.toLocaleString()}</span>
-                            )}
-                            <span className="text-sm font-serif text-primary">¥{subscriptionPrice.toLocaleString()}／回</span>
-                            {subscriptionDiscountPercent > 0 && (
-                              <span className="text-[10px] text-red-600 font-medium">{subscriptionDiscountPercent}%OFF</span>
-                            )}
                           </div>
                           <input
                             type="radio"
