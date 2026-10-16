@@ -486,7 +486,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
 
           <div>
             <div id="purchase-panel">
-              <h1 className="mb-3 text-[20px] font-medium leading-[1.65] tracking-wide text-primary md:text-2xl lg:!text-[28px]">
+              <h1 className="mb-3 !text-[22px] font-medium leading-[1.65] tracking-wide text-primary">
                 <span className="lg:hidden">
                   {getProductTitleLines(product.title).map((line, index) => (
                     <span key={`${index}-${line}`} className="block">{line}</span>
@@ -503,13 +503,14 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 {subscriptionEnabled && purchaseType === 'subscription' && subscriptionDiscountPercent > 0 ? (
                   <div className="flex items-baseline gap-3 mb-1">
                     <span className="text-xl md:text-2xl font-serif text-primary">¥{subscriptionPrice.toLocaleString()}</span>
-                    <span className="text-xs text-gray-500">／1回のお届け</span>
-                    <span className="text-sm text-gray-400 line-through">¥{calculatedPrice.toLocaleString()}</span>
+                    <span className="text-xs text-gray-500">（税込）</span>
                   </div>
                 ) : (
-                  <span className="text-xl md:text-2xl font-serif text-primary block mb-1">¥{calculatedPrice.toLocaleString()}</span>
+                  <div className="mb-1 flex items-baseline gap-3">
+                    <span className="text-xl font-serif text-primary md:text-2xl">¥{calculatedPrice.toLocaleString()}</span>
+                    <span className="text-xs text-gray-500">（税込）</span>
+                  </div>
                 )}
-                <span className="text-xs text-gray-500 block">税込</span>
               </div>
 
               {/* Variants UI */}
