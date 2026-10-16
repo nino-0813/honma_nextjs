@@ -88,8 +88,8 @@ export default function AboutPage() {
             <p className="text-[19px] leading-relaxed tracking-[0.07em] md:text-[26px]">毎日のごはんに、佐渡の田んぼをひとつ。</p>
             <Link href="/collections" className="mt-7 inline-block border-b border-[#1c1d1d] pb-1 text-[13px] tracking-[0.1em] transition-opacity hover:opacity-60">商品一覧を見る　→</Link>
           </div>
-          <div className="mt-14 aspect-video overflow-hidden md:mt-16">
-            <img src="/images/about/closing/good-times-collage.webp" alt="イケベジと地域の人たちが自然の中で過ごす様子" className="h-full w-full object-cover" />
+          <div className="mx-auto mt-14 w-full max-w-[640px] overflow-hidden md:mt-16">
+            <img src="/images/about/closing/good-times-collage-2x8.png" alt="イケベジと地域の人たちが自然の中で過ごす様子" className="block h-auto w-full" />
           </div>
         </FadeInSection>
       </section>
