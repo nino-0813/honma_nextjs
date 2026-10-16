@@ -95,18 +95,13 @@ const Header: React.FC<HeaderProps> = ({ onOpenCart, onOpenMenu }) => {
                 <Link
                   key={item.label}
                   href={item.href}
-                  className={`site-button-label transition-colors relative group whitespace-nowrap ${
+                  className={`site-button-label whitespace-nowrap border-b pb-1 transition-colors ${
                     active
-                      ? onHero ? 'text-white' : 'text-primary'
-                      : onHero ? 'text-white hover:text-white/80' : 'text-gray-600 hover:text-primary'
+                      ? onHero ? 'border-white text-white' : 'border-primary text-primary'
+                      : onHero ? 'border-transparent text-white hover:border-white hover:text-white/80' : 'border-transparent text-gray-600 hover:border-primary hover:text-primary'
                   }`}
                 >
                   {item.label}
-                  <span
-                    className={`absolute -bottom-2 left-0 w-full h-px ${onHero ? 'bg-white' : 'bg-primary'} transition-transform duration-300 origin-left ${
-                      active ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
-                    }`}
-                  />
                 </Link>
               );
             })}
