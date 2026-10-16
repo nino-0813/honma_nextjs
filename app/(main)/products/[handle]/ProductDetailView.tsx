@@ -739,8 +739,8 @@ export default function ProductDetailView({ product }: { product: Product }) {
                         'お届けの間隔はマイページからいつでも変更できます',
                         'いつでも解約できます',
                       ].map((t) => (
-                        <li key={t} className="flex items-start gap-2 text-[12px] md:text-[13px] text-gray-600 leading-relaxed">
-                          <svg className="shrink-0 mt-0.5 w-3.5 h-3.5 text-yuunagi" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8">
+                        <li key={t} className="flex items-start gap-2 !text-[12px] !leading-relaxed text-gray-600">
+                          <svg className="mt-[0.3em] h-3.5 w-3.5 shrink-0 text-yuunagi" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8">
                             <path d="M3 8.5l3.2 3.2L13 5" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                           {t}
