@@ -220,12 +220,12 @@ export default function CollectionsPage() {
 
         {categoryIntro && (
           <section className="mb-20 grid items-center gap-8 md:mb-28 md:grid-cols-2 md:gap-16">
-            <div className="aspect-[800/394] overflow-hidden bg-gray-100">
+            <div className="aspect-[800/394] overflow-hidden">
               <img
                 src={categoryIntro.image}
                 alt={categoryIntro.alt}
                 loading="lazy"
-                className="h-full w-full object-contain"
+                className="h-full w-full object-cover"
               />
             </div>
             <div className="space-y-5 text-gray-600">
