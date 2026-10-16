@@ -150,6 +150,11 @@ export default function ProductDetailView({ product }: { product: Product }) {
   const [wantsRiceKeepGift, setWantsRiceKeepGift] = useState<boolean | null>(null);
   const subscriptionPrice = Math.round(calculatedPrice * (1 - subscriptionDiscountPercent / 100));
   const subscriptionRiceSeason = product.subscriptionRiceSeason ?? null;
+  const hasRiceMillingOptions = Boolean(
+    product.variants_config?.some((type) =>
+      type.options.some((option) => /^(玄米|白米|分づき)$/.test(option.value.trim()))
+    )
+  );
 
   // 定期購入の注意事項モーダル
   const [showSubscriptionNotice, setShowSubscriptionNotice] = useState(false);
@@ -499,7 +504,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 </span>
               </h1>
 
-              <div className="mb-8 pb-8">
+              <div className={hasRiceMillingOptions ? 'mb-4 pb-2' : 'mb-8 pb-8'}>
                 {subscriptionEnabled && purchaseType === 'subscription' && subscriptionDiscountPercent > 0 ? (
                   <div className="flex items-baseline gap-3 mb-1">
                     <span className="text-xl md:text-2xl font-serif text-primary">¥{subscriptionPrice.toLocaleString()}</span>
@@ -529,16 +534,17 @@ export default function ProductDetailView({ product }: { product: Product }) {
                          <div className="flex flex-wrap gap-2.5">
                            {type.options.map(option => {
                              const selected = selectedOptions[type.id] === option.id;
+                             const isRiceMillingOption = /^(玄米|白米|分づき)$/.test(option.value.trim());
                              return (
                                <button
                                  key={option.id}
                                  onClick={() => handleOptionChange(type.id, option.id)}
                                  aria-pressed={selected}
-                                 className={`min-h-11 rounded-full border px-4 py-2 text-sm transition-colors ${
+                                 className={`min-h-11 border px-4 py-2 text-sm transition-colors ${isRiceMillingOption ? 'rounded-none' : 'rounded-full'} ${
                                    selected ? 'border-primary bg-primary text-white' : 'border-gray-300 bg-white text-primary hover:border-primary'
                                  }`}
                                >
-                                 {option.value}{option.priceAdjustment ? `（${option.priceAdjustment > 0 ? '+' : ''}¥${option.priceAdjustment.toLocaleString()}）` : ''}
+                                 {option.value}{!isRiceMillingOption && option.priceAdjustment ? `（${option.priceAdjustment > 0 ? '+' : ''}¥${option.priceAdjustment.toLocaleString()}）` : ''}
                                </button>
                              );
                            })}
