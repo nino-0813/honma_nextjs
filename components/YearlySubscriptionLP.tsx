@@ -23,7 +23,7 @@ export default function YearlySubscriptionLP() {
     <section className="mb-12 md:mb-20">
       <div className="flex min-h-[58svh] items-center justify-center px-4 py-16 md:min-h-[64svh]">
         <div className="mx-auto w-full min-w-0 max-w-3xl text-left">
-          <h1 className="whitespace-nowrap font-serif !text-[16px] font-semibold !leading-[1.5] tracking-[0.02em] text-primary md:!text-[44px] md:tracking-wide">
+          <h1 className="whitespace-nowrap font-serif !text-[26px] font-semibold !leading-[1.5] tracking-[0.02em] text-primary md:!text-[44px] md:tracking-wide">
             4700人とつくるイケベジ定期便
           </h1>
           <div className="mt-8 space-y-8 text-sm leading-[2] text-gray-600 md:text-base">
@@ -47,7 +47,7 @@ export default function YearlySubscriptionLP() {
 
       <div className="mx-auto mt-20 max-w-6xl px-5 md:mt-28 md:px-0">
         <div className="text-center text-primary">
-          <h2 className="mx-auto max-w-[18rem] text-center font-serif text-xs leading-loose tracking-[0.08em] md:max-w-none md:whitespace-nowrap md:text-base">
+          <h2 className="mx-auto max-w-[18rem] text-center font-serif !text-[26px] leading-loose tracking-[0.08em] md:max-w-none md:whitespace-nowrap md:!text-base">
             定期便を大切にしてくださるお客様へ、愛を込めて。
           </h2>
         </div>
@@ -58,7 +58,7 @@ export default function YearlySubscriptionLP() {
               key={reason.title.join('-')}
               className={`flex flex-col items-center px-3 text-center md:px-4 ${index > 0 ? 'md:relative md:before:absolute md:before:-left-7 md:before:top-5 md:before:h-28 md:before:w-px md:before:bg-gray-200' : ''}`}
             >
-              <h3 className="font-serif text-xl leading-relaxed tracking-[0.06em] text-primary md:text-[22px]">
+              <h3 className="font-serif !text-[26px] leading-relaxed tracking-[0.06em] text-primary md:!text-[22px]">
                 {reason.title.map((line) => (
                   <span key={line} className="block">{line}</span>
                 ))}
@@ -74,7 +74,7 @@ export default function YearlySubscriptionLP() {
       </nav>
 
       <div id="ikevege-subscription" className="mt-24 scroll-mt-28 pt-20 text-center md:mt-32 md:border-t md:border-gray-100 md:pt-28">
-        <h2 className="mx-auto max-w-5xl font-serif text-lg font-medium leading-loose tracking-[0.06em] text-primary md:text-[22px] lg:whitespace-nowrap lg:text-[26px]">できることを一つずつ積み重ねてお届けします。</h2>
+        <h2 className="mx-auto max-w-5xl font-serif !text-[26px] font-medium leading-loose tracking-[0.06em] text-primary md:!text-[22px] lg:whitespace-nowrap lg:!text-[26px]">できることを一つずつ積み重ねてお届けします。</h2>
       </div>
     </section>
   );
