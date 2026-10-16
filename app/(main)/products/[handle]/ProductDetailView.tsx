@@ -722,8 +722,8 @@ export default function ProductDetailView({ product }: { product: Product }) {
                     <span className="text-right text-sm text-primary tabular-nums">
                       <span className="flex items-center justify-end gap-2">
                         {subscriptionDiscountPercent > 0 && (
-                          <span className="rounded bg-red-50 px-2 py-0.5 text-xs font-medium text-red-600">
-                            定期 {subscriptionDiscountPercent}%OFF
+                          <span className="rounded-full bg-yuunagi px-3 py-1 text-xs font-medium text-white">
+                            {subscriptionDiscountPercent}%OFF
                           </span>
                         )}
                         <span>¥{subscriptionPrice.toLocaleString()}</span>
