@@ -22,8 +22,8 @@ export default function YearlySubscriptionLP() {
   return (
     <section className="mb-12 md:mb-20">
       <div className="flex min-h-[58svh] items-center justify-center px-4 py-16 md:min-h-[64svh]">
-        <div className="mx-auto max-w-3xl text-left">
-          <h1 className="whitespace-nowrap font-serif text-[16px] font-semibold leading-[1.5] tracking-[0.03em] text-primary md:text-[44px] md:tracking-wide">
+        <div className="mx-auto w-full min-w-0 max-w-3xl text-left">
+          <h1 className="whitespace-nowrap font-serif !text-[16px] font-semibold !leading-[1.5] tracking-[0.02em] text-primary md:!text-[44px] md:tracking-wide">
             4700人とつくるイケベジ定期便
           </h1>
           <div className="mt-8 space-y-8 text-sm leading-[2] text-gray-600 md:text-base">
