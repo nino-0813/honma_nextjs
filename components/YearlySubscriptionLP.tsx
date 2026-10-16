@@ -48,8 +48,10 @@ export default function YearlySubscriptionLP() {
 
       <div className="mx-auto mt-20 max-w-6xl px-5 md:mt-28 md:px-0">
         <div className="text-center text-primary">
-          <h2 className="mx-auto max-w-[18rem] text-center font-serif !text-[26px] leading-loose tracking-[0.08em] md:max-w-none md:whitespace-nowrap md:!text-base">
-            定期便を大切にしてくださるお客様へ、愛を込めて。
+          <h2 className="mx-auto text-center font-serif !text-[22px] leading-[1.8] tracking-[0.04em] md:max-w-none md:whitespace-nowrap md:!text-base md:leading-loose md:tracking-[0.08em]">
+            <span className="block md:hidden">定期便を大切にしてくださるお客様へ</span>
+            <span className="block md:hidden">愛を込めて</span>
+            <span className="hidden md:inline">定期便を大切にしてくださるお客様へ、愛を込めて。</span>
           </h2>
         </div>
 
@@ -59,9 +61,10 @@ export default function YearlySubscriptionLP() {
               key={reason.title.join('-')}
               className={`flex flex-col items-center px-3 text-center md:px-4 ${index > 0 ? 'md:relative md:before:absolute md:before:-left-7 md:before:top-5 md:before:h-28 md:before:w-px md:before:bg-gray-200' : ''}`}
             >
-              <h3 className="font-serif !text-[26px] leading-relaxed tracking-[0.06em] text-primary md:!text-[22px]">
+              <h3 className="whitespace-nowrap font-serif !text-[18px] leading-relaxed tracking-[0.02em] text-primary md:whitespace-normal md:!text-[22px] md:tracking-[0.06em]">
+                <span className="md:hidden">{reason.title.join('')}</span>
                 {reason.title.map((line) => (
-                  <span key={line} className="block">{line}</span>
+                  <span key={line} className="hidden md:block">{line}</span>
                 ))}
               </h3>
               <p className="mt-5 text-sm leading-[2] text-gray-600 md:text-[15px]">{reason.description}</p>
