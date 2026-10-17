@@ -22,7 +22,7 @@ export default function YearlySubscriptionLP() {
   return (
     <section className="mb-12 md:mb-20">
       <div className="flex min-h-[58svh] items-center justify-center px-4 py-16 md:min-h-[64svh]">
-        <div className="mx-auto w-full min-w-0 max-w-3xl text-left">
+        <div className="mx-auto w-full min-w-0 max-w-3xl text-left md:max-w-5xl">
           <h1 className="text-center font-serif !text-[26px] font-semibold !leading-[1.5] tracking-[0.02em] text-primary md:whitespace-nowrap md:!text-[26px] md:tracking-wide">
             <span className="block md:inline">4700人とつくる</span>
             <span className="block md:inline">イケベジ定期便</span>
@@ -39,20 +39,20 @@ export default function YearlySubscriptionLP() {
               この厳しい時代だからこそ、その営みを食べる人と一緒に次の世代へつないでいきたい。お米を食べることが、農家を増やしている実感につながるように。そんな想いで、この定期便を始めました。
             </p>
           </div>
-          <div className="mt-8 hidden space-y-8 text-center text-base leading-[2.2] text-gray-600 md:block">
+          <div className="mt-8 hidden space-y-8 text-center text-[clamp(13px,1vw,16px)] leading-[2.2] text-gray-600 md:block">
             <p>
-              イケベジが活動する豊田集落は、日本海に向かってゆるやかに下る傾斜地にあります。<br />
-              そこには東京ドーム約10個分の田んぼが広がり、水田と海に沈む夕日は私たちの宝です。
+              <span className="block whitespace-nowrap">イケベジが活動する豊田集落は、日本海に向かってゆるやかに下る傾斜地にあります。</span>
+              <span className="block whitespace-nowrap">そこには東京ドーム約10個分の田んぼが広がり、水田と海に沈む夕日は私たちの宝です。</span>
             </p>
             <p>
-              この田んぼを潤し続けてきたのは、江戸時代に山を縫うように拓かれた約4kmの用水路です。<br />
-              先人たちがさまざまな努力を重ねて里山を形づくり、<br />
-              集落の人たちが代々丁寧に手入れを続けてきたからこそ、いまも豊田の風景は残っています。
+              <span className="block whitespace-nowrap">この田んぼを潤し続けてきたのは、江戸時代に山を縫うように拓かれた約4kmの用水路です。</span>
+              <span className="block whitespace-nowrap">先人たちがさまざまな努力を重ねて里山を形づくり、</span>
+              <span className="block whitespace-nowrap">集落の人たちが代々丁寧に手入れを続けてきたからこそ、いまも豊田の風景は残っています。</span>
             </p>
             <p>
-              この厳しい時代だからこそ、その営みを食べる人と一緒に次の世代へつないでいきたい。<br />
-              お米を食べることが、農家を増やしている実感につながるように。<br />
-              そんな想いで、この定期便を始めました。
+              <span className="block whitespace-nowrap">この厳しい時代だからこそ、その営みを食べる人と一緒に次の世代へつないでいきたい。</span>
+              <span className="block whitespace-nowrap">お米を食べることが、農家を増やしている実感につながるように。</span>
+              <span className="block whitespace-nowrap">そんな想いで、この定期便を始めました。</span>
             </p>
           </div>
         </div>
