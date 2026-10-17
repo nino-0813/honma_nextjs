@@ -120,7 +120,7 @@ export default async function StartSetPage() {
                   ¥{PRICE.toLocaleString()}
                   <span className="ml-1 text-xs text-gray-500">（税込）</span>
                 </p>
-                <p className="mt-1 text-[11px] text-gray-500">＋送料　※価格は予定です</p>
+                <p className="mt-1 text-[11px] text-gray-500">初回送料無料　※価格は予定です</p>
               </div>
 
               <div className="rounded-sm border border-yuunagi-soft bg-yuunagi-soft/40 px-4 py-3 mb-4 text-[12px] text-yuunagi-ink">

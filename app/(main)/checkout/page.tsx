@@ -1030,6 +1030,11 @@ const Checkout = () => {
     // 1) 各商品を「どの発送方法で送るか」に割り当て（選択されたshippingMethodがあれば優先）
     const assigned: Record<string, Array<{ title: string; variant?: string; qty: number }>> = {};
     for (const item of cartItems) {
+      // 初回お試しセットなど、カート投入時に送料無料が確定した商品は
+      // 発送方法の割り当て対象から外す。ここで除外しないと、上の送料計算では
+      // 0円でも、最終表示用の shippingPlan で通常送料が再加算されてしまう。
+      if (item.product.isFreeShipping) continue;
+
       const linkedIds = productShippingMethodIds[item.product.id] || [];
       if (linkedIds.length === 0) continue;
 
@@ -1140,6 +1145,8 @@ const Checkout = () => {
     // 各商品に対して、選択された発送方法が適用可能かどうかを確認
     let totalCost = 0;
     for (const item of cartItems) {
+      if (item.product.isFreeShipping) continue;
+
       const linkedIds = productShippingMethodIds[item.product.id] || [];
       if (!linkedIds.includes(methodId)) {
         // この商品には選択された発送方法が適用できない → 最安の送料を使用
