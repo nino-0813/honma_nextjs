@@ -120,7 +120,7 @@ export default function AnnouncementPopup() {
           <p className="text-[11px] md:text-xs text-yuunagi-ink tracking-[0.3em] uppercase mb-3 font-medium">
             Information
           </p>
-          <h2 className="mb-3 whitespace-nowrap font-serif !text-[15px] font-semibold !leading-relaxed tracking-normal text-primary md:!text-xl md:tracking-widest">
+          <h2 className="mb-3 w-full whitespace-nowrap !text-center font-serif !text-[15px] font-semibold !leading-relaxed tracking-normal text-primary md:!text-xl md:tracking-widest">
             まずは食べ比べてみませんか
           </h2>
           <div className="w-10 h-px bg-yuunagi mx-auto mb-4" />
