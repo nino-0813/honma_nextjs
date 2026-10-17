@@ -27,6 +27,12 @@ export default async function RiceKeepPage() {
             <p className="mt-10 rounded-sm bg-gray-50 p-5 text-sm leading-loose text-gray-600">現在はご購入いただけません。</p>
           )}
           <Link href="/collections/rice" className="mt-8 inline-flex min-h-12 items-center rounded-full border border-primary px-6 text-sm text-primary hover:bg-primary hover:text-white">対象のお米を見る →</Link>
+          {product?.description && (
+            <div className="mt-12 border-t border-gray-200 pt-8">
+              <h2 className="font-serif text-xl tracking-wider text-primary">商品について</h2>
+              <p className="mt-5 whitespace-pre-line text-sm leading-loose text-gray-700">{product.description}</p>
+            </div>
+          )}
         </div>
       </div>
     </main>
