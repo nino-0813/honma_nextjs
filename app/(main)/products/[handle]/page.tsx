@@ -4,6 +4,7 @@ import { getProductByHandle } from '@/lib/supabase';
 import { jsonLdProduct } from '@/lib/jsonld';
 import { getBaseUrl } from '@/lib/site';
 import ProductDetailView from './ProductDetailView';
+import { redirect } from 'next/navigation';
 
 type Props = { params: Promise<{ handle: string }> };
 
@@ -38,6 +39,7 @@ export const revalidate = 60;
 
 export default async function ProductPage({ params }: Props) {
   const { handle } = await params;
+  if (handle === 'ricekeep') redirect('/rice-keep');
   const product = await getProductByHandle(handle);
   if (!product) notFound();
 

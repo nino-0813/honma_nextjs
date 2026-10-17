@@ -1113,7 +1113,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
             <h3 className="text-center text-lg font-serif tracking-[0.2em] mb-12">おすすめ商品</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {allProducts.filter(p => p.id !== product.id).slice(0, 4).map(rel => (
-                 <Link key={rel.id} href={`/products/${rel.handle}`} className="group block">
+                 <Link key={rel.id} href={rel.handle === 'ricekeep' ? '/rice-keep' : `/products/${rel.handle}`} className="group block">
                       <div className="aspect-square bg-[#f4f4f4] overflow-hidden mb-3 relative">
                         <div className="absolute inset-0 transition-transform duration-700 group-hover:scale-105">
                           <FadeInImage src={rel.image} alt={rel.title} className="w-full h-full" width={400} height={400} />

@@ -12,6 +12,7 @@ import { supabase, checkStockAvailability } from '@/lib/supabase';
 import { ShippingMethod, AreaFees, Product, CartItem, SUBSCRIPTION_INTERVAL_LABELS } from '@/types';
 import { calculateEarnableMiles } from '@/lib/eventMiles';
 import { computeFirstShippingDate, formatJapaneseDate } from '@/lib/subscriptionShipping';
+import { getRiceKeepPurchaseState } from '@/lib/riceKeepPurchase';
 
 // Stripe公開可能キー（環境変数から取得）
 // NOTE: 未設定だとPaymentElementが無言で出ないことがあるため、フォールバック文字列は使わない
@@ -218,13 +219,13 @@ const resolvePrefectureForShipping = (formData: any): string | null => {
 };
 
 // 決済フォームコンポーネント
-const CheckoutForm = ({ formData, total, clientSecret, onSuccess, shippingCostIssue, salesPeriodIssue, useDifferentShippingAddress, shippingAddressData, ensureOrderDraft, paymentIntentId }: {
+const CheckoutForm = ({ formData, total, clientSecret, onSuccess, shippingCostIssue, purchaseIssue, useDifferentShippingAddress, shippingAddressData, ensureOrderDraft, paymentIntentId }: {
   formData: any;
   total: number;
   clientSecret: string;
   onSuccess: (paymentIntentId?: string, bankTransfer?: boolean, instructionsUrl?: string | null) => void;
   shippingCostIssue?: string | null;
-  salesPeriodIssue?: string | null;
+  purchaseIssue?: string | null;
   useDifferentShippingAddress?: boolean;
   shippingAddressData?: any;
   ensureOrderDraft: (shippingData: any) => Promise<void>;
@@ -245,8 +246,8 @@ const CheckoutForm = ({ formData, total, clientSecret, onSuccess, shippingCostIs
       setError(`送料が計算できません: ${shippingCostIssue}`);
       return;
     }
-    if (salesPeriodIssue) {
-      setError(salesPeriodIssue);
+    if (purchaseIssue) {
+      setError(purchaseIssue);
       return;
     }
 
@@ -457,10 +458,10 @@ const CheckoutForm = ({ formData, total, clientSecret, onSuccess, shippingCostIs
       <div className="border-t border-gray-200 pt-6">
         <button
           type="submit"
-          disabled={!stripe || !elements || loading || !!shippingCostIssue || !!salesPeriodIssue}
+          disabled={!stripe || !elements || loading || !!shippingCostIssue || !!purchaseIssue}
           className="w-full py-4 bg-primary text-white text-sm tracking-widest uppercase hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? '処理中...' : salesPeriodIssue ? '販売期間外の商品があります' : shippingCostIssue ? '送料を確認してください' : `¥${total.toLocaleString()} の注文を確定する`}
+          {loading ? '処理中...' : purchaseIssue ? 'カート内容を確認してください' : shippingCostIssue ? '送料を確認してください' : `¥${total.toLocaleString()} の注文を確定する`}
         </button>
       </div>
     </form>
@@ -1247,6 +1248,8 @@ const Checkout = () => {
     }
     return null;
   }, [cartItems]);
+  const riceKeepIssue = useMemo(() => getRiceKeepPurchaseState(cartItems).issue, [cartItems]);
+  const purchaseIssue = salesPeriodIssue || riceKeepIssue;
   
   // デバッグ: 送料計算の状態を確認
   useEffect(() => {
@@ -1566,6 +1569,8 @@ const Checkout = () => {
                 unit_price: item.finalPrice ?? item.product.price,
                 quantity: item.quantity,
                 free_shipping: Boolean(item.product.isFreeShipping),
+                variant: item.variant,
+                selected_options: item.selectedOptions,
               })),
               metadata: {
                 itemCount: String(cartItems.length),
@@ -2902,11 +2907,10 @@ const Checkout = () => {
                         </div>
                       ) : paymentClientSecret ? (
                         <>
-                          {salesPeriodIssue && (
+                          {purchaseIssue && (
                             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-                              <p className="font-medium mb-1">⚠️ 販売期間外の商品があります</p>
-                              <p className="text-sm">{salesPeriodIssue}</p>
-                              <p className="text-xs mt-2">販売期間外の商品をカートから削除してください。</p>
+                              <p className="font-medium mb-1">⚠️ カート内容を確認してください</p>
+                              <p className="text-sm">{purchaseIssue}</p>
                             </div>
                           )}
                           {shippingCostIssue && (
@@ -2927,7 +2931,7 @@ const Checkout = () => {
                               clientSecret={paymentClientSecret}
                               onSuccess={handleSuccess}
                               shippingCostIssue={shippingCostIssue}
-                              salesPeriodIssue={salesPeriodIssue}
+                              purchaseIssue={purchaseIssue}
                               useDifferentShippingAddress={useDifferentShippingAddress}
                               shippingAddressData={shippingAddressData}
                               ensureOrderDraft={ensureOrderDraft}
@@ -2963,7 +2967,7 @@ const Checkout = () => {
                       const itemKey = `${item.product.id}-${item.variant || 'default'}-${item.purchaseType ?? 'one_time'}-${item.subscriptionInterval ?? ''}`;
                       return (
                       <div key={itemKey} className="flex gap-3 pb-4 border-b border-gray-100 last:border-b-0">
-                        <Link href={`/products/${item.product.handle || item.product.id}`} className="flex-shrink-0 aspect-square w-16 bg-gray-100 rounded overflow-hidden block">
+                        <Link href={item.product.handle === 'ricekeep' ? '/rice-keep' : `/products/${item.product.handle || item.product.id}`} className="flex-shrink-0 aspect-square w-16 bg-gray-100 rounded overflow-hidden block">
                           <FadeInImage
                             src={item.product.images && item.product.images.length > 0 ? item.product.images[0] : (item.product.image || '')}
                             alt={item.product.title}
@@ -2971,7 +2975,7 @@ const Checkout = () => {
                           />
                         </Link>
                         <div className="flex-1 min-w-0">
-                          <Link href={`/products/${item.product.handle || item.product.id}`}>
+                          <Link href={item.product.handle === 'ricekeep' ? '/rice-keep' : `/products/${item.product.handle || item.product.id}`}>
                             <h3 className="text-sm font-medium text-gray-900 mb-1 line-clamp-2 hover:text-primary transition-colors">
                               {item.product.title}
                             </h3>

@@ -1,10 +1,15 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
+import { getPublishedProductByHandle } from '@/lib/supabase';
+import RiceKeepPurchasePanel from '@/components/rice-keep/RiceKeepPurchasePanel';
 
 export const metadata: Metadata = { title: 'ライスキープ', description: '保存袋のプロとお米のプロが共同開発した、お米の保存袋ライスキープ。' };
 
-export default function RiceKeepPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function RiceKeepPage() {
+  const product = await getPublishedProductByHandle('ricekeep');
   return (
     <main className="page-top-offset min-h-screen bg-white px-5 pb-28 md:px-12">
       <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2 lg:gap-20">
@@ -16,8 +21,12 @@ export default function RiceKeepPage() {
             <p>保存袋のプロとお米のプロが共同開発した、常温保存が可能な究極のお米の保存袋です。</p>
             <p>これまで冷蔵が必須だったお米保存の常識を覆し、「新米のまま備蓄」を可能にしてくれます。</p>
           </div>
-          <p className="mt-10 rounded-sm bg-gray-50 p-5 text-sm leading-loose text-gray-600">商品登録後、こちらから購入できるようになります。</p>
-          <Link href="/collections" className="mt-8 inline-flex min-h-12 items-center rounded-full border border-primary px-6 text-sm text-primary hover:bg-primary hover:text-white">商品一覧を見る →</Link>
+          {product ? (
+            <RiceKeepPurchasePanel product={product} />
+          ) : (
+            <p className="mt-10 rounded-sm bg-gray-50 p-5 text-sm leading-loose text-gray-600">現在はご購入いただけません。</p>
+          )}
+          <Link href="/collections/rice" className="mt-8 inline-flex min-h-12 items-center rounded-full border border-primary px-6 text-sm text-primary hover:bg-primary hover:text-white">対象のお米を見る →</Link>
         </div>
       </div>
     </main>

@@ -57,7 +57,7 @@ const ProductGrid = () => {
       {!loading && !error && displayProducts.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-10 md:gap-x-6 md:gap-y-12">
           {displayProducts.map((product, index) => {
-            const productPath = `/products/${product.handle || product.id}`;
+            const productPath = product.handle === 'ricekeep' ? '/rice-keep' : `/products/${product.handle || product.id}`;
             const soldOut = isProductSoldOut(product);
             const preorder = !soldOut && isProductPreorder(product); // 在庫切れ優先
             return (

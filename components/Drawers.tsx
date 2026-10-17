@@ -9,6 +9,7 @@ import { FadeInImage } from './UI';
 import { supabase, checkStockAvailability } from '@/lib/supabase';
 import { PRIMARY_NAV, SECONDARY_NAV } from './navigation';
 import { calculateEarnableMiles } from '@/lib/eventMiles';
+import { getRiceKeepPurchaseState } from '@/lib/riceKeepPurchase';
 import {
   trackViewCart,
   trackBeginCheckout,
@@ -88,6 +89,7 @@ export const CartDrawer = ({ isOpen, onClose, cartItems, onRemove, onUpdateQuant
     const price = item.finalPrice ?? item.product.price;
     return sum + (price * item.quantity);
   }, 0);
+  const riceKeepPurchase = getRiceKeepPurchaseState(cartItems);
 
   // GA4 イベント用に CartItem を AnalyticsItem に変換するヘルパー
   const toAnalyticsItems = () =>
@@ -138,7 +140,7 @@ export const CartDrawer = ({ isOpen, onClose, cartItems, onRemove, onUpdateQuant
               const itemKey = cartItemKey(item);
               return (
               <div key={itemKey} className="flex items-start gap-3 border-b border-gray-100 pb-4 last:border-b-0">
-                <Link href={`/products/${item.product.handle}`} onClick={onClose} className="block h-20 w-20 flex-none self-start overflow-hidden rounded bg-gray-100">
+                <Link href={item.product.handle === 'ricekeep' ? '/rice-keep' : `/products/${item.product.handle}`} onClick={onClose} className="block h-20 w-20 flex-none self-start overflow-hidden rounded bg-gray-100">
                   <FadeInImage
                     src={item.product.images && item.product.images.length > 0 ? item.product.images[0] : (item.product.image || '')}
                     alt={item.product.title}
@@ -146,7 +148,7 @@ export const CartDrawer = ({ isOpen, onClose, cartItems, onRemove, onUpdateQuant
                   />
                 </Link>
                 <div className="flex-1 min-w-0">
-                  <Link href={`/products/${item.product.handle}`} onClick={onClose}>
+                  <Link href={item.product.handle === 'ricekeep' ? '/rice-keep' : `/products/${item.product.handle}`} onClick={onClose}>
                     <p className="mb-1 line-clamp-2 !text-[13px] font-medium !leading-[1.5] text-gray-900 transition-colors hover:text-primary">
                       {item.product.title}
                     </p>
@@ -273,10 +275,12 @@ export const CartDrawer = ({ isOpen, onClose, cartItems, onRemove, onUpdateQuant
             })()}
             <button
               onClick={handleCheckout}
-              className="w-full py-3 bg-primary text-white text-sm tracking-widest uppercase hover:bg-gray-800 transition-colors"
+              disabled={Boolean(riceKeepPurchase.issue)}
+              className="w-full py-3 bg-primary text-white text-sm tracking-widest uppercase hover:bg-gray-800 transition-colors disabled:cursor-not-allowed disabled:bg-gray-300"
             >
               レジに進む
             </button>
+            {riceKeepPurchase.issue && <p className="text-xs leading-relaxed text-red-600">{riceKeepPurchase.issue}</p>}
             <button
               onClick={onClose}
               className="w-full text-sm text-gray-500 hover:text-gray-700 transition-colors"

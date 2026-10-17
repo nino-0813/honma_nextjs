@@ -288,6 +288,8 @@ export default function CollectionsPage() {
                 key={product.id}
                 href={product.handle === 'start-set'
                   ? '/start-set'
+                  : product.handle === 'ricekeep'
+                    ? '/rice-keep'
                   : isLpView
                     ? `/products/${product.handle || product.id}?type=subscription`
                     : `/products/${product.handle || product.id}`}
