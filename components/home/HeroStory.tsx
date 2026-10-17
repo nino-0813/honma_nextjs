@@ -108,13 +108,13 @@ export default function HeroStory() {
             <p>「きょうも　しぜんと　いいときを。」</p>
           </div>
 
-          <div className="mt-12 w-fit max-w-full text-left">
+          <div className="ml-auto mt-12 w-fit max-w-full text-left">
             <p className="!text-right">敬具</p>
             <p>佐渡ヶ島より　愛を込めて</p>
             <p className="!text-right">イケベジより</p>
           </div>
 
-          <div className="mt-10 flex justify-start">
+          <div className="mt-10 flex justify-end">
             <Link href="/about" className="site-pill-link">
               詳しく知る →
             </Link>

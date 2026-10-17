@@ -27,6 +27,37 @@ function SubscriptionCopy() {
   );
 }
 
+function MobileSubscriptionCopy() {
+  return (
+    <>
+      <p>
+        イケベジは佐渡ヶ島と共に<br />
+        これからも前に進み続けます。
+      </p>
+      <p>
+        その佐渡の中にあり、<br />
+        イケベジが生まれ継ないでいく集落が<br />
+        「豊田集落」。
+      </p>
+      <p>
+        定期便は<br />
+        リーズナブルに安定して<br />
+        お届けする仕組みであると共に
+      </p>
+      <p>
+        お客様とイケベジが<br />
+        一緒に歩んでいくための形です。
+      </p>
+      <p>
+        日常の一杯のごはんが<br />
+        着実に日本の農業を変え<br />
+        この豊田集落を繋いでいく<br />
+        一杯になります。
+      </p>
+    </>
+  );
+}
+
 export default function SubscriptionCTA({ desktopSplit = false }: { desktopSplit?: boolean }) {
   return (
     <section className="bg-white pb-32 text-primary md:pb-48">
@@ -35,7 +66,7 @@ export default function SubscriptionCTA({ desktopSplit = false }: { desktopSplit
           <div className="site-reading-column">
             {desktopSplit && <h2 className="font-serif text-[26px] font-semibold leading-[1.55] tracking-[0.08em] md:text-[42px] lg:text-[50px]">4700人とつくる<br className="md:hidden" />イケベジ定期便</h2>}
             <div className="site-reading-text subscription-reading-text mt-8 space-y-10 font-serif text-gray-600 md:mt-12">
-              <SubscriptionCopy />
+              <MobileSubscriptionCopy />
             </div>
           </div>
         </FadeIn>
