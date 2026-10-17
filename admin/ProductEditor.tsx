@@ -184,8 +184,13 @@ const ProductEditor = () => {
       setTitle(data.title ?? '');
       setPrice(String(data.price ?? ''));
       setTaxRate(data.tax_rate === 8 ? '8' : '10');
-      const loadedCategories =
-        Array.isArray(data.categories) && data.categories.length > 0 ? data.categories : data.category ? [data.category] : ['お米'];
+      const loadedCategories = data.handle === 'sadonko-donko'
+        ? ['原木しいたけ']
+        : Array.isArray(data.categories) && data.categories.length > 0
+          ? data.categories
+          : data.category
+            ? [data.category]
+            : ['お米'];
       const loadedSubcategories =
         Array.isArray(data.subcategories) && data.subcategories.length > 0 ? data.subcategories : data.subcategory ? [data.subcategory] : [];
       setCategories(loadedCategories);

@@ -73,6 +73,10 @@ export interface DatabaseProduct {
 export const convertDatabaseProductToProduct = (dbProduct: DatabaseProduct): Product => {
   const hasVariantsFromConfig =
     Array.isArray(dbProduct.variants_config) && dbProduct.variants_config.length > 0;
+  const isSadoNkoDonko = dbProduct.handle === 'sadonko-donko';
+  const categories = isSadoNkoDonko
+    ? ['原木しいたけ']
+    : (dbProduct as any).categories || undefined;
   return {
     id: dbProduct.id,
     title: dbProduct.title,
@@ -81,9 +85,9 @@ export const convertDatabaseProductToProduct = (dbProduct: DatabaseProduct): Pro
     images: dbProduct.images || [],
     soldOut: dbProduct.sold_out,
     handle: dbProduct.handle,
-    category: dbProduct.category,
+    category: isSadoNkoDonko ? '原木しいたけ' : dbProduct.category,
     subcategory: dbProduct.subcategory || undefined,
-    categories: (dbProduct as any).categories || undefined,
+    categories,
     subcategories: (dbProduct as any).subcategories || undefined,
     description: dbProduct.description || undefined,
     // has_variants がfalseでも variants_config が入っているケースに対応
