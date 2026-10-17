@@ -94,7 +94,7 @@ export default function YearlySubscriptionLP() {
       </nav>
 
       <div id="ikevege-subscription" className="mt-24 scroll-mt-28 pt-20 text-center md:mt-32 md:border-t md:border-gray-100 md:pt-28">
-        <h2 className="mx-auto max-w-5xl font-serif !text-[26px] font-medium leading-loose tracking-[0.06em] text-primary md:!text-[22px] lg:whitespace-nowrap lg:!text-[26px]">できることを一つずつ積み重ねてお届けします。</h2>
+        <h2 className="mx-auto max-w-5xl whitespace-nowrap font-serif !text-[14px] font-medium leading-loose tracking-[0] text-primary md:whitespace-normal md:!text-[22px] md:tracking-[0.06em] lg:whitespace-nowrap lg:!text-[26px]">できることを一つずつ積み重ねてお届けします。</h2>
       </div>
     </section>
   );
