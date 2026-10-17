@@ -59,7 +59,22 @@ export default async function StartSetPage() {
         <h1 className="mx-auto max-w-4xl font-serif text-[28px] font-semibold leading-[1.5] tracking-[0.08em] text-primary md:text-4xl lg:text-[40px]">
           お試しセット
         </h1>
-        <p className="mx-auto mt-5 max-w-2xl text-[13px] leading-loose text-gray-600 md:text-sm lg:max-w-none">
+        <div className="mx-auto mt-5 space-y-5 text-[13px] leading-loose text-gray-600 md:hidden">
+          <p>
+            <span className="block">明治から続く「亀の尾」</span>
+            <span className="block">昭和に生まれた「従来コシヒカリ」</span>
+            <span className="block">平成に誕生した「にこまる」。</span>
+          </p>
+          <p>
+            <span className="block">同じ佐渡の田んぼでも、品種ごとに土づくりや</span>
+            <span className="block">育て方を変えて、試行錯誤を重ねてきました。</span>
+          </p>
+          <p>
+            <span className="block">甘みも、香りも、食感も違う3つのお米から</span>
+            <span className="block">あなたの「好き」を見つけてください。</span>
+          </p>
+        </div>
+        <p className="mx-auto mt-5 hidden max-w-2xl text-sm leading-loose text-gray-600 md:block lg:max-w-none">
           <span className="block lg:whitespace-nowrap">明治から続く「亀の尾」、昭和に生まれた「従来コシヒカリ」、平成に誕生した「にこまる」。</span>
           <span className="block lg:whitespace-nowrap">同じ佐渡の田んぼでも、品種ごとに土づくりや育て方を変えて、試行錯誤を重ねてきました。</span>
           <span className="block lg:whitespace-nowrap">甘みも、香りも、食感も違う3つのお米から、あなたの「好き」を見つけてください。</span>
