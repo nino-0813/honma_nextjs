@@ -31,28 +31,28 @@ function MobileSubscriptionCopy() {
   return (
     <>
       <p>
-        イケベジは佐渡ヶ島と共に<br />
-        これからも前に進み続けます。
+        <span className="block whitespace-nowrap">イケベジは佐渡ヶ島と共に</span>
+        <span className="block whitespace-nowrap">これからも前に進み続けます。</span>
       </p>
       <p>
-        その佐渡の中にあり、<br />
-        イケベジが生まれ継ないでいく集落が<br />
-        「豊田集落」。
+        <span className="block whitespace-nowrap">その佐渡の中にあり、</span>
+        <span className="block whitespace-nowrap">イケベジが生まれ継ないでいく集落が</span>
+        <span className="block whitespace-nowrap">「豊田集落」。</span>
       </p>
       <p>
-        定期便は<br />
-        リーズナブルに安定して<br />
-        お届けする仕組みであると共に
+        <span className="block whitespace-nowrap">定期便は</span>
+        <span className="block whitespace-nowrap">リーズナブルに安定して</span>
+        <span className="block whitespace-nowrap">お届けする仕組みであると共に</span>
       </p>
       <p>
-        お客様とイケベジが<br />
-        一緒に歩んでいくための形です。
+        <span className="block whitespace-nowrap">お客様とイケベジが</span>
+        <span className="block whitespace-nowrap">一緒に歩んでいくための形です。</span>
       </p>
       <p>
-        日常の一杯のごはんが<br />
-        着実に日本の農業を変え<br />
-        この豊田集落を繋いでいく<br />
-        一杯になります。
+        <span className="block whitespace-nowrap">日常の一杯のごはんが</span>
+        <span className="block whitespace-nowrap">着実に日本の農業を変え</span>
+        <span className="block whitespace-nowrap">この豊田集落を繋いでいく</span>
+        <span className="block whitespace-nowrap">一杯になります。</span>
       </p>
     </>
   );
