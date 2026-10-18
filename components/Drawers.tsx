@@ -316,18 +316,18 @@ export const MenuDrawer = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
       position="right"
       panelClassName="w-1/2 min-w-[175px] max-w-[210px]"
     >
-      <div className="flex flex-col px-6 py-8 gap-0">
-        <nav className="flex flex-col text-sm font-medium tracking-wide text-gray-800">
+      <div className="flex min-h-full flex-col justify-center gap-0 px-6 py-6 md:min-h-0 md:justify-start md:py-8">
+        <nav className="flex flex-col text-[13px] font-medium leading-tight tracking-wide text-gray-800 md:text-sm">
           {/* スマホでは横並びナビが非表示になるため、主要項目もここに残す */}
           <div className="md:hidden">
-            <button onClick={() => navigate('/')} className="text-left border-b border-gray-100 py-4 hover:text-gray-500 transition-colors block w-full">
+            <button onClick={() => navigate('/')} className="block w-full py-2.5 text-left transition-colors hover:text-gray-500 md:border-b md:border-gray-100 md:py-4">
               ホーム
             </button>
             {PRIMARY_NAV.map((item) => (
               <button
                 key={item.label}
                 onClick={() => navigate(item.href)}
-                className="text-left border-b border-gray-100 py-4 hover:text-gray-500 transition-colors block w-full"
+                className="block w-full py-2.5 text-left transition-colors hover:text-gray-500 md:border-b md:border-gray-100 md:py-4"
               >
                 {item.label}
               </button>
@@ -339,18 +339,18 @@ export const MenuDrawer = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
             <button
               key={item.label}
               onClick={() => navigate(item.href)}
-              className="text-left border-b border-gray-100 py-4 hover:text-gray-500 transition-colors block w-full"
+              className="block w-full py-2.5 text-left transition-colors hover:text-gray-500 md:border-b md:border-gray-100 md:py-4"
             >
               {item.label}
             </button>
           ))}
 
-          <button onClick={handleLoginClick} className="text-left border-b border-gray-100 py-4 hover:text-gray-500 transition-colors block w-full">
+          <button onClick={handleLoginClick} className="block w-full py-2.5 text-left transition-colors hover:text-gray-500 md:border-b md:border-gray-100 md:py-4">
             マイページ
           </button>
         </nav>
 
-        <div className="flex gap-8 justify-center mt-8 pt-8 border-t border-gray-100">
+        <div className="mt-6 flex justify-center gap-8 pt-5 md:mt-8 md:border-t md:border-gray-100 md:pt-8">
           <a
             href="https://www.instagram.com/ikevege_official"
             target="_blank"
