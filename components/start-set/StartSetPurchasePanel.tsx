@@ -129,7 +129,7 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
 
         <div className="mb-6 border border-gray-200 bg-white p-5 md:p-6">
           <div className="flex flex-wrap items-center gap-2 mb-2">
-            <span className={`rounded-full px-3 py-1 text-[10px] font-medium tracking-wide text-white ${isFirstPurchase ? 'bg-[#e87538]' : 'bg-primary'}`}>
+            <span className="rounded-full bg-[#e87538] px-3 py-1 text-[10px] font-medium tracking-wide text-white">
               {eligibilityLoading
                 ? '特典の対象を確認中'
                 : isFirstPurchase
@@ -164,7 +164,7 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
                   type="button"
                   aria-pressed={selected}
                   onClick={() => setMillingMethod(method)}
-                  className={`min-h-12 border px-4 py-3 text-sm transition-colors ${selected ? 'border-[#e87538] bg-[#e87538] text-white' : 'border-gray-300 bg-white text-primary hover:border-[#e87538]'}`}
+                  className={`min-h-12 border bg-white px-4 py-3 text-sm transition-colors ${selected ? 'border-[#e87538] text-[#d85f27] shadow-[inset_0_0_0_1px_#e87538]' : 'border-gray-300 text-primary hover:border-[#e87538]'}`}
                 >
                   {method}（3個セット）
                 </button>
