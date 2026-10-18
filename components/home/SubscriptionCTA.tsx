@@ -80,7 +80,7 @@ export default function SubscriptionCTA({ desktopSplit = false }: { desktopSplit
             ))}
           </div>
         </FadeIn>
-        <div className="mx-2 mt-8 text-left md:mt-12 md:text-center">
+        <div className="mx-2 mt-8 text-right md:mt-12 md:text-center">
           <Link href="/collections/rice/yearly?view=lp" className="site-pill-link subscription-pill-link">
             定期便を始める →
           </Link>
