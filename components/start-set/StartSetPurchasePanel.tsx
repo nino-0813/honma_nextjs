@@ -180,7 +180,7 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
             <span className="w-8 text-center text-sm tabular-nums">{quantity}</span>
             <button type="button" aria-label="数量を1つ増やす" disabled onClick={() => setQuantity(1)} className="h-10 w-10 disabled:opacity-30">＋</button>
           </div>
-          <button type="button" disabled={disabled || eligibilityLoading} onClick={handleAdd} className="min-h-12 flex-1 cursor-pointer rounded-full bg-primary px-6 text-sm font-medium text-white transition-colors duration-200 hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40">
+          <button type="button" disabled={disabled || eligibilityLoading} onClick={handleAdd} className="min-h-12 flex-1 cursor-pointer rounded-full bg-[#e87538] px-6 text-sm font-medium text-white transition-colors duration-200 hover:bg-[#cf5f27] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e87538] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40">
             {soldOut ? '売り切れ' : outsideSalesPeriod ? '販売期間外' : eligibilityLoading ? '購入条件を確認中' : !isLoggedIn ? 'ログインして特典を確認' : 'カートに入れる'}
           </button>
         </div>
