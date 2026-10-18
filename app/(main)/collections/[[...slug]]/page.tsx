@@ -214,6 +214,9 @@ export default function CollectionsPage() {
       {!isLpView && (
         <div className="sticky top-14 z-30 mb-28 bg-white/95 py-3 backdrop-blur-md md:top-16 md:mb-32">
           <div className="mx-auto max-w-[1160px] px-6 md:px-0">
+            <h1 className="mb-5 text-center font-serif text-[22px] tracking-[0.12em] text-primary md:hidden">
+              商品一覧
+            </h1>
             <ProductCategoryNav current={categoryNavKey} />
           </div>
         </div>
