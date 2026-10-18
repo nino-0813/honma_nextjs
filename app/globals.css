@@ -302,6 +302,17 @@
     line-height: 1.9;
   }
 
+  .public-site .mobile-footer-links,
+  .public-site .mobile-footer-links :where(li) {
+    font-size: 0.625rem;
+    line-height: 1.4;
+  }
+
+  .public-site .mobile-footer-meta {
+    font-size: 0.625rem;
+    line-height: 1.4;
+  }
+
   /* 関農園の基準値：主要見出し 26px、本文 15px、文字色 #212529。 */
   .public-site :where(h1, h2, h3) {
     font-size: 1.625rem !important;
