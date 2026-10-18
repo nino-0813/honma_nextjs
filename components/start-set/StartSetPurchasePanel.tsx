@@ -164,7 +164,7 @@ export default function StartSetPurchasePanel({ product }: { product: Product })
                   type="button"
                   aria-pressed={selected}
                   onClick={() => setMillingMethod(method)}
-                  className={`min-h-12 border px-4 py-3 text-sm transition-colors ${selected ? 'border-primary bg-primary text-white' : 'border-gray-300 bg-white text-primary hover:border-primary'}`}
+                  className={`min-h-12 border px-4 py-3 text-sm transition-colors ${selected ? 'border-[#e87538] bg-[#e87538] text-white' : 'border-gray-300 bg-white text-primary hover:border-[#e87538]'}`}
                 >
                   {method}（3個セット）
                 </button>

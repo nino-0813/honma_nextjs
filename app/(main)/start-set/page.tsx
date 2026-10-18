@@ -167,7 +167,10 @@ export default async function StartSetPage() {
         <section className="mb-48 mt-40 grid overflow-hidden bg-hekishoku text-white md:mb-48 md:mt-56 lg:grid-cols-2">
           <div className="min-h-[320px] lg:min-h-[480px]"><img src="/images/about/hero/retreat_2025_56.webp" alt="佐渡の田んぼで過ごす家族" loading="lazy" className="h-full w-full object-cover" /></div>
           <div className="flex flex-col justify-center p-8 md:p-12 lg:p-16">
-            <h2 className="font-serif text-[24px] font-semibold leading-relaxed tracking-wider !text-white md:text-3xl">おいしさだけじゃない、<br />イケベジが届けたいこと</h2>
+            <h2 className="font-serif text-[19px] font-semibold leading-relaxed tracking-[0.03em] !text-white md:text-3xl md:tracking-wider">
+              <span className="block whitespace-nowrap">おいしさだけじゃない、</span>
+              <span className="block whitespace-nowrap">イケベジが届けたいこと</span>
+            </h2>
             <p className="mt-6 text-sm leading-loose !text-white md:text-base">お客様の日常の「いいとき」を彩る一員であるとともに、「子どもたちがここに生まれて良かったと思える社会」を創ることが、私たちの目指すビジョンです。</p>
             <Link href="/about" className="mt-8 inline-flex min-h-12 w-fit items-center border border-white/50 px-6 text-sm transition-colors hover:bg-white hover:text-hekishoku">詳しく知る →</Link>
           </div>
