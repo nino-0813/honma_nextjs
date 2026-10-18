@@ -63,14 +63,14 @@ export default function HeroStory() {
       </section>
 
       <section className="bg-white pb-32 pt-24 md:hidden">
-        <FadeIn className="site-reading-text site-shell max-w-[430px] font-serif text-[#24211d]">
-          <div className="space-y-8">
+        <FadeIn className="home-letter-mobile site-reading-text site-shell max-w-[430px] font-serif text-[#24211d]">
+          <div className="space-y-6">
             <div>
               <p>拝啓</p>
               <p>イケベジを知ってくれた</p>
               <p>あなたへ</p>
             </div>
-            <div className="!mt-[calc(3rem+4.2em)]">
+            <div className="!mt-10">
               <p>佐渡ヶ島は</p>
               <p>豊かな自然や文化が詰まった</p>
               <p>「日本の縮図」といわれる島です。</p>
