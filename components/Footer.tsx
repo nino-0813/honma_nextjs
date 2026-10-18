@@ -14,7 +14,7 @@ const Footer = () => {
               <li><Link href="/terms" className="transition-colors hover:text-primary">利用規約</Link></li>
               <li><Link href="/privacy" className="transition-colors hover:text-primary">プライバシーポリシー</Link></li>
           </ul>
-          <div className="flex flex-col items-end gap-3 md:w-auto md:flex-row md:items-center md:gap-5">
+          <div className="flex self-end flex-col items-end gap-3 md:w-auto md:self-auto md:flex-row md:items-center md:gap-5">
               <p className="order-2 text-[10px] text-gray-400 md:order-1 md:text-xs">
                 &copy; {new Date().getFullYear()} IKEVEGE
               </p>
