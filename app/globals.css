@@ -273,6 +273,13 @@
   color: white;
 }
 
+@media (max-width: 767px) {
+  .subscription-pill-link {
+    width: 10.5rem;
+    padding-inline: 1.25rem;
+  }
+}
+
 @media (min-width: 768px) {
   .public-site {
     --site-type-body: 0.9375rem;

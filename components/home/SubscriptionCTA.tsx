@@ -81,7 +81,7 @@ export default function SubscriptionCTA({ desktopSplit = false }: { desktopSplit
           </div>
         </FadeIn>
         <div className="mx-2 mt-8 text-left md:mt-12 md:text-center">
-          <Link href="/collections/rice/yearly?view=lp" className="site-pill-link">
+          <Link href="/collections/rice/yearly?view=lp" className="site-pill-link subscription-pill-link">
             定期便を始める →
           </Link>
         </div>
@@ -102,7 +102,7 @@ export default function SubscriptionCTA({ desktopSplit = false }: { desktopSplit
                 </div>
               </FadeIn>
               <div className="mt-16 flex justify-end">
-                <Link href="/collections/rice/yearly?view=lp" className="site-pill-link">
+                <Link href="/collections/rice/yearly?view=lp" className="site-pill-link subscription-pill-link">
                   定期便を始める →
                 </Link>
               </div>
@@ -131,7 +131,7 @@ export default function SubscriptionCTA({ desktopSplit = false }: { desktopSplit
                 <SubscriptionCopy />
               </div>
               <div className="mt-12 text-left">
-                <Link href="/collections/rice/yearly?view=lp" className="site-pill-link">
+                <Link href="/collections/rice/yearly?view=lp" className="site-pill-link subscription-pill-link">
                   定期便を始める →
                 </Link>
               </div>
