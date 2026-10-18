@@ -316,7 +316,7 @@ export const MenuDrawer = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
       position="right"
       panelClassName="w-1/2 min-w-[175px] max-w-[210px]"
     >
-      <div className="flex min-h-full flex-col justify-center gap-0 px-6 py-6 md:min-h-0 md:justify-start md:py-8">
+      <div className="flex min-h-full flex-col justify-start gap-0 px-6 pb-6 pt-12 md:min-h-0 md:py-8">
         <nav className="flex flex-col text-[13px] font-medium leading-tight tracking-wide text-gray-800 md:text-sm">
           {/* スマホでは横並びナビが非表示になるため、主要項目もここに残す */}
           <div className="md:hidden">
