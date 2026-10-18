@@ -23,7 +23,7 @@ export default function HeroStory() {
             loop
             playsInline
             preload="auto"
-            className="block h-[100svh] w-full object-contain object-center md:hidden"
+            className="block h-auto w-full md:hidden"
           />
           <video
             src={DESKTOP_VIDEO}
