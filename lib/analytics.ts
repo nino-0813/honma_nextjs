@@ -37,17 +37,21 @@ export function trackPageView(path: string): void {
   }
 }
 
-/** 共通: gtag が読み込まれていれば送信 */
-function send(eventName: string, params: Record<string, any>): void {
-  if (typeof window === 'undefined') return;
-  if (typeof window.gtag !== 'function') return;
+/** handed_off は gtag 呼び出し完了のみ。GA4 の受信を保証しない。 */
+export type AnalyticsSendResult = 'handed_off' | 'unavailable' | 'error';
+
+/** 共通: gtag が読み込まれていれば渡す */
+function send(eventName: string, params: Record<string, any>): AnalyticsSendResult {
   try {
+    if (typeof window === 'undefined' || typeof window.gtag !== 'function') return 'unavailable';
     window.gtag('event', eventName, params);
+    return 'handed_off';
   } catch (e) {
     // 計測失敗はサイレントに（ユーザー体験に影響させない）
     if (process.env.NODE_ENV !== 'production') {
       console.warn('[analytics]', eventName, e);
     }
+    return 'error';
   }
 }
 
@@ -142,8 +146,8 @@ export function trackPurchase(args: {
   shipping?: number;
   tax?: number;
   couponCode?: string | null;
-}): void {
-  send('purchase', {
+}): AnalyticsSendResult {
+  return send('purchase', {
     transaction_id: args.transactionId,
     currency: CURRENCY,
     value: Math.round(args.value),

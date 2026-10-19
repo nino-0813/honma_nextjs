@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { CartContext } from '@/providers/CartProvider';
-import { trackPurchase, toAnalyticsItem } from '@/lib/analytics';
+import { toAnalyticsItem } from '@/lib/analytics';
+import { trackPurchaseOnce } from '@/lib/purchase-tracking';
 
 const CheckoutSuccess = () => {
   const searchParams = useSearchParams();
@@ -15,8 +16,7 @@ const CheckoutSuccess = () => {
   const isBankTransfer = searchParams?.get('bank_transfer') === '1';
   const instructionsUrl = searchParams?.get('instructions_url');
   const didClearCartRef = useRef(false);
-  // GA4 purchase イベント重複送信防止
-  const didFirePurchaseRef = useRef(false);
+  const paymentIntentId = searchParams?.get('payment_intent') ?? null;
 
   // ページ表示時にカートをクリア（初回のみ実行して無限レンダーを防止）
   useEffect(() => {
@@ -26,72 +26,92 @@ const CheckoutSuccess = () => {
   }, [clearCart]);
 
   useEffect(() => {
-    const paymentIntentId = searchParams?.get('payment_intent') ?? null;
+    let active = true;
+    let retryTimer: ReturnType<typeof setTimeout> | undefined;
+    const controller = new AbortController();
+    setOrderNumber(null);
+    setLoading(true);
 
-    if (paymentIntentId && supabase) {
-      const client = supabase;
-      const fetchOrder = async () => {
-        for (let attempt = 0; attempt < 10; attempt++) {
-          try {
-            const { data, error } = await client
-              .from('orders')
-              .select(
-                'id, order_number, total, subtotal, shipping_cost, created_at, payment_status, order_items(product_id, product_title, product_price, quantity)'
-              )
-              .eq('payment_intent_id', paymentIntentId)
-              .order('created_at', { ascending: false })
-              .limit(1)
-              .maybeSingle();
-
-            if (!error && data) {
-              if (data.order_number) {
-                setOrderNumber(data.order_number);
-
-                // GA4: 購入完了イベント（1回だけ送信、リロード時の重複もガード）
-                if (data.payment_status === 'paid' && !didFirePurchaseRef.current) {
-                  didFirePurchaseRef.current = true;
-                  try {
-                    const items = Array.isArray((data as any).order_items)
-                      ? (data as any).order_items.map((it: any) =>
-                          toAnalyticsItem({
-                            id: it.product_id ?? 'unknown',
-                            title: it.product_title ?? '',
-                            price: Number(it.product_price ?? 0),
-                            quantity: Number(it.quantity ?? 1),
-                          }),
-                        )
-                      : [];
-                    // 同じ payment_intent_id で1回しか送らないよう localStorage で多重送信防止
-                    const seenKey = `ga4_purchase_${paymentIntentId}`;
-                    if (typeof window !== 'undefined' && !localStorage.getItem(seenKey)) {
-                      trackPurchase({
-                        transactionId: data.order_number as string,
-                        value: Number(data.total ?? 0),
-                        shipping: Number((data as any).shipping_cost ?? 0),
-                        items,
-                      });
-                      localStorage.setItem(seenKey, '1');
-                    }
-                  } catch (gaErr) {
-                    console.warn('[GA4 purchase] failed', gaErr);
-                  }
-                }
-                break;
-              }
-            }
-          } catch (err) {
-            console.error('注文情報の取得に失敗しました:', err);
-          }
-          await new Promise((r) => setTimeout(r, 1000));
-        }
-        setLoading(false);
-      };
-
-      fetchOrder();
-    } else {
+    // Bound both slow requests and retries; never hold the confirmation UI for analytics.
+    const deadline = setTimeout(() => {
+      active = false;
+      clearTimeout(retryTimer);
+      controller.abort();
       setLoading(false);
-    }
-  }, [searchParams]);
+    }, 30_000);
+
+    const finish = () => {
+      clearTimeout(deadline);
+      if (active) setLoading(false);
+    };
+    const fetchOrder = async (attempt: number) => {
+      if (!active || !paymentIntentId || !supabase) return;
+      try {
+        const { data, error } = await supabase
+          .from('orders')
+          .select(
+            'id, order_number, total, subtotal, shipping_cost, created_at, payment_status, order_items(product_id, product_title, product_price, quantity)'
+          )
+          .eq('payment_intent_id', paymentIntentId)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .abortSignal(controller.signal)
+          .maybeSingle();
+        if (!active) return;
+        if (!error && data) {
+          if (data.order_number) {
+            setOrderNumber(data.order_number);
+            setLoading(false);
+          }
+          if (data.payment_status === 'paid' && data.order_number) {
+            // Capture once so every tag retry uses the same transaction_id and payload.
+            const purchase = {
+              transactionId: data.order_number as string,
+              value: Number(data.total ?? 0),
+              shipping: Number(data.shipping_cost ?? 0),
+              items: Array.isArray(data.order_items)
+                ? data.order_items.map((it: any) => toAnalyticsItem({
+                    id: it.product_id ?? 'unknown',
+                    title: it.product_title ?? '',
+                    price: Number(it.product_price ?? 0),
+                    quantity: Number(it.quantity ?? 1),
+                  }))
+                : [],
+            };
+            const tryTag = (tagAttempt: number) => {
+              if (!active) return;
+              const result = trackPurchaseOnce(paymentIntentId, purchase);
+              if ((result === 'unavailable' || result === 'error') && tagAttempt < 9) {
+                retryTimer = setTimeout(() => tryTag(tagAttempt + 1), 1000);
+              } else {
+                finish();
+              }
+            };
+            tryTag(0);
+            return;
+          }
+        }
+      } catch (err) {
+        if (!active) return;
+        console.error('注文情報の取得に失敗しました:', err);
+      }
+      if (active && attempt < 9) {
+        retryTimer = setTimeout(() => void fetchOrder(attempt + 1), 1000);
+      } else {
+        finish();
+      }
+    };
+
+    if (paymentIntentId && supabase) void fetchOrder(0);
+    else finish();
+
+    return () => {
+      active = false;
+      clearTimeout(retryTimer);
+      clearTimeout(deadline);
+      controller.abort();
+    };
+  }, [paymentIntentId]);
 
   return (
     <main className="min-h-screen bg-white pt-24 pb-16">
