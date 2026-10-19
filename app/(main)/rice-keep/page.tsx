@@ -12,7 +12,7 @@ export default async function RiceKeepPage() {
   const product = await getPublishedProductByHandle('ricekeep');
   return (
     <main className="page-top-offset min-h-screen bg-white px-5 pb-28 md:px-12">
-      <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2 lg:gap-20">
+      <div className="mx-auto grid max-w-6xl items-start gap-12 lg:grid-cols-2 lg:gap-20">
         <div className="relative aspect-[4/5] overflow-hidden bg-gray-50"><Image src="/images/rice-keep-bag.jpg" alt="お米保存袋 ライスキープ" fill className="object-cover" sizes="(max-width:1024px) 100vw, 50vw" priority /></div>
         <div>
           <p className="mb-4 text-sm text-yuunagi-ink">お米をおいしく保つ保存袋</p>
