@@ -1,6 +1,6 @@
 # 定期将来確保・玄米換算 ローカル実装結果
 
-本番未適用・未push・未デプロイ。作業ブランチ `design/kg-subscription-reservations`。現行mainは旧画面フォールバック修正版 `80ccf6a`のまま。締切年は回答待ちで、年産・銘柄ごとの管理者設定とし、2027年等の本番値を登録していない。
+コードのmain反映対象。DBは本番未適用であり、コード公開だけでは追加在庫機能は利用できません。作業ブランチ `design/kg-subscription-reservations`。締切年は回答待ちで、年産・銘柄ごとの管理者設定とし、2027年等の本番値を登録していない。
 
 ## 実装
 
@@ -40,8 +40,19 @@
 - `admin/KgSubscriptionSettings.tsx`、`admin/InventorySystem.tsx`、`lib/kgInventory.ts`: 管理UI・原料集計。
 - `lib/subscriptionSnapshots.ts`、`app/api/stripe-webhook/route.ts`、`app/api/sync-subscription/route.ts`: 新発送明細の初期化と契約同期保護。
 - `docs/kg-inventory-sql/README.md`、01b/03/04/05 SQL: 適用前後・停止/再開の改訂手順。本番適用は保留。
-- `npm test`: 60件成功（既存購入・フォールバック・設計、係数、画面、複製、同期競合、既存課金/重量変更制限）。
+- `npm test`: 63件成功（既存購入・フォールバック・設計、係数、画面、複製、同期競合、既存課金/重量変更制限）。
 - `npx tsc --noEmit`、本番向けローカルbuild成功。
 - 隔離PostgreSQL16でv1→v2、5回/4回、係数/数量、二重計上防止、発送/返金/解約、予約変更、スキップ、周期、休止、旧データ保持、権限を確認。`scripts/test-kg-subscriptions.sh`。
 - 全手順・事前不一致拒否・v1/v2導入・停止/再開・履歴保持・再照合を` scripts/test-kg-runbook.sh`で確認。
 - 外部リクエストを遮断した独立モック画面で1440px/390pxを確認。横溢れ・JSエラーなし、期限入力は空。`docs/kg-inventory-evidence/subscription-desktop.png` / `subscription-mobile.png`。
+
+## main反映前の再検証（2026-10-20）
+
+- origin/main `80ccf6a` を再取得し、他者による追加変更がないことを確認。
+- 初期kg版のみ導入済みなら明確な未拡張バナーと初期版の重量単位を維持。5kgの外販記録が5kgのままであることをテスト。
+- kg未導入時の旧画面閲覧・入庫/外販編集・削除と、認証/通信エラーでフォールバックしない回帰テスト成功。
+- 実webhookハンドラーを外部サービス完全モックで呼び出し、既存subscriptionsスキーマ・metadata NULL・二重通知・予約変更保持を確認。実メール/決済/計測なし。
+- 全63テスト、TypeScript、本番向けローカルbuild、隔離PostgreSQL16での全SQL手順が成功。
+- 独立モックの旧画面/初期kg/玄米定期版を1440pxと390pxで確認。横溢れ・JSエラーなし。締切入力は未設定。
+- 旧UI検証スクリプトが旧不足テキストを待って一度タイムアウト。モックのバージョンを明示した再検証は全画面成功。
+- SQLには本番適用保留の注意書きを追加。コード公開とDB適用は別であり、本番DBには接続・実行しない。

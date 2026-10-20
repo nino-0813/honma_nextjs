@@ -1,3 +1,4 @@
+-- ローカル検証版。本番適用は保留。締切年・玄米基準の初期値・既存注文との照合・本番スキーマを確認するまで適用 SQL は実行しない
 -- LOCAL REVIEW CANDIDATE. Apply after migration_add_kg_inventory.sql only after approval.
 -- No harvest deadline, old balance conversion, or customer data backfill is supplied.
 BEGIN;

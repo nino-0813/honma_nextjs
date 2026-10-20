@@ -1,3 +1,4 @@
+-- ローカル検証版。本番適用は保留。締切年・玄米基準の初期値・既存注文との照合・本番スキーマを確認するまで適用 SQL は実行しない
 -- 読み取り専用。v1適用済み（または02実行後）の追加仕様準備確認。
 BEGIN TRANSACTION READ ONLY;
 DO $$ DECLARE r record; actual text; BEGIN

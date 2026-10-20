@@ -32,6 +32,20 @@ afterEach(() => {
   cleanup();
   vi.resetAllMocks();
 });
+it("keeps v1 recording in its original units without exposing v2 settings", async () => {
+  const { accounting_version, ...v1 } = report;
+  rpc.mockResolvedValue({ data: v1, error: null });
+  render(<InventorySystem />);
+  await screen.findByText("初期kg版を使用中（玄米換算・定期将来確保は未導入）");
+  expect(screen.queryByText("契約の発送アンカーを確認")).toBeNull();
+  expect(screen.queryByLabelText("販売・使用の精米区分")).toBeNull();
+  fireEvent.change(screen.getByLabelText("区分"), { target: { value: "direct" } });
+  fireEvent.change(screen.getByLabelText("重量 kg（調整のみ負数可）"), { target: { value: "5" } });
+  fireEvent.change(screen.getByLabelText("理由・販売先"), { target: { value: "v1 fixture" } });
+  fireEvent.click(screen.getByText("履歴に追加"));
+  await waitFor(() => expect(rpc).toHaveBeenCalledWith("kg_record_movement",
+    expect.objectContaining({ kg: 5, reason: "v1 fixture" })));
+});
 it("does not assume a deadline year or convert old balances", async () => {
   rpc.mockResolvedValue({
     data: {

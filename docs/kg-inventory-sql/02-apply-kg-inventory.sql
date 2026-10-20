@@ -1,3 +1,4 @@
+-- ローカル検証版。本番適用は保留。締切年・玄米基準の初期値・既存注文との照合・本番スキーマを確認するまで適用 SQL は実行しない
 -- Additive kg accounting. Run only after the migration review described in docs/kg-inventory.md.
 BEGIN;
 CREATE TABLE public.kg_product_specs (

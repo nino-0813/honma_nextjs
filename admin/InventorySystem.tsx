@@ -310,9 +310,16 @@ export default function InventorySystem() {
         <h1 className="text-2xl font-bold">在庫システム · kg管理</h1>
         <p className="mt-2 text-sm">
           年産・銘柄ごとに、入庫 − 販売・使用済み −
-          入金待ち確保を集計します。購入受付とSKU在庫は従来どおりです。
+          {rawMode ? "注文・定期将来分・EC以外の確保" : "入金待ち確保"}
+          を集計します。購入受付とSKU在庫は従来どおりです。
         </p>
       </header>
+      {ready && !rawMode && (
+        <section role="status" className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm">
+          <h2 className="font-bold">初期kg版を使用中（玄米換算・定期将来確保は未導入）</h2>
+          <p>以下は初期版の重量基準による集計です。精米係数と未作成の定期発送分は含みません。玄米残量や定期受付可能量として使用しないでください。既存の閲覧・記録は引き続き利用できます。</p>
+        </section>
+      )}
       <div className="rounded-xl bg-amber-50 p-4 text-sm space-y-2">
         <p>
           販売可能量は倉庫の現物量ではありません。支払済み・未出荷は玄米基準では確保中として扱います。精米前後の重量基準を統一してください。
@@ -396,7 +403,7 @@ export default function InventorySystem() {
                     {[
                       ["入庫・調整後", r.incoming],
                       ["販売・使用済み", r.used],
-                      ["確保中（注文＋将来＋EC以外）", r.held],
+                      [rawMode ? "確保中（注文＋将来＋EC以外）" : "確保中（入金待ち）", r.held],
                       ...(rawMode
                         ? [
                             [
