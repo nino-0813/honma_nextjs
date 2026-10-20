@@ -6,6 +6,8 @@ import React, {
   useRef,
   useState,
 } from "react";
+import LegacyInventorySystem from "./LegacyInventorySystem";
+import { isKgReportUnavailable } from "@/lib/kgInventoryAvailability";
 import { supabase } from "@/lib/supabase";
 import {
   varieties,
@@ -74,6 +76,7 @@ export default function InventorySystem() {
     [loading, setLoading] = useState(true),
     [busy, setBusy] = useState(false),
     [notice, setNotice] = useState("");
+  const [legacyMode, setLegacyMode] = useState(false);
   const [ready, setReady] = useState(false);
   const lock = useRef(false),
     request = useRef<string | null>(null);
@@ -98,12 +101,21 @@ export default function InventorySystem() {
     [reason, setReason] = useState("");
   const load = useCallback(async () => {
     setLoading(true);
+    setLegacyMode(false);
     setError("");
     try {
       if (!supabase) throw new Error("接続設定がありません");
       const { data: report, error: reportError } =
         await supabase.rpc("kg_report");
-      if (reportError) throw new Error(reportError.message);
+      if (reportError) {
+        if (isKgReportUnavailable(reportError)) {
+          setData(empty);
+          setReady(false);
+          setLegacyMode(true);
+          return;
+        }
+        throw new Error(reportError.message);
+      }
       if (!report) throw new Error("管理者権限を確認してください");
       setData(report as Data);
       setReady(true);
@@ -200,6 +212,28 @@ export default function InventorySystem() {
           ),
     );
   }
+  if (legacyMode && !loading)
+    return (
+      <div className="space-y-6">
+        <section
+          role="status"
+          aria-label="従来の在庫管理を表示中"
+          className="rounded-xl border border-amber-300 bg-amber-50 p-5 text-sm text-amber-950"
+        >
+          <h1 className="font-bold">従来の在庫管理（参考集計）</h1>
+          <p className="mt-2">
+            新しいkg管理の集計機能がDBに未導入、または関数の公開情報に未反映のため、従来画面を表示しています。収穫量・手動確保・販売使用実績は従来どおり閲覧・編集できます。
+          </p>
+          <p className="mt-2">
+            以下は商品名・注文日から推定する旧方式の参考値です。購入時の銘柄・年産・重量を確定した新しいkg管理ではありません。残量や定期受付人数を、正確な販売可能量として使用しないでください。
+          </p>
+          <button type="button" className={`${button} mt-3`} onClick={load}>
+            新しいkg管理の準備状況を再確認
+          </button>
+        </section>
+        <LegacyInventorySystem />
+      </div>
+    );
   return (
     <div className="mx-auto max-w-7xl space-y-6 text-gray-900">
       <header>
@@ -269,7 +303,7 @@ export default function InventorySystem() {
       {error && (
         <p role="alert" className="rounded-lg bg-red-50 p-4 text-red-800">
           読み込み・保存を完了できませんでした: {error}
-          。DB未導入の場合は移行手順を確認してください。
+          。権限・接続状態を確認して再試行してください。
         </p>
       )}
       {notice && <p role="status">{notice}</p>}
