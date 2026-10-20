@@ -10,6 +10,8 @@ DO $$ BEGIN
 END $$;
 ALTER TABLE public.order_items DISABLE TRIGGER kg_capture_item;
 ALTER TABLE public.orders DISABLE TRIGGER kg_order_changed;
+ALTER TABLE public.subscriptions DISABLE TRIGGER kg_subscription_changed;
+ALTER TABLE public.kg_product_specs DISABLE TRIGGER kg_spec_changed;
 SELECT now() AS stopped_at, tgrelid::regclass AS table_name,tgname,tgenabled
-FROM pg_trigger WHERE tgname IN ('kg_capture_item','kg_order_changed');
+FROM pg_trigger WHERE tgname IN ('kg_capture_item','kg_order_changed','kg_subscription_changed','kg_spec_changed');
 COMMIT;

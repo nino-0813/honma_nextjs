@@ -9,6 +9,8 @@ DO $$ BEGIN
 END $$;
 ALTER TABLE public.order_items ENABLE TRIGGER kg_capture_item;
 ALTER TABLE public.orders ENABLE TRIGGER kg_order_changed;
+ALTER TABLE public.subscriptions ENABLE TRIGGER kg_subscription_changed;
+ALTER TABLE public.kg_product_specs ENABLE TRIGGER kg_spec_changed;
 SELECT now() AS resumed_at,tgrelid::regclass AS table_name,tgname,tgenabled
-FROM pg_trigger WHERE tgname IN ('kg_capture_item','kg_order_changed');
+FROM pg_trigger WHERE tgname IN ('kg_capture_item','kg_order_changed','kg_subscription_changed','kg_spec_changed');
 COMMIT;

@@ -1,3 +1,5 @@
+> ローカルの追加仕様（玄米換算・定期将来確保）は [kg-subscription-implementation.md](kg-subscription-implementation.md) を参照。追加仕様は未公開・本番DB未適用です。以下は初期版の記録です。
+
 # kg 在庫管理 初期版
 
 対象: nino-0813/honma_nextjs。基点: main `37dc126`。本番DBには未適用。

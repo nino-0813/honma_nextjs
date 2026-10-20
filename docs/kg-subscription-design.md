@@ -1,3 +1,5 @@
+> ローカル実装結果は [kg-subscription-implementation.md](kg-subscription-implementation.md) を参照。この文書は実装前の読み取り調査記録です。
+
 # 定期便の将来確保・玄米換算：読み取り調査と設計案
 
 2026-10-20。ローカル設計段階。新仕様はmain未公開、DB未適用。現行公開は旧画面フォールバック修正版 `80ccf6a`（production READY確認済み）。旧SQL一式は新仕様の本番投入用ではなく保留。

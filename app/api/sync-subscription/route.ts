@@ -1,3 +1,4 @@
+import { persistSubscriptionState } from '@/lib/subscriptionSnapshots';
 // 既存の subscriptions レコードを Stripe から最新化するためのユーティリティAPI
 // 主にデバッグ/バックフィル用途。本番ではWebhookで自動更新される。
 import { NextResponse } from 'next/server';
@@ -48,7 +49,7 @@ export async function POST(request: Request) {
     // 自分の subscription を全件取得
     const { data: subs, error: subsErr } = await supabaseAdmin
       .from('subscriptions')
-      .select('id, stripe_subscription_id, status')
+      .select('id, stripe_subscription_id, status, metadata')
       .eq('auth_user_id', authUser.id);
 
     if (subsErr) {
@@ -73,19 +74,13 @@ export async function POST(request: Request) {
           ? new Date(sub.canceled_at * 1000).toISOString()
           : null;
 
-        await supabaseAdmin
-          .from('subscriptions')
-          .update({
-            status: sub.status,
-            next_billing_at,
-            canceled_at: canceledAt,
-            metadata: {
-              ...(sub.metadata ?? {}),
-              cancel_at_period_end: sub.cancel_at_period_end,
-            },
-            updated_at: new Date().toISOString(),
-          })
-          .eq('stripe_subscription_id', row.stripe_subscription_id);
+        await persistSubscriptionState(supabaseAdmin, row.id, {
+          status: sub.status,
+          next_billing_at,
+          canceled_at: canceledAt,
+          metadata: { ...(sub.metadata ?? {}), pause_collection: sub.pause_collection ?? null, cancel_at_period_end: sub.cancel_at_period_end },
+          updated_at: new Date().toISOString(),
+        });
         updated++;
       } catch (e: any) {
         console.warn('[sync-subscription] failed for', row.stripe_subscription_id, e?.message);

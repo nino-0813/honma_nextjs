@@ -2,6 +2,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 cmp migration_add_kg_inventory.sql docs/kg-inventory-sql/02-apply-kg-inventory.sql
+cmp migration_add_kg_subscription_reservations.sql docs/kg-inventory-sql/02b-apply-subscription-reservations.sql
 name="honma-kg-runbook-${RANDOM}"
 runbook_tmp=$(mktemp -d /tmp/honma-kg-runbook.XXXXXX)
 docker run --name "$name" --rm -d -e POSTGRES_PASSWORD=local-test-only postgres:16-alpine >/dev/null
@@ -30,15 +31,21 @@ sql <<'SQL'
 ALTER TABLE order_items RENAME COLUMN fixture_wrong_quantity TO quantity;
 SQL
 sql < docs/kg-inventory-sql/02-apply-kg-inventory.sql
-sql < docs/kg-inventory-sql/03-postflight.sql
 sql < tests/kg-db/assertions.sql
+sql < tests/kg-db/subscription-fixture.sql
+sql < docs/kg-inventory-sql/01b-preflight-subscriptions.sql
+sql < docs/kg-inventory-sql/02b-apply-subscription-reservations.sql
+sql < docs/kg-inventory-sql/03-postflight.sql
+sql < tests/kg-db/subscription-assertions.sql
 if sql < docs/kg-inventory-sql/01-preflight.sql > "$runbook_tmp/repeat.log" 2>&1; then echo 'FAIL: repeated migration was not rejected'; exit 1; fi
 if sql < docs/kg-inventory-sql/04-emergency-stop.sql > "$runbook_tmp/guard.log" 2>&1; then echo 'FAIL: emergency guard did not block'; exit 1; fi
 sql < docs/kg-inventory-sql/03-postflight.sql
 sed "s/IF 'NOT_APPROVED'/IF 'STOP_KG_ORDER_TRIGGERS'/" docs/kg-inventory-sql/04-emergency-stop.sql > "$runbook_tmp/stop.sql"
 sql < "$runbook_tmp/stop.sql"
 sql <<'SQL'
-SELECT test_assert((SELECT count(*)=2 FROM pg_trigger WHERE tgname IN ('kg_capture_item','kg_order_changed') AND tgenabled='D'),'both order triggers disabled');
+SELECT test_assert((SELECT count(*)=4 FROM pg_trigger WHERE tgname IN ('kg_capture_item','kg_order_changed','kg_subscription_changed','kg_spec_changed') AND tgenabled='D'),'all four accounting triggers disabled');
+SET test.uid='00000000-0000-0000-0000-000000000001';
+SELECT test_assert((kg_report()->>'accounting_paused')::boolean,'UI report marks accounting paused');
 CREATE TEMP TABLE before_stop AS SELECT count(*) AS n FROM kg_movements;
 UPDATE orders SET payment_status='pending' WHERE order_number='legacy';
 SELECT test_assert((SELECT count(*) FROM kg_movements)=(SELECT n FROM before_stop),'no ledger mutations while stopped');

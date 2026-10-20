@@ -6,12 +6,19 @@ import React, {
   useRef,
   useState,
 } from "react";
+import KgSubscriptionSettings, {
+  type RawBaseline,
+  type ContractPlan,
+  type DeliverySlot,
+  type SubscriptionRow,
+} from "./KgSubscriptionSettings";
 import LegacyInventorySystem from "./LegacyInventorySystem";
 import { isKgReportUnavailable } from "@/lib/kgInventoryAvailability";
 import { supabase } from "@/lib/supabase";
 import {
   varieties,
   summarize,
+  summarizeRaw,
   unresolvedOrders,
   type Movement,
   type Snapshot,
@@ -32,6 +39,17 @@ type Spec = {
   note: string;
 };
 type Data = {
+  accounting_version?: number;
+  accounting_paused?: boolean;
+  raw_baselines?: RawBaseline[];
+  plans?: ContractPlan[];
+  slots?: DeliverySlot[];
+  subscriptions?: SubscriptionRow[];
+  harvest_rules?: {
+    season_id: string;
+    variety_key: string;
+    end_month: string;
+  }[];
   reviews: LegacyReview[];
   seasons: Season[];
   products: Product[];
@@ -54,7 +72,7 @@ const empty: Data = {
   sales: [],
 };
 const formatKg = (n: number) =>
-  `${n.toLocaleString("ja-JP", { maximumFractionDigits: 3 })} kg`;
+  `${n.toLocaleString("ja-JP", { maximumFractionDigits: 6 })} kg`;
 const control =
   "mt-1 min-h-11 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm";
 const button =
@@ -67,6 +85,7 @@ const kinds: Record<string, string> = {
   home_use: "自家用",
   adjustment: "理由付き調整",
   ec: "EC状態変更",
+  forecast: "定期の将来確保",
   legacy_review: "旧確保照合",
 };
 export default function InventorySystem() {
@@ -84,6 +103,7 @@ export default function InventorySystem() {
   const [movement, setMovement] = useState({
     variety: "koshihikari",
     kind: "receipt",
+    milling: "",
     kg: "",
     reason: "",
   });
@@ -132,17 +152,38 @@ export default function InventorySystem() {
     void load();
   }, [load]);
   const unknown = useMemo(
-    () => unresolvedOrders(data.orders, data.snapshots),
+    () =>
+      unresolvedOrders(
+        data.orders,
+        data.snapshots,
+        data.accounting_version === 2,
+      ),
     [data],
   );
-  const rows = summarize(
-    season,
-    data.movements,
-    data.stocks,
-    data.sales,
-    data.reviews,
-  );
-  const uncertain = unknown.length > 0 || rows.some((r) => r.reviewRequired);
+  const rawMode = data.accounting_version === 2;
+  const rows = rawMode
+    ? summarizeRaw(season, data.movements, data.raw_baselines || [])
+    : summarize(season, data.movements, data.stocks, data.sales, data.reviews);
+  const contractIssues =
+    (data.subscriptions || []).filter(
+      (s) =>
+        ["active", "trialing", "paused", "past_due"].includes(s.status) &&
+        !(data.plans || []).some((p) => p.subscription_id === s.id),
+    ).length +
+    (data.plans || []).filter((p) => !!p.issue).length +
+    (data.slots || []).filter(
+      (s) =>
+        !s.canceled &&
+        !s.item_id &&
+        s.shipping_date <
+          new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10),
+    ).length;
+  const uncertain =
+    unknown.length > 0 ||
+    contractIssues > 0 ||
+    rows.some(
+      (r) => r.reviewRequired || ("basisMissing" in r && r.basisMissing),
+    );
   async function save(
     action: () => PromiseLike<{ error: { message: string } | null }>,
   ) {
@@ -168,6 +209,18 @@ export default function InventorySystem() {
   async function record(e: React.FormEvent) {
     e.preventDefault();
     if (!supabase) return;
+    const convertsProduct =
+      rawMode && !["receipt", "adjustment"].includes(movement.kind);
+    const factor = (
+      { white: 1.1, partial: 1.05, brown: 1 } as Record<string, number>
+    )[movement.milling];
+    if (convertsProduct && !factor) {
+      setError("販売・使用分の精米区分を選択してください");
+      return;
+    }
+    const amount = convertsProduct
+      ? Math.round(Number(movement.kg) * factor * 1e6) / 1e6
+      : Number(movement.kg);
     request.current ||= crypto.randomUUID();
     const saved = await save(() =>
       supabase!.rpc("kg_record_movement", {
@@ -175,8 +228,10 @@ export default function InventorySystem() {
         season,
         variety: movement.variety,
         kind: movement.kind,
-        kg: Number(movement.kg),
-        reason: movement.reason,
+        kg: amount,
+        reason: convertsProduct
+          ? `${movement.reason} / 製品${movement.kg}kg・${movement.milling}×${factor}`
+          : movement.reason,
       }),
     );
     if (saved) setMovement((m) => ({ ...m, kg: "", reason: "" }));
@@ -212,6 +267,21 @@ export default function InventorySystem() {
           ),
     );
   }
+  if (rawMode && data.accounting_paused)
+    return (
+      <section
+        role="alert"
+        className="rounded-xl border border-red-300 bg-red-50 p-5"
+      >
+        <h1 className="text-xl font-bold">kg在庫連動を停止中</h1>
+        <p>
+          台帳は最新ではありません。在庫数の利用・編集を止め、停止期間の注文・出荷・契約変更を照合してください。トリガー再開だけでは過去イベントは再生されません。
+        </p>
+        <button className={`${button} mt-3`} onClick={load}>
+          状態を再確認
+        </button>
+      </section>
+    );
   if (legacyMode && !loading)
     return (
       <div className="space-y-6">
@@ -245,13 +315,13 @@ export default function InventorySystem() {
       </header>
       <div className="rounded-xl bg-amber-50 p-4 text-sm space-y-2">
         <p>
-          販売可能量は倉庫の現物量ではありません。支払済み・未出荷も販売済みに含みます。精米前後の重量基準を統一してください。
+          販売可能量は倉庫の現物量ではありません。支払済み・未出荷は玄米基準では確保中として扱います。精米前後の重量基準を統一してください。
         </p>
         <p>
           未判定がある場合、販売可能量は確定できません。年産が不明な注文は全年度共通の要確認として表示します。発送済み返品は返金だけでは入庫せず、検品後に理由付き調整を登録してください。
         </p>
         <p>
-          既存の手動確保は自動確保と重複する可能性があるため別表示します。照合完了まで販売可能量は未確定です。将来の定期配送は確保しません。
+          既存の手動確保は自動確保と重複する可能性があるため別表示します。照合完了まで販売可能量は未確定です。玄米基準では確認済み発送回の将来分を確保します。
         </p>
       </div>
       <div className="flex flex-wrap gap-3 items-end">
@@ -312,7 +382,9 @@ export default function InventorySystem() {
       ) : (
         ready && (
           <>
-            <p className="font-semibold">未判定 {unknown.length}件（全年度）</p>
+            <p className="font-semibold">
+              未判定 {unknown.length + contractIssues}件（全年度）
+            </p>
             <section
               aria-label="銘柄別在庫"
               className="grid gap-4 lg:grid-cols-3"
@@ -324,20 +396,42 @@ export default function InventorySystem() {
                     {[
                       ["入庫・調整後", r.incoming],
                       ["販売・使用済み", r.used],
-                      ["確保中（EC＋照合済み）", r.held],
-                      [
-                        r.reviewRequired
-                          ? "旧確保（要照合）"
-                          : "旧確保（原記録）",
-                        r.legacyHeld,
-                      ],
+                      ["確保中（注文＋将来＋EC以外）", r.held],
+                      ...(rawMode
+                        ? [
+                            [
+                              "うち定期の将来確保",
+                              "futureHeld" in r ? Number(r.futureHeld) : 0,
+                            ],
+                          ]
+                        : []),
+                      ...(!rawMode
+                        ? [
+                            [
+                              r.reviewRequired
+                                ? "旧確保（要照合）"
+                                : "旧確保（原記録）",
+                              r.legacyHeld,
+                            ],
+                          ]
+                        : []),
                     ].map(([label, n]) => (
-                      <div className="flex justify-between gap-2" key={label}>
-                        <dt>{label}</dt>
+                      <div
+                        className="flex justify-between gap-2"
+                        key={String(label)}
+                      >
+                        <dt>{String(label)}</dt>
                         <dd>{formatKg(n as number)}</dd>
                       </div>
                     ))}
                   </dl>
+                  {rawMode &&
+                    "basisMissing" in r &&
+                    Boolean(r.basisMissing) && (
+                      <p className="text-amber-800">
+                        玄米基準の入庫・旧使用量が未確認
+                      </p>
+                    )}
                   <p className="mt-4 font-bold">
                     販売可能: {uncertain ? "未確定" : formatKg(r.available)}
                   </p>
@@ -355,7 +449,7 @@ export default function InventorySystem() {
                 </article>
               ))}
             </section>
-            {rows.some((r) => r.legacyHeld > 0) && (
+            {!rawMode && rows.some((r) => r.legacyHeld > 0) && (
               <section className="rounded-xl border bg-amber-50 p-5">
                 <h2 className="font-bold">旧手動確保の個別照合</h2>
                 <p className="text-sm">
@@ -398,7 +492,7 @@ export default function InventorySystem() {
                       className={control}
                       type="number"
                       min="0"
-                      step="0.001"
+                      step="0.000001"
                       value={legacy.kg}
                       onChange={(e) =>
                         setLegacy({ ...legacy, kg: e.target.value })
@@ -422,12 +516,26 @@ export default function InventorySystem() {
                 </form>
               </section>
             )}
+            {rawMode && (
+              <KgSubscriptionSettings
+                season={season}
+                baselines={data.raw_baselines || []}
+                rules={data.harvest_rules || []}
+                plans={data.plans || []}
+                slots={data.slots || []}
+                subscriptions={data.subscriptions || []}
+                products={data.products}
+                orders={data.orders}
+                save={save}
+                busy={busy}
+              />
+            )}
             <section className="rounded-xl border bg-white p-5">
               <h2 className="text-lg font-bold">
                 入庫・販売・使用・調整を記録
               </h2>
               <p className="text-sm mt-1">
-                EC注文はここに再入力しないでください。訂正は削除せず、理由付き調整を追加します。
+                入庫・調整は玄米kg、直売・使用は製品kgと精米区分を入力し玄米換算します。EC注文はここに再入力しないでください。訂正は削除せず、理由付き調整を追加します。
               </p>
               <form
                 onSubmit={record}
@@ -461,7 +569,12 @@ export default function InventorySystem() {
                     }}
                   >
                     {Object.entries(kinds)
-                      .filter(([k]) => k !== "ec" && k !== "legacy_review")
+                      .filter(
+                        ([k]) =>
+                          k !== "ec" &&
+                          k !== "legacy_review" &&
+                          k !== "forecast",
+                      )
                       .map(([k, v]) => (
                         <option key={k} value={k}>
                           {v}
@@ -469,13 +582,33 @@ export default function InventorySystem() {
                       ))}
                   </select>
                 </label>
+                {rawMode &&
+                  !["receipt", "adjustment"].includes(movement.kind) && (
+                    <label>
+                      販売・使用の精米区分
+                      <select
+                        required
+                        className={control}
+                        value={movement.milling}
+                        onChange={(e) => {
+                          request.current = null;
+                          setMovement({ ...movement, milling: e.target.value });
+                        }}
+                      >
+                        <option value="">選択してください</option>
+                        <option value="white">白米 ×1.1</option>
+                        <option value="partial">分づき ×1.05</option>
+                        <option value="brown">玄米 ×1</option>
+                      </select>
+                    </label>
+                  )}
                 <label>
                   重量 kg（調整のみ負数可）
                   <input
                     required
                     className={control}
                     type="number"
-                    step="0.001"
+                    step="0.000001"
                     value={movement.kg}
                     onChange={(e) => {
                       request.current = null;
@@ -580,7 +713,7 @@ export default function InventorySystem() {
                 </label>
                 {!excluded && (
                   <label className="sm:col-span-2">
-                    1点あたりの構成品（JSON・kgは小数3桁まで）
+                    1点あたりの構成品（製品kgは小数3桁、millingはwhite/partial/brown）
                     <textarea
                       required
                       rows={4}
@@ -591,6 +724,7 @@ export default function InventorySystem() {
                           season_id: season || "年産ID",
                           variety_key: "koshihikari",
                           unit_kg: 5,
+                          milling: "white",
                         },
                       ])}
                       onChange={(e) => setComponents(e.target.value)}
@@ -606,6 +740,7 @@ export default function InventorySystem() {
                                 season_id: season,
                                 variety_key: "koshihikari",
                                 unit_kg: 5,
+                                milling: "white",
                               },
                             ],
                             null,

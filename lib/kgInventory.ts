@@ -7,6 +7,8 @@ export type Component = {
   season_id: string;
   variety_key: keyof typeof varieties;
   unit_kg: number;
+  milling?: "white" | "partial" | "brown";
+  raw_unit_kg?: number;
 };
 export type Movement = {
   id: string;
@@ -19,9 +21,11 @@ export type Movement = {
   reason: string;
   created_at: string;
   order_id?: string;
+  accounting_version?: number;
 };
 export type Snapshot = {
   item_id: string;
+  accounting_version?: number;
   reason: string;
   excluded: boolean;
   components: Component[];
@@ -30,6 +34,7 @@ export type Snapshot = {
 export type Item = {
   id: string;
   product_title: string;
+  is_subscription?: boolean;
   quantity: number;
   selected_options: unknown;
   order_id: string;
@@ -37,6 +42,7 @@ export type Item = {
 export type Order = {
   id: string;
   order_number: string;
+  stripe_subscription_id?: string;
   payment_status: string;
   order_status: string;
   order_items: Item[];
@@ -108,7 +114,11 @@ export function summarize(
     };
   });
 }
-export function unresolvedOrders(orders: Order[], snapshots: Snapshot[]) {
+export function unresolvedOrders(
+  orders: Order[],
+  snapshots: Snapshot[],
+  requireRaw = false,
+) {
   const byId = new Map(snapshots.map((s) => [s.item_id, s]));
   return orders.flatMap<{
     id: string;
@@ -129,7 +139,12 @@ export function unresolvedOrders(orders: Order[], snapshots: Snapshot[]) {
       ];
     return o.order_items.flatMap((i) => {
       const s = byId.get(i.id);
-      if (s && !s.reason.startsWith("REVIEW:")) return [];
+      if (
+        s &&
+        !s.reason.startsWith("REVIEW:") &&
+        (!requireRaw || s.accounting_version === 2)
+      )
+        return [];
       return [
         {
           id: i.id,
@@ -137,10 +152,59 @@ export function unresolvedOrders(orders: Order[], snapshots: Snapshot[]) {
           title: `${i.product_title} × ${i.quantity}`,
           item: i,
           reason: s
-            ? s.reason
+            ? requireRaw && s.accounting_version !== 2
+              ? "旧重量基準のスナップショット（自動換算しません）"
+              : s.reason
             : "購入時情報なし・未紐付け（年産を推定しません）",
         },
       ];
     });
+  });
+}
+
+/** Raw-rice v2 uses integer milligrams; old unconfirmed values are not converted. */
+export function summarizeRaw(
+  season: string,
+  movements: Movement[],
+  baselines: {
+    season_id: string;
+    variety_key: string;
+    incoming_kg: number;
+    external_used_kg: number;
+    external_held_kg: number;
+  }[],
+) {
+  const mg = (n: unknown) => Math.round(Number(n || 0) * 1_000_000);
+  return Object.entries(varieties).map(([key, label]) => {
+    const b = baselines.find(
+      (x) => x.season_id === season && x.variety_key === key,
+    );
+    let incoming = mg(b?.incoming_kg),
+      used = mg(b?.external_used_kg),
+      held = mg(b?.external_held_kg),
+      future = 0;
+    for (const m of movements.filter(
+      (x) =>
+        x.season_id === season &&
+        x.variety_key === key &&
+        x.accounting_version === 2,
+    )) {
+      incoming += mg(m.incoming_kg);
+      used += mg(m.used_kg);
+      held += mg(m.held_kg);
+      if (m.kind === "forecast") future += mg(m.held_kg);
+    }
+    return {
+      key,
+      label,
+      incoming: incoming / 1e6,
+      used: used / 1e6,
+      held: held / 1e6,
+      futureHeld: future / 1e6,
+      legacyHeld: 0,
+      reviewRequired: false,
+      basisMissing: !b,
+      available: (incoming - used - held) / 1e6,
+    };
   });
 }

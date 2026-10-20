@@ -1,3 +1,4 @@
+import { cloneRecurringItem, mergeSubscriptionMetadata, persistSubscriptionState } from '@/lib/subscriptionSnapshots';
 // Stripe Webhook handler (Next.js App Router Route Handler)
 // - Verifies Stripe signature with STRIPE_WEBHOOK_SECRET
 // - Idempotent via public.stripe_webhook_events (event_id)
@@ -1036,7 +1037,7 @@ export async function POST(request: Request) {
       // アプリ側で保持する予約変更を Stripe webhook で消さない。
       const { data: existingSubscription } = await supabaseAdmin
         .from('subscriptions')
-        .select('metadata')
+        .select('id, metadata')
         .eq('stripe_subscription_id', stripeSubscriptionId)
         .maybeSingle();
 
@@ -1050,8 +1051,8 @@ export async function POST(request: Request) {
         // Stripeのmetadataに加えて、Stripe Subscriptionトップレベルの cancel_at_period_end も保存
         // これにより「期末解約予約中」の状態がwebhook再受信でも消えなくなる
         metadata: {
-          ...((existingSubscription?.metadata as Record<string, unknown>) ?? {}),
-          ...(sub.metadata ?? {}),
+          ...mergeSubscriptionMetadata(existingSubscription?.metadata, sub.metadata),
+          pause_collection: sub.pause_collection ?? null,
           cancel_at_period_end: Boolean(sub.cancel_at_period_end),
           // cancel_at（将来のキャンセル予定時刻）も入れておく
           ...(sub.cancel_at
@@ -1063,11 +1064,24 @@ export async function POST(request: Request) {
         updated_at: new Date().toISOString(),
       };
 
-      const { error: upsertErr } = await supabaseAdmin
-        .from('subscriptions')
-        .upsert([row], { onConflict: 'stripe_subscription_id' });
+      let upsertErr: any = null;
+      try {
+        // Updates merge against current DB state with compare-and-set, not the earlier read.
+        const stripeState = { ...row, metadata: { ...(sub.metadata ?? {}), pause_collection: sub.pause_collection ?? null, cancel_at_period_end: Boolean(sub.cancel_at_period_end), cancel_at: sub.cancel_at ? new Date(sub.cancel_at * 1000).toISOString() : null } };
+        if (existingSubscription?.id) {
+          await persistSubscriptionState(supabaseAdmin, existingSubscription.id, stripeState);
+        } else {
+          const inserted = await supabaseAdmin.from('subscriptions').insert([row]);
+          if (inserted.error?.code === '23505') {
+            const { data: concurrent, error: lookupError } = await supabaseAdmin.from('subscriptions').select('id').eq('stripe_subscription_id', stripeSubscriptionId).single();
+            if (lookupError || !concurrent) throw lookupError || inserted.error;
+            await persistSubscriptionState(supabaseAdmin, concurrent.id, stripeState);
+          } else if (inserted.error) throw inserted.error;
+        }
+      } catch (error) { upsertErr = error; }
       if (upsertErr) {
         console.error('[Webhook] subscriptions upsert error:', upsertErr);
+        return NextResponse.json({ error: 'subscription_state_sync_failed' }, { status: 500 });
       }
       return NextResponse.json({ received: true });
     }
@@ -1226,7 +1240,7 @@ export async function POST(request: Request) {
       // 新しい発送回だけに現在の商品・配送先スナップショットを反映する。
       const { data: subscriptionRow } = await supabaseAdmin
         .from('subscriptions')
-        .select('metadata')
+        .select('id, metadata')
         .eq('stripe_subscription_id', stripeSubscriptionId)
         .maybeSingle();
       const currentProduct = subscriptionRow?.metadata?.current_product;
@@ -1238,9 +1252,7 @@ export async function POST(request: Request) {
         .eq('order_id', original.id);
 
       const newItems = (origItems || []).map((it: any) => {
-        const next: any = { ...it };
-        delete next.id;
-        delete next.created_at;
+        const next: any = cloneRecurringItem(it);
         if (it.is_subscription && currentProduct?.product_id) {
           Object.assign(next, {
             product_id: currentProduct.product_id,
