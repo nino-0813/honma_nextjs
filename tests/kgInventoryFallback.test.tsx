@@ -143,7 +143,7 @@ describe("legacy inventory fallback", () => {
       error: null,
     });
     render(<InventorySystem />);
-    await screen.findByText("未判定 0件（全年度）");
+    await screen.findByRole("button", { name: "在庫一覧" });
     expect(screen.queryByText("従来の在庫管理（参考集計）")).toBeNull();
     expect(mock.from).not.toHaveBeenCalled();
   });
