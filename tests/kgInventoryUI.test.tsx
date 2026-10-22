@@ -54,8 +54,13 @@ describe("admin kg screen", () => {
       error: null,
     });
     render(<InventorySystem />);
-    await screen.findByText("不足 5 kg");
-    expect(screen.getAllByText("販売可能: 未確定")).toHaveLength(3);
+    await screen.findByText("差引き（参考値）");
+    expect(
+      screen.getByText("差引き（参考値）").parentElement?.textContent,
+    ).toContain("-5 kg");
+    expect(
+      screen.getAllByText("未確認分があるため、販売可能量は未確定です。"),
+    ).toHaveLength(3);
     expect(screen.getByText(/未判定 1件/)).toBeTruthy();
   });
   it("never renders zero stock on a failed report fetch", async () => {

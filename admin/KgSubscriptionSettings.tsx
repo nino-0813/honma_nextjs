@@ -193,6 +193,8 @@ export default function KgSubscriptionSettings(p: Props) {
           }}
         >
           <p className="sm:col-span-3 text-sm">
+            収穫量は後から登録できます。未入力の間は登録せずに戻って構いません。0kgを仮入力して確定しないでください。
+            <br />
             選択年産・銘柄の玄米総入庫と、移行前のEC以外の使用・確保を証拠に基づき一度だけ登録します。現在庫の転記ではありません。EC分は注文照合で別に反映します。登録後の訂正は理由付き調整で記録します。
           </p>
           {(

@@ -76,10 +76,10 @@ it("does not assume a deadline year or convert old balances", async () => {
     "この年産の最終発送月（未確定の値を入れない）",
   );
   expect((month as HTMLInputElement).value).toBe("");
-  expect(screen.getAllByText("販売可能: 未確定")).toHaveLength(3);
-  expect(screen.getAllByText("玄米基準の入庫・旧使用量が未確認")).toHaveLength(
-    3,
-  );
+  expect(screen.getAllByText("差引き（収穫量未登録・参考値）")).toHaveLength(3);
+  expect(
+    screen.getAllByText("収穫量は未登録です。あとから登録できます。"),
+  ).toHaveLength(3);
 });
 it("hides stale numbers and edit controls when the accounting triggers are paused", async () => {
   rpc.mockResolvedValue({
