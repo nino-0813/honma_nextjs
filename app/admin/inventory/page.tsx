@@ -1,7 +1,8 @@
-'use client';
+"use client";
 
-import InventorySystem from '@/admin/InventorySystem';
+import InventorySystem from "@/admin/InventorySystem";
+import InventoryWorkspace from "@/admin/InventoryWorkspace";
 
 export default function AdminInventoryPage() {
-  return <InventorySystem />;
+  return <InventoryWorkspace ricePanel={<InventorySystem />} />;
 }
