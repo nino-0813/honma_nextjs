@@ -8,6 +8,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { computeBillingCycleAnchor, intervalToMonths, computeFirstShippingDate } from '@/lib/subscriptionShipping';
 import { sendBrevoEmail } from '@/lib/brevo';
+import { resolveStripePaymentMethod } from '@/lib/stripePaymentMethod';
 import { SUBSCRIPTION_INTERVAL_LABELS } from '@/types';
 
 type SubscriptionIntervalKey =
@@ -853,9 +854,19 @@ export async function POST(request: Request) {
       }
 
       const wasPaid = order.payment_status === 'paid';
-      const wasBankTransfer =
-        order.payment_method === 'bank_transfer' ||
-        (Array.isArray(pi.payment_method_types) && pi.payment_method_types.includes('customer_balance'));
+      let actualPaymentMethod: string;
+      try {
+        actualPaymentMethod = await resolveStripePaymentMethod(stripe, pi);
+      } catch (error) {
+        console.error('[Webhook] actual payment method lookup failed', {
+          paymentIntentId,
+          eventId: event.id,
+          message: error instanceof Error ? error.message : 'unknown',
+        });
+        // Keep the order unchanged and let Stripe retry this event.
+        return NextResponse.json({ error: 'payment_method_lookup_failed' }, { status: 500 });
+      }
+      const wasBankTransfer = actualPaymentMethod === 'bank_transfer';
 
       const nextOrderNumber = order.order_number || generateOrderNumber();
       const nowIso = new Date().toISOString();
@@ -866,7 +877,7 @@ export async function POST(request: Request) {
         .update({
           payment_status: 'paid',
           paid_at: nowIso,
-          payment_method: wasBankTransfer ? 'bank_transfer' : ((pi.payment_method_types && pi.payment_method_types[0]) || 'card'),
+          payment_method: actualPaymentMethod,
           order_number: nextOrderNumber,
           order_status: 'processing',
           notes: nextNotes ?? null,
