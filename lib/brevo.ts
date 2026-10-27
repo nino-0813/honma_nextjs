@@ -8,6 +8,7 @@ const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
 type BrevoRecipient = { email: string; name?: string };
 
 export interface SendBrevoEmailParams {
+  sender?: BrevoRecipient;
   to: BrevoRecipient[];
   /** Brevoのテンプレートを使う場合はテンプレートID（指定時は subject/htmlContent は不要） */
   templateId?: number;
@@ -28,6 +29,7 @@ export interface SendBrevoEmailParams {
  * - 失敗時は例外を投げるので、呼び出し側で try/catch すること。
  */
 export async function sendBrevoEmail({
+  sender,
   to,
   templateId,
   params,
@@ -48,11 +50,11 @@ export async function sendBrevoEmail({
     if (params) body.params = params;
   } else {
     // 直接送信：送信元アドレスが必要
-    const fromEmail = process.env.BREVO_FROM_EMAIL;
+    const fromEmail = sender?.email || process.env.BREVO_FROM_EMAIL;
     if (!fromEmail) {
       throw new Error('BREVO_FROM_EMAIL が設定されていません（Brevoで認証済みの送信者アドレス）。');
     }
-    const fromName = process.env.BREVO_FROM_NAME || 'イケベジ';
+    const fromName = sender?.name || process.env.BREVO_FROM_NAME || 'イケベジ';
     body.sender = { email: fromEmail, name: fromName };
     if (subject) body.subject = subject;
     if (htmlContent) body.htmlContent = htmlContent;

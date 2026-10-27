@@ -9,6 +9,8 @@ import { createClient } from '@supabase/supabase-js';
 import { computeBillingCycleAnchor, intervalToMonths, computeFirstShippingDate } from '@/lib/subscriptionShipping';
 import { sendBrevoEmail } from '@/lib/brevo';
 import { resolveStripePaymentMethod } from '@/lib/stripePaymentMethod';
+import { bankTransferDetails, sendBankTransferEmail } from '@/lib/bankTransferEmail';
+import type StripeType from 'stripe';
 import { SUBSCRIPTION_INTERVAL_LABELS } from '@/types';
 
 type SubscriptionIntervalKey =
@@ -124,6 +126,7 @@ async function sendOrderConfirmationEmail(
     customerTemplateId?: number;
     sendAdmin?: boolean;
     extraParams?: Record<string, unknown>;
+    bankInstructions?: StripeType.PaymentIntent.NextAction.DisplayBankTransferInstructions;
   } = {}
 ): Promise<void> {
   // 明細（注文時のスナップショットが order_items に保存されている）
@@ -214,7 +217,11 @@ async function sendOrderConfirmationEmail(
         params.start = fmtJaDate(startDate);
       }
 
-      const result = await sendBrevoEmail({
+      const result = options.bankInstructions ? await sendBankTransferEmail({
+        email: order.email, name: customerName, orderNumber,
+        total: numJa(order.total), due: String(options.extraParams?.payment_due || ''),
+        instructions: options.bankInstructions, items: templateItems, templateId,
+      }) : await sendBrevoEmail({
         to: [{ email: order.email, name: customerName }],
         templateId,
         params,
@@ -227,9 +234,11 @@ async function sendOrderConfirmationEmail(
         messageId: result.messageId,
       });
     } catch (e: any) {
+      if (options.bankInstructions) throw e;
       console.error('[OrderMail] customer mail failed (ignored)', e?.message || e);
     }
   } else {
+    if (options.bankInstructions) throw new Error('Bank transfer order email unavailable');
     console.warn('[OrderMail] order has no email, skip customer mail', { orderId: order?.id });
   }
 
@@ -706,6 +715,10 @@ export async function POST(request: Request) {
         try { await supabaseAdmin.from('stripe_webhook_events').delete().eq('event_id', event.id); } catch {}
         return NextResponse.json({ error: 'order_not_found' }, { status: 500 });
       }
+      // A delayed requires_action event must not reopen a settled/cancelled order.
+      if (['paid', 'refunded'].includes(order.payment_status) || order.order_status === 'cancelled') {
+        return NextResponse.json({ received: true, skipped: 'order_no_longer_pending' });
+      }
       if (!order.inventory_reserved_at) {
         const { error: reserveErr } = await supabaseAdmin.rpc('reserve_bank_transfer_order', { p_order_id: order.id });
         if (reserveErr) {
@@ -730,12 +743,26 @@ export async function POST(request: Request) {
       }).eq('id', order.id);
 
       if (!isDuplicateEvent) {
-        const instructionsUrl = pi.next_action?.display_bank_transfer_instructions?.hosted_instructions_url || '';
         const dueDate = new Date(paymentDueAt);
         try {
+          let instructions = pi.next_action.display_bank_transfer_instructions;
+          const details = bankTransferDetails(instructions);
+          if (!details.bank || !details.url) {
+            const current = await stripe.paymentIntents.retrieve(pi.id);
+            if (current.status !== 'requires_action' || current.next_action?.type !== 'display_bank_transfer_instructions') {
+              throw new Error('Bank transfer instructions are no longer pending');
+            }
+            instructions = current.next_action.display_bank_transfer_instructions;
+          }
+          const resolved = bankTransferDetails(instructions);
+          if (!instructions || (!resolved.bank && !resolved.url)) {
+            throw new Error('Bank transfer instructions unavailable after refresh');
+          }
+          const instructionsUrl = resolved.url || '';
           await sendOrderConfirmationEmail(supabaseAdmin, order, bankOrderNumber, {
             customerTemplateId: BANK_TRANSFER_ORDER_TEMPLATE_ID,
             sendAdmin: false,
+            bankInstructions: instructions,
             extraParams: {
               instructions_url: instructionsUrl,
               payment_instructions_url: instructionsUrl,
@@ -743,7 +770,12 @@ export async function POST(request: Request) {
             },
           });
         } catch (mailErr: any) {
-          console.error('[BankTransfer] pending mail failed (ignored)', mailErr?.message || mailErr);
+          // Release only the event marker, not the stock reservation, so Stripe
+          // can retry a failed lookup/send without reserving stock twice.
+          console.error('[BankTransfer] instructions mail failed', { eventId: event.id, orderId: order.id });
+          const { error: retryErr } = await supabaseAdmin.from('stripe_webhook_events').delete().eq('event_id', event.id);
+          if (retryErr) console.error('[BankTransfer] retry marker release failed', { eventId: event.id });
+          return NextResponse.json({ error: 'bank_transfer_email_failed' }, { status: 503 });
         }
       }
       return NextResponse.json({ received: true, bank_transfer: true });
