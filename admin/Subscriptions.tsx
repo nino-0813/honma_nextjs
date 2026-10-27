@@ -5,6 +5,9 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { SUBSCRIPTION_INTERVAL_LABELS, SubscriptionInterval } from '@/types';
 import { computeNextShippingDate, formatJapaneseDate } from '@/lib/subscriptionShipping';
+import { fetchAllAnalyticsPages } from '@/lib/storeAnalytics';
+import { shipmentDay, shipmentOrders, shipmentHasShipped, nextShipmentProduct, csvText, jstDay } from '@/lib/adminShipmentData';
+import SubscriptionAnnualSummary from './SubscriptionAnnualSummary';
 
 interface AdminSubscriptionRow {
   id: string;
@@ -70,17 +73,19 @@ const Subscriptions: React.FC = () => {
   >([]);
   const [cancelingId, setCancelingId] = useState<string | null>(null);
   const [cleaningUp, setCleaningUp] = useState(false);
+  const [allOrders, setAllOrders] = useState<any[]>([]);
+  const [shipmentMonth, setShipmentMonth] = useState('');
+  const [selectedSubs, setSelectedSubs] = useState<Set<string>>(new Set());
+  const [productLoadError, setProductLoadError] = useState(false);
 
   const fetchSubs = async () => {
     if (!supabase) return;
     try {
       setLoading(true);
       setError(null);
-      const { data, error: err } = await supabase
-        .from('subscriptions')
-        .select('*')
-        .order('created_at', { ascending: false });
-      if (err) throw err;
+      const client = supabase;
+      const data = await fetchAllAnalyticsPages<any>((from, to) => client.from('subscriptions').select('*', { count: 'exact' }).order('id').range(from, to));
+      setSelectedSubs(new Set());
 
       const subscriptionRows = (data ?? []) as AdminSubscriptionRow[];
       const subscriptionIds = subscriptionRows.map((row) => row.stripe_subscription_id);
@@ -90,11 +95,9 @@ const Subscriptions: React.FC = () => {
 
       const [ordersRes, profilesRes] = await Promise.all([
         subscriptionIds.length > 0
-          ? supabase
-              .from('orders')
-              .select('stripe_subscription_id, first_name, last_name, created_at')
-              .in('stripe_subscription_id', subscriptionIds)
-              .order('created_at', { ascending: false })
+          ? fetchAllAnalyticsPages<any>((from, to) => client.from('orders')
+              .select('*,order_items(*)', { count: 'exact' }).in('stripe_subscription_id', subscriptionIds)
+              .order('id').range(from, to)).then(data => ({ data, error: null }), error => ({ data: [], error }))
           : Promise.resolve({ data: [], error: null }),
         authUserIds.length > 0
           ? supabase.from('profiles').select('id, first_name, last_name').in('id', authUserIds)
@@ -104,6 +107,8 @@ const Subscriptions: React.FC = () => {
       if (ordersRes.error) {
         console.warn('定期購入者名の注文情報取得に失敗しました:', ordersRes.error);
       }
+      setProductLoadError(Boolean(ordersRes.error));
+      setAllOrders(ordersRes.data || []);
       if (profilesRes.error) {
         console.warn('定期購入者名のプロフィール取得に失敗しました:', profilesRes.error);
       }
@@ -144,6 +149,7 @@ const Subscriptions: React.FC = () => {
 
   const filtered = useMemo(() => {
     return subs.filter((s) => {
+      if (shipmentMonth && (!shipmentDay(s)?.startsWith(shipmentMonth) || shipmentHasShipped(s, allOrders))) return false;
       if (statusFilter !== 'all' && s.status !== statusFilter) return false;
       if (intervalFilter !== 'all' && s.interval !== intervalFilter) return false;
       if (search) {
@@ -156,8 +162,29 @@ const Subscriptions: React.FC = () => {
         if (!hit) return false;
       }
       return true;
+    }).sort((a, b) => (shipmentDay(a) || '9999').localeCompare(shipmentDay(b) || '9999'));
+  }, [subs, statusFilter, intervalFilter, search, shipmentMonth, allOrders]);
+
+  const eligibleRows = filtered.filter(s => shipmentDay(s) && !shipmentHasShipped(s, allOrders));
+  const selectedRows = eligibleRows.filter(s => selectedSubs.has(s.id));
+  const allSelected = eligibleRows.length > 0 && eligibleRows.every(s => selectedSubs.has(s.id));
+  const exportShipmentList = () => {
+    const rows = selectedRows.map(sub => {
+      const matches = shipmentOrders(sub, allOrders);
+      const order = matches.length === 1 ? matches[0] : null;
+      const original = allOrders.filter(o => o.stripe_subscription_id === sub.stripe_subscription_id).sort((a, b) => a.created_at.localeCompare(b.created_at))[0];
+      const address = order ? null : sub.metadata?.shipping;
+      const snapshot = order || original;
+      return { 顧客名: sub.customer_name || '氏名未登録', 発送予定日: shipmentDay(sub), 商品: nextShipmentProduct(sub, allOrders),
+        状態: matches.length > 1 ? '対象注文が複数・要確認' : order ? order.payment_status === 'paid' ? '支払済み' : '未決済' : '対象回未照合／注文未作成・要確認',
+        注文番号: order?.order_number || '', 契約ID: sub.stripe_subscription_id,
+        数量: order ? (order.order_items || []).filter((i: any) => i.is_subscription).reduce((n: number, i: any) => n + Number(i.quantity || 0), 0) : sub.metadata?.current_product?.quantity || (original?.order_items || []).filter((i: any) => i.is_subscription).reduce((n: number, i: any) => n + Number(i.quantity || 0), 0),
+        配送先: address?.address || snapshot?.shipping_address || '', 郵便番号: address?.postal_code || snapshot?.shipping_postal_code || '',
+      };
     });
-  }, [subs, statusFilter, intervalFilter, search]);
+    const url = URL.createObjectURL(new Blob([csvText(rows)], { type: 'text/csv;charset=utf-8' }));
+    const link = document.createElement('a'); link.href = url; link.download = '定期便発送予定_確認用.csv'; link.click(); URL.revokeObjectURL(url);
+  };
 
   const counts = useMemo(() => {
     const c: Record<string, number> = { all: subs.length };
@@ -346,6 +373,7 @@ const Subscriptions: React.FC = () => {
   return (
     <>
       <div className="p-6 space-y-6">
+        <SubscriptionAnnualSummary orders={allOrders} />
         {/* ヘッダー: 統計 */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           {[
@@ -372,6 +400,22 @@ const Subscriptions: React.FC = () => {
         </div>
 
         {/* フィルター */}
+        <div className="rounded-lg border border-gray-200 bg-white p-4 space-y-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <label className="text-sm">発送対象月 <input aria-label="発送対象月" type="month" value={shipmentMonth} onChange={e => { setShipmentMonth(e.target.value); setSelectedSubs(new Set()); }} className="ml-2 border border-gray-300 rounded p-2" /></label>
+            <button type="button" onClick={() => { setShipmentMonth(jstDay(new Date()).slice(0, 7)); setSelectedSubs(new Set()); }} className="text-sm underline">今月</button>
+            <button type="button" onClick={() => { setShipmentMonth(''); setSelectedSubs(new Set()); }} className="text-sm underline">すべて</button>
+            <label className="text-sm"><input type="checkbox" checked={allSelected} onChange={() => setSelectedSubs(new Set(allSelected ? [] : eligibleRows.map(s => s.id)))} /> 絞り込み結果の発送対象を全件選択</label>
+            <span className="text-sm">選択 {selectedRows.length}件</span>
+            <button type="button" disabled={!selectedRows.length || productLoadError} onClick={exportShipmentList} className="border rounded px-3 py-2 text-sm disabled:opacity-40">発送予定CSV（確認用）</button>
+          </div>
+          <p className="text-xs text-gray-500">未決済・注文未作成も表示します。CSVは発送指示ではなく確認用です。注文未作成の回に過去注文を代用しません。</p>
+          {selectedRows.map(sub => {
+            const matches = shipmentOrders(sub, allOrders);
+            return <div key={sub.id} className="text-sm">{sub.customer_name || '氏名未登録'}：{matches.length === 1 ? <Link className="text-blue-700 underline" href={`/admin/orders?detail=${encodeURIComponent(matches[0].id)}`}>{matches[0].order_number || '対象注文を見る'}</Link> : matches.length > 1 ? '対象注文が複数あります・要確認' : '対象回未照合／注文未作成・要確認'}</div>;
+          })}
+          {productLoadError && <p role="alert" className="text-sm text-red-700">商品・発送状態を取得できません。CSV出力は停止しています。</p>}
+        </div>
         <div className="bg-white border border-gray-200 rounded-lg p-4 flex flex-col sm:flex-row gap-3">
           <input
             type="text"
@@ -426,11 +470,10 @@ const Subscriptions: React.FC = () => {
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
                   <th className="text-left px-4 py-3 font-medium text-gray-700">顧客</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-700">Subscription ID</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-700">商品・精米区分・重量</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-700">ステータス</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-700">配送頻度</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-700">次回お届け</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-700">開始日</th>
                   <th className="text-right px-4 py-3 font-medium text-gray-700">操作</th>
                 </tr>
               </thead>
@@ -459,14 +502,14 @@ const Subscriptions: React.FC = () => {
                     return (
                       <tr key={sub.id} className="border-b border-gray-100 hover:bg-gray-50">
                         <td className="px-4 py-3">
+                          <input type="checkbox" disabled={!shipmentDay(sub) || shipmentHasShipped(sub, allOrders)} aria-label={`${sub.customer_name || sub.email}を選択`} checked={selectedSubs.has(sub.id)} onChange={e => setSelectedSubs(prev => { const next = new Set(prev); if (e.target.checked) next.add(sub.id); else next.delete(sub.id); return next; })} className="mr-2" />
                           <div className="font-medium text-gray-900">{sub.customer_name || sub.email}</div>
                           {sub.customer_name && (
                             <div className="text-xs text-gray-500 mt-0.5">{sub.email}</div>
                           )}
-                          <div className="text-[11px] text-gray-400 mt-0.5">{sub.stripe_customer_id}</div>
                         </td>
                         <td className="px-4 py-3 font-mono text-xs text-gray-600">
-                          {sub.stripe_subscription_id}
+                          {nextShipmentProduct(sub, allOrders)}
                         </td>
                         <td className="px-4 py-3">
                           <span
@@ -480,7 +523,6 @@ const Subscriptions: React.FC = () => {
                         </td>
                         <td className="px-4 py-3 text-gray-900">{intervalLabel}</td>
                         <td className="px-4 py-3 text-gray-700">{formatJapaneseDate(computeNextShippingDate({ created_at: sub.created_at, next_billing_at: sub.next_billing_at, interval: sub.interval, firstShippingOverride: typeof (sub.metadata as any)?.first_shipping_override === 'string' ? (sub.metadata as any).first_shipping_override : null }))}</td>
-                        <td className="px-4 py-3 text-gray-600">{formatDate(sub.created_at)}</td>
                         <td className="px-4 py-3 text-right">
                           <button
                             type="button"

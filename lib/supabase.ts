@@ -54,6 +54,7 @@ export interface DatabaseProduct {
   display_order: number | null;
   is_visible: boolean | null;
   is_free_shipping: boolean | null;
+  bank_transfer_disabled?: boolean;
   sale_start_at: string | null;
   sale_end_at: string | null;
   scheduled_shipping_date?: string | null;
@@ -99,6 +100,7 @@ export const convertDatabaseProductToProduct = (dbProduct: DatabaseProduct): Pro
     display_order: dbProduct.display_order ?? undefined,
     is_visible: dbProduct.is_visible ?? true,
     isFreeShipping: dbProduct.is_free_shipping ?? false,
+    bankTransferDisabled: dbProduct.bank_transfer_disabled ?? false,
     saleStartAt: (dbProduct as any).sale_start_at ?? undefined,
     saleEndAt: (dbProduct as any).sale_end_at ?? undefined,
     scheduledShippingDate: (dbProduct as any).scheduled_shipping_date ?? undefined,

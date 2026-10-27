@@ -83,6 +83,16 @@ const ProductEditor = () => {
   const [isActive, setIsActive] = useState(true);
   const [isVisible, setIsVisible] = useState(true);
   const [isFreeShipping, setIsFreeShipping] = useState(false);
+  const [bankTransferDisabled, setBankTransferDisabled] = useState(false);
+  const [bankSettingReady, setBankSettingReady] = useState(false);
+  useEffect(() => {
+    if (!supabase) return;
+    let active = true;
+    supabase.from('products').select('bank_transfer_disabled').limit(1).then(({ error }) => {
+      if (active) setBankSettingReady(!error);
+    });
+    return () => { active = false; };
+  }, []);
   const [saleStartAt, setSaleStartAt] = useState('');
   const [saleEndAt, setSaleEndAt] = useState('');
   const [scheduledShippingDate, setScheduledShippingDate] = useState('');
@@ -202,6 +212,7 @@ const ProductEditor = () => {
       setIsActive(data.is_active ?? true);
       setIsVisible(data.is_visible ?? true);
       setIsFreeShipping(data.is_free_shipping ?? false);
+      setBankTransferDisabled(Boolean(data.bank_transfer_disabled));
       const toDatetimeLocal = (iso: string | null) => {
         if (!iso) return '';
         const d = new Date(iso);
@@ -447,6 +458,7 @@ const ProductEditor = () => {
         is_active: isActive,
         is_visible: isActive,
         is_free_shipping: isFreeShipping,
+        ...(bankSettingReady ? { bank_transfer_disabled: bankTransferDisabled } : {}),
         status: isActive ? 'active' : 'draft',
         has_variants: hasVariants,
         variants: legacyVariants,
@@ -565,6 +577,14 @@ const ProductEditor = () => {
             </div>
           </div>
 
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <label className="flex items-center gap-3 text-sm font-medium text-gray-900">
+              <input type="checkbox" checked={bankTransferDisabled} disabled={!bankSettingReady} onChange={e => setBankTransferDisabled(e.target.checked)} />
+              銀行振込 対象外
+            </label>
+            <p className="mt-2 text-xs text-gray-500">対象外の商品を含むカート全体がクレジットカード払いのみになります。定期便は設定に関係なくカードのみです。</p>
+            {!bankSettingReady && <p className="mt-2 text-xs text-amber-700">設定を取得できません。初回は商品別銀行振込設定のSQL適用が必要です。</p>}
+          </div>
           <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-medium text-gray-900">バリエーション設定</h3>

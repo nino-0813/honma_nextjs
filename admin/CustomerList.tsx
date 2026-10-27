@@ -3,6 +3,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import { readAll } from '@/lib/loadStoreAnalytics';
+import { customerFullName, enrichCustomers, normalizedEmail } from '@/lib/adminCustomerData';
 import {
   IconPlus,
   IconSearch,
@@ -33,6 +35,8 @@ interface CustomerRow {
   newsletter_opt_in: boolean | null;
   referrer_name: string | null;
   isProfileOnly?: boolean;
+  activeSubscription?: boolean | null;
+  referred_by_customer_id?: string | null;
 }
 
 const TARGET_CATEGORIES = [
@@ -118,26 +122,23 @@ const CustomerList = () => {
     try {
       setLoading(true);
       setError(null);
-      const [customersResult, profilesResult] = await Promise.all([
-        supabase.from('customers').select('*').order('created_at', { ascending: false }),
-        supabase.from('profiles').select('id, email, first_name, last_name, created_at').order('created_at', { ascending: false }),
+      const [customerRows, profiles, subscriptions, orders, products] = await Promise.all([
+        readAll<CustomerRow>(supabase, 'customers', '*'),
+        readAll<any>(supabase, 'profiles', 'id,email,first_name,last_name,created_at'),
+        readAll<any>(supabase, 'subscriptions', 'id,auth_user_id,email,status'),
+        readAll<any>(supabase, 'orders', 'id,email,created_at,payment_status,order_status,order_items(product_id)'),
+        readAll<any>(supabase, 'products', 'id,category,categories'),
       ]);
-      if (customersResult.error) throw customersResult.error;
-      if (profilesResult.error) {
-        console.warn('プロフィールデータが取得できませんでした:', profilesResult.error);
-      }
-
-      const customerRows = (customersResult.data || []) as CustomerRow[];
       const customerEmails = new Set(
-        customerRows.map((c) => (c.email || '').toLowerCase()).filter(Boolean)
+        customerRows.map((c) => normalizedEmail(c.email)).filter(Boolean)
       );
 
       // 顧客リストにまだ登録されていない既存会員（profiles）を、編集可能な仮想行として追加
-      const profileOnlyRows: CustomerRow[] = (profilesResult.data || [])
-        .filter((p: any) => !p.email || !customerEmails.has(String(p.email).toLowerCase()))
+      const profileOnlyRows: CustomerRow[] = profiles
+        .filter((p: any) => !p.email || !customerEmails.has(normalizedEmail(p.email)))
         .map((p: any) => ({
           id: `profile-${p.id}`,
-          last_name: p.last_name || p.email || '（氏名未登録）',
+          last_name: p.last_name || '',
           first_name: p.first_name || null,
           email: p.email || null,
           platform: 'website',
@@ -156,7 +157,7 @@ const CustomerList = () => {
           isProfileOnly: true,
         }));
 
-      setCustomers([...customerRows, ...profileOnlyRows]);
+      setCustomers(enrichCustomers([...customerRows, ...profileOnlyRows], profiles, subscriptions, orders, products));
     } catch (err: any) {
       console.error('顧客データの取得に失敗しました:', err);
       setError(err.message || '顧客データの取得に失敗しました');
@@ -263,7 +264,8 @@ const CustomerList = () => {
       return;
     }
     const rows = toExport.map((c) => ({
-      氏名: `${c.last_name}${c.first_name ? ` ${c.first_name}` : ''}`,
+      氏名: customerFullName(c),
+      定期便active: c.activeSubscription == null ? '未取得' : c.activeSubscription ? 'あり' : 'なし',
       メール: c.email || '',
       プラットフォーム: c.platform ? PLATFORM_LABEL[c.platform] || c.platform : '',
       生年: c.birth_year || '',
@@ -455,7 +457,8 @@ const CustomerList = () => {
                       />
                     </th>
                     <th className="px-3 py-3 w-32 whitespace-nowrap">氏名</th>
-                    <th className="px-3 py-3 w-44 whitespace-nowrap">メール</th>
+                    <th className="px-3 py-3 w-32 whitespace-nowrap">紹介者氏名</th>
+                    <th className="px-3 py-3 w-28 whitespace-nowrap">定期便（active）</th>
                     <th className="px-3 py-3 w-24 whitespace-nowrap">年代・生年</th>
                     <th className="px-3 py-3 w-24 whitespace-nowrap">媒体</th>
                     <th className="px-3 py-3 w-20 whitespace-nowrap">カテゴリー</th>
@@ -481,16 +484,16 @@ const CustomerList = () => {
                           className="block truncate font-medium text-gray-900 hover:text-primary transition-colors"
                           title={`${c.last_name}${c.first_name ? ` ${c.first_name}` : ''}`}
                         >
-                          {c.last_name}
-                          {c.first_name ? ` ${c.first_name}` : ''}
+                          {customerFullName(c)}
                         </Link>
                         {c.isProfileOnly && (
                           <div className="text-[10px] text-amber-600 mt-0.5">会員登録済み・未編集</div>
                         )}
                       </td>
-                      <td className="px-3 py-3 text-gray-600 truncate" title={c.email || ''}>
-                        {c.email || '-'}
+                      <td className="px-3 py-3 text-gray-600 truncate" title={c.referrer_name || ''}>
+                        {c.referrer_name || '-'}
                       </td>
+                      <td className="px-3 py-3 text-xs">{c.activeSubscription == null ? '未取得' : c.activeSubscription ? 'あり' : 'なし'}</td>
                       <td className="px-3 py-3 text-xs text-gray-600 leading-relaxed" title={formatCustomerAge(c)}>
                         {c.birth_year ? `${c.birth_year}年` : c.age_decade ? <><span className="font-medium text-gray-800">{c.age_decade}代</span><br /><span className="text-[10px]">{c.birth_year_from}〜{c.birth_year_to}</span></> : '-'}
                       </td>

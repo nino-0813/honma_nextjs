@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { IconArrowLeft, IconTrash, IconPlus } from '@/components/Icons';
 import { LoadingButton } from '@/components/UI';
+import { registeredAddress } from '@/lib/adminCustomerData';
 
 const TARGET_CATEGORIES = [
   'プロダクト（美味しさ）',
@@ -69,6 +70,8 @@ const CustomerEditor = () => {
   const [referrerName, setReferrerName] = useState('');
   const [referralCode, setReferralCode] = useState('');
   const [copied, setCopied] = useState(false);
+  const [address, setAddress] = useState<string | null>(null);
+  const [addressError, setAddressError] = useState(false);
 
   useEffect(() => {
     const fetchFromProfile = async (client: NonNullable<typeof supabase>) => {
@@ -78,6 +81,7 @@ const CustomerEditor = () => {
         const { data, error } = await client.from('profiles').select('*').eq('id', profileId).single();
         if (error) throw error;
         const p = data as any;
+        setAddress(registeredAddress(p));
         setLastName(p.last_name || '');
         setFirstName(p.first_name || '');
         setEmail(p.email || '');
@@ -113,6 +117,13 @@ const CustomerEditor = () => {
         const { data, error } = await client.from('customers').select('*').eq('id', id).single();
         if (error) throw error;
         const c = data as any;
+        setAddress(null);
+        setAddressError(false);
+        if (c.email) {
+          const { data: profile, error: profileError } = await client.from('profiles').select('*').eq('email', c.email).maybeSingle();
+          setAddress(registeredAddress(profile));
+          setAddressError(Boolean(profileError));
+        }
 
         setLastName(c.last_name || '');
         setFirstName(c.first_name || '');
@@ -313,6 +324,11 @@ const CustomerEditor = () => {
       <div className="space-y-6">
         <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-6">
           <h2 className="text-lg font-semibold text-gray-900">基本情報</h2>
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+            <h3 className="text-sm font-medium text-gray-900">会員登録住所</h3>
+            <p className="mt-2 text-sm text-gray-700">{addressError ? '住所を取得できませんでした' : address || '会員登録住所は未登録です'}</p>
+            <p className="mt-1 text-xs text-gray-500">取得元：会員プロフィール。各注文の配送先とは別に表示しています。</p>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>

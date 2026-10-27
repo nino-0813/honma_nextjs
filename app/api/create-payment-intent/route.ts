@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import Stripe from 'stripe';
+import { bankTransferAllowed } from '@/lib/bankTransferAvailability';
 import {
   RICE_KEEP_HANDLE,
   RICE_KEEP_ONE_BAG_PRODUCT_IDS,
@@ -150,7 +151,8 @@ export async function POST(request: Request) {
 
     // Use account default Stripe API version.
     const stripe = new Stripe(stripeSecretKey);
-    const bankTransferEnabled = process.env.ENABLE_STRIPE_BANK_TRANSFER === 'true';
+    const bankTransferEnabled = process.env.ENABLE_STRIPE_BANK_TRANSFER === 'true' &&
+      await bankTransferAllowed(getAdminClient(), body.items, metadata);
 
     let customerId: string | undefined;
     if (bankTransferEnabled) {

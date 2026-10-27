@@ -930,6 +930,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                                <span className="absolute right-4 text-lg transition-transform duration-300 group-hover:translate-x-1">→</span>
                              </div>
                            </LoadingButton>
+                           {product.bankTransferDisabled && <p className="text-xs text-gray-600 mt-2">銀行振込 対象外（決済はクレジットカード払いのみとなります）</p>}
                            {stockError && (
                              <p className="text-sm text-red-600 mt-2 text-center">{stockError}</p>
                            )}

@@ -8,7 +8,7 @@ import {
   type AnalyticsTarget,
   type AnalyticsInventory,
 } from "./storeAnalytics";
-function readAll<T>(
+export function readAll<T>(
   client: SupabaseClient,
   table: string,
   columns: string,

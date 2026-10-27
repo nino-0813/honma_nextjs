@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import { readAll } from '@/lib/loadStoreAnalytics';
+import { couponUsageAudit } from '@/lib/couponUsageAudit';
 import {
   IconPlus,
   IconSearch,
@@ -37,6 +39,7 @@ const Discounts = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [observedUses, setObservedUses] = useState<Record<string, number> | null>(null);
 
   const fetchCoupons = async () => {
     if (!supabase) {
@@ -46,12 +49,12 @@ const Discounts = () => {
     try {
       setLoading(true);
       setError(null);
-      const { data, error: e } = await supabase
-        .from('coupons')
-        .select('*')
-        .order('created_at', { ascending: false });
-      if (e) throw e;
+      const [data, observed] = await Promise.all([
+        readAll<Coupon>(supabase, 'coupons', '*'),
+        readAll<any>(supabase, 'orders', 'id,coupon_id,payment_status,paid_at').then(couponUsageAudit, () => null),
+      ]);
       setCoupons((data || []) as Coupon[]);
+      setObservedUses(observed);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'クーポンの取得に失敗しました');
     } finally {
@@ -235,6 +238,9 @@ const Discounts = () => {
                         <td className="px-6 py-4 text-gray-600">
                           {c.usage_count || 0}
                           {c.usage_limit ? ` / ${c.usage_limit}` : ''}
+                          <div className={`mt-1 text-xs ${observedUses && (observedUses[c.id] || 0) !== c.usage_count ? 'text-amber-700' : 'text-gray-500'}`}>
+                            {observedUses === null ? '注文との照合は未取得' : `注文履歴：${observedUses[c.id] || 0}件${(observedUses[c.id] || 0) !== c.usage_count ? '・要照合' : '・一致'}`}
+                          </div>
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2 justify-end">

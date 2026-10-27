@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
+import { readAll } from '@/lib/loadStoreAnalytics';
+import { customerFullName, normalizedEmail } from '@/lib/adminCustomerData';
 import { supabase } from '@/lib/supabase';
 import { IconTrendingUp, IconUsers, IconSearch, IconChevronDown } from '@/components/Icons';
 
@@ -17,6 +20,7 @@ interface OrderRow {
   email: string | null;
   total: number;
   payment_status: string;
+  order_status?: string;
 }
 
 type ReferredPerson = {
@@ -36,6 +40,7 @@ const ReferralSales = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [referrerFilter, setReferrerFilter] = useState('');
 
   useEffect(() => {
     const load = async () => {
@@ -48,8 +53,8 @@ const ReferralSales = () => {
         setLoading(true);
         setError(null);
         const [customersRes, ordersRes] = await Promise.all([
-          supabase.from('customers').select('id, last_name, first_name, email, referrer_name, referred_by_customer_id'),
-          supabase.from('orders').select('email, total, payment_status').eq('payment_status', 'paid'),
+          readAll<CustomerRow>(supabase, 'customers', 'id,last_name,first_name,email,referrer_name,referred_by_customer_id').then(data => ({ data, error: null })),
+          readAll<OrderRow>(supabase, 'orders', 'id,email,total,payment_status,order_status').then(data => ({ data, error: null })),
         ]);
         if (customersRes.error) throw customersRes.error;
         if (ordersRes.error) throw ordersRes.error;
@@ -70,8 +75,8 @@ const ReferralSales = () => {
   const salesByEmail = useMemo(() => {
     const map = new Map<string, { total: number; count: number }>();
     orders.forEach((o) => {
-      if (!o.email) return;
-      const key = o.email.toLowerCase();
+      if (!o.email || o.payment_status !== 'paid' || o.order_status === 'cancelled') return;
+      const key = normalizedEmail(o.email);
       const current = map.get(key) || { total: 0, count: 0 };
       current.total += Number(o.total || 0);
       current.count += 1;
@@ -81,16 +86,15 @@ const ReferralSales = () => {
   }, [orders]);
 
   const getName = (c: { last_name: string; first_name: string | null }) =>
-    `${c.last_name}${c.first_name ? ` ${c.first_name}` : ''}`;
+    customerFullName(c);
 
-  const { groups, unlinked } = useMemo(() => {
+  const groups = useMemo(() => {
     const groupMap = new Map<string, { referrerId: string; referrerName: string; referred: ReferredPerson[] }>();
-    const unlinkedList: Array<ReferredPerson & { referrerName: string }> = [];
 
     customers.forEach((c) => {
-      if (!c.referred_by_customer_id && !c.referrer_name) return; // 紹介されていない人はスキップ
+      if (!c.referred_by_customer_id) return;
 
-      const sales = c.email ? salesByEmail.get(c.email.toLowerCase()) : undefined;
+      const sales = c.email ? salesByEmail.get(normalizedEmail(c.email)) : undefined;
       const person: ReferredPerson = {
         id: c.id,
         name: getName(c),
@@ -101,13 +105,12 @@ const ReferralSales = () => {
 
       if (c.referred_by_customer_id) {
         const referrer = customerById.get(c.referred_by_customer_id);
+        if (!referrer) return;
         const referrerName = referrer ? getName(referrer) : c.referrer_name || '（不明な紹介者）';
         const key = c.referred_by_customer_id;
         const group = groupMap.get(key) || { referrerId: key, referrerName, referred: [] };
         group.referred.push(person);
         groupMap.set(key, group);
-      } else if (c.referrer_name) {
-        unlinkedList.push({ ...person, referrerName: c.referrer_name });
       }
     });
 
@@ -119,22 +122,21 @@ const ReferralSales = () => {
       }))
       .sort((a, b) => b.totalSales - a.totalSales);
 
-    return { groups: groupList, unlinked: unlinkedList };
+    return groupList;
   }, [customers, salesByEmail, customerById]);
 
   const filteredGroups = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    if (!q) return groups;
-    return groups.filter((g) => g.referrerName.toLowerCase().includes(q));
-  }, [groups, searchQuery]);
+    return groups.filter((g) => (!q || g.referrerName.toLowerCase().includes(q)) && (!referrerFilter || g.referrerId === referrerFilter));
+  }, [groups, searchQuery, referrerFilter]);
 
   const stats = useMemo(
     () => ({
       totalReferrers: groups.length,
-      totalReferred: groups.reduce((sum, g) => sum + g.referredCount, 0) + unlinked.length,
+      totalReferred: groups.reduce((sum, g) => sum + g.referredCount, 0),
       totalSales: groups.reduce((sum, g) => sum + g.totalSales, 0),
     }),
-    [groups, unlinked]
+    [groups]
   );
 
   if (loading) {
@@ -158,6 +160,7 @@ const ReferralSales = () => {
       <div className="mb-6">
         <h1 className="text-xl font-semibold text-gray-900">紹介実績</h1>
         <p className="text-sm text-gray-500 mt-0.5">紹介URL経由で登録したお客様の購入実績を紹介者ごとに集計</p>
+        <p className="mt-2 rounded border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">現在の金額は自社サイトの送料込み・全期間の従来集計です。月別の還元額・外部注文・返金月の控除は未対応のため、精算には使用しないでください。</p>
       </div>
 
       <div className="space-y-6">
@@ -199,6 +202,7 @@ const ReferralSales = () => {
 
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           <div className="p-4 border-b border-gray-100">
+            <label className="block text-sm mb-3">紹介者で絞り込み <select value={referrerFilter} onChange={e => setReferrerFilter(e.target.value)} className="ml-2 border rounded p-2"><option value="">すべての紐付け済み紹介者</option>{groups.map(g => <option key={g.referrerId} value={g.referrerId}>{g.referrerName}</option>)}</select></label>
             <div className="relative">
               <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
@@ -255,7 +259,7 @@ const ReferralSales = () => {
                         <tbody className="divide-y divide-gray-200">
                           {g.referred.map((r) => (
                             <tr key={r.id}>
-                              <td className="py-2 text-gray-900">{r.name}</td>
+                              <td className="py-2 text-gray-900"><Link className="text-blue-700 underline" href={`/admin/customer-list/${encodeURIComponent(r.id)}`}>{r.name}</Link></td>
                               <td className="py-2 text-gray-600">{r.email || '-'}</td>
                               <td className="py-2 text-right text-gray-600">{r.orderCount}件</td>
                               <td className="py-2 text-right font-medium text-gray-900">{formatYen(r.total)}</td>
@@ -271,38 +275,6 @@ const ReferralSales = () => {
           )}
         </div>
 
-        {unlinked.length > 0 && (
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="p-4 border-b border-gray-100">
-              <h2 className="text-sm font-semibold text-gray-900">未紐付けの紹介</h2>
-              <p className="text-xs text-gray-500 mt-0.5">
-                紹介者氏名だけ手入力されていて、紹介URL経由の紐付けが無いお客様です
-              </p>
-            </div>
-            <table className="w-full text-left text-sm">
-              <thead className="bg-gray-50/50 text-gray-500 font-medium border-b border-gray-100">
-                <tr>
-                  <th className="px-6 py-3">紹介者（手入力）</th>
-                  <th className="px-6 py-3">紹介された方</th>
-                  <th className="px-6 py-3">メール</th>
-                  <th className="px-6 py-3 text-right">注文件数</th>
-                  <th className="px-6 py-3 text-right">購入金額</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {unlinked.map((u) => (
-                  <tr key={u.id}>
-                    <td className="px-6 py-3 text-gray-900">{u.referrerName}</td>
-                    <td className="px-6 py-3 text-gray-900">{u.name}</td>
-                    <td className="px-6 py-3 text-gray-600">{u.email || '-'}</td>
-                    <td className="px-6 py-3 text-right text-gray-600">{u.orderCount}件</td>
-                    <td className="px-6 py-3 text-right font-medium text-gray-900">{formatYen(u.total)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
       </div>
     </>
   );

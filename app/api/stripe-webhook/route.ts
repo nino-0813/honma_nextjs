@@ -9,6 +9,7 @@ import { createClient } from '@supabase/supabase-js';
 import { computeBillingCycleAnchor, intervalToMonths, computeFirstShippingDate } from '@/lib/subscriptionShipping';
 import { sendBrevoEmail } from '@/lib/brevo';
 import { resolveStripePaymentMethod } from '@/lib/stripePaymentMethod';
+import { recordCouponUsage } from '@/lib/recordCouponUsage';
 import { bankTransferDetails, sendBankTransferEmail } from '@/lib/bankTransferEmail';
 import type StripeType from 'stripe';
 import { SUBSCRIPTION_INTERVAL_LABELS } from '@/types';
@@ -985,9 +986,7 @@ export async function POST(request: Request) {
         }
 
         if (order.coupon_id) {
-          const { error: couponErr } = await supabaseAdmin.rpc('increment_coupon_usage', {
-            p_coupon_id: order.coupon_id,
-          });
+          const { error: couponErr } = await recordCouponUsage(supabaseAdmin, order);
           if (couponErr) {
             console.error('increment_coupon_usage failed', { couponId: order.coupon_id, couponErr });
           }

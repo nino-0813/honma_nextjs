@@ -31,6 +31,7 @@ export interface Product {
   display_order?: number; // 表示順序
   is_visible?: boolean; // 表示/非表示
   isFreeShipping?: boolean; // 送料無料フラグ
+  bankTransferDisabled?: boolean;
   saleStartAt?: string | null; // 販売開始日時 (ISO)
   saleEndAt?: string | null; // 販売終了日時 (ISO)
   scheduledShippingDate?: string | null; // 発送開始予定日 (YYYY-MM-DD)

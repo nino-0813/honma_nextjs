@@ -2,6 +2,8 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { fetchAllAnalyticsPages } from '@/lib/storeAnalytics';
 import { supabase } from '@/lib/supabase';
 import {
   IconChevronDown,
@@ -215,7 +217,9 @@ const copyText = async (text: string) => {
 
 const Orders = () => {
   const searchParams = useSearchParams();
+  const exactOrderId = searchParams?.get('detail') || null;
   const [orders, setOrders] = useState<Order[]>([]);
+  const loadVersion = useRef(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   // 顧客リストの「注文履歴」から ?email=... で来た場合、その顧客のメールアドレスで初期検索する
@@ -237,8 +241,10 @@ const Orders = () => {
   const importFileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    setSelectedIds(new Set());
+    setSearchQuery(searchParams?.get('email') || '');
     fetchOrders();
-  }, []);
+  }, [exactOrderId, searchParams?.get('email')]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -278,6 +284,7 @@ const Orders = () => {
   }, [detailOrder?.coupon_id, detailOrder?.coupon_code, detailOrder?.coupon_name, detailOrder?.coupon_note, couponInfoById]);
 
   const fetchOrders = async () => {
+    const version = ++loadVersion.current;
     const client = supabase;
     if (!client) {
       setError('Supabaseが設定されていません。');
@@ -288,21 +295,17 @@ const Orders = () => {
     try {
       setLoading(true);
       setError(null);
-      const { data: ordersData, error: ordersError } = await client
-        .from('orders')
-        .select(`
-          *,
-          order_items (*)
-        `)
-        .order('created_at', { ascending: false });
-
-      if (ordersError) throw ordersError;
-      setOrders((ordersData || []) as unknown as Order[]);
+      const ordersData = await fetchAllAnalyticsPages<any>(async (from, to) => {
+        let query = client.from('orders').select('*,order_items(*)', { count: 'exact' });
+        if (exactOrderId) query = query.eq('id', exactOrderId);
+        return query.order('created_at', { ascending: false }).order('id').range(from, to);
+      });
+      if (version === loadVersion.current) setOrders((ordersData || []) as unknown as Order[]);
     } catch (err: any) {
       console.error('注文データの取得に失敗しました:', err);
-      setError(err.message || '注文データの取得に失敗しました');
+      if (version === loadVersion.current) setError(err.message || '注文データの取得に失敗しました');
     } finally {
-      setLoading(false);
+      if (version === loadVersion.current) setLoading(false);
     }
   };
 
@@ -640,6 +643,7 @@ const Orders = () => {
   const filteredOrders = useMemo(() => {
     const query = searchQuery.toLowerCase();
     return orders.filter((order) => {
+      if (exactOrderId && order.id !== exactOrderId) return false;
       if (query) {
         const orderNumber = getOrderNumber(order);
         const customerName = getCustomerName(order);
@@ -664,7 +668,7 @@ const Orders = () => {
       }
       return true;
     });
-  }, [orders, searchQuery, statusFilter, paymentFilter, patternFilter, dateFrom, dateTo]);
+  }, [orders, exactOrderId, searchQuery, statusFilter, paymentFilter, patternFilter, dateFrom, dateTo]);
 
   const stats = useMemo(
     () => ({
@@ -1089,6 +1093,7 @@ const Orders = () => {
       </div>
 
       <div className="space-y-6">
+        {exactOrderId && <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">関連注文1件に絞り込んでいます。 <Link className="underline" href="/admin/orders">絞り込みを解除</Link></div>}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-white rounded-lg border border-gray-100 p-5 shadow-sm">
             <p className="text-xs text-gray-500 mb-2 font-medium">支払い前</p>

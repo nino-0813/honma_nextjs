@@ -78,7 +78,7 @@ export default function LegalPage() {
             <dl className="space-y-3 text-sm md:text-base leading-relaxed">
               <div className="flex flex-col md:flex-row">
                 <dt className="font-medium text-gray-900 w-40 flex-shrink-0 mb-1 md:mb-0">支払方法</dt>
-                <dd className="text-gray-700">クレジットカード・銀行振込による決済がご利用いただけます。<br />※定期便商品はクレジットカードに限りご利用いただけます。</dd>
+                <dd className="text-gray-700">クレジットカード・銀行振込による決済がご利用いただけます。<br />※定期便商品及び一部の商品はクレジットカードに限りご利用いただけます。</dd>
               </div>
               <div className="flex flex-col md:flex-row">
                 <dt className="font-medium text-gray-900 w-40 flex-shrink-0 mb-1 md:mb-0">支払時期</dt>
