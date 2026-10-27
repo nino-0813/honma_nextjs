@@ -3,6 +3,9 @@ import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import {
   computeNextShippingDate,
+  computeFirstShippingDate,
+  computeBillingCycleAnchor,
+  intervalToMonths,
   isWithinChangeDeadline,
   type SubscriptionIntervalKey,
 } from '@/lib/subscriptionShipping';
@@ -92,7 +95,7 @@ export async function POST(request: Request) {
     if (!ownership) {
       return NextResponse.json({ error: '定期購入が見つかりません' }, { status: 404 });
     }
-    if (ownership.auth_user_id && ownership.auth_user_id !== authUser.id) {
+    if (ownership.auth_user_id !== authUser.id) {
       return NextResponse.json({ error: '権限がありません' }, { status: 403 });
     }
     if (ownership.status !== 'active' && ownership.status !== 'trialing') {
@@ -114,32 +117,42 @@ export async function POST(request: Request) {
       );
     }
 
+    const stripe = new Stripe(stripeSecretKey);
+    const sub = await stripe.subscriptions.retrieve(subscription_id, {
+      expand: ['items.data.price.product'],
+    });
+    const now = new Date();
+    const firstShippingOverride = sub.metadata?.first_shipping_override ||
+      (typeof ownership.metadata?.first_shipping_override === 'string' ? ownership.metadata.first_shipping_override : null);
+    const createdAt = new Date(ownership.created_at || sub.created * 1000);
+    if (!Number.isFinite(createdAt.getTime())) throw new Error('契約開始日を確認できません');
+    // The first shipment was paid at checkout. A cadence change before it
+    // changes the SECOND shipment, never the first shipment or today's billing.
+    const firstShipping = computeFirstShippingDate(createdAt, firstShippingOverride);
+    const beforeFirstShipping = firstShipping.getTime() > now.getTime();
+    if (beforeFirstShipping && intervalToMonths(new_interval) === 0) {
+      return NextResponse.json({ error: '初回発送前は月単位のお届けサイクルを選択してください' }, { status: 400 });
+    }
+    const nextAnchor = beforeFirstShipping
+      ? computeBillingCycleAnchor(createdAt, new_interval, firstShippingOverride)
+      : null;
+
     // 9日締切バリデーション
     const nextShipping = computeNextShippingDate({
       created_at: ownership.created_at,
       next_billing_at: ownership.next_billing_at,
       interval: ownership.interval,
-      firstShippingOverride:
-        typeof (ownership.metadata as any)?.first_shipping_override === 'string'
-          ? (ownership.metadata as any).first_shipping_override
-          : null,
+      firstShippingOverride,
     });
-    if (!isWithinChangeDeadline(new Date(), nextShipping)) {
+    if (!isWithinChangeDeadline(now, nextShipping)) {
       return NextResponse.json(
         { error: '変更の締切（次回発送月の9日終日）を過ぎています' },
         { status: 400 }
       );
     }
 
-    const stripe = new Stripe(stripeSecretKey);
-
-    // Stripe Subscription を取得し、各アイテムを新しい interval の price に差し替える
-    const sub = await stripe.subscriptions.retrieve(subscription_id, {
-      expand: ['items.data.price.product'],
-    });
-
     const newRecurring = STRIPE_INTERVAL_MAP[new_interval];
-    const itemsUpdate: Array<{ id: string; price: string }> = [];
+    const itemsUpdate: Array<{ id: string; price: string; quantity: number }> = [];
 
     for (const item of sub.items.data) {
       const oldPrice = item.price;
@@ -152,13 +165,15 @@ export async function POST(request: Request) {
         recurring: newRecurring,
         metadata: { interval: new_interval },
       });
-      itemsUpdate.push({ id: item.id, price: newPrice.id });
+      itemsUpdate.push({ id: item.id, price: newPrice.id, quantity: item.quantity ?? 1 });
     }
 
-    // Subscription を更新（プロレーションなし、現サイクルはそのまま）
+    // Before the prepaid first shipment, explicitly anchor the next charge to
+    // first shipment + new cadence; changing a Price alone can reset Stripe's anchor.
     const updated = await stripe.subscriptions.update(subscription_id, {
       items: itemsUpdate,
       proration_behavior: 'none',
+      ...(nextAnchor ? { trial_end: nextAnchor } : {}),
       metadata: {
         ...(sub.metadata || {}),
         interval: new_interval,
@@ -166,26 +181,32 @@ export async function POST(request: Request) {
     });
 
     // DB更新
-    await supabaseAdmin
+    const nextBilling = nextAnchor || (updated.status === 'trialing' ? updated.trial_end : null) || updated.current_period_end ||
+      (updated.items?.data?.[0] as any)?.current_period_end;
+    const { error: updateError } = await supabaseAdmin
       .from('subscriptions')
       .update({
         interval: new_interval,
-        next_billing_at: updated.current_period_end
-          ? new Date(updated.current_period_end * 1000).toISOString()
+        status: updated.status,
+        next_billing_at: nextBilling
+          ? new Date(nextBilling * 1000).toISOString()
           : ownership.next_billing_at,
         metadata: {
           ...(ownership.metadata as any),
           interval: new_interval,
+          ...(firstShippingOverride ? { first_shipping_override: firstShippingOverride } : {}),
         },
         updated_at: new Date().toISOString(),
       })
       .eq('stripe_subscription_id', subscription_id);
+    if (updateError) throw updateError;
 
     return NextResponse.json({
       ok: true,
       subscription_id,
       interval: new_interval,
       status: updated.status,
+      next_billing_at: nextBilling ? new Date(nextBilling * 1000).toISOString() : ownership.next_billing_at,
     });
   } catch (error: any) {
     console.error('Subscription interval更新エラー:', error);

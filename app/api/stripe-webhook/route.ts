@@ -1233,13 +1233,19 @@ export async function POST(request: Request) {
         // 初回は payment_intent.succeeded ハンドラに任せる
         return NextResponse.json({ received: true, skipped: 'first_cycle_handled_elsewhere' });
       }
-      // 新APIで billing_reason が取れない/空のケースも、subscription_id があるなら処理続行
-      if (
-        billingReason &&
-        billingReason !== 'subscription_cycle' &&
-        billingReason !== 'subscription_update'
-      ) {
+      // A price/cadence change can emit a paid ¥0 invoice during a trial.
+      // It is not a delivery or a second payment. Only renewal invoices create orders.
+      if (!billingReason) {
+        return NextResponse.json({ error: 'invoice_billing_reason_missing' }, { status: 503 });
+      }
+      if (billingReason !== 'subscription_cycle') {
         return NextResponse.json({ received: true, skipped: `unhandled_billing_reason:${billingReason}` });
+      }
+      // Use the invoice total, not amount_paid: a legitimate renewal can be
+      // covered partly/fully by customer credit or discounts. Never copy the old price.
+      const invoiceTotal = Number(invoice.total);
+      if (invoice.total == null || !Number.isSafeInteger(invoiceTotal) || invoiceTotal < 0) {
+        return NextResponse.json({ error: 'invoice_total_invalid' }, { status: 503 });
       }
 
       // 既に同じpayment_intent_idでordersが存在すれば重複生成しない
@@ -1277,7 +1283,6 @@ export async function POST(request: Request) {
 
       const newOrderNumber = generateOrderNumber();
       const nowIso = new Date().toISOString();
-      const amountPaid = Number(invoice.amount_paid ?? 0);
 
       // 契約変更は過去注文ではなく subscriptions.metadata に保持する。
       // 新しい発送回だけに現在の商品・配送先スナップショットを反映する。
@@ -1334,9 +1339,7 @@ export async function POST(request: Request) {
         cloneOrder.shipping_address = currentShipping.address;
       }
       // 金額が異なる場合はinvoiceの値で上書き（送料変動などのため）
-      if (amountPaid && Number(original.total) !== amountPaid) {
-        cloneOrder.total = amountPaid;
-      }
+      cloneOrder.total = invoiceTotal;
 
       const { data: inserted, error: insErr } = await supabaseAdmin
         .from('orders')
