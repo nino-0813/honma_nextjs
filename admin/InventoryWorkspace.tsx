@@ -8,9 +8,11 @@ import styles from "./ShiitakeInventory.module.css";
 export default function InventoryWorkspace({
   ricePanel,
   initialCategory = "rice",
+  shiitakeSettings,
 }: {
   ricePanel: React.ReactNode;
   initialCategory?: "rice" | "shiitake";
+  shiitakeSettings?: React.ReactNode;
 }) {
   const [category, setCategory] = useState(initialCategory);
   return (
@@ -20,11 +22,13 @@ export default function InventoryWorkspace({
           <div className={styles.titleRow}>
             <h1>在庫システム</h1>
             <span className={styles.sampleBadge}>
-              デザイン案・サンプルデータ
+              {shiitakeSettings ? "開始在庫設定／在庫表示はサンプル" : "デザイン案・サンプルデータ"}
             </span>
           </div>
           <p>
-            店舗の在庫状況を確認し、補充の記録・管理を行います。すべての数値・履歴はサンプルであり、実際の在庫ではありません。
+            {shiitakeSettings
+              ? "開始在庫の設定を保存・修正できます。推定在庫・補充操作の表示例は、実データとは別のサンプルです。"
+              : "店舗の在庫状況を確認し、補充の記録・管理を行います。すべての数値・履歴はサンプルであり、実際の在庫ではありません。"}
           </p>
           <div className={styles.connectionNotice}>
             <Info size={18} aria-hidden="true" />
@@ -51,6 +55,7 @@ export default function InventoryWorkspace({
         </button>
       </nav>
       <div hidden={category !== "rice"}>{ricePanel}</div>
+      {category === "shiitake" && shiitakeSettings}
       {/* Preserve trial state when switching categories; no writes or persistence. */}
       <div hidden={category !== "shiitake"}>
         <ShiitakeInventory />

@@ -502,6 +502,16 @@
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
 }
+.baselineFields {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 16px;
+}
+.baselineFields > div { min-width: 0; }
+.baselineFields .input { width: 100%; }
 .scrollHint {
   display: none;
 }
