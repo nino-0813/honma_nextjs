@@ -1,5 +1,5 @@
 import React from "react";
-import { afterEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import {
   cleanup,
   fireEvent,
@@ -8,8 +8,19 @@ import {
   waitFor,
 } from "@testing-library/react";
 import InventorySystem from "../admin/InventorySystem";
-const mocks = vi.hoisted(() => ({ rpc: vi.fn() }));
+const mocks = vi.hoisted(() => ({ rpc: vi.fn(), read: vi.fn() }));
 vi.mock("@/lib/supabase", () => ({ supabase: mocks }));
+vi.mock("@/lib/loadStoreAnalytics", () => ({ readAll: mocks.read }));
+const sourceSnapshots = [
+  "rice_tabechoku",
+  "rice_satofuru",
+  "rice_furusatodo",
+].map((source) => ({ source, payload: { lines: [] } }));
+beforeEach(() => {
+  mocks.read.mockImplementation(async (_db, table) =>
+    table === "external_sheet_snapshots" ? sourceSnapshots : [],
+  );
+});
 vi.mock("../admin/InventoryMapping", () => ({
   default: () => <div>商品設定</div>,
 }));
@@ -116,4 +127,56 @@ it("still distinguishes a confirmed shortage from a missing harvest", async () =
   expect(
     screen.queryByRole("region", { name: "収穫量は後から登録できます" }),
   ).toBeNull();
+});
+it("subtracts reconciled external raw-rice usage exactly once in the inventory UI", async () => {
+  const line = {
+    inventoryReady: true,
+    status: "active",
+    harvestYear: 2026,
+    variety: "koshihikari",
+    unitKg: 5,
+    quantity: 2,
+    milling: "white",
+    sourceKeyBasis: "explicit_line_id",
+  };
+  mocks.read.mockImplementation(async (_db, table) =>
+    table === "external_sheet_snapshots"
+      ? sourceSnapshots
+      : [
+          {
+            source: "rice_tabechoku",
+            inventory_enabled: true,
+            accountable: line,
+            payload: line,
+            source_missing: false,
+          },
+        ],
+  );
+  mocks.rpc.mockResolvedValue({
+    data: report([
+      baseline("koshihikari", 1000),
+      baseline("kamenoo"),
+      baseline("nikomaru"),
+    ]),
+    error: null,
+  });
+  render(<InventorySystem />);
+  await screen.findByText("あと販売できる量");
+  expect(
+    screen.getByText("あと販売できる量").parentElement?.textContent,
+  ).toContain("884.5 kg");
+});
+it("marks the balance as a reference when external stock data cannot be fetched", async () => {
+  mocks.read.mockRejectedValue(new Error("missing SQL"));
+  mocks.rpc.mockResolvedValue({
+    data: report([
+      baseline("koshihikari", 1000),
+      baseline("kamenoo"),
+      baseline("nikomaru"),
+    ]),
+    error: null,
+  });
+  render(<InventorySystem />);
+  await screen.findByText("差引き（参考値）");
+  expect(screen.queryByText("あと販売できる量")).toBeNull();
 });

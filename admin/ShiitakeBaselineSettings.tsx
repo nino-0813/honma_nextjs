@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { ShiitakeBaseline, suggestedShiitakeBaseline, validateShiitakeBaseline } from '@/lib/shiitakeBaseline';
 import styles from './ShiitakeInventory.module.css';
 
-export default function ShiitakeBaselineSettings() {
+export default function ShiitakeBaselineSettings({onSaved}:{onSaved?:()=>void}={}) {
   const prefix = useId();
   const [baseline, setBaseline] = useState<ShiitakeBaseline | null>(null);
   const [history, setHistory] = useState<ShiitakeBaseline[]>([]);
@@ -63,7 +63,8 @@ export default function ShiitakeBaselineSettings() {
       const result = await request('POST', input);
       const saved: ShiitakeBaseline = result.baseline;
       setBaseline(saved); setHistory(previous => [saved, ...previous].slice(0, 10)); setReason('');
-      setNotice('開始在庫の設定を保存しました。売上連携後は、この基準で再計算します。現在の推定在庫はまだ更新していません。');
+      onSaved?.();
+      setNotice('開始在庫の設定を保存しました。椎茸の「実在庫を更新」で、変更した基準の集計を確認してください。');
     } catch (e) { setError(e instanceof Error ? e.message : '保存できませんでした'); }
     finally { setBusy(false); }
   }

@@ -33,12 +33,12 @@ it('rejects disabled integration, absent/short/wrong tokens and unregistered sou
 });
 it('defaults to dry-run with aggregate response only and no writes', async () => {
   const result = await (await send()).json();
-  expect(result).toMatchObject({ dryRun: true, saved: false, ready: 1, review: 0, inventoryChanged: false });
+  expect(result).toMatchObject({ dryRun: true, saved: false, ready: 1, review: 0, stockTablesChanged: false, accountingMayChange: false });
   expect(JSON.stringify(result)).not.toContain('fixture-line'); expect(mock.rpc).not.toHaveBeenCalled();
 });
 it('saves a full snapshot through one RPC, never an orders/stock write', async () => {
   const result = await (await send({ ...body(), dryRun: false })).json();
-  expect(result.saved).toBe(true); expect(result.inventoryChanged).toBe(false);
+  expect(result.saved).toBe(true); expect(result.stockTablesChanged).toBe(false); expect(result.accountingMayChange).toBe(true);
   expect(mock.rpc).toHaveBeenCalledTimes(1);
   expect(mock.rpc.mock.calls[0][0]).toBe('ingest_external_sheet_snapshot');
 });

@@ -90,6 +90,11 @@ it('rejects an unknown invoice reason without creating an order', async () => {
   expect((await deliver()).status).toBe(503);
   expect(writes.filter(w => w.table === 'orders')).toHaveLength(0);
 });
+it('stores the shipment month from the charged invoice period rather than webhook arrival',async()=>{
+ Object.assign(mock.event.data.object,{billing_reason:'subscription_cycle',currency:'jpy',total:8085,lines:{has_more:false,data:[{type:'subscription',proration:false,period:{start:Math.floor(Date.parse('2027-01-09T20:00:00Z')/1000)}}]}});
+ expect((await deliver()).status).toBe(200);
+ expect(writes.find(w=>w.table==='orders')!.value[0].subscription_shipping_date).toBe('2027-01-15');
+});
 it('rejects a renewal with no amount instead of copying the original amount', async () => {
   mock.event.data.object.billing_reason = 'subscription_cycle';
   delete mock.event.data.object.total;

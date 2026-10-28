@@ -5,6 +5,7 @@ import { cloneRecurringItem, mergeSubscriptionMetadata, persistSubscriptionState
 // - Marks orders paid/failed and decrements stock atomically via RPC
 
 import { NextResponse } from 'next/server';
+import { invoiceShipmentDate } from '@/lib/invoiceShipmentDate';
 import { createClient } from '@supabase/supabase-js';
 import { computeBillingCycleAnchor, intervalToMonths, computeFirstShippingDate } from '@/lib/subscriptionShipping';
 import { sendBrevoEmail } from '@/lib/brevo';
@@ -1287,7 +1288,7 @@ export async function POST(request: Request) {
       // 新しい発送回だけに現在の商品・配送先スナップショットを反映する。
       const { data: subscriptionRow } = await supabaseAdmin
         .from('subscriptions')
-        .select('id, metadata')
+        .select('id, metadata, interval')
         .eq('stripe_subscription_id', stripeSubscriptionId)
         .maybeSingle();
       const currentProduct = subscriptionRow?.metadata?.current_product;
@@ -1326,6 +1327,9 @@ export async function POST(request: Request) {
       cloneOrder.paid_at = nowIso;
       cloneOrder.order_status = 'processing';
       cloneOrder.updated_at = nowIso;
+      delete cloneOrder.subscription_shipping_date;
+      const chargedShippingDate = invoiceShipmentDate(invoice, subscriptionRow?.interval || original.subscription_interval);
+      if (chargedShippingDate) cloneOrder.subscription_shipping_date = chargedShippingDate;
       cloneOrder.notes = `[定期請求] サイクル ${invoice.number || ''} - 元注文 ${original.order_number ?? original.id}`;
       if (newItems.length > 0) cloneOrder.subtotal = computedSubtotal;
       if (currentShipping?.postal_code) {

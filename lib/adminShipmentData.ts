@@ -16,7 +16,7 @@ export function shipmentOrders(sub: any, orders: any[]) {
   if (!day) return [];
   const related = orders.filter(o => o.stripe_subscription_id === sub.stripe_subscription_id).sort((a, b) => a.created_at.localeCompare(b.created_at));
   const first = related[0]?.id;
-  return related.filter(o => o.order_status !== 'cancelled' && o.order_status !== 'shipped' &&
+  return related.filter(o => !['cancelled','shipped','delivered'].includes(o.order_status) &&
     !(o.order_items?.length && o.order_items.every((i: any) => i.shipping_status === 'shipped')) &&
     orderShipmentDay(o, sub, first) === day);
 }
@@ -24,7 +24,7 @@ export function shipmentHasShipped(sub: any, orders: any[]) {
   const related = orders.filter(o => o.stripe_subscription_id === sub.stripe_subscription_id).sort((a, b) => a.created_at.localeCompare(b.created_at));
   const day = shipmentDay(sub);
   return Boolean(day && related.some(o => orderShipmentDay(o, sub, related[0]?.id) === day &&
-    (o.order_status === 'shipped' || o.order_items?.length && o.order_items.every((i: any) => i.shipping_status === 'shipped'))));
+    (['shipped','delivered'].includes(o.order_status) || o.order_items?.length && o.order_items.every((i: any) => i.shipping_status === 'shipped'))));
 }
 export function nextShipmentProduct(sub: any, orders: any[]) {
   const current = sub.metadata?.current_product;

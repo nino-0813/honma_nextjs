@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { fetchAllAnalyticsPages } from '@/lib/storeAnalytics';
 import { supabase } from '@/lib/supabase';
+import { parseShipmentHandoff, resolveShipmentHandoff } from '@/lib/shipmentHandoff';
 import {
   IconChevronDown,
   IconClose,
@@ -218,6 +219,8 @@ const copyText = async (text: string) => {
 const Orders = () => {
   const searchParams = useSearchParams();
   const exactOrderId = searchParams?.get('detail') || null;
+  const shipmentSelectionKey = searchParams?.get('shipment') || null;
+  const [shipmentReview, setShipmentReview] = useState<{ subscriptionId: string; day: string; reason: string }[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const loadVersion = useRef(0);
   const [loading, setLoading] = useState(true);
@@ -244,7 +247,7 @@ const Orders = () => {
     setSelectedIds(new Set());
     setSearchQuery(searchParams?.get('email') || '');
     fetchOrders();
-  }, [exactOrderId, searchParams?.get('email')]);
+  }, [exactOrderId, shipmentSelectionKey, searchParams?.get('email')]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -295,6 +298,24 @@ const Orders = () => {
     try {
       setLoading(true);
       setError(null);
+      setShipmentReview([]);
+      if (shipmentSelectionKey) {
+        setOrders([]); // Invalid/expired handoffs must never fall back to all orders.
+        const selection = parseShipmentHandoff(sessionStorage.getItem(`ikevege:shipment:${shipmentSelectionKey}`));
+        const ids = [...new Set(selection.rows.map(r => r.subscriptionId))];
+        const contracts: any[] = [], related: any[] = [];
+        for (let i = 0; i < ids.length; i += 100) {
+          const chunk = ids.slice(i, i + 100);
+          const [subs, allRelated] = await Promise.all([
+            fetchAllAnalyticsPages<any>((from, to) => client.from('subscriptions').select('*', { count: 'exact' }).in('stripe_subscription_id', chunk).order('id').range(from, to)),
+            fetchAllAnalyticsPages<any>((from, to) => client.from('orders').select('*,order_items(*)', { count: 'exact' }).in('stripe_subscription_id', chunk).order('id').range(from, to)),
+          ]);
+          contracts.push(...subs); related.push(...allRelated);
+        }
+        const result = resolveShipmentHandoff(selection, contracts, related);
+        if (version === loadVersion.current) { setOrders(result.orders); setShipmentReview(result.review); }
+        return;
+      }
       const ordersData = await fetchAllAnalyticsPages<any>(async (from, to) => {
         let query = client.from('orders').select('*,order_items(*)', { count: 'exact' });
         if (exactOrderId) query = query.eq('id', exactOrderId);
@@ -760,6 +781,7 @@ const Orders = () => {
       注文者郵便番号: o.billing_postal_code || o.shipping_postal_code || '',
       注文者住所: formatBillingFull(o),
       購入商品情報: (o.order_items || []).map((it) => `${it.product_title}×${it.quantity}`).join(' / '),
+      支払状況: o.payment_status,
     }));
 
     downloadText(`shipping-${new Date().toISOString().slice(0, 10)}.csv`, toCsv(rows));
@@ -1094,6 +1116,11 @@ const Orders = () => {
 
       <div className="space-y-6">
         {exactOrderId && <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">関連注文1件に絞り込んでいます。 <Link className="underline" href="/admin/orders">絞り込みを解除</Link></div>}
+        {shipmentSelectionKey && <section aria-label="定期便から引き継いだ発送対象" className="rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
+          <p>定期便から引き継いだ該当回の注文：{orders.length}件。全件選択後、既存の注文CSV・発送CSVを出力できます。未決済も含むため、発送前に支払状況を確認してください。</p>
+          <Link className="underline" href="/admin/orders">絞り込みを解除</Link>
+          {shipmentReview.length > 0 && <details open><summary>CSV対象外・要確認 {shipmentReview.length}件</summary><ul>{shipmentReview.map(r => <li key={r.subscriptionId}>{r.day} ／ {r.subscriptionId}：{r.reason}</li>)}</ul></details>}
+        </section>}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-white rounded-lg border border-gray-100 p-5 shadow-sm">
             <p className="text-xs text-gray-500 mb-2 font-medium">支払い前</p>

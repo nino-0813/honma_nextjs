@@ -16,6 +16,8 @@ import InventoryMapping from "./InventoryMapping";
 import LegacyInventorySystem from "./LegacyInventorySystem";
 import { isKgReportUnavailable } from "@/lib/kgInventoryAvailability";
 import { supabase } from "@/lib/supabase";
+import { readAll } from '@/lib/loadStoreAnalytics';
+import { externalRiceUsage, externalRecordNeedsReview, type ExternalOrderRecord } from '@/lib/externalOrderAccounting';
 import {
   varieties,
   summarize,
@@ -99,6 +101,9 @@ export default function InventorySystem() {
     [notice, setNotice] = useState("");
   const [legacyMode, setLegacyMode] = useState(false);
   const [ready, setReady] = useState(false);
+  const [externalRecords,setExternalRecords]=useState<ExternalOrderRecord[]>([]);
+  const [externalError,setExternalError]=useState('');
+  const [externalInputIssues,setExternalInputIssues]=useState(0);
   const lock = useRef(false),
     request = useRef<string | null>(null);
   const [year, setYear] = useState(new Date().getFullYear());
@@ -133,6 +138,14 @@ export default function InventorySystem() {
       }
       if (!report) throw new Error("管理者権限を確認してください");
       setData(report as Data);
+      if(report.accounting_version===2)try {
+        const[records,snapshots]=await Promise.all([readAll<ExternalOrderRecord>(supabase,'external_order_records','*','source_key'),readAll<any>(supabase,'external_sheet_snapshots','source,payload','source')]);
+        setExternalRecords(records);
+        setExternalInputIssues(snapshots.filter(s=>s.source.startsWith('rice_')).reduce((n,s)=>n+(s.payload?.lines||[]).filter((l:any)=>!l.sourceKey).length,0));
+        const missingSources=['rice_tabechoku','rice_satofuru','rice_furusatodo'].filter(id=>!snapshots.some(s=>s.source===id));
+        setExternalError(missingSources.length?`お米の外部注文に未受信の販売元が${missingSources.length}件あります。外部販売分が揃っていない参考値として確認してください。`:'');
+      } catch { setExternalRecords([]);setExternalError('外部注文の計上データは未取得です。表示残量は外部注文を含まない参考値です。追加SQL・接続を確認してください。'); }
+      else {setExternalRecords([]);setExternalError('');setExternalInputIssues(0);}
       setReady(true);
       setSeason((s) => s || report.seasons[0]?.id || "");
     } catch (e) {
@@ -156,9 +169,11 @@ export default function InventorySystem() {
     [data],
   );
   const rawMode = data.accounting_version === 2;
-  const rows = rawMode
+  const ownRows = rawMode
     ? summarizeRaw(season, data.movements, data.raw_baselines || [])
     : summarize(season, data.movements, data.stocks, data.sales, data.reviews);
+  const externalUsage=externalRiceUsage(externalRecords,data.seasons.find(s=>s.id===season)?.harvest_year||0);
+  const rows=ownRows.map(row=>({...row,used:row.used+(rawMode?externalUsage[row.key]||0:0),available:row.available-(rawMode?externalUsage[row.key]||0:0)}));
   const contractIssues =
     (data.subscriptions || []).filter(
       (s) =>
@@ -174,6 +189,7 @@ export default function InventorySystem() {
           new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10),
     ).length;
   const uncertain =
+    !!externalError || externalInputIssues>0 || externalRecords.some(r=>r.source.startsWith('rice_')&&externalRecordNeedsReview(r)) ||
     unknown.length > 0 ||
     contractIssues > 0 ||
     rows.some(
@@ -382,6 +398,8 @@ export default function InventorySystem() {
         </p>
       )}
       {notice && <p role="status">{notice}</p>}
+      {externalError && <p role="alert" className="rounded border border-amber-300 bg-amber-50 p-4 text-sm">{externalError}</p>}
+      {externalRecords.some(r=>r.source.startsWith('rice_')&&externalRecordNeedsReview(r)) && <p className="rounded bg-amber-50 p-3 text-sm">外部注文に未照合・消失・不正行があります。「外部注文・取込確認」で照合してください。既に計上した行の不正編集・削除は、最後の確認済み数量を保持しています。</p>}
       {loading ? (
         <p role="status">全件を集計中…</p>
       ) : (

@@ -36,7 +36,7 @@ export async function POST(request: Request) {
     return Response.json({ error: error instanceof Error ? error.message : 'invalid_request' }, { status: 400 });
   }
   const summary = { source: snapshot.source, lines: snapshot.payload.lines.length,
-    ready: snapshot.payload.readyCount, review: snapshot.payload.reviewCount, inventoryChanged: false };
+    ready: snapshot.payload.readyCount, review: snapshot.payload.reviewCount, stockTablesChanged: false, accountingMayChange: !snapshot.dryRun };
   if (snapshot.dryRun) return Response.json({ ...summary, dryRun: true, saved: false });
   const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;

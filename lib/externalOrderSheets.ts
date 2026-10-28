@@ -80,7 +80,9 @@ export function parseExternalSheet(sourceId: ExternalSheetSourceId, headers: unk
     const identity = lineId ? ['line', lineId]
       : order ? ['order', order, product, millingValue, get('重量')]
       : mailIds.length && date ? ['mail', mailIds.join(','), date, product] : null;
-    const sourceKey = identity ? [source.id, ...identity].map(encodeURIComponent).join(':') : null;
+    const encodedKey = identity ? [source.id, ...identity].map(encodeURIComponent).join(':') : null;
+    const sourceKey = encodedKey && encodedKey.length <= 1000 ? encodedKey : null;
+    if(encodedKey && !sourceKey) issues.push('識別子が長すぎます。短い不変の明細IDを設定してください');
     if (!date) issues.push('日時を確認してください');
     if (!product) issues.push('商品名がありません');
     if (quantity == null || (status !== 'cancelled' && quantity === 0)) issues.push('数量が未登録または不正です');
@@ -93,6 +95,7 @@ export function parseExternalSheet(sourceId: ExternalSheetSourceId, headers: unk
       if (!milling) issues.push('精米区分を確認してください');
       if (!unitKg || unitKg > 100000) issues.push('重量を確認してください');
     }
+    if (source.id === 'shiitake_yorankasha' && product !== '乾椎茸(原木)') issues.push('直売所の商品対応を確認してください');
     lines.push({ source: sourceId, sourceRow: index + 2, sourceKey,
       sourceKeyBasis: lineId ? 'explicit_line_id' : order ? 'order_product' : identity ? 'mail_product' : 'unresolved',
       externalOrderId: order, date, product, quantity,

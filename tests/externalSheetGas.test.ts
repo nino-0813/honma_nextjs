@@ -8,7 +8,7 @@ function fixture(status = 200, mode?: string) {
   const fetch = vi.fn((_url: string, options: { payload: string }) => {
     const input = JSON.parse(options.payload);
     return { getResponseCode: () => status, getContentText: () => JSON.stringify({
-      source: input.source, saved: !input.dryRun, inventoryChanged: false, lines: 1, review: 1,
+      source: input.source, saved: !input.dryRun, stockTablesChanged: false, lines: 1, review: 1,
     }) };
   });
   const release = vi.fn();

@@ -1,5 +1,8 @@
 # 外部シート連携の調査・読み取り変換（2026/10/28）
 
+第2段階で取込確認UI・外部明細・照合後の在庫集計・紹介集計用の顧客／商品代金紐付けを追加した。
+現在の仕様・本番導入順は `admin-operations-phase2.md` を参照。以下には第1段階時点の説明も残る。
+
 ## 確認した参照元
 
 - お米：`1XvPCDAYhGXSpQV_rWgTbAgefmegEFulj3YCwgHPfDJg`

@@ -9,12 +9,16 @@ export default function InventoryWorkspace({
   ricePanel,
   initialCategory = "rice",
   shiitakeSettings,
+  shiitakePanel,
+  externalPanel,
 }: {
   ricePanel: React.ReactNode;
   initialCategory?: "rice" | "shiitake";
   shiitakeSettings?: React.ReactNode;
+  shiitakePanel?: React.ReactNode;
+  externalPanel?: React.ReactNode;
 }) {
-  const [category, setCategory] = useState(initialCategory);
+  const [category, setCategory] = useState<"rice" | "shiitake" | "external">(initialCategory);
   return (
     <div className={styles.workspace}>
       {category === "shiitake" && (
@@ -22,17 +26,17 @@ export default function InventoryWorkspace({
           <div className={styles.titleRow}>
             <h1>在庫システム</h1>
             <span className={styles.sampleBadge}>
-              {shiitakeSettings ? "開始在庫設定／在庫表示はサンプル" : "デザイン案・サンプルデータ"}
+              {shiitakePanel ? "照合済みデータを集計" : shiitakeSettings ? "開始在庫設定／在庫表示はサンプル" : "デザイン案・サンプルデータ"}
             </span>
           </div>
           <p>
-            {shiitakeSettings
+            {shiitakePanel ? "開始在庫と補充・調整、照合済みの売上を集計します。未照合分がある間は参考値です。" : shiitakeSettings
               ? "開始在庫の設定を保存・修正できます。推定在庫・補充操作の表示例は、実データとは別のサンプルです。"
               : "店舗の在庫状況を確認し、補充の記録・管理を行います。すべての数値・履歴はサンプルであり、実際の在庫ではありません。"}
           </p>
           <div className={styles.connectionNotice}>
             <Info size={18} aria-hidden="true" />
-            <span>GAS・スプレッドシート連携は未設定です。</span>
+            <span>{shiitakePanel ? "実際の受信・要確認状況は「外部注文・取込確認」で確認できます。" : "GAS・スプレッドシート連携は未設定です。"}</span>
           </div>
         </header>
       )}
@@ -45,6 +49,7 @@ export default function InventoryWorkspace({
         >
           お米
         </button>
+        {externalPanel && <button type="button" aria-pressed={category === 'external'} className={category === 'external' ? styles.activeTab : ''} onClick={() => setCategory('external')}>外部注文・取込確認</button>}
         <button
           type="button"
           aria-pressed={category === "shiitake"}
@@ -56,9 +61,10 @@ export default function InventoryWorkspace({
       </nav>
       <div hidden={category !== "rice"}>{ricePanel}</div>
       {category === "shiitake" && shiitakeSettings}
+      {category === "external" && externalPanel}
       {/* Preserve trial state when switching categories; no writes or persistence. */}
       <div hidden={category !== "shiitake"}>
-        <ShiitakeInventory />
+        {shiitakePanel ? category === 'shiitake' && shiitakePanel : <ShiitakeInventory />}
       </div>
     </div>
   );

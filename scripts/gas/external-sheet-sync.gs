@@ -1,4 +1,5 @@
-/** Standalone GAS project. READS sheets only. No Gmail, sheet writes or trigger creation.
+/** Standalone GAS project. Sync READS sheets only. No Gmail or sheet writes.
+ * The optional daily-trigger installer at the end runs only when explicitly invoked.
  * Script Properties: IKEVEGE_SYNC_ORIGIN, IKEVEGE_SYNC_MODE (dry_run/save),
  * IKEVEGE_SYNC_TOKEN_<SOURCE_ID in uppercase> (one secret per source).
  * Leave MODE unset for a dry run. Do not put Supabase service-role keys here.
@@ -64,7 +65,7 @@ function syncIkevegeExternalSheets() {
         });
         if (response.getResponseCode() !== 200) throw new Error('HTTP ' + response.getResponseCode());
         var result = JSON.parse(response.getContentText());
-        if (result.source !== source.id || result.inventoryChanged !== false || (dryRun ? result.saved !== false : result.saved !== true)) {
+        if (result.source !== source.id || result.stockTablesChanged !== false || (dryRun ? result.saved !== false : result.saved !== true)) {
           throw new Error('受信結果の確認に失敗しました');
         }
         // No customer details, mail IDs, tokens or response body in logs.
@@ -78,4 +79,17 @@ function syncIkevegeExternalSheets() {
   } finally {
     lock.releaseLock();
   }
+}
+
+/** Run manually only after dry-run and test DB checks. Creates at most one daily trigger.
+ * Gmail import should complete before this window. Apps Script runs within the selected hour.
+ */
+function installIkevegeDailySheetSync() {
+  var properties = PropertiesService.getScriptProperties();
+  if (properties.getProperty('IKEVEGE_SYNC_MODE') !== 'save') throw new Error('保存モードでの手動検証を先に完了してください');
+  var hour = Number(properties.getProperty('IKEVEGE_SYNC_HOUR_JST') || '9');
+  if (!Number.isInteger(hour) || hour < 0 || hour > 23) throw new Error('JST時刻は0〜23の整数');
+  var existing = ScriptApp.getProjectTriggers().filter(function(t) { return t.getHandlerFunction() === 'syncIkevegeExternalSheets'; });
+  if (existing.length) throw new Error('日次同期トリガーは既に存在します。重複作成しません');
+  ScriptApp.newTrigger('syncIkevegeExternalSheets').timeBased().atHour(hour).everyDays(1).inTimezone('Asia/Tokyo').create();
 }
