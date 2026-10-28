@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { varieties, type Component, type Item } from "@/lib/kgInventory";
 import { millingFactors, millingLabels } from "@/lib/inventoryPresentation";
 import type { Product } from "@/types";
+import InventoryAutoMapping from './InventoryAutoMapping';
 
 export type InventorySpec = {
   id: string;
@@ -13,7 +14,7 @@ export type InventorySpec = {
   excluded: boolean;
   note: string;
 };
-type Season = { id: string; label: string };
+type Season = { id: string; label: string; harvest_year?: number };
 type ReviewItem = {
   id: string;
   order: string;
@@ -29,6 +30,7 @@ type Props = {
   unknown: ReviewItem[];
   rawMode: boolean;
   busy: boolean;
+  onRefresh?: () => void;
   save: (
     action: () => PromiseLike<{ error: { message: string } | null }>,
   ) => Promise<unknown>;
@@ -177,6 +179,9 @@ export default function InventoryMapping(p: Props) {
   }
   return (
     <section className="space-y-6">
+      {p.rawMode && p.onRefresh ? <InventoryAutoMapping key={p.season}
+        harvestYear={p.seasons.find(s => s.id === p.season)?.harvest_year}
+        disabled={p.busy} onRefresh={p.onRefresh} /> : null}
       <div className="rounded-2xl border border-gray-200 bg-white p-5 md:p-6">
         <h2 className="text-lg font-bold">商品設定 / 過去注文の確認</h2>
         <p className="mt-2 text-sm text-gray-600">

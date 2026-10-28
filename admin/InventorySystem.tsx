@@ -931,6 +931,7 @@ export default function InventorySystem() {
                 rawMode={rawMode}
                 busy={busy}
                 save={save}
+                onRefresh={() => void load()}
               />
             </div>
           </>
