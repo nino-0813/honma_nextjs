@@ -15,6 +15,7 @@ const STATIC_PATHS: { path: string; priority: number; changeFrequency: MetadataR
   { path: '/collections/rice/nikomaru', priority: 0.8, changeFrequency: 'weekly' },
   { path: '/collections/rice/yearly', priority: 0.9, changeFrequency: 'weekly' },
   { path: '/collections/crescent', priority: 0.7, changeFrequency: 'weekly' },
+  { path: '/collections/wakeari', priority: 0.7, changeFrequency: 'weekly' },
   { path: '/collections/other', priority: 0.6, changeFrequency: 'weekly' },
   { path: '/about', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/blog', priority: 0.7, changeFrequency: 'weekly' },

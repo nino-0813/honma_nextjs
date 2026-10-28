@@ -1,6 +1,7 @@
+import React from 'react';
 import Link from 'next/link';
 
-export type ProductCategoryKey = 'all' | 'rice' | 'subscription' | 'start-set' | 'koshihikari' | 'kamenoo' | 'nikomaru' | 'shiitake' | 'crescent' | 'ticket' | 'other';
+export type ProductCategoryKey = 'all' | 'rice' | 'subscription' | 'start-set' | 'koshihikari' | 'kamenoo' | 'nikomaru' | 'shiitake' | 'crescent' | 'wakeari' | 'ticket' | 'other';
 
 type CategoryItem = { key: ProductCategoryKey; label: string; href: string };
 
@@ -9,6 +10,7 @@ const MAIN_ITEMS: CategoryItem[] = [
   { key: 'rice', label: 'お米', href: '/collections/rice' },
   { key: 'shiitake', label: '原木しいたけ', href: '/collections/shiitake' },
   { key: 'crescent', label: 'Crescentmoon', href: '/collections/crescent' },
+  { key: 'wakeari', label: 'ワケあり', href: '/collections/wakeari' },
   { key: 'ticket', label: 'チケット', href: '/collections/ticket' },
   { key: 'other', label: 'その他', href: '/collections/other' },
 ];

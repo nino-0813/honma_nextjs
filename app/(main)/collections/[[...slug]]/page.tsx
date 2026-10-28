@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
 import { useProducts } from '@/hooks/useProducts';
@@ -13,6 +13,7 @@ import ProductCategoryNav, { type ProductCategoryKey } from '@/components/produc
 function getFilterNameFromParam(param: string) {
   if (param === 'rice') return 'お米';
   if (param === 'crescent') return 'Crescentmoon';
+  if (param === 'wakeari') return 'ワケあり';
   if (param === 'other') return 'その他';
   if (param === 'shiitake') return '原木しいたけ';
   if (param === 'ticket') return 'チケット';
@@ -30,7 +31,7 @@ function getSubcategoryNameFromParam(param: string): string {
   return mapping[param] ?? param;
 }
 
-type CategoryLabel = 'ALL' | 'お米' | 'Crescentmoon' | 'その他' | '原木しいたけ' | 'チケット';
+type CategoryLabel = 'ALL' | 'お米' | 'Crescentmoon' | 'ワケあり' | 'その他' | '原木しいたけ' | 'チケット';
 
 const FARMING_TERMS = ['農薬・化学肥料不使用栽培', '無農薬無化学肥料', '自然栽培'];
 
@@ -148,6 +149,7 @@ export default function CollectionsPage() {
       } else {
         result = supabaseProducts.filter((p) => {
           const cats = getProductCategories(p);
+          if (currentCategory === 'ワケあり') return cats.includes('ワケあり') || cats.includes('訳あり');
           if (currentCategory === '原木しいたけ') return cats.some((cat) => /原木(しいたけ|椎茸)/.test(cat)) || /原木(しいたけ|椎茸)/.test(p.title);
           return cats.includes(currentCategory) || p.title.includes(currentCategory);
         });
@@ -191,6 +193,8 @@ export default function CollectionsPage() {
             ? 'shiitake'
             : currentCategory === 'Crescentmoon'
               ? 'crescent'
+              : currentCategory === 'ワケあり'
+                ? 'wakeari'
               : currentCategory === 'チケット'
                 ? 'ticket'
                 : currentCategory === 'その他'

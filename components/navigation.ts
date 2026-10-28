@@ -46,6 +46,8 @@ export const CATEGORY_NAV = {
     { label: 'にこまる', href: '/collections/rice/nikomaru', indent: true },
     { label: '原木しいたけ', href: '/collections/shiitake' },
     { label: 'Crescentmoon', href: '/collections/crescent' },
+    { label: 'ワケあり', href: '/collections/wakeari' },
+    { label: 'チケット', href: '/collections/ticket' },
     { label: 'その他', href: '/collections/other' },
   ],
 };

@@ -39,6 +39,7 @@ const CATEGORIES = [
   ] },
   { id: '原木しいたけ', name: '原木しいたけ', subcategories: [] },
   { id: 'Crescentmoon', name: 'Crescentmoon', subcategories: [] },
+  { id: 'ワケあり', name: 'ワケあり', subcategories: [] },
   { id: 'チケット', name: 'チケット', subcategories: [] },
   { id: 'その他', name: 'その他', subcategories: [] },
 ];
@@ -203,7 +204,7 @@ const ProductEditor = () => {
             : ['お米'];
       const loadedSubcategories =
         Array.isArray(data.subcategories) && data.subcategories.length > 0 ? data.subcategories : data.subcategory ? [data.subcategory] : [];
-      setCategories(loadedCategories);
+      setCategories([...new Set<string>(loadedCategories.map((category: string) => category === '訳あり' ? 'ワケあり' : category))]);
       setSubcategories(loadedSubcategories);
       setDescription(data.description ?? '');
       setHandle(data.handle ?? '');

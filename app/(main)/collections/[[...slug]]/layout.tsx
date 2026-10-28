@@ -43,6 +43,10 @@ const PAGE_META: Record<string, { title: string; description: string }> = {
     description:
       'イケベジの姉妹ブランド Crescentmoon の焼き菓子一覧。佐渡島の素材を活かした季節限定のクッキーなどをお届けします。',
   },
+  wakeari: {
+    title: 'ワケあり商品一覧',
+    description: 'イケベジのワケあり商品一覧です。商品の状態やワケありの理由を各商品ページでご確認いただけます。',
+  },
   other: {
     title: 'その他の商品一覧',
     description: 'イケベジのお米・焼き菓子以外の商品一覧です。',
