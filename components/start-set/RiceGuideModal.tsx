@@ -28,12 +28,12 @@ export default function RiceGuideModal() {
             <div className="mx-auto -mt-11 max-w-[900px] px-2 pb-8 pt-2 md:px-8">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/docs/ikevege-rice-selection-guide.png"
+                src="/docs/ikevege-rice-selection-guide-20261030.png"
                 alt="従来コシヒカリ、にこまる、亀の尾の食味・特徴比較表"
                 className="h-auto w-full"
               />
               <div className="mt-5 text-center">
-                <a href="/docs/ikevege-rice-selection-guide.pdf" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center border-b border-primary px-2 text-sm text-primary">
+                <a href="/docs/ikevege-rice-selection-guide-20261030.pdf" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center justify-center border-b border-primary px-2 text-sm text-primary">
                   PDFファイルを開く ↗
                 </a>
               </div>
