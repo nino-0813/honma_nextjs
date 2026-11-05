@@ -410,3 +410,13 @@
     font-size: min(12px, 4cqw);
   }
 }
+
+@media (width < 768px) {
+  .about-children {
+    container-type: inline-size;
+  }
+
+  .about-children-title {
+    font-size: min(24px, 5.5cqw);
+  }
+}

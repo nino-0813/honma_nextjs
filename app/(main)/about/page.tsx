@@ -61,8 +61,8 @@ export default function AboutPage() {
       </section>
 
       <section className="px-4 py-20 md:px-6 md:py-28">
-        <FadeInSection className="mx-auto max-w-[1120px] text-left">
-          <h2 className="text-[min(24px,5.5vw)] font-medium leading-[1.9] tracking-[0.14em] md:text-[34px]">
+        <FadeInSection className="about-children mx-auto max-w-[1120px] text-left">
+          <h2 className="about-children-title text-[24px] font-medium leading-[1.9] tracking-[0.14em] md:text-[34px]">
             子どもたちが<br /><span className="whitespace-nowrap">「ここに生まれてよかった」と</span><br />思える社会を。
           </h2>
           <div className="mt-10 max-w-[680px] space-y-5 text-[13px] font-light leading-[2.15] tracking-[0.08em] text-gray-600 md:mt-12 md:text-sm">
