@@ -385,3 +385,28 @@
     transition: none;
   }
 }
+
+/* Keep the editorial line breaks on mobile; size text to the available width. */
+@media (width < 768px) {
+  .about-intro {
+    container-type: inline-size;
+  }
+
+  .about-intro > p,
+  .about-intro > h1,
+  .about-intro > div > p {
+    white-space: nowrap;
+  }
+
+  .about-intro > p {
+    font-size: min(11px, 3.4cqw);
+  }
+
+  .about-intro > h1 {
+    font-size: min(26px, 8cqw);
+  }
+
+  .about-intro > div {
+    font-size: min(12px, 4cqw);
+  }
+}

@@ -43,14 +43,14 @@ export default function AboutPage() {
 
   return (
     <main className="page-top-offset w-full overflow-x-hidden bg-white text-[#1c1d1d]">
-      <header className="px-6 pb-14 pt-16 text-center md:pb-20 md:pt-24">
+      <header className="about-intro px-6 pb-14 pt-16 text-center md:pb-20 md:pt-24">
         <p className="text-[11px] tracking-[0.24em] text-gray-500">自然の“イケてる”を、暮らしのそばへ。</p>
-        <h1 className="mt-5 font-serif text-[26px] font-medium leading-[1.8] tracking-[0.13em] md:text-[38px]">農を通じて、<br className="md:hidden" />人と自然のいい関係をつくる。</h1>
+        <h1 className="mt-5 font-serif text-[26px] font-medium leading-[1.8] tracking-[0.13em] md:text-[38px]">農を通じて<span className="hidden md:inline">、</span><br className="md:hidden" />人と自然の<br className="md:hidden" />いい関係をつくる。</h1>
         <div className="mx-auto mt-6 max-w-[760px] space-y-2 text-[12px] leading-[2.1] tracking-[0.08em] text-gray-600 md:text-sm">
-          <p>イケベジは、新潟県・佐渡ヶ島を拠点に活動する農業ブランドです。</p>
-          <p>農薬や化学肥料に頼らず、酒粕や牡蠣殻、竹など島の資源を土に還しながら、お米と原木しいたけを育てています。</p>
-          <p>その作物を届けること。田んぼをひらき、体験や学びの場をつくること。</p>
-          <p>イケベジは、農を起点に、自然の在り方を社会へと伝える「通訳」で在り続けます。</p>
+          <p>イケベジは、新潟県・佐渡ヶ島を拠点に<br className="md:hidden" />活動する農業ブランドです。</p>
+          <p>農薬や化学肥料に頼らず、酒粕や牡蠣殻、<br className="md:hidden" />竹など島の資源を土に還しながら、<br className="md:hidden" />お米と原木しいたけを育てています。</p>
+          <p>その作物を届けること。<br className="md:hidden" />田んぼをひらき、<br className="md:hidden" />体験や学びの場をつくること。</p>
+          <p>イケベジは、農を起点に、<br className="md:hidden" />自然の在り方を社会へと伝える<br className="md:hidden" />「通訳」で在り続けます。</p>
         </div>
       </header>
 
@@ -62,12 +62,12 @@ export default function AboutPage() {
 
       <section className="px-4 py-20 md:px-6 md:py-28">
         <FadeInSection className="mx-auto max-w-[1120px] text-left">
-          <h2 className="text-[25px] font-medium leading-[1.9] tracking-[0.14em] md:text-[34px]">
+          <h2 className="text-[24px] font-medium leading-[1.9] tracking-[0.14em] md:text-[34px]">
             子どもたちが<br />「ここに生まれてよかった」と<br />思える社会を。
           </h2>
           <div className="mt-10 max-w-[680px] space-y-5 text-[13px] font-light leading-[2.15] tracking-[0.08em] text-gray-600 md:mt-12 md:text-sm">
-            <p>自然界では、多様な命が、無理なく、<br />あるがままに響き合い、めぐり続けている。<br />その在り方を、私たちは“イケてる”と呼んでいます。</p>
-            <p>そんな“イケてる”社会を小さな島の集落から、一歩ずつ。</p>
+            <p>自然界では、多様な命が、無理なく、<br />あるがままに響き合い、めぐり続けている。<br />その在り方を、私たちは<br className="md:hidden" />“イケてる”と呼んでいます。</p>
+            <p>そんな“イケてる”社会を<br className="md:hidden" />小さな島の集落から、<br className="md:hidden" /><br className="md:hidden" />一歩ずつ。</p>
           </div>
         </FadeInSection>
       </section>
@@ -76,15 +76,15 @@ export default function AboutPage() {
         <FadeInSection className="mx-auto max-w-[1120px]">
           <div className="grid md:grid-cols-[minmax(0,1fr)_minmax(320px,0.82fr)] md:items-center md:gap-20">
             <div className="order-1 min-w-0">
-              <h2 className="text-left text-[24px] font-medium tracking-[0.2em] md:text-[32px]">きょうも しぜんと いいときを。</h2>
-              <div className="mt-12 max-w-[720px] space-y-7 text-left text-[13px] font-light leading-[2.3] tracking-[0.09em] text-gray-600 md:text-sm">
-                <p>「しぜんと」には、自然と向き合うこと、そして気負わず自然体でいること。そのふたつの意味を込めています。</p>
-                <p>イケベジが届けたいのは、特別な日のごちそうではなく、毎日のなかにある、ささやかな「いいとき」です。</p>
+              <h2 className="text-left text-[26px] font-medium leading-[1.35] tracking-[0.2em] md:text-[32px] md:leading-normal">きょうも<span className="hidden md:inline"> </span><br className="md:hidden" />しぜんと<span className="hidden md:inline"> </span><br className="md:hidden" />いいときを。</h2>
+              <div className="mt-8 max-w-[720px] space-y-5 md:mt-12 md:space-y-7 text-left text-[13px] font-light leading-[1.8] tracking-[0.09em] md:leading-[2.3] text-gray-600 md:text-sm">
+                <p>「しぜんと」には、自然と向き合うこと、そして<span className="md:hidden">、</span><br className="md:hidden" />気負わず自然体でいること。<br className="md:hidden" />そのふたつの意味を込めています。</p>
+                <p>イケベジが届けたいのは、<br className="md:hidden" />特別な日のごちそうではなく、<br className="md:hidden" />毎日のなかにある、ささやかな<br className="md:hidden" />「いいとき」です。</p>
               </div>
 
-              <div className="mt-14 max-w-[680px] space-y-7 text-left text-[13px] font-light leading-[2.3] tracking-[0.09em] text-gray-600 md:mt-16 md:text-sm">
-                <p>ひと粒のお米の向こうには、<br />山から流れてくる水や、田んぼに集う生きもの、<br />トキが舞う空と、長い年月をかけて受け継がれてきた田んぼがあります。</p>
-                <p>あなたの「いいとき」は、自然が重ねてきた時間とつながっている。<br />ありのままのあなたで、<br />きょうも、しぜんと。</p>
+              <div className="mt-8 max-w-[680px] space-y-5 md:space-y-7 text-left text-[13px] font-light leading-[1.8] tracking-[0.09em] md:leading-[2.3] text-gray-600 md:mt-16 md:text-sm">
+                <p>ひと粒のお米の向こうには、<br />山から流れてくる水や、<br className="md:hidden" />田んぼに集う生きもの、<br />トキが舞う空と、<br className="md:hidden" />長い年月をかけて<br className="md:hidden" />受け継がれてきた田んぼがあります。</p>
+                <p>あなたの「いいとき」は、自然が重ねてきた時間とつながっている。<br /><br className="md:hidden" />ありのままのあなたで、<br />きょうも、しぜんと。</p>
               </div>
             </div>
 
