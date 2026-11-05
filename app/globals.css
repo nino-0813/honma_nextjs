@@ -417,6 +417,7 @@
   }
 
   .about-children-title {
-    font-size: min(24px, 5.5cqw);
+    font-size: 26px;
+    letter-spacing: -0.04em;
   }
 }
