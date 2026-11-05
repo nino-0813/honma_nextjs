@@ -11,12 +11,12 @@ const TILES = [
 export default function Lineup() {
   return (
     <section id="products" className="bg-white pb-32 md:pb-48">
-      <ul className="site-shell grid grid-cols-2 gap-3 bg-white md:gap-5 lg:grid-cols-3 lg:gap-6">
+      <ul className="site-shell grid grid-cols-1 gap-3 bg-white md:grid-cols-2 md:gap-5 lg:grid-cols-3 lg:gap-6">
         {TILES.map((tile, index) => (
           <li key={tile.title} className={index === 2 ? 'col-start-1 lg:col-start-auto' : ''}>
             <FadeIn delay={index * 70}>
               <Link href={tile.href} aria-label={`${tile.title}の商品を見る`} className="group block">
-                <span className="relative block aspect-square overflow-hidden bg-dim">
+                <span className="relative block aspect-[2/1] overflow-hidden md:aspect-square bg-dim">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={tile.image} alt="" aria-hidden="true" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.025]" />
                   <span className="absolute inset-0 bg-black/25 transition-colors duration-300 group-hover:bg-black/35" />
@@ -29,7 +29,7 @@ export default function Lineup() {
             </FadeIn>
           </li>
         ))}
-        <li className="flex aspect-square items-end justify-end lg:hidden">
+        <li className="mt-5 flex items-end justify-end md:mt-0 md:aspect-square lg:hidden">
           <Link href="/collections" className="site-pill-link">
             商品一覧へ →
           </Link>
