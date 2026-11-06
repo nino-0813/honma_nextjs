@@ -57,13 +57,12 @@ it('exports the filtered result when nothing is checked and surfaces failures fo
   expect((screen.getByRole('button', { name: /ヤマト取込用Excel/ }) as HTMLButtonElement).disabled).toBe(false);
 });
 
-it('retains subscription CSV and adds Excel for the checked, matched shipment cycle', async () => {
+it('retains subscription CSV while removing the subscription Yamato Excel button', async () => {
   render(<Subscriptions />);
   await screen.findByRole('checkbox', { name: 'fixture@example.invalidを選択' });
   fireEvent.change(screen.getByLabelText('発送対象月'), { target: { value: '2026-11' } });
   fireEvent.click(screen.getByRole('checkbox', { name: /絞り込み結果の発送対象を全件選択/ }));
   expect(screen.getByRole('button', { name: '発送予定CSV（確認用）' })).toBeTruthy();
-  fireEvent.click(screen.getByRole('button', { name: 'ヤマト取込用Excel' }));
-  await waitFor(() => expect(mock.download).toHaveBeenCalledOnce());
-  expect(mock.download.mock.calls[0][0].map((o: any) => o.id)).toEqual(['first']);
+  expect(screen.queryByRole('button', { name: 'ヤマト取込用Excel' })).toBeNull();
+  expect(mock.download).not.toHaveBeenCalled();
 });
