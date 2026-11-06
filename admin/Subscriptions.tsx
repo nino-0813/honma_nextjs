@@ -9,6 +9,8 @@ import { fetchAllAnalyticsPages } from '@/lib/storeAnalytics';
 import { nextShipmentProduct, csvText, jstDay } from '@/lib/adminShipmentData';
 import SubscriptionAnnualSummary from './SubscriptionAnnualSummary';
 import { buildShipmentHandoff, shipmentTargets } from '@/lib/shipmentHandoff';
+import { subscriptionYamatoOrders } from '@/lib/subscriptionYamato';
+import { downloadYamatoWorkbook } from '@/lib/yamatoWorkbook';
 
 interface AdminSubscriptionRow {
   id: string;
@@ -79,6 +81,7 @@ const Subscriptions: React.FC = () => {
   const [selectedSubs, setSelectedSubs] = useState<Set<string>>(new Set());
   const [productLoadError, setProductLoadError] = useState(false);
   const [handoffError, setHandoffError] = useState('');
+  const [yamatoExporting, setYamatoExporting] = useState(false);
 
   const fetchSubs = async () => {
     if (!supabase) return;
@@ -180,6 +183,19 @@ const Subscriptions: React.FC = () => {
       window.location.assign(`/admin/orders?shipment=${key}`);
     } catch (e) { setHandoffError((e as Error).message || '選択情報を保存できません。ブラウザの保存設定をご確認ください'); }
   };
+  const exportYamatoExcel = async () => {
+    setHandoffError('');
+    setYamatoExporting(true);
+    try {
+      const orders = subscriptionYamatoOrders(selectedRows, allOrders, shipmentMonth);
+      await downloadYamatoWorkbook(orders, `ヤマト取込用_定期便_${jstDay(new Date())}.xlsx`);
+    } catch (error) {
+      setHandoffError(error instanceof Error ? error.message : 'Excelの出力に失敗しました。もう一度お試しください。');
+    } finally {
+      setYamatoExporting(false);
+    }
+  };
+
   const exportShipmentList = () => {
     const rows = selectedRows.flatMap(sub => shipmentTargets(sub,allOrders,shipmentMonth).map(target => {
       const order = allOrders.find(o=>o.id===target.orderId)||null;
@@ -419,8 +435,10 @@ const Subscriptions: React.FC = () => {
             <label className="text-sm"><input type="checkbox" checked={allSelected} onChange={() => setSelectedSubs(new Set(allSelected ? [] : eligibleRows.map(s => s.id)))} /> 絞り込み結果の発送対象を全件選択</label>
             <span className="text-sm">選択 {selectedRows.length}契約・{buildShipmentHandoff(selectedRows,allOrders,shipmentMonth).rows.length}発送回</span>
             <button type="button" disabled={!selectedRows.length || productLoadError} onClick={exportShipmentList} className="border rounded px-3 py-2 text-sm disabled:opacity-40">発送予定CSV（確認用）</button>
+            <button type="button" disabled={!selectedRows.length || productLoadError || yamatoExporting} onClick={exportYamatoExcel} className="border rounded px-3 py-2 text-sm disabled:opacity-40">{yamatoExporting ? 'Excelを作成中...' : 'ヤマト取込用Excel'}</button>
             <button type="button" disabled={!selectedRows.length || productLoadError} onClick={handoffShipmentOrders} className="rounded bg-emerald-800 px-3 py-2 text-sm text-white disabled:opacity-40">選択した定期便の注文を確認</button>
           </div>
+          <p className="text-xs text-gray-500">ヤマトExcelは対象回の注文がある発送のみ出力できます。C列（クール区分）・E列（出荷予定日）は出力後に入力してください。</p>
           <p className="text-xs text-gray-500">未決済・注文未作成も表示します。CSVは発送指示ではなく確認用です。注文未作成の回に過去注文を代用しません。</p>
           {selectedRows.flatMap(sub => shipmentTargets(sub,allOrders,shipmentMonth).map(target => <div key={`${sub.id}:${target.day}`} className="text-sm">{sub.customer_name||'氏名未登録'} ／ {target.day}：{target.orderId?<Link className="text-blue-700 underline" href={`/admin/orders?detail=${encodeURIComponent(target.orderId)}`}>対象回の注文を見る</Link>:'対象回未照合／注文未作成・要確認'}</div>))}
           {productLoadError && <p role="alert" className="text-sm text-red-700">商品・発送状態を取得できません。CSV出力は停止しています。</p>}

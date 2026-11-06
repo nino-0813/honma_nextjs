@@ -5,6 +5,8 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { fetchAllAnalyticsPages } from '@/lib/storeAnalytics';
 import { supabase } from '@/lib/supabase';
+import { downloadYamatoWorkbook } from '@/lib/yamatoWorkbook';
+import { jstDay } from '@/lib/adminShipmentData';
 import { parseShipmentHandoff, resolveShipmentHandoff } from '@/lib/shipmentHandoff';
 import {
   IconChevronDown,
@@ -236,6 +238,7 @@ const Orders = () => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkStatus, setBulkStatus] = useState<Exclude<MappedStatus, 'all'>>('before_shipping');
   const [exportOpen, setExportOpen] = useState(false);
+  const [yamatoExporting, setYamatoExporting] = useState(false);
   const [detailOrder, setDetailOrder] = useState<Order | null>(null);
   const [couponInfoById, setCouponInfoById] = useState<Record<string, { code: string | null; name: string | null; note: string | null }>>({});
   const [shippingEdits, setShippingEdits] = useState<Record<string, { carrier: string; tracking: string }>>({});
@@ -787,6 +790,19 @@ const Orders = () => {
     downloadText(`shipping-${new Date().toISOString().slice(0, 10)}.csv`, toCsv(rows));
   };
 
+  const exportYamatoExcel = async () => {
+    const toExport = selectedCount > 0 ? filteredOrders.filter(o => selectedIds.has(o.id)) : filteredOrders;
+    setYamatoExporting(true);
+    try {
+      await downloadYamatoWorkbook(toExport, `ヤマト取込用_注文_${jstDay(new Date())}.xlsx`);
+      setExportOpen(false);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Excelの出力に失敗しました。もう一度お試しください。');
+    } finally {
+      setYamatoExporting(false);
+    }
+  };
+
   const exportTrackingImportCsv = () => {
     const toExportOrders = selectedCount > 0 ? filteredOrders.filter((o) => selectedIds.has(o.id)) : filteredOrders;
     if (toExportOrders.length === 0) {
@@ -1086,6 +1102,15 @@ const Orders = () => {
                   className="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100"
                 >
                   発送CSV（指定形式）{selectedCount > 0 ? `（選択${selectedCount}件）` : '（フィルタ適用）'}
+                </button>
+                <button
+                  type="button"
+                  disabled={yamatoExporting}
+                  onClick={exportYamatoExcel}
+                  className="w-full text-left px-4 py-3 text-sm hover:bg-gray-50 border-b border-gray-100 disabled:opacity-50"
+                >
+                  {yamatoExporting ? 'Excelを作成中...' : 'ヤマト取込用Excel'}{selectedCount > 0 ? `（選択${selectedCount}件）` : '（フィルタ適用）'}
+                  <span className="mt-1 block text-xs text-gray-500">C列・E列は出力後に手動入力</span>
                 </button>
                 <button
                   onClick={exportTrackingImportCsv}
