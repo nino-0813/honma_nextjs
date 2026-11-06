@@ -1,28 +1,30 @@
-import { buildYamatoRows, YAMATO_HEADERS, type YamatoOrder } from './yamatoExport';
+import { buildYamatoRows, type YamatoOrder } from './yamatoExport';
+import type { Style } from 'exceljs';
+import template from './yamatoTemplate.json';
+
+const cloneStyle = (style: unknown): Partial<Style> => JSON.parse(JSON.stringify(style));
 
 export async function createYamatoWorkbook(orders: YamatoOrder[]) {
   const rows = buildYamatoRows(orders);
   // Only load the Excel writer when an administrator asks for an export.
   const { default: ExcelJS } = await import('exceljs');
   const workbook = new ExcelJS.Workbook();
-  const sheet = workbook.addWorksheet('外部データ取り込み基本レイアウト', { views: [{ state: 'frozen', ySplit: 1 }] });
-  sheet.columns = YAMATO_HEADERS.map((header, index) => ({
-    header, width: [11, 22, 27, 32].includes(index) ? 45 : 22, style: { numFmt: '@' },
-  }));
-  sheet.getRow(1).font = { bold: true };
-  sheet.getRow(1).height = 32;
-  sheet.getRow(1).alignment = { vertical: 'middle', wrapText: true };
+  const sheet = workbook.addWorksheet(template.sheetName);
+  sheet.columns = template.columns.map(column => ({ header: column.header, width: column.width }));
+  sheet.getRow(1).height = template.headerHeight;
+  template.columns.forEach((column, index) => {
+    sheet.getCell(1, index + 1).style = cloneStyle(template.headerStyles[column.headerStyleIndex]);
+  });
   sheet.getCell('C1').note = 'クール区分は出力後に手動入力してください。';
   sheet.getCell('E1').note = '出荷予定日は出力後にYYYY/MM/DDで手動入力してください。';
   for (const values of rows) {
     // Assign literal strings, never formulas, to preserve leading zeroes and customer text.
     const row = sheet.addRow(values);
-    row.eachCell({ includeEmpty: true }, cell => { cell.numFmt = '@'; });
-    for (const column of [3, 5]) row.getCell(column).fill = {
-      type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF2CC' },
-    };
+    row.height = template.dataRowHeight;
+    template.columns.forEach((column, index) => {
+      row.getCell(index + 1).style = { ...cloneStyle(template.dataStyle), numFmt: '@' };
+    });
   }
-  sheet.autoFilter = { from: 'A1', to: `AP${rows.length + 1}` };
   return workbook;
 }
 

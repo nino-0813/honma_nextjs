@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { buildYamatoRows, yamatoTimeCode, YAMATO_HEADERS, type YamatoOrder } from '../lib/yamatoExport';
 import { createYamatoWorkbook } from '../lib/yamatoWorkbook';
+import template from '../lib/yamatoTemplate.json';
 
 // Synthetic fixtures only, not customer records.
 export const sampleOrder: YamatoOrder = {
@@ -33,7 +34,7 @@ describe('revised Yamato 42-column mapping', () => {
     }
   });
 
-  it('retains the buyer as sender for a gift, with the EC message and subscription flag only for different parties', () => {
+  it('retains the buyer as sender for a gift, with the EC message and a subscription label for both same and different parties', () => {
     const gift = { ...sampleOrder, shipping_last_name: '試験', shipping_first_name: '受取人', shipping_phone: '010-0000-0002' };
     for (const subscription of [false, true]) {
       const [row] = buildYamatoRows([{ ...gift, stripe_subscription_id: subscription ? 'sub_fixture' : null }]);
@@ -45,7 +46,7 @@ describe('revised Yamato 42-column mapping', () => {
       expect(column(row, 'Y')).toBe('試験 購入者');
       expect(column(row, 'AG')).toBe(`イケベジECサイトより発送${subscription ? ' 定期便' : ''}`);
     }
-    expect(column(buildYamatoRows([{ ...sampleOrder, stripe_subscription_id: 'sub_fixture' }])[0], 'AG')).toBe('');
+    expect(column(buildYamatoRows([{ ...sampleOrder, stripe_subscription_id: 'sub_fixture' }])[0], 'AG')).toBe('定期便');
   });
 
   it.each([
@@ -99,7 +100,13 @@ it('round-trips a macro-free XLSX with literal strings, 42 columns, and data fro
   expect(sheet.getCell('G2').value).toBe('0812');
   expect(sheet.getCell('AP2').value).toBe('01');
   expect(sheet.getCell('P2').value).toBe('試験 =1+1');
-  expect(Array.from({ length: 42 }, (_, i) => sheet.getCell(1, i + 1).value)).toEqual([...YAMATO_HEADERS]);
+  expect(Array.from({ length: 42 }, (_, i) => sheet.getCell(1, i + 1).value)).toEqual(template.columns.map(column => column.header));
+  expect(sheet.getRow(1).height).toBe(template.headerHeight);
+  for (let i = 0; i < 42; i++) {
+    expect(template.columns[i].header.split('\n')[0]).toBe(YAMATO_HEADERS[i]);
+    expect(sheet.getColumn(i + 1).width).toBe(template.columns[i].width);
+    expect(sheet.getCell(1, i + 1).fill).toEqual(template.headerStyles[template.columns[i].headerStyleIndex].fill);
+  }
   for (let i = 1; i <= 42; i++) expect(sheet.getCell(2, i).numFmt).toBe('@');
   expect(sheet.getCell('C2').value || '').toBe('');
   expect(sheet.getCell('E2').value || '').toBe('');

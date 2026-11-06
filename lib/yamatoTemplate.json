@@ -1,0 +1,493 @@
+{
+  "source": "1khMCTsX9IhkicIDJHQFOObzJIZjmf7gM",
+  "capturedOn": "2026-11-06",
+  "sheetName": "外部データ取り込み基本レイアウト",
+  "headerHeight": 349.5,
+  "dataRowHeight": 13.5,
+  "columns": [
+    {
+      "header": "お客様管理番号\n半角英数字50文字",
+      "width": 20,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "送り状種類\n半角数字1文字\n 0 : 発払い\n 2 : コレクト\n 3 : クロネコゆうメール\n 4 : タイム\n 5 : 着払い\n 6 : 発払い（複数口）\n 7 : クロネコゆうパケット\n 8 : 宅急便コンパクト\n 9 : 宅急便コンパクトコレクト\n A : ネコポス\n\n(※宅急便_必須項目)\n(※クロネコゆうメール_必須項目)\n(※クロネコゆうパケット_必須項目)\n(※ネコポス_必須項目)",
+      "width": 32.5,
+      "headerStyleIndex": 1
+    },
+    {
+      "header": "クール区分\n半角数字1文字\n0または空白 : 通常\n 1 : クール冷凍\n 2 : クール冷蔵\n\n※「0:発払い」、「2:コレクト」、「5:着払い」のみ、ご利用頂けます。上記以外の送り状の場合、空白扱いで取り込みます。",
+      "width": 24.13,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "伝票番号\n半角数字12文字\n\n※B2クラウドにて付与",
+      "width": 16.13,
+      "headerStyleIndex": 2
+    },
+    {
+      "header": "出荷予定日\n半角10文字\n｢YYYY/MM/DD｣で入力してください。\n\n(※宅急便_必須項目)\n(※クロネコゆうメール_必須項目)\n(※クロネコゆうパケット_必須項目)\n(※ネコポス_必須項目)",
+      "width": 21.63,
+      "headerStyleIndex": 3
+    },
+    {
+      "header": "お届け予定日\n半角10文字\n｢YYYY/MM/DD｣で入力してください。\n\n※入力なしの場合、印字されません。\n※「最短日」と入力可",
+      "width": 16.88,
+      "headerStyleIndex": 4
+    },
+    {
+      "header": "配達時間帯\n半角4文字\n発払・コレクト・着払・宅急便コンパクト・宅急便コンパクトコレクト・発払（複数口）　の場合\n 空白 : 指定なし\n 0812 : 午前中\n 1416 : 14～16時\n 1618 : 16～18時\n 1820 : 18～20時\n 1921 : 19～21時\n\nタイム\n 0010 : 午前10時まで\n 0017 : 午後5時まで",
+      "width": 19.63,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "お届け先コード\n半角英数字20文字",
+      "width": 23,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "お届け先電話番号\n半角数字15文字ハイフン含む\n\n(※宅急便_必須項目)\n(※クロネコゆうパケット_必須項目)\n(※ネコポス_必須項目)",
+      "width": 21.13,
+      "headerStyleIndex": 1
+    },
+    {
+      "header": "お届け先電話番号枝番\n半角数字2文字",
+      "width": 21.88,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "お届け先郵便番号\n半角数字8文字\nハイフンなし7文字も可\n\n(※宅急便_必須項目)\n(※クロネコゆうメール_必須項目)\n(※クロネコゆうパケット_必須項目)\n(※ネコポス_必須項目)",
+      "width": 21.63,
+      "headerStyleIndex": 1
+    },
+    {
+      "header": "お届け先住所\n全角/半角\n都道府県（４文字）\n市区郡町村（１２文字）\n町・番地（１６文字）\n\n(※宅急便_必須項目)\n(※クロネコゆうメール_必須項目)\n(※クロネコゆうパケット_必須項目)\n(※ネコポス_必須項目)",
+      "width": 61.13,
+      "headerStyleIndex": 1
+    },
+    {
+      "header": "お届け先アパートマンション名\n全角/半角 \n16文字/32文字 ",
+      "width": 33.13,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "お届け先会社・部門１\n全角/半角\n25文字/50文字 ",
+      "width": 42.13,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "お届け先会社・部門２\n全角/半角 \n25文字/50文字 ",
+      "width": 42.13,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "お届け先名\n全角/半角\n16文字/32文字 \n\n(※宅急便_必須項目)\n(※クロネコゆうメール_必須項目)\n(※クロネコゆうパケット_必須項目)\n(※ネコポス_必須項目)",
+      "width": 31.88,
+      "headerStyleIndex": 1
+    },
+    {
+      "header": "お届け先名(ｶﾅ)\n半角カタカナ 50文字 ",
+      "width": 54.63,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "敬称\n全角/半角 2文字/4文字\nクロネコゆうメールの場合に指定可能\n【入力例】\n様・御中・殿・行・係・宛・先生・なし",
+      "width": 25.63,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "ご依頼主コード\n半角英数字 20文字 ",
+      "width": 21.13,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "ご依頼主電話番号\n半角数字15文字ハイフン含む\n\n(※宅急便_必須項目)\n(※クロネコゆうパケット_必須項目)\n(※ネコポス_必須項目)",
+      "width": 20.63,
+      "headerStyleIndex": 1
+    },
+    {
+      "header": "ご依頼主電話番号枝番\n半角数字 2文字 ",
+      "width": 21,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "ご依頼主郵便番号\n半角数字8文字\nハイフンなし半角7文字も可 \n\n(※宅急便_必須項目)\n(※クロネコゆうパケット_必須項目)\n(※ネコポス_必須項目)",
+      "width": 21.63,
+      "headerStyleIndex": 1
+    },
+    {
+      "header": "ご依頼主住所\n全角/半角32文字/64文字\n都道府県（４文字）\n市区郡町村（１２文字）\n町・番地（１６文字）\n\n(※宅急便_必須項目)\n(※クロネコゆうパケット_必須項目)\n(※ネコポス_必須項目)",
+      "width": 61.13,
+      "headerStyleIndex": 1
+    },
+    {
+      "header": "ご依頼主アパートマンション\n全角/半角 16文字/32文字 ",
+      "width": 32.63,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "ご依頼主名\n全角/半角 16文字/32文字 \n\n(※宅急便_必須項目)\n(※クロネコゆうパケット_必須項目)\n(※ネコポス_必須項目)",
+      "width": 32.13,
+      "headerStyleIndex": 1
+    },
+    {
+      "header": "ご依頼主名(ｶﾅ)\n半角カタカナ 50文字",
+      "width": 56.13,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "品名コード１\n半角英数字 30文字 ",
+      "width": 33.63,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "品名１\n全角/半角 25文字/50文字 \n\n(※宅急便_必須項目)\n(※クロネコゆうパケット_必須項目)\n(※ネコポス_必須項目)",
+      "width": 42.13,
+      "headerStyleIndex": 1
+    },
+    {
+      "header": "品名コード２\n半角英数字 30文字",
+      "width": 33.63,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "品名２\n全角/半角 25文字/50文字 ",
+      "width": 42.13,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "荷扱い１\n全角/半角 10文字/20文字 ",
+      "width": 19.5,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "荷扱い２\n全角/半角 10文字/20文字 ",
+      "width": 19.5,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "記事\n全角/半角 22文字/44文字 ",
+      "width": 30.13,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "ｺﾚｸﾄ代金引換額（税込)\n半角数字 7文字\n\n※コレクトの場合は必須\n300,000円以下　1円以上\n※但し、宅急便コンパクトコレクトの場合は\n30,000円以下　　1円以上",
+      "width": 23.88,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "内消費税額等\n半角数字 7文字\n\n※コレクトの場合は必須 \n※コレクト代金引換額（税込)以下",
+      "width": 15.13,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "止置き\n半角数字 1文字\n0 : 利用しない\n1 : 利用する ",
+      "width": 15.63,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "営業所コード\n半角数字 6文字\n\n※止置きを利用する場合は必須 ",
+      "width": 15.13,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "発行枚数\n半角数字 2文字\n\n※発払い、タイム、着払い、クロネコゆうパケット、発払い（複数口）、ネコポスのみ指定可能",
+      "width": 25.63,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "個数口表示フラグ\n半角数字 1文字\n1 : 印字する\n2 : 印字しない \n3 : 枠と口数を印字する\n\n※宅急便コンパクト、宅急便コンパクトコレクトは対象外\n※複数口の場合、本項目の指定に関係なく、3 : 枠と口数を印字する扱いとする",
+      "width": 25.63,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "請求先顧客コード\n半角数字10～12文字\n\n(※宅急便_必須項目)\n(※クロネコゆうパケット_必須項目)\n(※ネコポス_必須項目)",
+      "width": 21.63,
+      "headerStyleIndex": 1
+    },
+    {
+      "header": "請求先分類コード\n空白または半角数字3文字\n",
+      "width": 21.63,
+      "headerStyleIndex": 0
+    },
+    {
+      "header": "運賃管理番号\n半角数字2文字\n\n(※宅急便_必須項目)\n(※クロネコゆうパケット_必須項目)\n(※ネコポス_必須項目)",
+      "width": 19.88,
+      "headerStyleIndex": 1
+    }
+  ],
+  "dataStyle": {
+    "font": {
+      "size": 11,
+      "color": {
+        "theme": 1
+      },
+      "name": "MS PGothic"
+    },
+    "border": {},
+    "fill": {
+      "type": "pattern",
+      "pattern": "none"
+    },
+    "alignment": {
+      "vertical": "bottom",
+      "wrapText": false,
+      "shrinkToFit": false
+    }
+  },
+  "headerStyles": [
+    {
+      "numFmt": "@",
+      "font": {
+        "size": 11,
+        "color": {
+          "theme": 1
+        },
+        "name": "ＭＳ ゴシック"
+      },
+      "border": {
+        "left": {
+          "style": "thin",
+          "color": {
+            "argb": "FF000000"
+          }
+        },
+        "right": {
+          "style": "thin",
+          "color": {
+            "argb": "FF000000"
+          }
+        },
+        "top": {
+          "style": "thin",
+          "color": {
+            "argb": "FF000000"
+          }
+        },
+        "bottom": {
+          "style": "thin",
+          "color": {
+            "argb": "FF000000"
+          }
+        }
+      },
+      "fill": {
+        "type": "pattern",
+        "pattern": "solid",
+        "fgColor": {
+          "argb": "FFCCFFFF"
+        },
+        "bgColor": {
+          "argb": "FFCCFFFF"
+        }
+      },
+      "alignment": {
+        "vertical": "top",
+        "wrapText": true,
+        "shrinkToFit": false
+      }
+    },
+    {
+      "numFmt": "@",
+      "font": {
+        "size": 11,
+        "color": {
+          "theme": 1
+        },
+        "name": "ＭＳ ゴシック"
+      },
+      "border": {
+        "left": {
+          "style": "thin",
+          "color": {
+            "argb": "FF000000"
+          }
+        },
+        "right": {
+          "style": "thin",
+          "color": {
+            "argb": "FF000000"
+          }
+        },
+        "top": {
+          "style": "thin",
+          "color": {
+            "argb": "FF000000"
+          }
+        },
+        "bottom": {
+          "style": "thin",
+          "color": {
+            "argb": "FF000000"
+          }
+        }
+      },
+      "fill": {
+        "type": "pattern",
+        "pattern": "solid",
+        "fgColor": {
+          "argb": "FF00CCFF"
+        },
+        "bgColor": {
+          "argb": "FF00CCFF"
+        }
+      },
+      "alignment": {
+        "vertical": "top",
+        "wrapText": true,
+        "shrinkToFit": false
+      }
+    },
+    {
+      "numFmt": "@",
+      "font": {
+        "size": 11,
+        "color": {
+          "theme": 1
+        },
+        "name": "ＭＳ ゴシック"
+      },
+      "border": {
+        "left": {
+          "style": "thin",
+          "color": {
+            "argb": "FF000000"
+          }
+        },
+        "right": {
+          "style": "thin",
+          "color": {
+            "argb": "FF000000"
+          }
+        },
+        "top": {
+          "style": "thin",
+          "color": {
+            "argb": "FF000000"
+          }
+        },
+        "bottom": {
+          "style": "thin",
+          "color": {
+            "argb": "FF000000"
+          }
+        }
+      },
+      "fill": {
+        "type": "pattern",
+        "pattern": "solid",
+        "fgColor": {
+          "argb": "FF969696"
+        },
+        "bgColor": {
+          "argb": "FF969696"
+        }
+      },
+      "alignment": {
+        "vertical": "top",
+        "wrapText": true,
+        "shrinkToFit": false
+      }
+    },
+    {
+      "font": {
+        "size": 11,
+        "color": {
+          "theme": 1
+        },
+        "name": "ＭＳ ゴシック"
+      },
+      "border": {
+        "left": {
+          "style": "thin",
+          "color": {
+            "argb": "FF000000"
+          }
+        },
+        "right": {
+          "style": "thin",
+          "color": {
+            "argb": "FF000000"
+          }
+        },
+        "top": {
+          "style": "thin",
+          "color": {
+            "argb": "FF000000"
+          }
+        },
+        "bottom": {
+          "style": "thin",
+          "color": {
+            "argb": "FF000000"
+          }
+        }
+      },
+      "fill": {
+        "type": "pattern",
+        "pattern": "solid",
+        "fgColor": {
+          "argb": "FF00CCFF"
+        },
+        "bgColor": {
+          "argb": "FF00CCFF"
+        }
+      },
+      "alignment": {
+        "vertical": "top",
+        "wrapText": true,
+        "shrinkToFit": false
+      }
+    },
+    {
+      "font": {
+        "size": 11,
+        "color": {
+          "theme": 1
+        },
+        "name": "ＭＳ ゴシック"
+      },
+      "border": {
+        "left": {
+          "style": "thin",
+          "color": {
+            "argb": "FF000000"
+          }
+        },
+        "right": {
+          "style": "thin",
+          "color": {
+            "argb": "FF000000"
+          }
+        },
+        "top": {
+          "style": "thin",
+          "color": {
+            "argb": "FF000000"
+          }
+        },
+        "bottom": {
+          "style": "thin",
+          "color": {
+            "argb": "FF000000"
+          }
+        }
+      },
+      "fill": {
+        "type": "pattern",
+        "pattern": "solid",
+        "fgColor": {
+          "argb": "FFCCFFFF"
+        },
+        "bgColor": {
+          "argb": "FFCCFFFF"
+        }
+      },
+      "alignment": {
+        "vertical": "top",
+        "wrapText": true,
+        "shrinkToFit": false
+      }
+    }
+  ]
+}

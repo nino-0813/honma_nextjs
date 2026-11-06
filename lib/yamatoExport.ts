@@ -125,7 +125,7 @@ export function buildYamatoRows(orders: YamatoOrder[]): string[][] {
       row[24] = sameParty ? 'イケベジ' : buyerName; // Y
       row[27] = `${text(item.product_title)}${text(item.variant) ? ` / ${text(item.variant)}` : ''}${quantity > 1 ? `×${quantity}` : ''}`; // AB
       const isSubscription = subscription || Boolean(order.stripe_subscription_id || order.subscription_interval);
-      row[32] = sameParty ? '' : `イケベジECサイトより発送${isSubscription ? ' 定期便' : ''}`; // AG
+      row[32] = [sameParty ? '' : 'イケベジECサイトより発送', isSubscription ? '定期便' : ''].filter(Boolean).join(' '); // AG: subscription label applies even for the same party
       row[39] = '05036345251'; // AN: specified billing customer code
       row[41] = '01'; // AP
       rows.push(row);
