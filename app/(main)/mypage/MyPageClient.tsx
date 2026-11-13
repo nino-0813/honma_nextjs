@@ -15,6 +15,7 @@ import {
 import { getEventMileBalance, getEventMileTransactions } from '@/lib/eventMiles';
 import { computeNextShippingDate, formatJapaneseDate, isWithinChangeDeadline, getChangeDeadline } from '@/lib/subscriptionShipping';
 import SubscriptionCardChangeModal from '@/components/SubscriptionCardChangeModal';
+import { scopeSubscriptionItems, subscriptionSourceOrderId } from '@/lib/subscriptionScope';
 
 interface SubscriptionRow {
   id: string;
@@ -298,11 +299,15 @@ const MyPage = () => {
                 firstOrderBySub[o.stripe_subscription_id] = o.id;
               }
             });
-            const orderIds = Object.values(firstOrderBySub);
+            for (const sub of subsRows) {
+              const source = subscriptionSourceOrderId(sub.metadata);
+              if (source) firstOrderBySub[sub.stripe_subscription_id] = source;
+            }
+            const orderIds = [...new Set(Object.values(firstOrderBySub))];
             if (orderIds.length > 0) {
               const { data: itemsData } = await supabase
                 .from('order_items')
-                .select('order_id, product_id, product_title, product_image, product_price, quantity, is_subscription, selected_options')
+                .select('id, order_id, product_id, product_title, product_image, product_price, quantity, is_subscription, selected_options')
                 .in('order_id', orderIds);
               const itemsByOrderId: Record<string, any[]> = {};
               (itemsData ?? []).forEach((it: any) => {
@@ -311,7 +316,8 @@ const MyPage = () => {
               });
               const result: Record<string, SubscriptionItemView[]> = {};
               for (const [subId, orderId] of Object.entries(firstOrderBySub)) {
-                const items = (itemsByOrderId[orderId] || []).filter((it: any) => it.is_subscription);
+                const metadata = subsRows.find(sub => sub.stripe_subscription_id === subId)?.metadata;
+                const items = scopeSubscriptionItems(itemsByOrderId[orderId] || [], metadata).filter((it: any) => it.is_subscription);
                 result[subId] = items.map((it: any) => ({
                   product_id: it.product_id,
                   product_title: it.product_title || '商品',

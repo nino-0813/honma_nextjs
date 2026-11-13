@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { computeNextShippingDate, formatJapaneseDate, getSubscriptionChangeTiming } from '@/lib/subscriptionShipping';
 import { applySubscriptionProductChange } from '@/lib/subscriptionChanges';
+import { subscriptionItemIds } from '@/lib/subscriptionScope';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -27,6 +28,8 @@ export async function POST(request: Request) {
     if (!sub) return NextResponse.json({ error: '定期購入が見つかりません' }, { status: 404 });
     if (sub.auth_user_id && sub.auth_user_id !== userData.user.id) return NextResponse.json({ error: '権限がありません' }, { status: 403 });
     if (!['active', 'trialing'].includes(sub.status)) return NextResponse.json({ error: '稼働中の定期購入のみ変更できます' }, { status: 400 });
+    const scopedIds = subscriptionItemIds(sub.metadata);
+    if (scopedIds && scopedIds.length > 1) return NextResponse.json({ error: '複数商品を含む契約の商品変更は個別確認が必要です' }, { status: 400 });
 
     const nextShipping = computeNextShippingDate({
       created_at: sub.created_at, next_billing_at: sub.next_billing_at, interval: sub.interval,

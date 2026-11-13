@@ -1,4 +1,5 @@
 import { computeFirstShippingDate, computeNextShippingDate } from './subscriptionShipping';
+import { subscriptionOrders, subscriptionSourceOrderId } from './subscriptionScope';
 export const jstDay = (d: Date) => Number.isFinite(d.getTime()) ? new Date(d.getTime() + 9 * 3600000).toISOString().slice(0, 10) : '';
 export function shipmentDay(sub: any) {
   if (!['active', 'trialing', 'past_due', 'unpaid'].includes(sub.status)) return null;
@@ -6,7 +7,7 @@ export function shipmentDay(sub: any) {
   return date && Number.isFinite(date.getTime()) ? jstDay(date) : null;
 }
 export function orderShipmentDay(order: any, sub: any, firstOrderId: string) {
-  if (order.id === firstOrderId) return jstDay(computeFirstShippingDate(new Date(order.created_at), sub.metadata?.first_shipping_override));
+  if (order.id === (subscriptionSourceOrderId(sub.metadata) || firstOrderId)) return jstDay(computeFirstShippingDate(new Date(order.created_at), sub.metadata?.first_shipping_override));
   // A delayed payment can arrive in another shipping month. Never identify a
   // recurring shipment from payment/creation date alone.
   return typeof order.subscription_shipping_date === 'string' ? order.subscription_shipping_date.slice(0, 10) : null;
@@ -14,14 +15,14 @@ export function orderShipmentDay(order: any, sub: any, firstOrderId: string) {
 export function shipmentOrders(sub: any, orders: any[]) {
   const day = shipmentDay(sub);
   if (!day) return [];
-  const related = orders.filter(o => o.stripe_subscription_id === sub.stripe_subscription_id).sort((a, b) => a.created_at.localeCompare(b.created_at));
+  const related = subscriptionOrders(sub, orders);
   const first = related[0]?.id;
   return related.filter(o => !['cancelled','shipped','delivered'].includes(o.order_status) &&
     !(o.order_items?.length && o.order_items.every((i: any) => i.shipping_status === 'shipped')) &&
     orderShipmentDay(o, sub, first) === day);
 }
 export function shipmentHasShipped(sub: any, orders: any[]) {
-  const related = orders.filter(o => o.stripe_subscription_id === sub.stripe_subscription_id).sort((a, b) => a.created_at.localeCompare(b.created_at));
+  const related = subscriptionOrders(sub, orders);
   const day = shipmentDay(sub);
   return Boolean(day && related.some(o => orderShipmentDay(o, sub, related[0]?.id) === day &&
     (['shipped','delivered'].includes(o.order_status) || o.order_items?.length && o.order_items.every((i: any) => i.shipping_status === 'shipped'))));
@@ -29,7 +30,7 @@ export function shipmentHasShipped(sub: any, orders: any[]) {
 export function nextShipmentProduct(sub: any, orders: any[]) {
   const current = sub.metadata?.current_product;
   if (current?.product_title) return `${current.product_title}${current.variant ? ` / ${current.variant}` : ''}`;
-  const original = orders.filter(o => o.stripe_subscription_id === sub.stripe_subscription_id).sort((a, b) => a.created_at.localeCompare(b.created_at))[0];
+  const original = subscriptionOrders(sub, orders)[0];
   return (original?.order_items || []).filter((i: any) => i.is_subscription).map((i: any) => `${i.product_title}${i.variant ? ` / ${i.variant}` : ''}`).join('・') || '商品情報未登録';
 }
 export function csvText(rows: Record<string, unknown>[]) {

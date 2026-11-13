@@ -1,4 +1,5 @@
 import Stripe from 'stripe';
+import { scopeSubscriptionItems, subscriptionSourceOrderId, subscriptionItemIds } from './subscriptionScope';
 
 export type PendingProductChange = {
   product_id: string;
@@ -21,18 +22,26 @@ export async function applySubscriptionProductChange(args: {
   const { data: subscriptionRow, error: subscriptionError } = await db.from('subscriptions')
     .select('id, metadata').eq('stripe_subscription_id', subscriptionId).maybeSingle();
   if (subscriptionError || !subscriptionRow) throw new Error('定期便の契約情報が見つかりません');
+  const scopedIds = subscriptionItemIds(subscriptionRow.metadata);
+  if (scopedIds && scopedIds.length !== 1) throw new Error('複数商品を含む契約の商品変更は個別確認が必要です');
+  const sourceOrderId = subscriptionSourceOrderId(subscriptionRow.metadata);
   const { data: firstOrder, error: orderError } = await db.from('orders')
     .select('id')
-    .eq('stripe_subscription_id', subscriptionId)
+    .eq(sourceOrderId ? 'id' : 'stripe_subscription_id', sourceOrderId || subscriptionId)
     .order('created_at', { ascending: true }).limit(1).maybeSingle();
   if (orderError) throw orderError;
 
   let currentItem: any = null;
   if (firstOrder?.id) {
-    const { data, error: itemError } = await db.from('order_items')
-      .select('*').eq('order_id', firstOrder.id).eq('is_subscription', true).limit(1).maybeSingle();
-    if (itemError) throw itemError;
-    currentItem = data;
+    if (sourceOrderId) {
+      const { data, error } = await db.from('order_items').select('*').eq('order_id',firstOrder.id);
+      if (error) throw error;
+      currentItem = scopeSubscriptionItems(data || [], subscriptionRow.metadata)[0];
+    } else {
+      const { data, error } = await db.from('order_items').select('*').eq('order_id', firstOrder.id).eq('is_subscription', true).limit(1).maybeSingle();
+      if (error) throw error;
+      currentItem = data;
+    }
   }
 
   const sub: any = await stripe.subscriptions.retrieve(subscriptionId, { expand: ['items.data.price.product'] });

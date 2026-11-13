@@ -14,6 +14,11 @@ export function mergeSubscriptionMetadata(
   stripe: Record<string, any> | null,
 ) {
   const merged = { ...(existing || {}), ...(stripe || {}) };
+  if (existing?.billing_group_version === '1') {
+    for (const key of ['billing_group_version','billing_group_key','order_id','source_item_ids','recurring_shipping_yen']) {
+      merged[key] = existing[key];
+    }
+  }
   for (const key of [
     "current_product",
     "pending_changes",

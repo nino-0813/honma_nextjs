@@ -9,6 +9,7 @@ import { fetchAllAnalyticsPages } from '@/lib/storeAnalytics';
 import { nextShipmentProduct, csvText, jstDay } from '@/lib/adminShipmentData';
 import SubscriptionAnnualSummary from './SubscriptionAnnualSummary';
 import { buildShipmentHandoff, shipmentTargets } from '@/lib/shipmentHandoff';
+import { subscriptionOrders, subscriptionSourceOrderId } from '@/lib/subscriptionScope';
 
 interface AdminSubscriptionRow {
   id: string;
@@ -91,11 +92,12 @@ const Subscriptions: React.FC = () => {
 
       const subscriptionRows = (data ?? []) as AdminSubscriptionRow[];
       const subscriptionIds = subscriptionRows.map((row) => row.stripe_subscription_id);
+      const sourceOrderIds = [...new Set(subscriptionRows.map(row => subscriptionSourceOrderId(row.metadata)).filter((id): id is string => Boolean(id)))];
       const authUserIds = Array.from(
         new Set(subscriptionRows.map((row) => row.auth_user_id).filter((id): id is string => Boolean(id)))
       );
 
-      const [ordersRes, profilesRes] = await Promise.all([
+      const [linkedOrdersRes, profilesRes, sourceOrdersRes] = await Promise.all([
         subscriptionIds.length > 0
           ? fetchAllAnalyticsPages<any>((from, to) => client.from('orders')
               .select('*,order_items(*)', { count: 'exact' }).in('stripe_subscription_id', subscriptionIds)
@@ -104,7 +106,12 @@ const Subscriptions: React.FC = () => {
         authUserIds.length > 0
           ? supabase.from('profiles').select('id, first_name, last_name').in('id', authUserIds)
           : Promise.resolve({ data: [], error: null }),
+        sourceOrderIds.length > 0
+          ? fetchAllAnalyticsPages<any>((from, to) => client.from('orders').select('*,order_items(*)', { count: 'exact' }).in('id', sourceOrderIds).order('id').range(from,to))
+              .then(data => ({ data, error: null }), error => ({ data: [], error }))
+          : Promise.resolve({ data: [], error: null }),
       ]);
+      const ordersRes = { data: [...new Map([...linkedOrdersRes.data, ...sourceOrdersRes.data].map(order => [order.id, order])).values()], error: linkedOrdersRes.error || sourceOrdersRes.error };
 
       if (ordersRes.error) {
         console.warn('定期購入者名の注文情報取得に失敗しました:', ordersRes.error);
@@ -183,7 +190,7 @@ const Subscriptions: React.FC = () => {
   const exportShipmentList = () => {
     const rows = selectedRows.flatMap(sub => shipmentTargets(sub,allOrders,shipmentMonth).map(target => {
       const order = allOrders.find(o=>o.id===target.orderId)||null;
-      const original = allOrders.filter(o => o.stripe_subscription_id === sub.stripe_subscription_id).sort((a, b) => a.created_at.localeCompare(b.created_at))[0];
+      const original = subscriptionOrders(sub, allOrders)[0];
       const address = order ? null : sub.metadata?.shipping;
       const snapshot = order || original;
       return { 顧客名: sub.customer_name || '氏名未登録', 発送予定日: target.day, 商品: order ? (order.order_items||[]).map((i:any)=>i.product_title).join('・') : nextShipmentProduct(sub, allOrders),
@@ -219,7 +226,11 @@ const Subscriptions: React.FC = () => {
         .eq('stripe_subscription_id', sub.stripe_subscription_id)
         .order('created_at', { ascending: false });
       if (ordersRes.error) throw ordersRes.error;
-      setDetailOrders((ordersRes.data ?? []) as OrderSummary[]);
+      const source = subscriptionSourceOrderId(sub.metadata);
+      const initial = source ? allOrders.find(order => order.id === source) : null;
+      const details = [...(ordersRes.data || [])];
+      if (initial && !details.some(order => order.id === initial.id)) details.push(initial);
+      setDetailOrders(details.sort((a,b) => b.created_at.localeCompare(a.created_at)) as OrderSummary[]);
 
       // 解約アンケート（service role 経由なら全件参照可能）
       try {
@@ -662,6 +673,7 @@ const Subscriptions: React.FC = () => {
                               {o.order_number || o.id.slice(0, 8)}
                             </div>
                             <div className="text-xs text-gray-500 mt-0.5">{formatDate(o.created_at)}</div>
+                            {o.id === subscriptionSourceOrderId(activeSub.metadata) && <div className="text-xs text-gray-500">初回一括決済の注文（金額は他の商品を含む合計）</div>}
                           </div>
                           <div className="text-right">
                             <div className="text-gray-900 font-medium">{formatYen(o.total)}</div>

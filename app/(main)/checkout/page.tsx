@@ -77,135 +77,7 @@ const getPrefectureFromPostalCode = (postalCode: string): string | null => {
   return null;
 };
 
-// 都道府県から地域（AreaFeesのキー）を判定
-// NOTE: 送料テーブルの地域キーは運用で変遷しやすい（旧: north_tohoku/kanto... 新: kitatohoku/kanto_area...）
-//       Checkout側は両方に対応して「0円」にならないようにする。
-const getAreaFromPrefecture = (prefecture: string): keyof AreaFees | null => {
-  if (!prefecture) return null;
-  
-  if (prefecture === '北海道') return 'hokkaido';
-  // 新地域区分（ShippingMethodEditorのキーに合わせる）
-  if (['青森県', '秋田県', '岩手県'].includes(prefecture)) return 'kitatohoku' as any;
-  if (['宮城県', '山形県', '福島県'].includes(prefecture)) return 'minamitohoku' as any;
-  if (['東京都', '神奈川県', '山梨県', '千葉県', '茨城県', '栃木県', '群馬県', '埼玉県'].includes(prefecture)) return 'kanto_area' as any;
-  if (['新潟県', '長野県'].includes(prefecture)) return 'shinetsu';
-  if (['富山県', '石川県', '福井県'].includes(prefecture)) return 'hokuriku';
-  if (['静岡県', '愛知県', '三重県', '岐阜県'].includes(prefecture)) return 'chubu_area' as any;
-  if (['大阪府', '京都府', '滋賀県', '奈良県', '和歌山県', '兵庫県'].includes(prefecture)) return 'kansai_area' as any;
-  if (['岡山県', '広島県', '山口県', '鳥取県', '島根県'].includes(prefecture)) return 'chugoku_area' as any;
-  if (['香川県', '徳島県', '愛媛県', '高知県'].includes(prefecture)) return 'shikoku_area' as any;
-  if (['福岡県', '佐賀県', '長崎県', '熊本県', '大分県', '宮崎県', '鹿児島県'].includes(prefecture)) return 'kyushu_area' as any;
-  if (prefecture === '沖縄県') return 'okinawa_area' as any;
-  
-  return null;
-};
-
-const AREA_KEY_COMPAT: Record<string, string> = {
-  // new -> old
-  kitatohoku: 'north_tohoku',
-  minamitohoku: 'south_tohoku',
-  kanto_area: 'kanto',
-  chubu_area: 'chubu',
-  kansai_area: 'kansai',
-  chugoku_area: 'chugoku',
-  shikoku_area: 'shikoku',
-  kyushu_area: 'kyushu',
-  okinawa_area: 'okinawa',
-  // old -> new
-  north_tohoku: 'kitatohoku',
-  south_tohoku: 'minamitohoku',
-  kanto: 'kanto_area',
-  chubu: 'chubu_area',
-  kansai: 'kansai_area',
-  chugoku: 'chugoku_area',
-  shikoku: 'shikoku_area',
-  kyushu: 'kyushu_area',
-  okinawa: 'okinawa_area',
-};
-
-const getAreaFee = (fees: any, areaKey: string | null): number => {
-  if (!fees || !areaKey) return 0;
-  const direct = fees?.[areaKey];
-  if (direct !== undefined && direct !== null) return Number(direct) || 0;
-  const compat = AREA_KEY_COMPAT[areaKey];
-  const alt = compat ? fees?.[compat] : undefined;
-  if (alt !== undefined && alt !== null) return Number(alt) || 0;
-  return 0;
-};
-
-type SizeBoxType = {
-  size?: number;
-  weight_kg?: number;
-  cap: number;   // 1箱に入る数
-  cost: number;  // 1箱あたりの送料（地域別）
-};
-
-type SizeFeePlan = {
-  cost: number;
-  boxes: Array<{ label: string; count: number; perBoxCost: number; cap: number }>;
-};
-
-// サイズ別送料（size_fees）で、qty個を送る最小送料と箱割りを求める
-// - boxType: { max_items_per_box, area_fees } を1箱として扱う
-// - 例: 100サイズ(5個/箱) + 60サイズ(1個/箱) など「混在」も最小化に含める
-const getMinPlanForSizeFees = (sizeFees: any, qty: number, areaKey: string | null): SizeFeePlan => {
-  const target = Math.max(0, Number(qty || 0));
-  if (!sizeFees || target <= 0) return { cost: 0, boxes: [] };
-
-  const boxTypes: SizeBoxType[] = [];
-  for (const sf of Object.values(sizeFees as any)) {
-    const cap = Math.max(1, Number((sf as any)?.max_items_per_box || 1));
-    const cost = getAreaFee((sf as any)?.area_fees, areaKey);
-    const size = (sf as any)?.size;
-    const weight_kg = (sf as any)?.weight_kg;
-    if (cost > 0) boxTypes.push({ size, weight_kg, cap, cost });
-  }
-  if (boxTypes.length === 0) return { cost: 0, boxes: [] };
-
-  // dp[i] = i個送る最小送料（iは0..target）
-  const dp = Array(target + 1).fill(Infinity) as number[];
-  const prev = Array(target + 1).fill(-1) as number[];
-  const prevBoxIdx = Array(target + 1).fill(-1) as number[];
-  dp[0] = 0;
-  for (let i = 0; i <= target; i++) {
-    if (!Number.isFinite(dp[i])) continue;
-    for (let b = 0; b < boxTypes.length; b++) {
-      const bt = boxTypes[b];
-      const next = Math.min(target, i + bt.cap);
-      const cand = dp[i] + bt.cost;
-      if (cand < dp[next]) {
-        dp[next] = cand;
-        prev[next] = i;
-        prevBoxIdx[next] = b;
-      }
-    }
-  }
-  if (!Number.isFinite(dp[target])) return { cost: 0, boxes: [] };
-
-  // reconstruct
-  const counts = new Map<number, number>(); // boxIdx -> count
-  let cur = target;
-  while (cur > 0 && prev[cur] !== -1 && prevBoxIdx[cur] !== -1) {
-    const bi = prevBoxIdx[cur];
-    counts.set(bi, (counts.get(bi) || 0) + 1);
-    cur = prev[cur];
-  }
-
-  const boxes: SizeFeePlan['boxes'] = [];
-  for (const [bi, count] of counts.entries()) {
-    const bt = boxTypes[bi];
-    const label = bt.size ? `${bt.size}サイズ` : 'サイズ別';
-    boxes.push({ label, count, perBoxCost: bt.cost, cap: bt.cap });
-  }
-  // size順に並べる（見やすさ）
-  boxes.sort((a, b) => {
-    const an = Number(String(a.label).replace(/[^0-9]/g, '') || 0);
-    const bn = Number(String(b.label).replace(/[^0-9]/g, '') || 0);
-    return an - bn;
-  });
-
-  return { cost: dp[target], boxes };
-};
+import { getAreaFromPrefecture, getAreaFee, getMinPlanForSizeFees, datedShipmentShippingPlan } from '@/lib/shippingRates';
 
 const resolvePrefectureForShipping = (formData: any): string | null => {
   // 住所検索（Zipcloud）で入ってきた都道府県を最優先（郵便番号テーブルは網羅できないため）
@@ -1011,6 +883,16 @@ const Checkout = () => {
     const areaKey = prefecture ? getAreaFromPrefecture(prefecture) : null;
     if (!areaKey) return empty;
 
+    if (subscriptionCartInfo.isSubscriptionCart && subscriptionCartInfo.interval !== 'weekly' && subscriptionCartInfo.interval !== 'biweekly') {
+      const now = new Date();
+      const dated = cartItems.map(item => ({ product_id:item.product.id,title:item.product.title,quantity:item.quantity,free:Boolean(item.product.isFreeShipping),
+        firstShipping:new Date(computeFirstShippingDate(now,item.product.firstShippingOverrideDate).getTime()+9*3600000).toISOString().slice(0,10) }));
+      if (new Set(dated.map(item => item.firstShipping)).size > 1) {
+        try { return datedShipmentShippingPlan(dated,productShippingMethodIds,shippingMethods,prefecture!,formData.shippingMethod); }
+        catch (error) { return { ...empty, issue:error instanceof Error ? error.message : '発送ごとの送料を計算できません' }; }
+      }
+    }
+
     const shippingMethodById: Record<string, ShippingMethod> = Object.fromEntries(
       shippingMethods.map((m) => [m.id, m])
     );
@@ -1175,6 +1057,7 @@ const Checkout = () => {
   
   // 送料が0円になる理由を判定
   const getShippingCostIssue = (): string | null => {
+    if ('issue' in shippingPlan && shippingPlan.issue) return String(shippingPlan.issue);
     if (cartItems.length === 0) return null; // カートが空の場合はチェックしない
     
     // 配送先情報を決定（購入者情報と異なる場合は配送先情報を使用）
@@ -3119,14 +3002,10 @@ const Checkout = () => {
 
                   {/* 定期購入カートのとき: 初回お届け予定を表示 */}
                   {subscriptionCartInfo.isSubscriptionCart && !subscriptionCartInfo.blocked && (() => {
-                    // カート内の override 日（最も遅い日）を取得
-                    const overrides = subscriptionCartInfo.subscriptionItems
-                      .map((it) => it.product?.firstShippingOverrideDate ?? null)
-                      .filter((d): d is string => Boolean(d))
-                      .sort();
-                    const overrideMax = overrides.length > 0 ? overrides[overrides.length - 1] : null;
-                    const firstShipping = computeFirstShippingDate(new Date(), overrideMax);
-                    const isOverride = Boolean(overrideMax) && formatJapaneseDate(firstShipping) === formatJapaneseDate(computeFirstShippingDate(new Date(), overrideMax));
+                    const now = new Date();
+                    const starts = subscriptionCartInfo.subscriptionItems.map(item => ({ title:item.product.title,
+                      date:formatJapaneseDate(computeFirstShippingDate(now,item.product.firstShippingOverrideDate)) }));
+                    const split = new Set(starts.map(item => item.date)).size > 1;
                     return (
                       <div className="pt-4 border-t border-gray-200">
                         <div className="rounded-lg border border-sky-200 bg-sky-50 p-3 text-sm">
@@ -3137,12 +3016,10 @@ const Checkout = () => {
                             <span className="text-xs font-medium text-sky-900">初回お届け予定</span>
                           </div>
                           <p className="text-sky-900 font-medium">
-                            {formatJapaneseDate(firstShipping)} 発送予定
+                            {split ? starts.map((item,index) => <span key={index} className="block">{item.title}：{item.date} 発送予定</span>) : `${starts[0]?.date || '-'} 発送予定`}
                           </p>
                           <p className="text-xs text-sky-700 mt-1">
-                            {overrideMax && isOverride
-                              ? '※ 商品設定により、この商品は全員同じ日に初回発送されます。'
-                              : '※ ご決済日が当月10日までは当月15日、11日以降は翌月15日発送となります。'}
+                            {split ? '※ 初回発送日ごとに契約を分けます。初回分は一括決済、2回目以降は各発送月の10日に商品代金と発送ごとに計算した送料を請求します。' : '※ 商品設定の初回発送日を優先し、指定がない場合は10日までのご決済で当月15日、11日以降は翌月15日に発送します。'}
                           </p>
                         </div>
                       </div>

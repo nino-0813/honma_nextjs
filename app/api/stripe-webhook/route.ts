@@ -1,4 +1,6 @@
 import { cloneRecurringItem, mergeSubscriptionMetadata, persistSubscriptionState } from '@/lib/subscriptionSnapshots';
+import { buildBillingGroups, freezeBillingGroups, createBillingGroups, quoteBillingGroupShipping } from '@/lib/deferredSubscriptionGroups';
+import { scopeSubscriptionItems, subscriptionSourceOrderId, subscriptionShippingCost } from '@/lib/subscriptionScope';
 // Stripe Webhook handler (Next.js App Router Route Handler)
 // - Verifies Stripe signature with STRIPE_WEBHOOK_SECRET
 // - Idempotent via public.stripe_webhook_events (event_id)
@@ -197,6 +199,7 @@ async function sendOrderConfirmationEmail(
           order.subscription_interval;
         // 発送開始日（商品の初回発送オーバーライドがあれば反映）
         let firstShippingOverride: string | null = null;
+        let itemStarts: {title:string;date:string}[] = [];
         try {
           const productIds = Array.from(
             new Set((items || []).map((it: any) => it.product_id).filter((v: any) => typeof v === 'string' && v.length > 0))
@@ -211,12 +214,17 @@ async function sendOrderConfirmationEmail(
               .filter((d: any): d is string => Boolean(d))
               .sort();
             if (overrides.length > 0) firstShippingOverride = overrides[overrides.length - 1];
+            const byProduct = new Map((prods || []).map((product:any) => [product.id,product.first_shipping_override_date]));
+            itemStarts = (items || []).map((item:any) => ({title:item.product_title,
+              date:fmtJaDate(computeFirstShippingDate(new Date(order.created_at),byProduct.get(item.product_id) as string | null))}));
           }
         } catch (e) {
           console.warn('[OrderMail] first_shipping_override 取得失敗（15日ルールで継続）', e);
         }
         const startDate = computeFirstShippingDate(new Date(order.created_at), firstShippingOverride);
-        params.start = fmtJaDate(startDate);
+        params.start = new Set(itemStarts.map(item => item.date)).size > 1
+          ? itemStarts.map(item => `${item.title}：${item.date}`).join(' ／ ')
+          : fmtJaDate(startDate);
       }
 
       const result = options.bankInstructions ? await sendBankTransferEmail({
@@ -292,11 +300,11 @@ async function createDeferredSubscription(
     // 1) Customer / PaymentMethod 検証
     if (!pi?.customer) {
       console.error('[DeferredSub] PI に customer がありません', logCtx);
-      return;
+      throw new Error('Subscription customer missing');
     }
     if (!pi?.payment_method) {
       console.error('[DeferredSub] PI に payment_method がありません', logCtx);
-      return;
+      throw new Error('Subscription payment method missing');
     }
 
     // 2) interval を決定（order.subscription_interval を優先、なければ pi.metadata.interval）
@@ -305,24 +313,37 @@ async function createDeferredSubscription(
     ) as SubscriptionIntervalKey;
     if (!STRIPE_INTERVAL_MAP[intervalKey]) {
       console.error('[DeferredSub] interval が不正', { ...logCtx, interval: intervalKey });
-      return;
+      throw new Error('Subscription interval invalid');
     }
     const recurring = STRIPE_INTERVAL_MAP[intervalKey];
 
     // 3) order_items から定期購入アイテムを取得（is_subscription=true）
     const { data: orderItems, error: itemsErr } = await supabaseAdmin
       .from('order_items')
-      .select('product_id, product_title, product_price, quantity, is_subscription')
+      .select('id, product_id, product_title, product_price, quantity, is_subscription')
       .eq('order_id', order.id);
     if (itemsErr) {
       console.error('[DeferredSub] order_items 取得失敗', { ...logCtx, err: itemsErr });
-      return;
+      throw itemsErr;
     }
     const subItems = (orderItems || []).filter((it: any) => Boolean(it.is_subscription));
     if (subItems.length === 0) {
       console.error('[DeferredSub] 注文に定期購入アイテムがありません', logCtx);
-      return;
+      throw new Error('Subscription items missing');
     }
+
+    if (intervalKey !== 'weekly' && intervalKey !== 'biweekly') {
+      const { data: products, error } = await supabaseAdmin.from('products')
+        .select('id, first_shipping_override_date, is_free_shipping').in('id', [...new Set(subItems.map((item: any) => item.product_id))]);
+      if (error || !products) throw error || new Error('Subscription product dates unavailable');
+      const groups = buildBillingGroups(subItems, products, new Date(pi.created * 1000), intervalKey, Number(order.shipping_cost || 0));
+      const plan = await freezeBillingGroups(stripe, pi, groups, intervalKey, Number(order.shipping_cost || 0), () => quoteBillingGroupShipping(supabaseAdmin,order,groups,products));
+      if (plan) {
+        await createBillingGroups(stripe, supabaseAdmin, pi, order, plan, recurring);
+        return;
+      }
+    }
+    if (Date.now() - Number(pi.created) * 1000 > 23 * 3600000) throw new Error('初回契約の安全な作成期間を過ぎたため手動確認が必要です');
 
     // 4) Stripe Product / Price (recurring) を作成
     const stripeItems: any[] = [];
@@ -338,7 +359,7 @@ async function createDeferredSubscription(
           product_id: String(it.product_id || ''),
           source: 'ikevege_subscription',
         },
-      });
+      }, { idempotencyKey:`subscription-init-v1:${pi.id}:item:${it.id}` });
       stripeItems.push({
         quantity: Math.max(1, Number(it.quantity || 1)),
         price_data: {
@@ -360,7 +381,7 @@ async function createDeferredSubscription(
       const shippingProduct = await stripe.products.create({
         name: '送料',
         metadata: { product_id: '__shipping__', source: 'ikevege_subscription' },
-      });
+      }, { idempotencyKey:`subscription-init-v1:${pi.id}:shipping` });
       stripeItems.push({
         quantity: 1,
         price_data: {
@@ -430,7 +451,7 @@ async function createDeferredSubscription(
       paymentMethod: pi.payment_method,
     });
 
-    const subscription = await stripe.subscriptions.create(subscriptionParams);
+    const subscription = await stripe.subscriptions.create(subscriptionParams, { idempotencyKey:`subscription-init-v1:${pi.id}:contract` });
 
     // 8) orders に stripe_subscription_id を保存
     const updates: any = {
@@ -447,6 +468,7 @@ async function createDeferredSubscription(
       .eq('id', order.id);
     if (updErr) {
       console.error('[DeferredSub] order 更新エラー', { ...logCtx, err: updErr });
+      throw updErr;
     }
 
     console.log('[DeferredSub] 作成成功', {
@@ -466,6 +488,7 @@ async function createDeferredSubscription(
       raw: e?.raw,
       stack: e?.stack,
     });
+    throw e;
   }
 }
 
@@ -864,7 +887,8 @@ export async function POST(request: Request) {
         });
       }
 
-      if (isDuplicateEvent && order.payment_status === 'paid') {
+      if (isDuplicateEvent && order.payment_status === 'paid' &&
+          (pi?.metadata?.type !== 'subscription_init' || order.stripe_subscription_id)) {
         return NextResponse.json({ received: true, duplicate: true, skipped: 'already_paid' });
       }
 
@@ -996,9 +1020,15 @@ export async function POST(request: Request) {
         // イベントマイル付与（ログインユーザーかつ対象商品が含まれる場合）
         await grantEventMilesForOrder(supabaseAdmin, order.id);
 
-        // 定期購入の場合: ここで初めて Stripe Subscription を作成する
-        if (pi?.metadata?.type === 'subscription_init' && !order.stripe_subscription_id) {
+      }
+
+      // Also retry incomplete contract creation after the initial payment is already recorded.
+      if (pi?.metadata?.type === 'subscription_init' && !order.stripe_subscription_id) {
+        try {
           await createDeferredSubscription(stripe, supabaseAdmin, pi, order);
+        } catch {
+          await supabaseAdmin.from('stripe_webhook_events').delete().eq('event_id', event.id);
+          return NextResponse.json({ error: 'subscription_creation_incomplete' }, { status: 503 });
         }
       }
 
@@ -1260,11 +1290,17 @@ export async function POST(request: Request) {
         }
       }
 
-      // 元注文（最初の請求時に作られた order）をテンプレートとして取得
-      const { data: original, error: origErr } = await supabaseAdmin
+      const { data: subscriptionRow, error: subscriptionReadError } = await supabaseAdmin
+        .from('subscriptions').select('id, metadata, interval')
+        .eq('stripe_subscription_id', stripeSubscriptionId).maybeSingle();
+      if (subscriptionReadError || !subscriptionRow) return NextResponse.json({ error: 'subscription_read_failed' }, { status: 503 });
+      const sourceOrderId = subscriptionSourceOrderId(subscriptionRow?.metadata);
+      // Split contracts share an initial order, but never share renewal membership.
+      let originalQuery = supabaseAdmin
         .from('orders')
-        .select('*')
-        .eq('stripe_subscription_id', stripeSubscriptionId)
+        .select('*');
+      originalQuery = sourceOrderId ? originalQuery.eq('id', sourceOrderId) : originalQuery.eq('stripe_subscription_id', stripeSubscriptionId);
+      const { data: original, error: origErr } = await originalQuery
         .order('created_at', { ascending: true })
         .limit(1)
         .maybeSingle();
@@ -1273,6 +1309,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'original_order_fetch_failed' }, { status: 500 });
       }
       if (!original) {
+        if (sourceOrderId) return NextResponse.json({ error: 'subscription_source_order_missing' }, { status: 503 });
         console.error('[Webhook] original order not found for subscription:', stripeSubscriptionId);
         return NextResponse.json({
           received: true,
@@ -1286,21 +1323,27 @@ export async function POST(request: Request) {
 
       // 契約変更は過去注文ではなく subscriptions.metadata に保持する。
       // 新しい発送回だけに現在の商品・配送先スナップショットを反映する。
-      const { data: subscriptionRow } = await supabaseAdmin
-        .from('subscriptions')
-        .select('id, metadata, interval')
-        .eq('stripe_subscription_id', stripeSubscriptionId)
-        .maybeSingle();
       const currentProduct = subscriptionRow?.metadata?.current_product;
       const currentShipping = subscriptionRow?.metadata?.shipping;
 
-      const { data: origItems } = await supabaseAdmin
+      const { data: origItems, error: originalItemsError } = await supabaseAdmin
         .from('order_items')
         .select('*')
         .eq('order_id', original.id);
 
-      const newItems = (origItems || []).map((it: any) => {
+      if (originalItemsError) return NextResponse.json({ error: 'original_items_read_failed' }, { status: 503 });
+      let contractItems: any[];
+      let scopedShipping: number | null;
+      try {
+        contractItems = scopeSubscriptionItems(origItems || [], subscriptionRow?.metadata);
+        scopedShipping = subscriptionShippingCost(subscriptionRow?.metadata);
+        if (sourceOrderId && currentProduct?.product_id && contractItems.length !== 1) throw new Error('Ambiguous multi-item product change');
+      } catch {
+        return NextResponse.json({ error: 'subscription_item_scope_invalid' }, { status: 503 });
+      }
+      const newItems = contractItems.map((it: any) => {
         const next: any = cloneRecurringItem(it);
+        if (sourceOrderId) next.subscription_interval = subscriptionRow.interval || it.subscription_interval;
         if (it.is_subscription && currentProduct?.product_id) {
           Object.assign(next, {
             product_id: currentProduct.product_id,
@@ -1321,6 +1364,23 @@ export async function POST(request: Request) {
       const cloneOrder: any = { ...original };
       delete cloneOrder.id;
       delete cloneOrder.created_at;
+      if (sourceOrderId) {
+        cloneOrder.stripe_subscription_id = stripeSubscriptionId;
+        cloneOrder.subscription_interval = subscriptionRow.interval || original.subscription_interval;
+        cloneOrder.shipping_cost = scopedShipping;
+        cloneOrder.shipping_method = JSON.stringify([{ cost:scopedShipping, items:contractItems.map(item => item.product_title).join(' / '), note:'初回発送日別の定期契約' }]);
+        cloneOrder.payment_session_id = null;
+        cloneOrder.inventory_reserved_at = null;
+        cloneOrder.inventory_released_at = null;
+        cloneOrder.payment_due_at = null;
+        cloneOrder.coupon_id = null;
+        cloneOrder.coupon_code = null;
+        cloneOrder.coupon_name = null;
+        cloneOrder.coupon_note = null;
+        cloneOrder.discount_amount = 0;
+        cloneOrder.coupon_usage_recorded = false;
+        cloneOrder.event_miles_used = 0;
+      }
       cloneOrder.order_number = newOrderNumber;
       cloneOrder.payment_intent_id = recurringPaymentKey;
       cloneOrder.payment_status = 'paid';
@@ -1397,7 +1457,7 @@ export async function POST(request: Request) {
           shipping_city: cloneOrder.shipping_city,
           shipping_postal_code: cloneOrder.shipping_postal_code,
           subtotal: cloneOrder.subtotal,
-          shipping_cost: original.shipping_cost,
+          shipping_cost: cloneOrder.shipping_cost,
           total: cloneOrder.total,
           payment_status: 'paid',
           order_status: 'processing',

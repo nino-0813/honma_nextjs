@@ -19,6 +19,7 @@ import { POST as changeInterval } from '../app/api/update-subscription-interval/
 let subscription: any;
 let stripeSubscription: any;
 let writes: { table: string; value: any }[];
+let sourceItems: any[];
 const original = { id: 'original', total: 8085, subtotal: 7425, shipping_cost: 660,
   order_number: 'ORD-original', email: 'fixture@example.invalid', auth_user_id: null,
   subscription_interval: 'monthly', stripe_subscription_id: 'sub_fixture' };
@@ -27,6 +28,7 @@ beforeEach(() => {
   for (const [name, value] of Object.entries({ STRIPE_SECRET_KEY: 'fixture', STRIPE_WEBHOOK_SECRET: 'fixture', SUPABASE_URL: 'http://127.0.0.1:1', SUPABASE_SERVICE_ROLE_KEY: 'fixture', GAS_URL: '' })) vi.stubEnv(name, value);
   vi.stubGlobal('fetch', vi.fn(() => { throw new Error('External requests forbidden'); }));
   writes = [];
+  sourceItems = [{ id: 'item', product_id: 'rice', product_title: 'Rice', product_price: 7425, quantity: 1, line_total: 7425, is_subscription: true }];
   subscription = { id: 'subrow', auth_user_id: 'user', status: 'trialing', interval: 'monthly',
     created_at: '2026-07-26T09:08:00Z', next_billing_at: '2026-12-09T20:00:00Z',
     metadata: { first_shipping_override: '2026-11-15', shipping: { city: 'keep' } } };
@@ -58,7 +60,7 @@ beforeEach(() => {
       maybeSingle: async () => ({ data: table === 'subscriptions' ? subscription
         : table === 'orders' ? (filters.payment_intent_id ? null : original) : null, error: null }),
       single: async () => ({ data: table === 'orders' ? (inserted ? { id: 'renewal' } : original) : null, error: null }),
-      then: (resolve: any) => Promise.resolve({ data: table === 'order_items' ? [{ id: 'item', product_id: 'rice', product_title: 'Rice', product_price: 7425, quantity: 1, line_total: 7425, is_subscription: true }] : null, error: null }).then(resolve),
+      then: (resolve: any) => Promise.resolve({ data: table === 'order_items' ? sourceItems : null, error: null }).then(resolve),
     };
     return q;
   });
@@ -140,4 +142,27 @@ it('rejects missing ownership instead of allowing another user to edit a legacy 
   subscription.auth_user_id = null;
   expect((await change()).status).toBe(403);
   expect(mock.update).not.toHaveBeenCalled();
+});
+
+it('creates only the billed group from a shared initial order, with its own shipping and inventory',async()=>{
+  sourceItems=[
+    {id:'early-item',product_id:'early',product_title:'Early rice',product_price:1000,quantity:2,line_total:2000,is_subscription:true},
+    {id:'later-item',product_id:'later',product_title:'Later rice',product_price:3000,quantity:1,line_total:3000,is_subscription:true},
+    {id:'one-off',product_id:'one-off',product_title:'One-off',product_price:500,quantity:1,line_total:500,is_subscription:false},
+  ];
+  subscription.metadata={billing_group_version:'1',order_id:'original',source_item_ids:'["later-item"]',recurring_shipping_yen:'600'};
+  Object.assign(mock.event.data.object,{billing_reason:'subscription_cycle',total:3600,amount_paid:3600});
+  expect((await deliver()).status).toBe(200);
+  const renewal=writes.find(w=>w.table==='orders')!.value[0];
+  expect(renewal).toMatchObject({stripe_subscription_id:'sub_fixture',subtotal:3000,shipping_cost:600,total:3600,event_miles_used:0,discount_amount:0,coupon_id:null});
+  const newItems=writes.find(w=>w.table==='order_items')!.value;
+  expect(newItems).toHaveLength(1);expect(newItems[0].product_id).toBe('later');
+  expect(mock.rpc.mock.calls.filter(call=>call[0]==='decrement_product_stock').map(call=>call[1].p_product_id)).toEqual(['later']);
+});
+
+it('rejects unknown split membership instead of cloning all original products',async()=>{
+  subscription.metadata={billing_group_version:'1',order_id:'original',source_item_ids:'["missing"]',recurring_shipping_yen:'600'};
+  Object.assign(mock.event.data.object,{billing_reason:'subscription_cycle',total:3600});
+  expect((await deliver()).status).toBe(503);
+  expect(writes.filter(w=>w.table==='orders')).toEqual([]);expect(mock.rpc).not.toHaveBeenCalled();
 });

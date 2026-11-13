@@ -1,4 +1,5 @@
 import { shipmentDay, orderShipmentDay } from "./adminShipmentData";
+import { subscriptionOrders } from './subscriptionScope';
 export type ShipmentHandoff = {
   version: 1;
   createdAt: string;
@@ -7,9 +8,7 @@ export type ShipmentHandoff = {
 export function shipmentTargets(sub: any, orders: any[], month = "") {
   if (!["active", "trialing", "past_due", "unpaid"].includes(sub.status))
     return [];
-  const related = orders
-    .filter((o) => o.stripe_subscription_id === sub.stripe_subscription_id)
-    .sort((a, b) => a.created_at.localeCompare(b.created_at));
+  const related = subscriptionOrders(sub, orders);
   const completed = (o: any) =>
     ["shipped", "delivered"].includes(o.order_status) ||
     (o.order_items?.length &&
@@ -35,7 +34,9 @@ export function shipmentTargets(sub: any, orders: any[], month = "") {
       return {
         subscriptionId: sub.stripe_subscription_id as string,
         day,
-        orderId: matches.length === 1 ? (matches[0].id as string) : null,
+        // A shared initial payment cannot be handed off as a whole order for one group.
+        // Initial split shipments must be checked at item level in order management.
+        orderId: matches.length === 1 && !matches[0].shared_initial_order ? (matches[0].id as string) : null,
       };
     });
 }

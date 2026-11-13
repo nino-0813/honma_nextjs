@@ -131,7 +131,8 @@ export async function POST(request: Request) {
       // 定期便は銀行振込を許可せず、カード払いだけに固定する。
       payment_method_types: ['card'],
       metadata: {
-        ...metadata,
+        // The retry manifest is server-owned and must not be supplied by checkout clients.
+        ...Object.fromEntries(Object.entries(metadata).filter(([key]) => !key.startsWith('split_'))),
         type: 'subscription_init',
         interval,
         item_count: String(items.length),
